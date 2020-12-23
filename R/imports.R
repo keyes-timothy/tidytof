@@ -16,4 +16,5 @@
 #' @importFrom utils file_test
 #'
 #' @importFrom rlang .data
+#' @importFrom rlang are_na
 NULL
