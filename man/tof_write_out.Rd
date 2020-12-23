@@ -22,7 +22,7 @@ The default is to group cells based on the column "file_names" (as produced by t
 \item{format}{format for the files being written. Currently supports .csv and .fcs files}
 }
 \value{
-
+Nothing
 }
 \description{
 Write data (in the form of a tibble) into either a .csv or an .fcs file for storage.

@@ -30,6 +30,7 @@
 #' total in the dataset) and each column represents a metal measurement
 #' (of n total in the dataset). In addition, the last column of the tibble will
 #' represent the filename from which the cell was read.
+#'
 #' @export
 #'
 #' @examples
@@ -129,7 +130,8 @@ tof_read_fcs <- function(file_path = NULL) {
 #' @param out_folder_path file path to the folder where the output files should be saved
 #' @param format format for the files being written. Currently supports .csv and .fcs files
 #'
-#' @return
+#' @return Nothing
+#'
 #' @export
 #'
 #' @examples
@@ -146,18 +148,15 @@ tof_write_out <-
         nest(data = everything()) %>%
         ungroup() %>%
         mutate(prefix = str_c(setdiff(colnames(.), "data"))) %>%
-        map2(
-          .x =
+        pmap(
+          .l = .,
+          .f =
+            ~
+            write_csv(
+              x = ..1,
+              path = file.path(out_folder_path, str_c(!!! group_vars, ".csv"))
+            )
         )
-      pmap(
-        .l = .,
-        .f =
-          ~
-          write_csv(
-            x = ..1,
-            path = file.path(out_folder_path, str_c(!!! group_vars, ".csv"))
-          )
-      )
     }
     if ("fcs" %in% format) {
       tof_tibble %>%
@@ -169,6 +168,5 @@ tof_write_out <-
           path = file.path(out_folder_path, str_c({group_vars}, ".fcs"))
         )
     }
-
   }
 

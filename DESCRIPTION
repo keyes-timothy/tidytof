@@ -14,3 +14,19 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.1.1
+Imports: 
+    dplyr,
+    flowCore,
+    parallel,
+    foreach,
+    data.table,
+    doParallel,
+    magrittr,
+    purrr,
+    stringr,
+    ggplot2,
+    tidyr,
+    ggthemes,
+    forcats,
+    methods,
+    rlang
