@@ -1,11 +1,16 @@
 Package: tidytof
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Analyze Mass Cytometry Data Using Tidy Data Principles
+Version: 0.0.0.9000
+Authors@R: 
+    person("Timothy", "Keyes", email = "tkeyes@stanford.edu", role = c("aut", "cre"))
+Maintainer: Timothy Keyes <tkeyes@stanford.edu>
+Description: A data analysis pipeline for mass cytometry (CyTOF) data built using tidy data principles. 
+    It is specifically designed to play well with the tidyverse suite of data cleaning and analysis tools.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.1.1
