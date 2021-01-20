@@ -17,4 +17,7 @@
 #'
 #' @importFrom rlang .data
 #' @importFrom rlang are_na
+#'
+#' @importFrom foreach `%dopar%`
+#' @importFrom foreach `%do%`
 NULL
