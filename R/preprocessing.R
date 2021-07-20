@@ -6,7 +6,7 @@
 #' tof_preprocess() transforms a tibble of raw ion counts directly measured on a mass cytometer.
 #'
 #' @param tof_tibble a tibble, data.frame, or something that can be coerced into either
-#' @param metadata_vars variables that contain information about varaibles that should not
+#' @param metadata_vars variables that contain information about variables that should not
 #' computed over, i.e. file names, patient names, stimulation names, etc.
 #' Supports tidy selection using tidy_select helpers.
 #' Not currently used.

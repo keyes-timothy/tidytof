@@ -2,28 +2,33 @@
 % Please edit documentation in R/io.R
 \name{tof_write_out}
 \alias{tof_write_out}
-\title{Write data to a file}
+\title{Write cytof data to a file or directory of files}
 \usage{
 tof_write_out(
   tof_tibble = NULL,
-  group_vars = "file_names",
-  out_folder_path = NULL,
-  format = NULL
+  group_vars = file_name,
+  out_path = NULL,
+  format = c("csv", "fcs")
 )
 }
 \arguments{
-\item{tof_tibble}{a tibble, data.frame, or something that can be coerced into either}
+\item{tof_tibble}{A `tof_tibble`.}
 
-\item{group_vars}{variables that should be used to group cells into individual files.
-The default is to group cells based on the column "file_names" (as produced by tof_read_fcs).}
+\item{group_vars}{Unquoted variable names representing columns to be used to
+group cells into individual files. Defaults to `file_name` (as produced by
+`tof_read_fcs`).}
 
-\item{out_folder_path}{file path to the folder where the output files should be saved}
+\item{out_path}{Path to the directory where output files should be saved.}
 
 \item{format}{format for the files being written. Currently supports .csv and .fcs files}
 }
 \value{
-Nothing
+This function does not explicitly return any values. Instead,
+it writes .csv or .fcs files to the specified `out_path`.
 }
 \description{
 Write data (in the form of a tibble) into either a .csv or an .fcs file for storage.
+}
+\examples{
+NULL
 }

@@ -15,7 +15,7 @@ tof_preprocess(
 \arguments{
 \item{tof_tibble}{a tibble, data.frame, or something that can be coerced into either}
 
-\item{metadata_vars}{variables that contain information about varaibles that should not
+\item{metadata_vars}{variables that contain information about variables that should not
 computed over, i.e. file names, patient names, stimulation names, etc.
 Supports tidy selection using tidy_select helpers.
 Not currently used.}

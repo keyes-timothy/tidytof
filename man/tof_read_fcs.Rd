@@ -2,23 +2,31 @@
 % Please edit documentation in R/io.R
 \name{tof_read_fcs}
 \alias{tof_read_fcs}
-\title{Read data from an .fcs file or a directory of .fcs files.}
+\title{Read CyTOF data from an .fcs file into a tidy tibble.}
 \usage{
-tof_read_fcs(file_path = NULL)
+tof_read_fcs(file_path = NULL, sep = "|")
 }
 \arguments{
-\item{file_path}{A file path. It can lead to either a single .fcs file or
-to a directory filled with .fcs files.}
+\item{file_path}{A file path to a single .fcs file.}
+
+\item{sep}{A string to use to separate the antigen name and its associated
+metal in the column names of the output tibble. Defaults to "|".}
 }
 \value{
-An [m by n+1] tibble in which each row represents a single cell (of m
-total in the dataset) and each column represents a metal measurement
-(of n total in the dataset). In addition, the last column of the tibble will
-represent the filename from which the cell was read.
+a `tof_tibble` in which each row represents a single cell and each
+column represents a CyTOF antigen channel.
+
+A `tof_tibble` is an S3 class that extends the "tibble" class by storing
+one additional attribute: "panel" (a tibble storing information about the
+panel used during data acquisition).
 }
 \description{
-Read data from an .fcs file or a directory of .fcs files.
+This function reads CyTOF data from a single .fcs file into a tidy data
+structure called a "tof_tibble." tof_tibbles are identical to normal
+tibbles except for an additional attribute ("panel") that stores information
+about the CyTOF panel used during data acquisition.
 }
 \examples{
 NULL
+
 }

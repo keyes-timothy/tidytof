@@ -34,7 +34,7 @@ contains the plots to be saved.}
 
 \item{height}{The height for the plots being saved.}
 
-\item{device}{"jpg", "tif", or "pdf" file format.}
+\item{device}{"jpg", "tiff", or "pdf" file format.}
 
 \item{...}{Additional arguments to pass to `ggsave()`}
 
