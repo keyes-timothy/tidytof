@@ -57,8 +57,6 @@ tof_find_panel_info <- function(input_flowFrame) {
 
 
 
-
-
 # tof_read_fcs ------------------
 
 #' Read CyTOF data from an .fcs file into a tidy tibble.
@@ -258,20 +256,191 @@ tof_read_data <- function(path = NULL, sep = "|") {
 
 # tof_write_csv ------------------
 
-tof_write_csv <- function(tof_tibble, group_vars, out_path) {
-  NULL
-}
+#' Write a series of .csv files from a tof_tibble
+#'
+#' This function takes a given `tof_tibble` and writes the single-cell data
+#' it contains into .csv files within the directory located at `out_path`. The
+#' `group_vars` argument specifies how the rows of the `tof_tibble` (each cell)
+#' should be broken into separate .csv files
+#'
+#' @param tof_tibble A `tof_tibble`.
+#' @param group_vars Unquoted names of the columns in `tof_tibble` that should
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
+#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#' @param out_path A system path indicating the directory where the output .csv
+#' files should be saved. If the directory doesn't exist, it will be created.
+#' @param sep Delimiter that should be used between each of the values of `group_vars`
+#' to create the output .csv file names. Defaults to "_".
+#'
+#' @return This function does not return anything. Instead, it has the side-effect
+#' of saving .csv files to `out_path`.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+tof_write_csv <-
+  function(
+    tof_tibble,
+    group_vars = where(~ !(purrr::is_integer(.x) || purrr::is_double(.x))),
+    out_path,
+    sep = "_"
+  ) {
+
+    dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
+
+    tof_tibble <-
+      tof_tibble %>%
+      group_by(across({{group_vars}})) %>%
+      nest() %>%
+      ungroup() %>%
+      unite(col = "prefix", {{group_vars}}, sep = sep)
+
+    walk2(
+      .x = tof_tibble$prefix,
+      .y = tof_tibble$data,
+      .f = ~
+        readr::write_csv(
+          x = .y,
+          file = file.path(out_path, stringr::str_c(.x, ".csv"))
+        )
+    )
+  }
 
 
 
 # tof_write_fcs ------------------
 
-tof_write_fcs <- function(tof_tibble, group_vars, out_path) {
-  NULL
-}
+#' Write a series of .fcs files from a tof_tibble
+#'
+#' This function takes a given `tof_tibble` and writes the single-cell data
+#' it contains into .fcs files within the directory located at `out_path`. The
+#' `group_vars` argument specifies how the rows of the `tof_tibble` (each cell)
+#' should be broken into separate .fcs files
+#'
+#' @param tof_tibble A `tof_tibble`.
+#' @param group_vars Unquoted names of the columns in `tof_tibble` that should
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
+#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#' @param out_path A system path indicating the directory where the output .csv
+#' files should be saved. If the directory doesn't exist, it will be created.
+#' @param sep Delimiter that should be used between each of the values of `group_vars`
+#' to create the output .fcs file names. Defaults to "_".
+#'
+#' @return This function does not return anything. Instead, it has the side-effect
+#' of saving .fcs files to `out_path`.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+tof_write_fcs <-
+  function(
+    tof_tibble,
+    group_vars = where(~ !(purrr::is_integer(.x) || purrr::is_double(.x))),
+    out_path,
+    sep = "_"
+  ) {
+
+    dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
+
+    # find max and min values for all non-grouping columns in tof_tibble
+    maxes_and_mins <-
+      tof_tibble %>%
+      select(-{{group_vars}}) %>%
+      summarize(
+        across(
+          everything(),
+          .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+          .names = "{.col}_____{.fn}"
+        )
+      ) %>%
+      pivot_longer(
+        cols = everything(),
+        names_to = c("antigen", "value_type"),
+        values_to = "value",
+        names_sep = "_____"
+      )  %>%
+      pivot_wider(
+        names_from = value_type,
+        values_from = value
+      )
+
+    # extract the names of all non-grouping columns to be saved to the .fcs file
+    data_cols <- maxes_and_mins$antigen
+
+    # nest tof_tibble
+    tof_tibble <-
+      tof_tibble %>%
+      group_by(across({{group_vars}})) %>%
+      nest() %>%
+      ungroup() %>%
+      unite(col = "prefix", {{group_vars}}, sep = sep)
+
+    # make components of parameters AnnotatedDataFrame
+    fcs_varMetadata <-
+      data.frame(
+        labelDescription =
+          c(
+            "Name of Parameter",
+            "Description of Parameter",
+            "Range of Parameter",
+            "Minimum Parameter Value after Transformation",
+            "Maximum Parameter Value after Transformation"
+          )
+      )
+
+    fcs_data <-
+      maxes_and_mins %>%
+      transmute(
+        name = str_replace(antigen, "\\|", "_"),
+        desc = str_replace(antigen, "\\|", "_"),
+        range = max - min,
+        minRange = min,
+        maxRange = max
+      ) %>%
+      as.data.frame()
+
+    row.names(fcs_data) <- stringr::str_c("$", "P", 1:nrow(fcs_data))
+
+    #fcs_dimLabels <- c("rowNames", "columnNames")
+
+    # make the AnnotatedDataFrame
+    parameters <-
+      Biobase::AnnotatedDataFrame(data = fcs_data, varMetadata = fcs_varMetadata)
+
+    # make flowFrames for each row of tof_tibble
+    tof_tibble <-
+      tof_tibble %>%
+      dplyr::transmute(
+        prefix,
+        flowFrames =
+          purrr:::map(
+            .x = data,
+            ~ flowCore::flowFrame(
+              exprs =
+                as.matrix(dplyr::rename_with(.x, stringr::str_replace, pattern = "\\|", replacement = "_")),
+              parameters = parameters
+            )
+          )
+      )
+
+    # write out final .fcs files
+    walk2(
+      .x = tof_tibble$prefix,
+      .y = tof_tibble$flowFrames,
+      .f = ~
+        flowCore::write.FCS(
+          x = .y,
+          filename = file.path(out_path, stringr::str_c(.x, ".fcs"))
+        )
+    )
+
+  }
 
 
-# tof_write_out ------------------
+
+# tof_write_data ------------------
 
 #' Write cytof data to a file or directory of files
 #'
@@ -287,6 +456,9 @@ tof_write_fcs <- function(tof_tibble, group_vars, out_path) {
 #'
 #' @param format format for the files being written. Currently supports .csv and .fcs files
 #'
+#' @param sep Delimiter that should be used between each of the values of `group_vars`
+#' to create the output .csv/.fcs file names. Defaults to "_".
+#'
 #' @return This function does not explicitly return any values. Instead,
 #' it writes .csv or .fcs files to the specified `out_path`.
 #'
@@ -294,51 +466,35 @@ tof_write_fcs <- function(tof_tibble, group_vars, out_path) {
 #'
 #' @examples
 #' NULL
-tof_write_out <-
+tof_write_data <-
   function(
     tof_tibble = NULL,
     group_vars = file_name,
     out_path = NULL,
-    format = c("csv", "fcs")
+    format = c("csv", "fcs"),
+    sep = "_"
   ) {
     # check that the format argument is correctly specified
     format <- match.arg(arg = format, choices = c("csv", "fcs"), several.ok = TRUE)
 
+    # if .csv file is asked for
     if ("csv" %in% format) {
-      tof_tibble <-
-        tof_tibble %>%
-        group_by(across({{group_vars}})) %>%
-        nest(data = everything()) %>%
-        ungroup() %>%
-        mutate(prefix = str_c(setdiff(colnames(.), "data")))
-
-      #check this for bugs
-      pwalk(
-        .l = tof_tibble,
-        .f =
-          ~
-          write_csv(
-            x = ..1,
-            path = file.path(out_path, str_c(!!! group_vars, ".csv"))
-          )
+      tof_write_csv(
+        tof_tibble = tof_tibble,
+        group_vars = {{group_vars}},
+        out_path = out_path,
+        sep = sep
       )
     }
-    # has a bug
-    if ("fcs" %in% format) {
-      annotated_df <-
-        Biobase::AnnotatedDataFrame(
-          data = NULL,
-          varMetadata = NULL
-        )
 
-      tof_tibble %>%
-        group_by({group_vars}) %>%
-        nest(data = everything()) %>%
-        map(
-          .x = data,
-          .f = flowCore::write.fcs,
-          path = file.path(out_path, str_c({group_vars}, ".fcs"))
-        )
+    # if .fcs file is asked for
+    if ("fcs" %in% format) {
+      tof_write_fcs(
+        tof_tibble = tof_tibble,
+        group_vars = {{group_vars}},
+        out_path = out_path,
+        sep = sep
+      )
     }
   }
 
@@ -367,6 +523,7 @@ tof_write_out <-
 #' @export
 #'
 #' @examples
+#' NULL
 tof_save_figures <-
 
   function(
