@@ -3,7 +3,10 @@
 #' @import stringr
 #' @import forcats
 #' @import ggplot2
+#' @import readr
+#' @import tibble
 #' @import purrr
+#' @import tidyselect
 #'
 #' @importFrom methods as
 #'

@@ -6,7 +6,7 @@
 \usage{
 tof_write_data(
   tof_tibble = NULL,
-  group_vars = file_name,
+  group_vars = where(~!(purrr::is_integer(.x) || purrr::is_double(.x))),
   out_path = NULL,
   format = c("csv", "fcs"),
   sep = "_"
@@ -15,9 +15,9 @@ tof_write_data(
 \arguments{
 \item{tof_tibble}{A `tof_tibble`.}
 
-\item{group_vars}{Unquoted variable names representing columns to be used to
-group cells into individual files. Defaults to `file_name` (as produced by
-`tof_read_fcs`).}
+\item{group_vars}{group_vars Unquoted names of the columns in `tof_tibble` that should
+be used to group cells into separate files. Supports tidyselect helpers. Defaults
+to selecting all non-numeric (i.e. non-integer and non-double) columns.}
 
 \item{out_path}{Path to the directory where output files should be saved.}
 
@@ -31,7 +31,7 @@ This function does not explicitly return any values. Instead,
 it writes .csv or .fcs files to the specified `out_path`.
 }
 \description{
-Write data (in the form of a tibble) into either a .csv or an .fcs file for storage.
+Write data (in the form of a tof_tibble) into either a .csv or an .fcs file for storage.
 }
 \examples{
 NULL

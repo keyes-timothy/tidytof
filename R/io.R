@@ -139,7 +139,7 @@ tof_read_fcs <-
 #' @examples
 #' NULL
 tof_read_csv <-
-  function(file_path = NULL, panel_info = NULL) {
+  function(file_path = NULL, panel_info = tibble::tibble()) {
 
     tof_tibble <-
       file_path %>%
@@ -163,6 +163,39 @@ tof_read_csv <-
     return(tof_tibble)
   }
 
+
+#' Read CyTOF data from a single .fcs or .csv file into a tidy tibble.
+#'
+#' @param file_path A file path to a single .fcs or .csv file.
+#'
+#' @param panel_info Optional. A tibble or data.frame containing information about the
+#' panel used during CyTOF data acquisition. Two columns are required:
+#' "metals" and "antigens". Only used if the input file is a .csv file.
+#'
+#' @return A `tof_tibble` in which each row represents a single cell and each
+#' column represents a CyTOF antigen channel.
+#'
+#' A `tof_tibble` is an S3 class that extends the "tibble" class by storing
+#' one additional attribute: "panel" (a tibble storing information about the
+#' panel used during data acquisition). Because panel information isn't
+#' obvious from data read as a .csv file, this information must be provided
+#' manually from the user.
+#'
+#' @examples
+#' NULL
+tof_read_file <- function(file_path = NULL, sep = "|", panel_info = NULL) {
+  if (get_extension(file_path) == "fcs") {
+    tof_tibble <-
+      path %>%
+      tof_read_fcs(sep = sep)
+  } else if (get_extension(file_path) == "csv") {
+    tof_tibble <-
+      path %>%
+      tof_read_csv(panel_info = panel_info)
+  }
+  return(tof_tibble)
+}
+
 # tof_read_data ------------------
 
 #' Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
@@ -170,6 +203,14 @@ tof_read_csv <-
 #' @param path A file path to a single file or to a directory of files.
 #' The only valid file types are .fcs files or .csv files
 #' containing CyTOF data.
+#'
+#' @param sep Optional. A string to use to separate the antigen name and its associated
+#' metal in the column names of the output tibble. Defaults to "|". Only used if
+#' the input file is an .fcs file.
+#'
+#' @param panel_info Optional. A tibble or data.frame containing information about the
+#' panel used during CyTOF data acquisition. Two columns are required:
+#' "metals" and "antigens". Only used if the input file is a .csv file.
 #'
 #' @return An [c by m+1] tibble in which each row represents a single cell (of c
 #' total in the dataset) and each column represents a CyTOF measurement
@@ -182,31 +223,35 @@ tof_read_csv <-
 #' @examples
 #' NULL
 #'
-tof_read_data <- function(path = NULL, sep = "|") {
+#' Notes: Will be buggy in the event that a direcory has a combination of .fcs
+#' and .csv files, as their "panel" attribute may differ (and currently we do
+#' not do anything to check for this or fix it).
+#'
+tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble()) {
 
   # if the path leads to a single file
   if (file_test(op = "-f", x = path)) {
-    if (get_extension(path) == "fcs") {
-      tof_tibble <-
-        path %>%
-        tof_read_fcs()
-    } else if (get_extension(path) == "csv") {
-        tof_tibble <-
-          path %>%
-          tof_read_csv
-    }
+    tof_tibble <- tof_read_file(path, sep = sep, panel_info = panel_info)
     return(tof_tibble)
 
     # if the path leads to a directory
   } else if (file_test(op = "-d", x = path)) {
 
-    file_names <- list.files(path, full.names = FALSE)
+    file_names <-
+      list.files(path, full.names = FALSE) %>%
+      stringr::str_remove_all("\\.fcs|\\.csv")
 
     # read files into a nested tibble
     tof_tibble <-
       tibble::tibble(
         file_name = file_names,
-        data = map(.x = list.files(path, full.names = TRUE), .f = tof_read_fcs)
+        data =
+          map(
+            .x = list.files(path, full.names = TRUE),
+            .f = tof_read_file,
+            sep = sep,
+            panel_info = panel_info
+          )
       )
 
     # check how many unique panels are present across all files being read
@@ -344,14 +389,20 @@ tof_write_fcs <-
 
     dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
 
+    # eliminate all non-grouping and non-numeric columns from tof_tibble
+    tof_tibble <-
+      tof_tibble %>%
+      select({{group_vars}}, where(~ purrr::is_integer(.x) || purrr::is_double(.x)))
+
     # find max and min values for all non-grouping columns in tof_tibble
     maxes_and_mins <-
       tof_tibble %>%
-      select(-{{group_vars}}) %>%
       summarize(
         across(
-          everything(),
+          -{{group_vars}},
           .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+          # use the many underscores because it's unlikely this will come up
+          # in column names on their own...maybe make more rigorous?
           .names = "{.col}_____{.fn}"
         )
       ) %>%
@@ -375,7 +426,7 @@ tof_write_fcs <-
       group_by(across({{group_vars}})) %>%
       nest() %>%
       ungroup() %>%
-      unite(col = "prefix", {{group_vars}}, sep = sep)
+      unite(col = "prefix", -data, sep = sep)
 
     # make components of parameters AnnotatedDataFrame
     fcs_varMetadata <-
@@ -393,6 +444,8 @@ tof_write_fcs <-
     fcs_data <-
       maxes_and_mins %>%
       transmute(
+        # have to change any instances of "|" in column names to another
+        # separator, as "|" has special meaning as an .fcs file delimiter
         name = str_replace(antigen, "\\|", "_"),
         desc = str_replace(antigen, "\\|", "_"),
         range = max - min,
@@ -402,8 +455,6 @@ tof_write_fcs <-
       as.data.frame()
 
     row.names(fcs_data) <- stringr::str_c("$", "P", 1:nrow(fcs_data))
-
-    #fcs_dimLabels <- c("rowNames", "columnNames")
 
     # make the AnnotatedDataFrame
     parameters <-
@@ -419,7 +470,16 @@ tof_write_fcs <-
             .x = data,
             ~ flowCore::flowFrame(
               exprs =
-                as.matrix(dplyr::rename_with(.x, stringr::str_replace, pattern = "\\|", replacement = "_")),
+                # have to change any instances of "|" in column names to another
+                # separator, as "|" has special meaning as an .fcs file delimiter
+                as.matrix(
+                  dplyr::rename_with(
+                    .x,
+                    stringr::str_replace,
+                    pattern = "\\|",
+                    replacement = "_"
+                  )
+                ),
               parameters = parameters
             )
           )
@@ -439,18 +499,17 @@ tof_write_fcs <-
   }
 
 
-
 # tof_write_data ------------------
 
 #' Write cytof data to a file or directory of files
 #'
-#' Write data (in the form of a tibble) into either a .csv or an .fcs file for storage.
+#' Write data (in the form of a tof_tibble) into either a .csv or an .fcs file for storage.
 #'
 #' @param tof_tibble A `tof_tibble`.
 #'
-#' @param group_vars Unquoted variable names representing columns to be used to
-#' group cells into individual files. Defaults to `file_name` (as produced by
-#' `tof_read_fcs`).
+#' @param group_vars group_vars Unquoted names of the columns in `tof_tibble` that should
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
+#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
 #'
 #' @param out_path Path to the directory where output files should be saved.
 #'
@@ -469,7 +528,7 @@ tof_write_fcs <-
 tof_write_data <-
   function(
     tof_tibble = NULL,
-    group_vars = file_name,
+    group_vars = where(~ !(purrr::is_integer(.x) || purrr::is_double(.x))),
     out_path = NULL,
     format = c("csv", "fcs"),
     sep = "_"

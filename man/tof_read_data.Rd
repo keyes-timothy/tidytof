@@ -4,12 +4,20 @@
 \alias{tof_read_data}
 \title{Read data from an .fcs/.csv file or a directory of .fcs/.csv files.}
 \usage{
-tof_read_data(path = NULL, sep = "|")
+tof_read_data(path = NULL, sep = "|", panel_info = tibble::tibble())
 }
 \arguments{
 \item{path}{A file path to a single file or to a directory of files.
 The only valid file types are .fcs files or .csv files
 containing CyTOF data.}
+
+\item{sep}{Optional. A string to use to separate the antigen name and its associated
+metal in the column names of the output tibble. Defaults to "|". Only used if
+the input file is an .fcs file.}
+
+\item{panel_info}{Optional. A tibble or data.frame containing information about the
+panel used during CyTOF data acquisition. Two columns are required:
+"metals" and "antigens". Only used if the input file is a .csv file.}
 }
 \value{
 An [c by m+1] tibble in which each row represents a single cell (of c
@@ -23,5 +31,9 @@ Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 }
 \examples{
 NULL
+
+Notes: Will be buggy in the event that a direcory has a combination of .fcs
+and .csv files, as their "panel" attribute may differ (and currently we do
+not do anything to check for this or fix it).
 
 }
