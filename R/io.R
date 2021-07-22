@@ -339,7 +339,7 @@ tof_write_csv <-
       group_by(across({{group_vars}})) %>%
       nest() %>%
       ungroup() %>%
-      unite(col = "prefix", {{group_vars}}, sep = sep)
+      unite(col = "prefix", -data, sep = sep)
 
     walk2(
       .x = tof_tibble$prefix,

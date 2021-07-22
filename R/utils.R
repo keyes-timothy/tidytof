@@ -59,3 +59,29 @@ get_extension <- function(filename) {
 }
 
 
+#' Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.
+#'
+#' @param x A numeric vector.
+#'
+#' @param shift_factor The scalar value `a` in the following equation used to
+#' transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+#'    `new_x <- asinh(a + b * x)`.
+#'
+#' @param scale_factor The scalar value `b` in the following equation used to
+#' transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+#'    `new_x <- asinh(a + b * x)`.
+#'
+#' @return A numeric vector after undergoing reverse
+#' arcsinh transformation
+#'
+#' @export
+#'
+#'
+rev_asinh <- function(x, shift_factor, scale_factor) {
+
+  new_x <- (sinh(x) - shift_factor) / scale_factor
+  return(new_x)
+
+}
+
+

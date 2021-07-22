@@ -116,11 +116,16 @@ group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_def
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+
+
+# dplyr methods
+
 #' @export
-ungroup.grouped_tof_tbl <- function(x, ...) {
-  panel <- tof_get_panel(x)
+mutate.tof_tbl <- function(.data, ...) {
+  panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
+
 
 
 # grouped_tof_tbl methods ---------------------------------
@@ -129,3 +134,9 @@ ungroup.grouped_tof_tbl <- function(x, ...) {
 
 #' @export
 nest.grouped_tof_tbl <- nest.tof_tbl
+
+#' @export
+ungroup.grouped_tof_tbl <- function(x, ...) {
+  panel <- tof_get_panel(x)
+  return(new_tof_tibble(x = NextMethod(), panel = panel))
+}

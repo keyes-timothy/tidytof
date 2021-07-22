@@ -13,30 +13,44 @@ tof_preprocess(
 )
 }
 \arguments{
-\item{tof_tibble}{a tibble, data.frame, or something that can be coerced into either}
+\item{tof_tibble}{A `tof_tibble` or a `tibble`.}
 
-\item{metadata_vars}{variables that contain information about variables that should not
-computed over, i.e. file names, patient names, stimulation names, etc.
+\item{metadata_vars}{Unquoted column names of columns in `tof_tibble` that should
+not be computed over, i.e. file names, patient names, stimulation names, etc.
 Supports tidy selection using tidy_select helpers.
 Not currently used.}
 
 \item{channel_vars}{A vector of non-quoted variables representing columns that contain
 single-cell protein measurements. Anything that works in the first argument of
-dplyr::across will work. See ?across. Supports tidy selection using tidy_select
+dplyr::across will work. See ?across. Supports tidy selection using tidyselect
 helpers. If nothing is specified, the default is to transform all numeric columns.}
 
-\item{undo_noise}{logical indicating if you'd like to remove the uniform noise that
-Fluidigm software adds to each protein measurement for aesthetic
-and visualization purposes. See _____. Default = TRUE.}
+\item{undo_noise}{A boolean value indicating whether to remove the uniform noise that
+Fluidigm software adds to each CyTOF measurement for aesthetic
+and visualization purposes. See \href{https://pubmed.ncbi.nlm.nih.gov/30277658/}{this paper}.
+Defaults to TRUE.}
 
-\item{transform_fun}{vectorized function to apply to each protein value for
-variance stabilization. Default is asinh transformation (with a co-factor of 5).}
+\item{transform_fun}{A vectorized function to apply to each protein value for
+variance stabilization. Defaults to \code{\link[base]{asinh}} transformation
+(with a co-factor of 5).}
 }
 \value{
-a tibble with identical dimensions to the input tof_tibble, with all
-columns specified in channel_vars transformed using transform_fun (with noise
-removed or not removed depending on undo_noise).
+A `tof_tibble` with identical dimensions to the input `tof_tibble`, with all
+columns specified in channel_vars transformed using `transform_fun` (with noise
+removed or not removed depending on `undo_noise`).
 }
 \description{
-tof_preprocess() transforms a tibble of raw ion counts directly measured on a mass cytometer.
+This function transforms a `tof_tibble` of raw ion counts directly measured on
+a mass cytometer using a user-provided function.
+}
+\examples{
+NULL
+
+Note: This can be optimized by keeping track of all tranformations/analyses
+that have been applied to a tof_tibble (giving it memory)...then creating a
+function that can automatically undo it? Or it can at least be referenced.
+
+Note: Convert this to a dtplyr backend and so some speed testing?
+
+
 }
