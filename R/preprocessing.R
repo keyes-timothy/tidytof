@@ -5,6 +5,13 @@
 
 # tof_preprocess ----------------------------
 
+#Note: This can be optimized by keeping track of all tranformations/analyses
+#that have been applied to a tof_tibble (giving it memory)...then creating a
+#function that can automatically undo it? Or it can at least be referenced.
+
+#Note: Convert this to a dtplyr backend and so some speed testing?
+
+
 #' Preprocess raw CyTOF data.
 #'
 #' This function transforms a `tof_tibble` of raw ion counts directly measured on
@@ -39,12 +46,6 @@
 #'
 #' @examples
 #' NULL
-#'
-#' Note: This can be optimized by keeping track of all tranformations/analyses
-#' that have been applied to a tof_tibble (giving it memory)...then creating a
-#' function that can automatically undo it? Or it can at least be referenced.
-#'
-#' Note: Convert this to a dtplyr backend and so some speed testing?
 #'
 #'
 tof_preprocess <-
@@ -106,6 +107,8 @@ tof_preprocess <-
 #' @export
 #'
 #' @examples
+#' NULL
+#'
 tof_postprocess <-
   function(
     tof_tibble = NULL,

@@ -107,9 +107,7 @@ tof_read_fcs <-
     tof_tibble <-
       new_tof_tibble(
         x = tof_tibble,
-        panel = panel_info#,
-        #nrow = nrow(tof_tibble),
-        #class = "tof_tbl"
+        panel = panel_info
       )
 
     return(tof_tibble)
@@ -186,11 +184,11 @@ tof_read_csv <-
 tof_read_file <- function(file_path = NULL, sep = "|", panel_info = NULL) {
   if (get_extension(file_path) == "fcs") {
     tof_tibble <-
-      path %>%
+      file_path %>%
       tof_read_fcs(sep = sep)
   } else if (get_extension(file_path) == "csv") {
     tof_tibble <-
-      path %>%
+      file_path %>%
       tof_read_csv(panel_info = panel_info)
   }
   return(tof_tibble)

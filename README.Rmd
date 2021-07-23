@@ -13,43 +13,48 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidytof
+# tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of tidytof is to ...
+The goal of `tidytof` is to provide an integrated suite of R functions for CyTOF data analysis using an intuitive and internally consistent set of design principles. As an extension of the `tidyverse` ecosystem of data manipulation tools in R, `tidytof` is both performant and easy-to-use for scientists with a wide range of coding experience (including beginners).
+
+
 
 ## Installation
 
-You can install the released version of tidytof from [CRAN](https://CRAN.R-project.org) with:
+You can install the development version of tidytof from GitHub with the following command:
 
-``` r
-install.packages("tidytof")
+```{r, eval=FALSE}
+if(!require(devtools)) install.packages("devtools") 
+devtools::install_github("keyes-timothy/tidytof")
 ```
 
-## Example
 
-This is a basic example which shows you how to solve a common problem:
+## Usage
 
-```{r example}
-library(tidytof)
-## basic example code
-```
+### Reading data (including example datasets)
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+### Pre-processing 
 
-```{r cars}
-summary(cars)
-```
+### Clustering
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+### Dimensionality reduction
 
-You can also embed plots, for example:
+### Differential Expression Analysis
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+### Patient-level feature extraction
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+### Outcomes modeling
+
+### Post-processing
+
+### Writing data
+
+
+
+<https://github.com/r-lib/actions/tree/master/examples>.
+
+
