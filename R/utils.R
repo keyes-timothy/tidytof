@@ -84,4 +84,20 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 
 }
 
+#' Find if a vector is numeric
+#'
+#' This function takes an input vector `.vec` and checks if it is either an
+#' integer or a double (i.e. is the type of vector that might encode CyTOF
+#' measurements).
+#'
+#' @param .vec
+#'
+#' @return A boolean value indicating if .vec is of type integer or double.
+#'
+#' @examples
+#' NULL
+tof_is_numeric <- function(.vec) {
+  return(purrr::is_integer(.vec) || purrr::is_double(.vec))
+}
+
 

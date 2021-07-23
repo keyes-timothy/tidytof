@@ -46,11 +46,5 @@ a mass cytometer using a user-provided function.
 \examples{
 NULL
 
-Note: This can be optimized by keeping track of all tranformations/analyses
-that have been applied to a tof_tibble (giving it memory)...then creating a
-function that can automatically undo it? Or it can at least be referenced.
-
-Note: Convert this to a dtplyr backend and so some speed testing?
-
 
 }
