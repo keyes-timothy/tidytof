@@ -63,9 +63,9 @@ tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 
 flowsom_clusters <-
    tof_cluster_flowsom(
-   tof_tibble,
-   cluster_vars = contains("CD", ignore.case = FALSE)
- )
+     tof_tibble,
+     cluster_vars = contains("CD", ignore.case = FALSE)
+   )
 
 
 

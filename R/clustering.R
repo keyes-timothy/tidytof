@@ -52,9 +52,9 @@
 #'
 #' flowsom_clusters <-
 #'    tof_cluster_flowsom(
-#'    tof_tibble,
-#'    cluster_vars = contains("CD", ignore.case = FALSE)
-#'  )
+#'      tof_tibble,
+#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'    )
 #'
 #'
 #'
@@ -69,13 +69,11 @@ tof_cluster_flowsom <-
     num_metaclusters = 20,
     ...
   ) {
-
     som_distance_function <-
       match.arg(
         arg = som_distance_function,
         choices = c("euclidean", "manhattan", "chebyshev", "cosine")
       )
-
 
     # extract string indicating which markers should be used for clustering
     clustering_markers <-
@@ -121,7 +119,7 @@ tof_cluster_flowsom <-
     # if no metaclustering, return flowSOM cluster labels
     if (!perform_metaclustering) {
       flowsom_clusters <- som$map$mapping[,1]
-      return(flowsom_clusters)
+      return(tibble::tibble(flowsom_cluster = flowsom_clusters))
 
     # otherwise, perform metaclustering
     } else {
@@ -137,9 +135,9 @@ tof_cluster_flowsom <-
 
       flowsom_metaclusters <-
         flowsom_metacluster_object[mst$map$mapping[,1]] %>%
-        as.character()
+        as.integer()
 
-      return(flowsom_metaclusters)
+      return(tibble::tibble(flowsom_metacluster = flowsom_metaclusters))
     }
   }
 
@@ -178,9 +176,9 @@ tof_cluster_flowsom <-
 #'
 #' phenograph_clusters <-
 #'    tof_cluster_phenograph(
-#'    tof_tibble,
-#'    cluster_vars = contains("CD", ignore.case = FALSE)
-#'  )
+#'      tof_tibble,
+#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'    )
 #'
 #'
 tof_cluster_phenograph <-
@@ -220,23 +218,149 @@ tof_cluster_phenograph <-
     }
 
     #return final result
-    phenograph_clusters <- as.numeric(phenograph_clusters)
-    return(phenograph_clusters)
+    phenograph_clusters <- as.integer(phenograph_clusters)
+    return(tibble(phenograph_cluster = phenograph_clusters))
   }
 
 
 # tof_cluster_kmeans ------------------
-# TO DO
+
+#' Perform k-means clustering on CyTOF data.
+#'
+#' This function performs k-means clustering on CyTOF data using a user-specified
+#' selection of input variables/CyTOF measurements. It is mostly a convenient
+#' wrapper around \code{\link[stats]{kmeans}}.
+#'
+#' @param tof_tibbleA `tof_tibble`.
+#'
+#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' use in computing the flowSOM clusters. Defaults to all numeric columns
+#' in `tof_tibble`. Supports tidyselect helpers.
+#'
+#' @param num_clusters An integer indicating the maximum number of clusters
+#' that should be returned Defaults to 20.
+#'
+#' @param ... Optional additional arguments that can be passed to
+#' \code{\link[stats]{kmeans}}.
+#'
+#' @return An integer vector of length `nrow(tof_tibble)` indicating the id of
+#' the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
+#'
+#' @export
+#'
+#' @examples
+#' tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
+#'
+#' kmeans_clusters <-
+#'    tof_cluster_kmeans(
+#'      tof_tibble,
+#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'    )
+#'
+tof_cluster_kmeans <-
+  function(
+    tof_tibble,
+    cluster_vars = where(tof_is_numeric),
+    num_clusters = 20,
+    ...
+  ) {
+
+    kmeans_clusters <-
+      stats::kmeans(
+        x = select(tof_tibble, {{cluster_vars}}),
+        centers = num_clusters,
+        ...
+      ) %>%
+      purrr::pluck("cluster")
+
+    return(tibble(kmeans_cluster = kmeans_clusters))
+  }
 
 
 
 # tof_cluster_ddpr --------------------
-# TO DO
 
+#' Perform k-means clustering on CyTOF data.
+#'
+#' This function performs k-means clustering on CyTOF data using a user-specified
+#' selection of input variables/CyTOF measurements. It is mostly a convenient
+#' wrapper around \code{\link[stats]{kmeans}}.
+#'
+#' @param healthy_tibble A `tibble` or `tof_tibble` containing cells from only
+#' healthy control samples (i.e. not disease samples).
+#'
+#' @param cancer_tibble
+#'
+#' @param healthy_cell_labels A character or integer vector of length `nrow(healthy_tibble)`.
+#' Each entry in this vector should represent the cell subpopulation label (or cluster id) for
+#' the corresponding row in `healthy_tibble`.
+#'
+#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' use in computing the DDPR clusters. Defaults to all numeric columns
+#' in `tof_tibble`. Supports tidyselect helpers.
+#'
+#' @param num_cores
+#'
+#' @param distance_function
+#'
+#' @param return_distances
+#'
+#' @param verbose
+#'
+#' @param ...
+#'
+#' @return
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+#'
+tof_cluster_ddpr <-
+  function(
+    healthy_tibble,
+    cancer_tibble,
+    healthy_cell_labels,
+    cluster_vars = where(tof_is_numeric),
+    distance_function = c("mahalanobis", "cosine", "pearson"),
+    num_cores = 1,
+    parallel_vars = NULL,
+    return_distances = FALSE,
+    verbose = FALSE,
+    ...
+  ) {
+    distance_function <-
+      match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
 
+    # build classifier
+    classifier_fit <-
+      tof_build_classifier(
+        healthy_tibble = healthy_tibble,
+        healthy_cell_labels = healthy_cell_labels,
+        classifier_markers = {{cluster_vars}},
+        verbose = verbose
+      )
 
-# tof_cluster_louvain -----------------
-# TO DO
+    # apply classifier
+    result <-
+      tof_apply_classifier(
+        cancer_tibble = cancer_tibble,
+        classifier_fit = classifier_fit,
+        distance_function = distance_function,
+        num_cores = num_cores,
+        parallel_vars = parallel_vars
+      )
+
+    if (!return_distances) {
+      result <-
+        result %>%
+        dplyr::select(tidyselect::all_of(paste0(distance_function, "_cluster")))
+    }
+
+    return(result)
+
+  }
+
 
 
 

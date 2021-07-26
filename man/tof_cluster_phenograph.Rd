@@ -43,9 +43,9 @@ tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 
 phenograph_clusters <-
    tof_cluster_phenograph(
-   tof_tibble,
-   cluster_vars = contains("CD", ignore.case = FALSE)
- )
+     tof_tibble,
+     cluster_vars = contains("CD", ignore.case = FALSE)
+   )
 
 
 }
