@@ -97,6 +97,7 @@ tof_cluster_flowsom <-
 
     # build self-organizing map and extract cluster labels
     distf <-
+      # convert character distance function name to a number that BuildSOM understands
       switch(
         som_distance_function,
         manhattan = 1,
