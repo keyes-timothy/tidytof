@@ -28,7 +28,7 @@
 #' so adjust this value to affect the final number of clusters. Defaults to 10.
 #'
 #' @param som_distance_function The distance function used during self-organizing
-#' map calculations. Options are "euclidian" (the default), "manhattan", "chebyshev",
+#' map calculations. Options are "euclidean" (the default), "manhattan", "chebyshev",
 #' and "cosine".
 #'
 #' @param perform_metaclustering A boolean value indicating if metaclustering
@@ -41,7 +41,9 @@
 #' @param ... Optional additional parameters that can be passed to the \code{\link[FlowSOM]{BuildSOM}}
 #' function.
 #'
-#' @return An integer vector of length `nrow(tof_tibble)` indicating the id of
+#' @return A tibble with one column named `flowsom_cluster` or `flowsom_metacluster`
+#' depending on the value of `perform_metaclustering`. The column will contain an
+#' integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
 #' @export
@@ -281,16 +283,19 @@ tof_cluster_kmeans <-
 
 # tof_cluster_ddpr --------------------
 
-#' Perform k-means clustering on CyTOF data.
+#' Perform developmental clustering on CyTOF data.
 #'
-#' This function performs k-means clustering on CyTOF data using a user-specified
-#' selection of input variables/CyTOF measurements. It is mostly a convenient
-#' wrapper around \code{\link[stats]{kmeans}}.
+#' This function performs distance-based clustering on CyTOF data
+#' by sorting cancer cells (passed into the function as `cancer_tibble`) with
+#' their most phenotypically similar healthy cell subpopulation (passed into the
+#' function using `healthy_tibble` and `healthy_cell_labels`). For details about
+#' the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
 #'
 #' @param healthy_tibble A `tibble` or `tof_tibble` containing cells from only
 #' healthy control samples (i.e. not disease samples).
 #'
-#' @param cancer_tibble
+#' @param cancer_tibble A `tibble` or `tof_tibble` containing cells to be classified
+#' into their nearest healthy subpopulation (generally cancer cells).
 #'
 #' @param healthy_cell_labels A character or integer vector of length `nrow(healthy_tibble)`.
 #' Each entry in this vector should represent the cell subpopulation label (or cluster id) for
@@ -300,17 +305,39 @@ tof_cluster_kmeans <-
 #' use in computing the DDPR clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
-#' @param num_cores
+#' @param distance_function A string indicating which distance function should
+#' be used to perform the classification. Options are "mahalanobis" (the default),
+#' "cosine", and "pearson".
 #'
-#' @param distance_function
+#' @param num_cores An integer indicating the number of CPU cores used to parallelize
+#' the classification. Defaults to 1 (a single core).
 #'
-#' @param return_distances
+#' @param parallel_vars Optional. Unquoted column names indicating which columns in `cancer_tibble` to
+#' use for breaking up the data in order to parallelize the classification using
+#' `foreach` on a `doParallel` backend.
+#' Supports tidyselect helpers.
 #'
-#' @param verbose
+#' @param return_distances A boolean value indicating whether or not the returned
+#' result should include only one column, the cluster ids corresponding to each row
+#' of `cancer_tibble` (return_distances = FALSE, the default), or if the returned
+#' result should include additional columns representing the distance between each
+#' row of `cancer_tibble` and each of the healthy subpopulation centroids
+#' (return_distances = TRUE).
 #'
-#' @param ...
+#' @param verbose  A boolean value indicating whether progress updates should be
+#' printed during developmental classification. Default is FALSE.
 #'
-#' @return
+#' @return  If `return_distances = FALSE`, a tibble with one column named
+#' `{distance_function}_cluster`, a character vector of length `nrow(cancer_tibble)`
+#' indicating the id of the developmental cluster to which each cell
+#' (i.e. each row) in `cancer_tibble` was assigned.
+#'
+#' If `return_distances = TRUE`, a tibble with `nrow(cancer_tibble)` rows and `nrow(classifier_fit) + 1`
+#' columns. Each row represents a cell from `cancer_tibble`, and `nrow(classifier_fit)`
+#' of the columns represent the distance between the cell and each of the healthy
+#' subpopulations' cluster centroids. The final column represents the cluster id of
+#' the healthy subpopulation with the minimum distance to the cell represented
+#' by that row.
 #'
 #' @export
 #'
@@ -324,12 +351,13 @@ tof_cluster_ddpr <-
     healthy_cell_labels,
     cluster_vars = where(tof_is_numeric),
     distance_function = c("mahalanobis", "cosine", "pearson"),
-    num_cores = 1,
-    parallel_vars = NULL,
+    num_cores = 1L,
+    parallel_vars,
     return_distances = FALSE,
-    verbose = FALSE,
-    ...
+    verbose = FALSE
   ) {
+
+    # check distance function
     distance_function <-
       match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
 
@@ -343,15 +371,26 @@ tof_cluster_ddpr <-
       )
 
     # apply classifier
-    result <-
-      tof_apply_classifier(
-        cancer_tibble = cancer_tibble,
-        classifier_fit = classifier_fit,
-        distance_function = distance_function,
-        num_cores = num_cores,
-        parallel_vars = parallel_vars
-      )
+    if(missing(parallel_vars)) {
+      result <-
+        tof_apply_classifier(
+          cancer_tibble = cancer_tibble,
+          classifier_fit = classifier_fit,
+          distance_function = distance_function,
+          num_cores = num_cores
+        )
+    } else {
+      result <-
+        tof_apply_classifier(
+          cancer_tibble = cancer_tibble,
+          classifier_fit = classifier_fit,
+          distance_function = distance_function,
+          num_cores = num_cores,
+          parallel_vars = {{parallel_vars}}
+        )
+    }
 
+    # return desired result
     if (!return_distances) {
       result <-
         result %>%
@@ -359,13 +398,15 @@ tof_cluster_ddpr <-
     }
 
     return(result)
-
   }
 
 
 
 
 # tof_cluster_spade -----------------
+# TO DO
+
+# tof_cluster_xshift -----------------
 # TO DO
 
 

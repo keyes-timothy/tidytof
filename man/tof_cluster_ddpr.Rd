@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_ddpr}
 \alias{tof_cluster_ddpr}
-\title{Title}
+\title{Perform k-means clustering on CyTOF data.}
 \usage{
 tof_cluster_ddpr(
   healthy_tibble,
@@ -27,7 +27,9 @@ healthy control samples (i.e. not disease samples).}
 Each entry in this vector should represent the cell subpopulation label (or cluster id) for
 the corresponding row in `healthy_tibble`.}
 
-\item{cluster_vars}{}
+\item{cluster_vars}{Unquoted column names indicating which columns in `tof_tibble` to
+use in computing the DDPR clusters. Defaults to all numeric columns
+in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{distance_function}{}
 
@@ -43,7 +45,9 @@ the corresponding row in `healthy_tibble`.}
 
 }
 \description{
-Title
+This function performs k-means clustering on CyTOF data using a user-specified
+selection of input variables/CyTOF measurements. It is mostly a convenient
+wrapper around \code{\link[stats]{kmeans}}.
 }
 \examples{
 NULL

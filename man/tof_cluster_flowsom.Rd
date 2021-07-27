@@ -31,7 +31,7 @@ total number of clusters returned by FlowSOM will be som_xdim * som_ydim,
 so adjust this value to affect the final number of clusters. Defaults to 10.}
 
 \item{som_distance_function}{The distance function used during self-organizing
-map calculations. Options are "euclidian" (the default), "manhattan", "chebyshev",
+map calculations. Options are "euclidean" (the default), "manhattan", "chebyshev",
 and "cosine".}
 
 \item{perform_metaclustering}{A boolean value indicating if metaclustering
