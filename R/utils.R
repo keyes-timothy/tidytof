@@ -100,5 +100,50 @@ tof_is_numeric <- function(.vec) {
   return(purrr::is_integer(.vec) || purrr::is_double(.vec))
 }
 
+tof_knn_density <-
+  function(
+    neighbor_ids, # an N by K matrix representing each cell's knn IDs
+    neighbor_distances, # an N by K matrix representing each cell's knn distances
+    method = c("mean_distance", "sum_distance", "xshift"),
+    d # optional argument, only if method = "xshift", represents the number of dimensions over which distances were calculated
+  ) {
+    # check method argument
+    method <-
+      match.arg(method, choices = c("mean_distance", "sum_distance", "xshift"))
+
+    # extract needed values
+    k <- ncol(neighbor_ids)
+    n <- nrow(neighbor_ids)
+
+    # find densities using one of 3 methods
+    if (method == "mean_distance") {
+      densities <- base::colSums(abs(neighbor_distances))
+    } else if (method == "sum_distance") {
+      densities <- base::colMeans(abs(neighbor_distances))
+    } else if (method == "xshift") {
+      # transform distances into actual cosine space
+      neighbor_distances <- neighbor_distances
+
+      # find longest distance for every row (each cell)
+      largest_dist <- apply(X = neighbor_distances, MARGIN = 1, FUN = max)
+
+      #
+      densities <-
+        # need to figure out what compile.dists means...
+        (1/(n*(largest_dist^d))) * (sum(c(1:k)^d)/sum(compile.dists))^d
+
+    } else {
+      stop("Not a valid method.")
+    }
+
+    # normalize densities?
+    densities <-
+      (densities - min(densities)) /
+      ((max(densities) - min(densities)))
+
+    return(densities) # a vector of length N (number of cells) with the ith
+    # entry representing the KNN-estimated density of the ith cell.
+  }
+
 
 

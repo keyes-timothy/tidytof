@@ -45,7 +45,9 @@ that should be returned after metaclustering. Defaults to 20.}
 function.}
 }
 \value{
-An integer vector of length `nrow(tof_tibble)` indicating the id of
+A tibble with one column named `flowsom_cluster` or `flowsom_metacluster`
+depending on the value of `perform_metaclustering`. The column will contain an
+integer vector of length `nrow(tof_tibble)` indicating the id of
 the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{

@@ -13,9 +13,9 @@
 #                 median channel value.
 #     - color_option = color palette name to be passed to scale_color_viridis as argument `option`.
 #                      Choices include "inferno", "plasma", "viridis", "magma", and "cividis".
-#     - lower_quantile = lowest quantile in `channel_var` to include in the density plot. ALl cells with
+#     - lower_quantile = lowest quantile in `channel_var` to include in the density plot. All cells with
 #                        `channel_var` values lower than this will be filtered out of the plot.
-#     - upper_quantile = highest quantile in `channel_var` to include in the density plot. ALl cells with
+#     - upper_quantile = highest quantile in `channel_var` to include in the density plot. All cells with
 #                        `channel_var` values higher than this will be filtered out of the plot.
 #     - ... = additional arguments to be passed to `geom_tof_ridges()`.
 #

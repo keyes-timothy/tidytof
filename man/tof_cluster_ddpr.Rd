@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_ddpr}
 \alias{tof_cluster_ddpr}
-\title{Perform k-means clustering on CyTOF data.}
+\title{Perform developmental clustering on CyTOF data.}
 \usage{
 tof_cluster_ddpr(
   healthy_tibble,
@@ -10,18 +10,18 @@ tof_cluster_ddpr(
   healthy_cell_labels,
   cluster_vars = where(tof_is_numeric),
   distance_function = c("mahalanobis", "cosine", "pearson"),
-  num_cores = 1,
-  parallel_vars = NULL,
+  num_cores = 1L,
+  parallel_vars,
   return_distances = FALSE,
-  verbose = FALSE,
-  ...
+  verbose = FALSE
 )
 }
 \arguments{
 \item{healthy_tibble}{A `tibble` or `tof_tibble` containing cells from only
 healthy control samples (i.e. not disease samples).}
 
-\item{cancer_tibble}{}
+\item{cancer_tibble}{A `tibble` or `tof_tibble` containing cells to be classified
+into their nearest healthy subpopulation (generally cancer cells).}
 
 \item{healthy_cell_labels}{A character or integer vector of length `nrow(healthy_tibble)`.
 Each entry in this vector should represent the cell subpopulation label (or cluster id) for
@@ -31,23 +31,47 @@ the corresponding row in `healthy_tibble`.}
 use in computing the DDPR clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
-\item{distance_function}{}
+\item{distance_function}{A string indicating which distance function should
+be used to perform the classification. Options are "mahalanobis" (the default),
+"cosine", and "pearson".}
 
-\item{num_cores}{}
+\item{num_cores}{An integer indicating the number of CPU cores used to parallelize
+the classification. Defaults to 1 (a single core).}
 
-\item{return_distances}{}
+\item{parallel_vars}{Optional. Unquoted column names indicating which columns in `cancer_tibble` to
+use for breaking up the data in order to parallelize the classification using
+`foreach` on a `doParallel` backend.
+Supports tidyselect helpers.}
 
-\item{verbose}{}
+\item{return_distances}{A boolean value indicating whether or not the returned
+result should include only one column, the cluster ids corresponding to each row
+of `cancer_tibble` (return_distances = FALSE, the default), or if the returned
+result should include additional columns representing the distance between each
+row of `cancer_tibble` and each of the healthy subpopulation centroids
+(return_distances = TRUE).}
 
-\item{...}{}
+\item{verbose}{A boolean value indicating whether progress updates should be
+printed during developmental classification. Default is FALSE.}
 }
 \value{
+If `return_distances = FALSE`, a tibble with one column named
+`{distance_function}_cluster`, a character vector of length `nrow(cancer_tibble)`
+indicating the id of the developmental cluster to which each cell
+(i.e. each row) in `cancer_tibble` was assigned.
 
+If `return_distances = TRUE`, a tibble with `nrow(cancer_tibble)` rows and `nrow(classifier_fit) + 1`
+columns. Each row represents a cell from `cancer_tibble`, and `nrow(classifier_fit)`
+of the columns represent the distance between the cell and each of the healthy
+subpopulations' cluster centroids. The final column represents the cluster id of
+the healthy subpopulation with the minimum distance to the cell represented
+by that row.
 }
 \description{
-This function performs k-means clustering on CyTOF data using a user-specified
-selection of input variables/CyTOF measurements. It is mostly a convenient
-wrapper around \code{\link[stats]{kmeans}}.
+This function performs distance-based clustering on CyTOF data
+by sorting cancer cells (passed into the function as `cancer_tibble`) with
+their most phenotypically similar healthy cell subpopulation (passed into the
+function using `healthy_tibble` and `healthy_cell_labels`). For details about
+the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
 }
 \examples{
 NULL
