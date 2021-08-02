@@ -6,7 +6,7 @@
 \usage{
 tof_cluster_flowsom(
   tof_tibble = NULL,
-  cluster_vars = where(tof_is_numeric),
+  cluster_cols = where(tof_is_numeric),
   som_xdim = 10,
   som_ydim = 10,
   som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
@@ -18,7 +18,7 @@ tof_cluster_flowsom(
 \arguments{
 \item{tof_tibble}{A `tof_tibble`.}
 
-\item{cluster_vars}{Unquoted column names indicating which columns in `tof_tibble` to
+\item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the flowSOM clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
@@ -66,7 +66,7 @@ tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 flowsom_clusters <-
    tof_cluster_flowsom(
      tof_tibble,
-     cluster_vars = contains("CD", ignore.case = FALSE)
+     cluster_cols = contains("CD", ignore.case = FALSE)
    )
 
 

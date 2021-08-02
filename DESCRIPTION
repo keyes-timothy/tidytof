@@ -13,24 +13,26 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
+    diffcyt,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.1.1
-Imports: 
-    dplyr,
-    flowCore,
-    parallel,
-    foreach,
+Imports:
     data.table,
+    dplyr,
     doParallel,
+    flowCore,
+    forcats,
+    foreach,
+    ggplot2,
+    ggthemes,
     magrittr,
+    methods,
+    parallel,
     purrr,
     stringr,
-    ggplot2,
     tidyr,
-    ggthemes,
-    forcats,
-    methods,
+    RANN,
     rlang
 Depends: 
     R (>= 2.10)

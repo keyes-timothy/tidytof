@@ -100,16 +100,90 @@ tof_is_numeric <- function(.vec) {
   return(purrr::is_integer(.vec) || purrr::is_double(.vec))
 }
 
+
+#' Find the k-nearest neighbors of each cell in a CyTOF dataset.
+#'
+#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
+#' and each column represents a CyTOF measurement.
+#'
+#' @param k An integer indicating the number of nearest neighbors to return for each cell.
+#'
+#' @param distance_function A string indicating which distance function to use for the
+#' nearest-neighbor calculation. Options include "euclidean" (the default) and "cosine" distances.
+#'
+#' @return A list with two elements: "neighbor_ids" and "neighbor_distances," both of which are n by k
+#' matrices (in which n is the number of cells in the input `.data`. The [i,j]-th entry of "neighbor_ids" represents
+#' the row index for the j-th nearest neighbor of the cell in the i-th row of `.data`. The [i,j]-th entry of
+#' "neighbor_distances" represents the distance between those two cells according to `distance_function`.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+#'
+tof_find_knn <-
+  function(
+    .data,
+    k = min(10, nrow(.data)),
+    distance_function = c("euclidean", "cosine"),
+    ...
+  ) {
+    # check distance function
+    distance_function <-
+      match.arg(distance_function, choices = c("euclidean", "cosine"))
+
+    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
+    # distance between l2-normalized vectors will scale with
+    # cosine distance (and this allows us to us to proceed as normal)
+    if (distance_function == "cosine") {
+      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
+    }
+
+    # compute result
+    # have found that eps up to 0.4 will provide NN accuracy above 95%
+    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
+    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
+
+    # remove the first-closest neighbor (column), which is always the point itself
+    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
+    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
+
+    # return result
+    return(nn_result)
+  }
+
+#' Find the KNN density estimate for each cell in a CyTOF dataset.
+#'
+#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
+#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
+#'
+#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
+#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
+#'
+#' @param method A string indicating how the relative density for each cell should be
+#' calculated from the distances between it and each of its k nearest neighbors. Options are
+#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
+#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
+#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
+#' distances to its nearest neighbors).
+#'
+#' @return a vector of length N (number of cells) with the ith
+# entry representing the KNN-estimated density of the ith cell.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
 tof_knn_density <-
   function(
     neighbor_ids, # an N by K matrix representing each cell's knn IDs
     neighbor_distances, # an N by K matrix representing each cell's knn distances
-    method = c("mean_distance", "sum_distance", "xshift"),
-    d # optional argument, only if method = "xshift", represents the number of dimensions over which distances were calculated
+    method = c("mean_distance", "sum_distance")
   ) {
+
     # check method argument
     method <-
-      match.arg(method, choices = c("mean_distance", "sum_distance", "xshift"))
+      match.arg(method, choices = c("mean_distance", "sum_distance"))
 
     # extract needed values
     k <- ncol(neighbor_ids)
@@ -117,26 +191,14 @@ tof_knn_density <-
 
     # find densities using one of 3 methods
     if (method == "mean_distance") {
-      densities <- base::colSums(abs(neighbor_distances))
+      densities <- -base::rowSums(abs(neighbor_distances))
     } else if (method == "sum_distance") {
-      densities <- base::colMeans(abs(neighbor_distances))
-    } else if (method == "xshift") {
-      # transform distances into actual cosine space
-      neighbor_distances <- neighbor_distances
-
-      # find longest distance for every row (each cell)
-      largest_dist <- apply(X = neighbor_distances, MARGIN = 1, FUN = max)
-
-      #
-      densities <-
-        # need to figure out what compile.dists means...
-        (1/(n*(largest_dist^d))) * (sum(c(1:k)^d)/sum(compile.dists))^d
-
+      densities <- -base::rowMeans(abs(neighbor_distances))
     } else {
-      stop("Not a valid method.")
+    stop("Not a valid method.")
     }
 
-    # normalize densities?
+    # normalize densities
     densities <-
       (densities - min(densities)) /
       ((max(densities) - min(densities)))
@@ -144,6 +206,278 @@ tof_knn_density <-
     return(densities) # a vector of length N (number of cells) with the ith
     # entry representing the KNN-estimated density of the ith cell.
   }
+
+make_binary_vector <- function(length, indices) {
+  result <- rep.int(0, times = length)
+  result[indices] <- 1
+
+  return(result)
+}
+
+
+#' Find the dot product between two vectors.
+#'
+#' @param x A numeric vector.
+#' @param y A numeric vector.
+#'
+#' @return The dot product between x and y.
+#'
+#'
+#' @examples
+#' NULL
+#'
+dot <- function(x, y) {
+  return(as.numeric(t(x) %*% y))
+}
+
+#' Find the magnitude of a vector.
+#'
+#' @param x A numeric vector.
+#'
+#' @return A scalar value (the magnitude of x).
+#'
+#' @examples
+#' NULL
+magnitude <- function(x) {
+  return(sqrt(dot(x, x)))
+}
+
+l2_normalize <- function(x) {
+  return(x / magnitude(x))
+}
+
+cosine_similarity <- function(x, y) {
+  result <- dot(x, y) / (magnitude(x) * magnitude(y))
+  return(result)
+}
+
+
+
+
+
+
+
+
+
+prepare_diffcyt_args <-
+  function(
+    tof_tibble,
+    sample_col,
+    cluster_col,
+    marker_cols = where(tof_is_numeric),
+    fixed_effect_cols,
+    random_effect_cols,
+    method = c("glmm", "edgeR", "voom"),
+    include_observation_level_random_effects = FALSE
+  ) {
+    # initialize formula
+    my_formula <- NULL
+
+    # extract sample column name as a string
+    sample_colname <-
+      rlang::enquo(sample_col) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+
+    # extract cluster column name as a string
+    cluster_colname <-
+      rlang::enquo(cluster_col) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    # extract fixed effect columns as a character vector
+    # will return an empty character vector if the argument is missing
+    fixed_effect_colnames <-
+      rlang::enquo(fixed_effect_cols) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    # extract random effect columns as a character vector
+    # will return an empty character vector if the argument is missing
+    random_effect_colnames <-
+      rlang::enquo(random_effect_cols) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    # find all marker names by process of elimination
+    marker_names <-
+      colnames(tof_tibble)[
+        !(
+          colnames(tof_tibble) %in%
+            c(cluster_colname, sample_colname, fixed_effect_colnames, random_effect_colnames)
+        )
+      ]
+
+    # create diffcyt experiment_info
+    experiment_info <-
+      tof_tibble %>%
+      dplyr::select({{sample_col}}, {{fixed_effect_cols}}, {{random_effect_cols}}) %>%
+      dplyr::distinct() %>%
+      dplyr::rename(sample_id = {{sample_col}}) %>%
+      dplyr::arrange(sample_id)
+
+    # create diffcyt marker_info
+    marker_info <-
+      tibble::tibble(marker_name = marker_names) %>%
+      dplyr::mutate(marker_class = "state")
+
+    # create formula or design matrix depending on which method is being used
+    if (method %in% c("glmm", "lmm") & include_observation_level_random_effects) {
+      random_effect_colnames <-
+        c("sample_id", random_effect_colnames)
+    }
+
+    if (method %in% c("glmm", "lmm")) {
+      # if using glmms, create formula
+
+      if (length(random_effect_colnames) == 0) {
+        # if there are no random effects
+        my_formula <-
+          diffcyt::createFormula(
+            experiment_info = experiment_info,
+            cols_fixed = fixed_effect_colnames
+          )
+      } else {
+        # if there are random effects
+        my_formula <-
+          diffcyt::createFormula(
+            experiment_info = experiment_info,
+            cols_fixed = fixed_effect_colnames,
+            cols_random = random_effect_colnames
+          )
+      }
+    }
+
+    # create design matrix
+    my_design <-
+      diffcyt::createDesignMatrix(
+        experiment_info = experiment_info,
+        cols_design = fixed_effect_colnames
+      )
+
+    ## make contrast matrix
+    contrast_names <- colnames(my_design)
+
+    # tibble of contrast matrices to test the null hypothesis that any given
+    # fixed-effect coefficient is 0
+    contrast_matrix_tibble <-
+      tibble::tibble(
+        contrast_names = contrast_names,
+        contrast_matrices =
+          purrr::map(
+            .x = 1:length(contrast_names),
+            .f = ~
+              make_binary_vector(length = length(contrast_names), indices = .x) %>%
+              diffcyt::createContrast()
+          )
+      ) %>%
+      filter(contrast_names != "(Intercept)")
+
+    # test against the null hypothesis that all fixed-effect coefficients are 0
+    initial_contrast <-
+      diffcyt::createContrast(
+        make_binary_vector(length = length(contrast_names), indices = -1)
+      )
+
+    contrast_matrix_tibble <-
+      bind_rows(
+        tibble::tibble(contrast_names = "omnibus", contrast_matrices = list(initial_contrast)),
+        contrast_matrix_tibble
+      )
+
+    # configure data into the format diffcyt likes
+    data_list <-
+      tof_tibble %>%
+      dplyr::group_by({{sample_col}}) %>%
+      tidyr::nest() %>%
+      dplyr::arrange({{sample_col}}) %>%
+      dplyr::pull(data)
+
+    cols_to_include <-
+      colnames(data_list[[1]]) %in%
+      marker_info$marker_name
+
+    data_diff <-
+      diffcyt::prepareData(
+        d_input = data_list,
+        experiment_info = as.data.frame(experiment_info),
+        marker_info = as.data.frame(marker_info),
+        cols_to_include = cols_to_include
+      )
+
+    # add clusters to diffcyt object
+    temp <-
+      data_diff %>%
+      SummarizedExperiment::rowData()
+
+    temp[,"cluster_id"] <-
+      tof_tibble %>%
+      dplyr::pull({{cluster_col}}) %>%
+      as.factor()
+
+    SummarizedExperiment::rowData(data_diff) <- temp
+
+    # fix type-related issues in the exprs component of the SummarizedExperiment
+    data_exprs <-
+      data_diff %>%
+      SummarizedExperiment::assays() %>%
+      `[[`("exprs")
+
+    data_colnames <- colnames(data_exprs)
+
+    data_exprs <-
+      data_exprs %>%
+      apply(MARGIN = 2, FUN = as.numeric)
+
+    colnames(data_exprs) <- data_colnames
+
+    SummarizedExperiment::assays(data_diff)[["exprs"]] <- data_exprs
+
+    # return result
+    diffcyt_args <-
+      list(
+        sample_colname = sample_colname,
+        cluster_colname = cluster_colname,
+        fixed_effect_colnames = fixed_effect_colnames,
+        random_effect_colnames = random_effect_colnames,
+        marker_names = marker_names,
+        experiment_info = experiment_info,
+        marker_info = marker_info,
+        my_formula = my_formula,
+        my_design = my_design,
+        contrast_matrix_tibble = contrast_matrix_tibble,
+        data_diff = data_diff
+      )
+
+    return(diffcyt_args)
+  }
+
+
+
+
+fit_da_model <- function(data, formula, has_random_effects = TRUE) {
+  if (has_random_effects) {
+    model_fit <-
+      lme4::glmer(formula, data, family = "binomial", weights = total_cells)
+  } else {
+    model_fit <-
+      glm(formula, data, family = "binomial", weights = total_cells)
+  }
+
+}
+
+fit_de_model <- function(data, formula, has_random_effects = TRUE) {
+  if (has_random_effects) {
+    model_fit <-
+      lmerTest::lmer(formula, data)
+  } else {
+      model_fit <-
+        glm(formula, data, family = "gaussian")
+  }
+}
+
+
 
 
 

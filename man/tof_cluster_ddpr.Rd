@@ -8,10 +8,10 @@ tof_cluster_ddpr(
   healthy_tibble,
   cancer_tibble,
   healthy_cell_labels,
-  cluster_vars = where(tof_is_numeric),
+  cluster_cols = where(tof_is_numeric),
   distance_function = c("mahalanobis", "cosine", "pearson"),
   num_cores = 1L,
-  parallel_vars,
+  parallel_cols,
   return_distances = FALSE,
   verbose = FALSE
 )
@@ -27,7 +27,7 @@ into their nearest healthy subpopulation (generally cancer cells).}
 Each entry in this vector should represent the cell subpopulation label (or cluster id) for
 the corresponding row in `healthy_tibble`.}
 
-\item{cluster_vars}{Unquoted column names indicating which columns in `tof_tibble` to
+\item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the DDPR clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
@@ -38,7 +38,7 @@ be used to perform the classification. Options are "mahalanobis" (the default),
 \item{num_cores}{An integer indicating the number of CPU cores used to parallelize
 the classification. Defaults to 1 (a single core).}
 
-\item{parallel_vars}{Optional. Unquoted column names indicating which columns in `cancer_tibble` to
+\item{parallel_cols}{Optional. Unquoted column names indicating which columns in `cancer_tibble` to
 use for breaking up the data in order to parallelize the classification using
 `foreach` on a `doParallel` backend.
 Supports tidyselect helpers.}

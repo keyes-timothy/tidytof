@@ -6,13 +6,13 @@
 \usage{
 tof_cluster_kmeans(
   tof_tibble,
-  cluster_vars = where(tof_is_numeric),
+  cluster_cols = where(tof_is_numeric),
   num_clusters = 20,
   ...
 )
 }
 \arguments{
-\item{cluster_vars}{Unquoted column names indicating which columns in `tof_tibble` to
+\item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the flowSOM clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
@@ -39,7 +39,7 @@ tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 kmeans_clusters <-
    tof_cluster_kmeans(
      tof_tibble,
-     cluster_vars = contains("CD", ignore.case = FALSE)
+     cluster_cols = contains("CD", ignore.case = FALSE)
    )
 
 }
