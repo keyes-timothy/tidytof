@@ -479,5 +479,111 @@ fit_de_model <- function(data, formula, has_random_effects = TRUE) {
 
 
 
+#' Find the earth-mover's distance between two numeric vectors
+#'
+#' @param vec_1 A numeric vector.
+#'
+#' @param vec_2 A numeric vector.
+#'
+#' @param num_bins An integer number of bins to use when performing kernel
+#' density estimation on the two vectors. Defaults to 100.
+#'
+#' @return A double (of length 1) representing the EMD between the two vectors.
+#'
+#'
+#' @examples
+#'
+tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
 
+  # check that both vec_1 and vec_2 are numeric
+  if (!is.numeric(vec_1) | ! is.numeric(vec_2)) {
+    return(NA_real_)
+  }
+
+  if (length(vec_1) < 10 | length(vec_2) < 10) {
+    return(NA_real_)
+  }
+
+  # set up bins
+  set_max <- ceiling(max(vec_1, vec_2))
+  set_min <- floor(min(vec_1, vec_2))
+  bins <- seq(set_max, set_min, length.out = num_bins)
+
+  # find histograms
+  density_1 <-
+    graphics::hist(vec_1, breaks = bins, plot = FALSE)$density %>%
+    as.matrix()
+
+  density_2 <-
+    graphics::hist(vec_2, breaks = bins, plot = FALSE)$density %>%
+    as.matrix()
+
+  # return final result
+  em_dist <- emdist::emd2d(density_1, density_2)
+  return(em_dist)
+}
+
+
+#' Find the Jensen-Shannon Divergence (JSD) between two numeric vectors
+#'
+#' @param vec_1 A numeric vector.
+#'
+#' @param vec_2 A numeric vector.
+#'
+#' @param num_bins An integer number of bins to use when binning
+#' across the two vectors' commbined range. Defaults to 100.
+#'
+#' @return A double (of length 1) representing the JSD between the two vectors.
+#'
+#'
+#' @examples
+#'
+tof_find_jsd <- function(vec_1, vec_2, num_bins = 100) {
+
+  # check that both vectors are numeric
+  if (!is.numeric(vec_1) | ! is.numeric(vec_2)) {
+    return(NA_real_)
+  }
+
+  # check that both vectors have at least 10 cells
+  if (length(vec_1) < 10 | length(vec_2) < 10) {
+    return(NA_real_)
+  }
+
+  # set up bins
+  set_max <- ceiling(max(vec_1, vec_2))
+  set_min <- floor(min(vec_1, vec_2))
+  bins <- seq(set_max, set_min, length.out = num_bins)
+
+  # find histograms
+  p1 <-
+    graphics::hist(vec_1, breaks = bins, plot = FALSE)$counts %>%
+    as.numeric()
+
+  p1 <- p1 / sum(p1)
+
+  p2 <-
+    graphics::hist(vec_2, breaks = bins, plot = FALSE)$counts %>%
+    as.numeric()
+
+  p2 <- p2 / sum(p2)
+
+  # return final result
+  js_dist <-
+    purrr::quietly(philentropy::JSD)(rbind(p1, p2))$result %>%
+    as.numeric()
+
+  return(js_dist)
+}
+
+
+
+
+pull_unless_null <- function(tib, uq_colname) {
+  if (is.null(tib)) {
+    return(NULL)
+  } else {
+    return(dplyr::pull(tib, {{uq_colname}}))
+  }
+}
 

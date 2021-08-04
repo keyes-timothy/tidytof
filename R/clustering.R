@@ -15,7 +15,7 @@
 #'
 #' @param tof_tibble A `tof_tibble`.
 #'
-#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the flowSOM clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -55,7 +55,7 @@
 #' flowsom_clusters <-
 #'    tof_cluster_flowsom(
 #'      tof_tibble,
-#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'      cluster_cols = contains("CD", ignore.case = FALSE)
 #'    )
 #'
 #'
@@ -63,7 +63,7 @@
 tof_cluster_flowsom <-
   function(
     tof_tibble = NULL,
-    cluster_vars = where(tof_is_numeric),
+    cluster_cols = where(tof_is_numeric),
     som_xdim = 10,
     som_ydim = 10,
     som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
@@ -80,7 +80,7 @@ tof_cluster_flowsom <-
     # extract string indicating which markers should be used for clustering
     clustering_markers <-
       tof_tibble %>%
-      dplyr::select({{cluster_vars}}) %>%
+      dplyr::select({{cluster_cols}}) %>%
       colnames()
 
     # build the flowsom object
@@ -158,7 +158,7 @@ tof_cluster_flowsom <-
 #'
 #' @param tof_tibble A `tof_tibble`.
 #'
-#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the flowSOM clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -180,14 +180,14 @@ tof_cluster_flowsom <-
 #' phenograph_clusters <-
 #'    tof_cluster_phenograph(
 #'      tof_tibble,
-#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'      cluster_cols = contains("CD", ignore.case = FALSE)
 #'    )
 #'
 #'
 tof_cluster_phenograph <-
   function(
     tof_tibble,
-    cluster_vars = where(tof_is_numeric),
+    cluster_cols = where(tof_is_numeric),
     num_neighbors = 30,
     ...
   ) {
@@ -196,7 +196,7 @@ tof_cluster_phenograph <-
         suppressMessages(
           phenograph_result <-
             Rphenograph::Rphenograph(
-              data = dplyr::select(tof_tibble, {{cluster_vars}}),
+              data = dplyr::select(tof_tibble, {{cluster_cols}}),
               k = num_neighbors
             )
         )
@@ -236,7 +236,7 @@ tof_cluster_phenograph <-
 #'
 #' @param tof_tibbleA `tof_tibble`.
 #'
-#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the flowSOM clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -257,20 +257,20 @@ tof_cluster_phenograph <-
 #' kmeans_clusters <-
 #'    tof_cluster_kmeans(
 #'      tof_tibble,
-#'      cluster_vars = contains("CD", ignore.case = FALSE)
+#'      cluster_cols = contains("CD", ignore.case = FALSE)
 #'    )
 #'
 tof_cluster_kmeans <-
   function(
     tof_tibble,
-    cluster_vars = where(tof_is_numeric),
+    cluster_cols = where(tof_is_numeric),
     num_clusters = 20,
     ...
   ) {
 
     kmeans_clusters <-
       stats::kmeans(
-        x = select(tof_tibble, {{cluster_vars}}),
+        x = select(tof_tibble, {{cluster_cols}}),
         centers = num_clusters,
         ...
       ) %>%
@@ -301,7 +301,7 @@ tof_cluster_kmeans <-
 #' Each entry in this vector should represent the cell subpopulation label (or cluster id) for
 #' the corresponding row in `healthy_tibble`.
 #'
-#' @param cluster_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the DDPR clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -312,7 +312,7 @@ tof_cluster_kmeans <-
 #' @param num_cores An integer indicating the number of CPU cores used to parallelize
 #' the classification. Defaults to 1 (a single core).
 #'
-#' @param parallel_vars Optional. Unquoted column names indicating which columns in `cancer_tibble` to
+#' @param parallel_cols Optional. Unquoted column names indicating which columns in `cancer_tibble` to
 #' use for breaking up the data in order to parallelize the classification using
 #' `foreach` on a `doParallel` backend.
 #' Supports tidyselect helpers.
@@ -349,10 +349,10 @@ tof_cluster_ddpr <-
     healthy_tibble,
     cancer_tibble,
     healthy_cell_labels,
-    cluster_vars = where(tof_is_numeric),
+    cluster_cols = where(tof_is_numeric),
     distance_function = c("mahalanobis", "cosine", "pearson"),
     num_cores = 1L,
-    parallel_vars,
+    parallel_cols,
     return_distances = FALSE,
     verbose = FALSE
   ) {
@@ -366,12 +366,12 @@ tof_cluster_ddpr <-
       tof_build_classifier(
         healthy_tibble = healthy_tibble,
         healthy_cell_labels = healthy_cell_labels,
-        classifier_markers = {{cluster_vars}},
+        classifier_markers = {{cluster_cols}},
         verbose = verbose
       )
 
     # apply classifier
-    if(missing(parallel_vars)) {
+    if(missing(parallel_cols)) {
       result <-
         tof_apply_classifier(
           cancer_tibble = cancer_tibble,
@@ -386,7 +386,7 @@ tof_cluster_ddpr <-
           classifier_fit = classifier_fit,
           distance_function = distance_function,
           num_cores = num_cores,
-          parallel_vars = {{parallel_vars}}
+          parallel_cols = {{parallel_cols}}
         )
     }
 
@@ -407,7 +407,39 @@ tof_cluster_ddpr <-
 # TO DO
 
 # tof_cluster_xshift -----------------
-# TO DO
+tof_cluster_xshift <-
+  function(
+    tof_tibble,
+    k = max(20, nrow(tof_tibble)),
+    distance_function = c("cosine", "euclidean"),
+    p_value = 0.01
+  ) {
+    # check distance_function argument
+    distance_function <-
+      match.arg(distance_function, choices = c("cosine", "euclidean"))
+
+    # calculate "z" value for nearest-neighbor search during step 2
+    z <-
+      -log(p_value / nrow(tof_tibble), base = 2) %>%
+      floor()
+
+    # step 1a - find nearest neighbors of each cell in tof_tibble
+    nn_result <-
+      tof_tibble %>%
+      tof_find_knn(k = max(z, k), distance_function = distance_function)
+
+    # step 1b - compute local densities of each cell using knn density estimation
+    densities <-
+      xshift_compute_local_densities(
+        neighbor_ids = nn_result$neighbor_ids[, 1:k],
+        neighbor_distances = nn_result$neighbor_distances[, 1:k]
+      )
+
+    # step 2 -
+
+
+
+  }
 
 
 # tof_cluster -------------------------
