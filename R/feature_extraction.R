@@ -1,4 +1,6 @@
-
+# feature_extraction.R
+# This file contains functions relevant to extracting patient- or sample-level
+# features by aggregating single-cell data in tof_tibble objects.
 
 
 #' Extract the proportion of cells in each cluster in a `tof_tibble`.
