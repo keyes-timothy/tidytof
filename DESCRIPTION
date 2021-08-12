@@ -45,7 +45,10 @@ Imports:
     workflows,
     yardstick,
     generics,
-    survival
+    survival,
+    ggridges,
+    tidygraph,
+    ggraph
 Suggests: 
     diffcyt,
     Rphenograph,

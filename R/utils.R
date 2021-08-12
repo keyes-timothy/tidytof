@@ -28,10 +28,7 @@ tidytof_example_data <-
       dir(system.file("extdata", package = "tidytof"))
     }
     else {
-      dir(
-        system.file("extdata", dataset_name, package = "tidytof", mustWork = TRUE),
-        full.names = TRUE
-      )
+      system.file("extdata", dataset_name, package = "tidytof", mustWork = TRUE)#,
     }
   }
 

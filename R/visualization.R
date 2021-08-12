@@ -1,265 +1,267 @@
 
 
-#### geom_tof_ridges.R ####
-# Description: A function that encodes a geom specifically for generating univariate histograms
-#              of CyTOF data.
-#             Currently VERY EXPERIMENTAL and NOT OPTIMIZED
-#
-# Inputs:
-#     - rel_min_height, size, and scale = arguments to pass to geom_density_ridges_gradient()
-#                                         (with nice defaults set)
-#     - ... = additional arguments to pass to geom_density_ridges_gradient()
-#
-# Outputs: None
-#
-# Dependencies:
-#     - ggridges package and all of its dependencies
+# single-cell visualizations ----------------------------
 
-geom_tof_ridges <- function(rel_min_height = 0.00, size = 0.5, scale = 1.4, ...) {
-  geom_density_ridges_gradient(
-    rel_min_height = rel_min_height,
-    size = size,
-    scale = scale,
-    ...
-  )
-}
-
-
-######################   tof_histogram
-
-#' Generate univariate histograms of CyTOF data from a `tof_tibble`.
-#'
-#' Plots a series of overlaid histograms for a given CyTOF channel broken up
-#' by a given grouping variable.
-#'
-#' @param tof_tibble A tibble, data.frame, or something that can be coerced into either
-#'
-#' @param channel_var An unquoted variable name indicating which channel should be plotted
-#'
-#' @param group_var An unquoted variable name indicating which variable should be used to
-#' break the cells into different histograms along the overlay.
-#'
-#' @param ordered A logical indicating the the histograms along the y axis should
-#' be ordered by decreasing median channel value.
-#'
-#' @param color_option Color palette name to be passed to scale_color_viridis as argument `option`.
-#' Choices include "inferno", "plasma", "viridis", "magma", and "cividis".
-#'
-#' @param lower_quantile lowest quantile in `channel_var` to include in the density plot. All cells with
-#' `channel_var` values lower than this will be filtered out of the plot.
-#'
-#' @param upper_quantile highest quantile in `channel_var` to include in the density plot. All cells with
-#' `channel_var` values higher than this will be filtered out of the plot.
-#'
-#' @param ... Optional additional arguments to be passed to `geom_tof_ridges()`
-#'
-#' @return A ggplot object.
-#'
-#' @export
-#'
-#' @examples
-#' NULL
-#'
-tof_histogram <- function(
-  tof_tibble = NULL,
-  channel_var = NULL,
-  group_var = NULL,
-  ordered = FALSE,
-  color_option = "plasma",
-  lower_quantile = 0.01,
-  upper_quantile = 0.99,
-  ...
-) {
-  if (ordered) {
-    tof_tibble <-
-      tof_tibble %>%
-      mutate(
-        "{{group_var}}" :=
-          fct_reorder({{group_var}}, {{channel_var}}, median, .desc = TRUE)
-      )
-  }
-
-  tof_tibble <-
-    tof_tibble %>%
-    select({{channel_var}}, {{group_var}}) %>%
-    filter(
-      {{channel_var}} <= quantile({{channel_var}}, upper_quantile),
-      {{channel_var}} >= quantile({{channel_var}}, lower_quantile),
-    )
-
-  tof_tibble %>%
-    ggplot(aes(x = {{channel_var}}, y = {{group_var}}, fill = stat(x))) +
-    geom_vline(
-      xintercept = mean(pull(tof_tibble, {{channel_var}})),
-      linetype = "dotted",
-      size = 0.5
-    ) +
-    geom_tof_ridges(...) +
-    scale_y_discrete(expand = expansion(mult = c(0.05, 0.15))) +
-    scale_fill_viridis_c(option = color_option) +
-    theme_ridges() +
-    theme(legend.position = "bottom") +
-    guides(
-      fill =
-        guide_colorbar(
-          title.position = "top",
-          title.theme = element_text(size = 12),
-          title.hjust = 0.5,
-          barwidth = 10,
-          barheight = 0.5
-        )
-    ) +
-    labs(
-      subtitle = NULL,
-      x = NULL,
-      y = as_name(enexpr(group_var)),
-      fill = str_c(as_name(enexpr(channel_var)), " expression")
-    )
-}
-
-
-
-
-
-#' Generate grouped univariate histograms of CyTOF data from a `tof_tibble`.
-#'
-#' @param tof_tibble A tibble, data.frame, or something that can be coerced into either
-#'
-#' @param channel_var An unquoted variable name indicating which channel should be plotted
-#'
-#' @param group_var An unquoted variable name indicating which variable should be used to
-#' break the cells into different histograms along the overlay.
-#'
-#' @param split_var an unquoted variable name indicating which variable should be used to break
-#' the cells into different histograms along the axis of `channel_var`.
-#'
-#' @param ordered A logical indicating the the histograms along the y axis should
-#' be ordered by decreasing median channel value.
-#'
-#' @param lower_quantile lowest quantile in `channel_var` to include in the density plot. All cells with
-#' `channel_var` values lower than this will be filtered out of the plot.
-#'
-#' @param upper_quantile highest quantile in `channel_var` to include in the density plot. All cells with
-#' `channel_var` values higher than this will be filtered out of the plot.
-#'
-#' @param ... Optional additional arguments to be passed to `geom_tof_ridges()`
-#'
-#' @return A ggplot object.
-#'
-#' @export
-#'
-#' @examples
-#' NULL
-#'
-tof_histogram_2 <-
+tof_plot_sc_histograms <-
   function(
-    tof_tibble = NULL,
-    channel_var = NULL,
-    group_var = NULL,
-    split_var = NULL,
-    ordered = FALSE,
-    lower_quantile = 0.01,
-    upper_quantile = 0.99,
+    tof_tibble,
+    x_col,
+    y_col,
+    facet_cols,
+    theme = ggplot2::theme_bw(),
     ...
   ) {
+    stop("This function is not yet implemented!")
+  }
 
-    if (ordered) {
-      tof_tibble <-
+tof_plot_sc_dr <-
+  function(
+    tof_tibble,
+    dr_cols,
+    color_col,
+    facet_cols,
+    dr_method = c("pca", "tsne", "umap"),
+    point_alpha = 1,
+    theme = ggplot2::theme_bw(),
+    ...# optional additional arguments to the specified tof_dr_* family function
+  ) {
+
+    # if no dr_cols are specified, use the dr_method to compute them
+    if (missing(dr_cols)) {
+      # if there's no dr_method specified, just use PCA (for speed)
+      if (dr_method == c("pca", "tsne", "umap")) {
+        message("No dr_cols were specified, and no dr_method was specified.
+                Performing PCA as the default dimensionality reduction method.")
+      }
+      # check dr_method columns
+      dr_method <- rlang::arg_match(dr_method)
+      dr_tibble <-
         tof_tibble %>%
-        mutate(
-          "{{group_var}}" :=
-            fct_reorder({{group_var}}, {{channel_var}}, median, .desc = TRUE)
+        tof_dr(method = dr_method, ...)
+
+    # if there are dr_cols specified, just use those
+    } else {
+      # check dr_cols - there should only be two
+      dr_tibble <-
+        tof_tibble %>%
+        dplyr::select({{dr_cols}})
+
+      num_dr_cols <-
+        dr_tibble %>%
+        ncol()
+
+      if (num_dr_cols != 2) {
+        stop("2 dimensionality reduction columns must be selected.")
+      }
+    }
+
+    if (missing(color_col)) {
+      shape = 16
+    } else {
+      shape = 21
+    }
+
+    # create plot
+    result <-
+      tof_tibble %>%
+      ggplot2::ggplot(aes(x = dr_tibble[[1]], y = dr_tibble[[2]], fill = {{color_col}})) +
+      ggplot2::geom_point(shape = shape, alpha = point_alpha) +
+      labs(
+        x = colnames(dr_tibble)[[1]],
+        y = colnames(dr_tibble)[[2]]
+      )
+
+    if (!missing(facet_cols)) {
+      result <-
+        result +
+        ggplot2::facet_wrap(facets = vars({{facet_cols}}))
+    }
+
+    return(result)
+
+  }
+
+tof_plot_sc_layout <-
+  function(
+    tof_tibble,
+    knn_cols = where(tof_is_numeric),
+    color_col,
+    facet_cols,
+    num_neighbors = 5,
+    graph_type = c("weighted", "unweighted"),
+    graph_layout = "fr",
+    distance_function = c("euclidean", "cosine"),
+    knn_error = 0,
+    edge_alpha = 0.25,
+    node_size = 2,
+    theme = ggplot2::theme_void(),
+    ...
+  ) {
+    # check distance function
+    distance_function <- rlang::arg_match(distance_function)
+
+    # check graph type
+    graph_type = rlang::arg_match(graph_type)
+
+    knn_data <-
+      tof_tibble %>%
+      # select only knn_cols
+      dplyr::select({{knn_cols}}) %>%
+      tof_find_knn(
+        k = num_neighbors,
+        distance_function = distance_function,
+        eps = knn_error
+      )
+
+    # extract knn_ids and put them into long format
+    knn_ids <-
+      knn_data %>%
+      purrr::pluck("neighbor_ids")
+    colnames(knn_ids) <- 1:ncol(knn_ids)
+
+    knn_ids <-
+      knn_ids %>%
+      tibble::as_tibble() %>%
+      dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) %>%
+      tidyr::pivot_longer(
+        cols = -from,
+        names_to = "neighbor_index",
+        values_to = "to"
+      )
+
+    if (graph_type == "weighted") {
+      # extract knn distances and put them into long format
+      knn_dists <-
+        knn_data %>%
+        purrr::pluck("neighbor_distances")
+      colnames(knn_dists) <- 1:ncol(knn_dists)
+
+      knn_dists <-
+        knn_dists %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
+        tidyr::pivot_longer(
+          cols = -from,
+          names_to = "neighbor_index",
+          values_to = "distance"
+        )
+
+      # join knn distances with knn ids for final edge tibble
+      edge_tibble <-
+        knn_ids %>%
+        dplyr::left_join(knn_dists, by = (c("from", "neighbor_index")))
+
+      if (distance_function == "euclidean") {
+        edge_tibble <-
+          edge_tibble %>%
+          dplyr::mutate(weight = 1 / (1 + distance))
+      } else {
+        edge_tibble <-
+          edge_tibble %>%
+          dplyr::mutate(weight = 1 - distance)
+      }
+
+    } else {
+      edge_tibble <-
+        knn_ids
+    }
+
+    # make the knn_graph
+    knn_graph <-
+      tidygraph::tbl_graph(
+        nodes = tof_tibble,
+        edges = edge_tibble,
+        directed = FALSE
+      )
+
+    # make the initial ggraph call with or without weights
+    if (graph_type == "weighted") {
+      knn_plot <-
+        ggraph::ggraph(
+          graph = knn_graph,
+          layout = graph_layout,
+          weights = weight,
+          ...
+        )
+    } else {
+      knn_plot <-
+        ggraph::ggraph(
+          graph = knn_graph,
+          layout = graph_layout,
+          ...
         )
     }
 
-    tof_tibble <-
-      tof_tibble %>%
-      select({{channel_var}}, {{group_var}}, {{split_var}}) %>%
-      filter(
-        {{channel_var}} <= quantile({{channel_var}}, upper_quantile),
-        {{channel_var}} >= quantile({{channel_var}}, lower_quantile),
+    knn_plot <-
+      knn_plot +
+      ggraph::geom_edge_link(alpha = edge_alpha) +
+      ggraph::geom_node_point(
+        aes(fill = {{color_col}}),
+        shape = 21,
+        size = node_size
       )
 
-    tof_tibble %>%
-      ggplot(aes(x = {{channel_var}}, y = {{group_var}}, fill = {{split_var}})) +
-      geom_density_ridges(...) +
-      scale_y_discrete(expand = expansion(mult = c(0.05, 0.15))) +
-      scale_fill_tableau()
+    if (!missing(facet_cols)) {
+      knn_plot <-
+        knn_plot +
+        ggraph::facet_nodes(facets = vars({{facet_cols}}))
+    }
+
+    return(knn_plot + theme)
   }
 
 
 
+# community-level visualizations ----------------------------
 
-#' Title
-#'
-#' Plots a series of overlain histograms for all CyTOF channels in your dataset broken up
-#' by a given grouping variable.
-#'
-#' @param tof_tibble a tibble, data.frame, or somehing that can be coerced into either
-#' of these
-#'
-#' @param group_var an unquoted variable name indicating which variable should be used to
-#' break the cells into different histograms.
-#'
-#' @param out_path file path to the directory in which the plots should be saved
-#'
-#' @param label_prefix An optional string to concatenate to the beginning of each file name.
-#'
-#' @param label_suffix An optional string to concatenate to the beginning of each file name.
-#'
-#' @param width The width for the plots being saved.
-#'
-#' @param height The height of the plots being saved.
-#'
-#' @param device "jpg", "tif", or "pdf" file format
-#'
-#' @param ... Optional additional arguments to pass to `tof_histogram()`
-#'
-#' @return Save all density plots to the file path specified by `out_path`.
-#'
-#' @export
-#'
-#' @examples
-#' NULL
-#'
-tof_plot_all_histograms <-
+tof_plot_community_layout <-
   function(
-    tof_tibble,
-    group_var,
-    out_path = NULL,
-    label_prefix = "",
-    label_suffix = "",
-    width,
-    height,
-    device = "pdf",
     ...
   ) {
-
-    my_channels <- tof_tibble %>%
-      select_if(is.numeric) %>%
-      colnames()
-
-    my_channels %>%
-      syms() %>%
-      walk(
-        .f =
-          function(x) {
-            tof_histogram(
-              tof_tibble = tof_tibble,
-              channel_var = !!x,
-              group_var = {{group_var}},
-              ...
-            ) %>%
-              ggsave(
-                filename = str_c(label_prefix, x, label_suffix, sep = "-"),
-                plot = .,
-                device = device,
-                path = out_path,
-                width = width,
-                height = height,
-                units = "in"
-              )
-          }
-      )
+    stop("This function is not yet implemented!")
   }
+
+tof_plot_community_volcano <-
+  function(
+    ...
+  ) {
+    stop("This function is not yet implemented!")
+
+  }
+
+
+# patient-level visualizations --------------------------
+
+tof_plot_patient_features <-
+  function(
+    ...
+  ) {
+    stop("This function is not yet implemented!")
+
+  }
+
+tof_plot_patient_model <-
+  function(
+    model_fit,
+    new_data,
+    ...
+  ) {
+    stop("This function is not yet implemented!")
+
+    # find model type from model_fit
+    NULL
+
+    # make plot depending on the input model_fit
+    if (model_type == "regression") {
+      # make scatterplot of real y values vs. predictions
+      NULL
+    } else if (model_type == "classification") {
+      # make an ROC curve
+      NULL
+    } else {
+      # make some kind of survival curve
+      NULL
+    }
+  }
+
 
