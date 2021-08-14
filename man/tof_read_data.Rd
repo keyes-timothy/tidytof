@@ -32,8 +32,5 @@ Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 \examples{
 NULL
 
-Notes: Will be buggy in the event that a direcory has a combination of .fcs
-and .csv files, as their "panel" attribute may differ (and currently we do
-not do anything to check for this or fix it).
 
 }

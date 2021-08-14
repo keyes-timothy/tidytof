@@ -34,6 +34,7 @@ selection of input variables/CyTOF measurements. It is mostly a convenient
 wrapper around \code{\link[stats]{kmeans}}.
 }
 \examples{
+\dontrun{
 tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 
 kmeans_clusters <-
@@ -41,5 +42,6 @@ kmeans_clusters <-
      tof_tibble,
      cluster_cols = contains("CD", ignore.case = FALSE)
    )
+}
 
 }

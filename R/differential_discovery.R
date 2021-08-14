@@ -138,7 +138,7 @@ tof_daa_diffcyt <-
     }
 
     # check method argument
-    method <- match.arg(method, choices = c("glmm", "edgeR", "voom"))
+    method <- rlang::arg_match(method)
 
     # edgeR can't model random effects, so we throw an error for the user
     # if they are included
@@ -205,7 +205,7 @@ tof_daa_diffcyt <-
                   ...
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
-                  tibble::as_tibble()
+                  dplyr::as_tibble()
               }
             )
         )
@@ -255,7 +255,7 @@ tof_daa_diffcyt <-
                   ...
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
-                  tibble::as_tibble()
+                  dplyr::as_tibble()
               }
             )
         )
@@ -281,7 +281,7 @@ tof_daa_diffcyt <-
                   ...
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
-                  tibble::as_tibble()
+                  dplyr::as_tibble()
               }
             )
         )
@@ -467,8 +467,8 @@ tof_dea_diffcyt <-
 
     my_contrast <-
       diffcyt_args$contrast_matrix_tibble %>%
-      pull(contrast_matrices) %>%
-      pluck(1)
+      dplyr::pull(contrast_matrices) %>%
+      purrr::pluck(1)
 
     if (method == "lmm") {
       # if lmm's are being used,
@@ -492,7 +492,7 @@ tof_dea_diffcyt <-
                   ...
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
-                  tibble::as_tibble()
+                  dplyr::as_tibble()
               }
             )
         )
@@ -537,7 +537,7 @@ tof_dea_diffcyt <-
                   ...
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
-                  tibble::as_tibble() %>%
+                  dplyr::as_tibble() %>%
                   select(-ID)
               }
             )

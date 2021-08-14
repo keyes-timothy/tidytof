@@ -45,4 +45,5 @@ Saves a list of plots contained in a plot_tibble (useful for nested tibbles).
 }
 \examples{
 NULL
+
 }

@@ -20,6 +20,3 @@ A double (of length 1) representing the JSD between the two vectors.
 \description{
 Find the Jensen-Shannon Divergence (JSD) between two numeric vectors
 }
-\examples{
-
-}

@@ -3,9 +3,9 @@
 # and writing output data to files.
 
 
-# tof_find_panel_info ------------------
+# tof_find_panel_info ----------------------------------------------------------
 
-#' Use tkeyes's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
+#' Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
 #'
 #' Using the character vectors obtained from the `name` and `desc` columns of
 #' the parameters of the data of a flowFrame, figure out the CyTOF panel used
@@ -28,26 +28,61 @@ tof_find_panel_info <- function(input_flowFrame) {
 
   # find metals
   metals <-
-    if_else(
-      str_detect(data_names, pattern = str_c(metal_masterlist, collapse = "|")),
-      str_extract(data_names, pattern = str_c(metal_masterlist, collapse = "|")),
-      data_names
+    dplyr::if_else(
+      stringr::str_detect(
+        data_names,
+        pattern = str_c(metal_masterlist, collapse = "|")
+      ),
+      stringr::str_extract(
+        data_names,
+        pattern = str_c(metal_masterlist, collapse = "|")
+      ),
+      stringr::str_extract(
+        data_desc,
+        pattern = str_c(metal_masterlist, collapse = "|")
+      )
     )
 
-  # find antigens
+  # if no metal could be detected, just throw whatever was in the names
+  # slot (to be as informative as possible)
+  metals <-
+    dplyr::if_else(
+      is.na(metals),
+      data_names,
+      metals
+    )
+
+  # find antigens --------------------------------------------------------------
+
+  # first, look in the description slot and remove any metal patterns. What
+  # remains (minus any punctuation) is a candidate antigen name.
   antigens <-
-    if_else(
-      str_detect(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
-      str_remove(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
+    dplyr::if_else(
+      stringr::str_detect(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
+      stringr::str_remove(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
       data_desc
     ) %>%
-    str_remove("^[:punct:]|[:punct:]$") %>%
-    str_remove_all("\\(|\\)|Di") %>%
-    if_else(. == "", "empty", .)
+    stringr::str_remove("^[:punct:]|[:punct:]$") %>%
+    stringr::str_remove_all("\\(|\\)|Di")
+
+  # if a given antigen name is empty after the first round of candidates is
+  # explored, check the desc slot. Remove any metal patterns (and punctuation)
+  # and what remains should be the antigen name.
+  antigens <-
+    dplyr::if_else(
+      antigens == "",
+      stringr::str_remove(data_names, pattern = str_c(metal_masterlist, collapse = "|")),
+      antigens
+    ) %>%
+    stringr::str_remove("^[:punct:]|[:punct:]$") %>%
+    stringr::str_remove_all("\\(|\\)|Di") %>%
+    # if the antigen name of any given channel is still empty, just put the
+    # word "empty"
+    dplyr::if_else(. == "", "empty", .)
 
   # return result
   result <-
-    tibble(
+    tibble::tibble(
       metals,
       antigens
     )
@@ -57,7 +92,7 @@ tof_find_panel_info <- function(input_flowFrame) {
 
 
 
-# tof_read_fcs ------------------
+# tof_read_fcs -----------------------------------------------------------------
 
 #' Read CyTOF data from an .fcs file into a tidy tibble.
 #'
@@ -93,7 +128,8 @@ tof_read_fcs <-
     panel_info <- tof_find_panel_info(input_flowFrame = tof_flowFrame)
 
     # derive and set the column names to use for the output tof_tibble
-    col_names <- str_c(panel_info$antigens, panel_info$metals, sep = sep)
+    col_names <-
+      stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
 
     tof_tibble <-
       tof_flowFrame %>%
@@ -181,6 +217,7 @@ tof_read_csv <-
 #'
 #' @examples
 #' NULL
+#'
 tof_read_file <- function(file_path = NULL, sep = "|", panel_info = NULL) {
   if (get_extension(file_path) == "fcs") {
     tof_tibble <-
@@ -194,7 +231,11 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = NULL) {
   return(tof_tibble)
 }
 
-# tof_read_data ------------------
+# tof_read_data ----------------------------------------------------------------
+# Notes: Will be buggy in the event that a direcory has a combination of .fcs
+# and .csv files, as their "panel" attribute may differ (and currently we do
+# not do anything to check for this or fix it).
+
 
 #' Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 #'
@@ -221,9 +262,6 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = NULL) {
 #' @examples
 #' NULL
 #'
-#' Notes: Will be buggy in the event that a direcory has a combination of .fcs
-#' and .csv files, as their "panel" attribute may differ (and currently we do
-#' not do anything to check for this or fix it).
 #'
 tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble()) {
 
@@ -297,7 +335,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
   return(tof_tibble)
 }
 
-# tof_write_csv ------------------
+# tof_write_csv ----------------------------------------------------------------
 
 #' Write a series of .csv files from a tof_tibble
 #'
@@ -322,6 +360,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 #'
 #' @examples
 #' NULL
+#'
 tof_write_csv <-
   function(
     tof_tibble,
@@ -352,7 +391,7 @@ tof_write_csv <-
 
 
 
-# tof_write_fcs ------------------
+# tof_write_fcs ----------------------------------------------------------------
 
 #' Write a series of .fcs files from a tof_tibble
 #'
@@ -362,11 +401,14 @@ tof_write_csv <-
 #' should be broken into separate .fcs files
 #'
 #' @param tof_tibble A `tof_tibble`.
+#'
 #' @param group_vars Unquoted names of the columns in `tof_tibble` that should
 #' be used to group cells into separate files. Supports tidyselect helpers. Defaults
 #' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#'
 #' @param out_path A system path indicating the directory where the output .csv
 #' files should be saved. If the directory doesn't exist, it will be created.
+#'
 #' @param sep Delimiter that should be used between each of the values of `group_vars`
 #' to create the output .fcs file names. Defaults to "_".
 #'
@@ -377,26 +419,28 @@ tof_write_csv <-
 #'
 #' @examples
 #' NULL
+#'
 tof_write_fcs <-
   function(
     tof_tibble,
-    group_vars = where(~ !(purrr::is_integer(.x) || purrr::is_double(.x))),
+    group_vars = where(~ !(tof_is_numeric(.x))),
     out_path,
     sep = "_"
   ) {
 
+    # create out_path
     dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
 
     # eliminate all non-grouping and non-numeric columns from tof_tibble
     tof_tibble <-
       tof_tibble %>%
-      select({{group_vars}}, where(~ purrr::is_integer(.x) || purrr::is_double(.x)))
+      dplyr::select({{group_vars}}, where(tof_is_numeric))
 
     # find max and min values for all non-grouping columns in tof_tibble
     maxes_and_mins <-
       tof_tibble %>%
-      summarize(
-        across(
+      dplyr::summarize(
+        dplyr::across(
           -{{group_vars}},
           .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
           # use the many underscores because it's unlikely this will come up
@@ -404,13 +448,13 @@ tof_write_fcs <-
           .names = "{.col}_____{.fn}"
         )
       ) %>%
-      pivot_longer(
-        cols = everything(),
+      tidyr::pivot_longer(
+        cols = tidyselect::everything(),
         names_to = c("antigen", "value_type"),
         values_to = "value",
         names_sep = "_____"
       )  %>%
-      pivot_wider(
+      tidyr::pivot_wider(
         names_from = value_type,
         values_from = value
       )
@@ -421,10 +465,10 @@ tof_write_fcs <-
     # nest tof_tibble
     tof_tibble <-
       tof_tibble %>%
-      group_by(across({{group_vars}})) %>%
-      nest() %>%
-      ungroup() %>%
-      unite(col = "prefix", -data, sep = sep)
+      dplyr::group_by(across({{group_vars}})) %>%
+      tidyr::nest() %>%
+      dplyr::ungroup() %>%
+      tidyr::unite(col = "prefix", -data, sep = sep)
 
     # make components of parameters AnnotatedDataFrame
     fcs_varMetadata <-
@@ -441,11 +485,11 @@ tof_write_fcs <-
 
     fcs_data <-
       maxes_and_mins %>%
-      transmute(
+      dplyr::transmute(
         # have to change any instances of "|" in column names to another
         # separator, as "|" has special meaning as an .fcs file delimiter
-        name = str_replace(antigen, "\\|", "_"),
-        desc = str_replace(antigen, "\\|", "_"),
+        name = sstringr::tr_replace(antigen, "\\|", "_"),
+        desc = string::str_replace(antigen, "\\|", "_"),
         range = max - min,
         minRange = min,
         maxRange = max
@@ -484,7 +528,7 @@ tof_write_fcs <-
       )
 
     # write out final .fcs files
-    walk2(
+    purrr::walk2(
       .x = tof_tibble$prefix,
       .y = tof_tibble$flowFrames,
       .f = ~
@@ -497,9 +541,9 @@ tof_write_fcs <-
   }
 
 
-# tof_write_data ------------------
+# tof_write_data ---------------------------------------------------------------
 
-#' Write cytof data to a file or directory of files
+#' Write cytof data to a file or to a directory of files
 #'
 #' Write data (in the form of a tof_tibble) into either a .csv or an .fcs file for storage.
 #'
@@ -523,16 +567,17 @@ tof_write_fcs <-
 #'
 #' @examples
 #' NULL
+#'
 tof_write_data <-
   function(
     tof_tibble = NULL,
-    group_vars = where(~ !(purrr::is_integer(.x) || purrr::is_double(.x))),
+    group_vars = where(~ !(tof_is_numeric(.x))),
     out_path = NULL,
     format = c("csv", "fcs"),
     sep = "_"
   ) {
     # check that the format argument is correctly specified
-    format <- match.arg(arg = format, choices = c("csv", "fcs"), several.ok = TRUE)
+    format <- rlang::arg_match(arg = format)
 
     # if .csv file is asked for
     if ("csv" %in% format) {
@@ -556,7 +601,7 @@ tof_write_data <-
   }
 
 
-# tof_save_figures --------------------------
+# tof_save_figures -------------------------------------------------------------
 
 #' Save each entry in a list-column of ggplot figures in a tibble.
 #'
@@ -577,10 +622,9 @@ tof_write_data <-
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @examples
 #' NULL
+#'
 tof_save_figures <-
 
   function(

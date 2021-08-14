@@ -2,7 +2,7 @@
 % Please edit documentation in R/io.R
 \name{tof_find_panel_info}
 \alias{tof_find_panel_info}
-\title{Use tkeyes's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs}
+\title{Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs}
 \usage{
 tof_find_panel_info(input_flowFrame)
 }

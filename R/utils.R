@@ -251,11 +251,17 @@ cosine_similarity <- function(x, y) {
 
 
 
-
-
-
-
-
+#' @importFrom SummarizedExperiment assays
+#' @importFrom SummarizedExperiment rowData
+#' @importFrom rlang enquo
+#' @importFrom tidyselect eval_select
+#' @importFrom diffcyt createFormula
+#' @importFrom diffcyt createDesignMatrix
+#' @importFrom diffcyt createContrast
+#' @importFrom diffcyt prepareData
+#' @importFrom purrr map
+#' @importFrom tidyr nest
+#'
 prepare_diffcyt_args <-
   function(
     tof_tibble,
@@ -316,7 +322,7 @@ prepare_diffcyt_args <-
 
     # create diffcyt marker_info
     marker_info <-
-      tibble::tibble(marker_name = marker_names) %>%
+      dplyr::tibble(marker_name = marker_names) %>%
       dplyr::mutate(marker_class = "state")
 
     # create formula or design matrix depending on which method is being used
@@ -359,7 +365,7 @@ prepare_diffcyt_args <-
     # tibble of contrast matrices to test the null hypothesis that any given
     # fixed-effect coefficient is 0
     contrast_matrix_tibble <-
-      tibble::tibble(
+      dplyr::tibble(
         contrast_names = contrast_names,
         contrast_matrices =
           purrr::map(
@@ -369,7 +375,7 @@ prepare_diffcyt_args <-
               diffcyt::createContrast()
           )
       ) %>%
-      filter(contrast_names != "(Intercept)")
+      dplyr::filter(contrast_names != "(Intercept)")
 
     # test against the null hypothesis that all fixed-effect coefficients are 0
     initial_contrast <-
@@ -378,8 +384,8 @@ prepare_diffcyt_args <-
       )
 
     contrast_matrix_tibble <-
-      bind_rows(
-        tibble::tibble(contrast_names = "omnibus", contrast_matrices = list(initial_contrast)),
+      dplyr::bind_rows(
+        dplyr::tibble(contrast_names = "omnibus", contrast_matrices = list(initial_contrast)),
         contrast_matrix_tibble
       )
 
@@ -452,25 +458,33 @@ prepare_diffcyt_args <-
 
 
 
-
+#'
+#' @importFrom lme4 glmer
+#' @importFrom stats glm
+#'
 fit_da_model <- function(data, formula, has_random_effects = TRUE) {
+
   if (has_random_effects) {
     model_fit <-
       lme4::glmer(formula, data, family = "binomial", weights = total_cells)
   } else {
     model_fit <-
-      glm(formula, data, family = "binomial", weights = total_cells)
+      stats::glm(formula, data, family = "binomial", weights = total_cells)
   }
 
 }
 
+#'
+#' @importFrom lmerTest lmer
+#' @importFrom stats glm
+#'
 fit_de_model <- function(data, formula, has_random_effects = TRUE) {
   if (has_random_effects) {
     model_fit <-
       lmerTest::lmer(formula, data)
   } else {
       model_fit <-
-        glm(formula, data, family = "gaussian")
+        stats::glm(formula, data, family = "gaussian")
   }
 }
 
@@ -487,6 +501,7 @@ fit_de_model <- function(data, formula, has_random_effects = TRUE) {
 #'
 #' @return A double (of length 1) representing the EMD between the two vectors.
 #'
+#' @importFrom emdist emd2d
 #'
 #' @examples
 #'
@@ -532,8 +547,9 @@ tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
 #'
 #' @return A double (of length 1) representing the JSD between the two vectors.
 #'
+#' @importFrom philentropy JSD
+#' @importFrom purrr quietly
 #'
-#' @examples
 #'
 tof_find_jsd <- function(vec_1, vec_2, num_bins = 100) {
 
@@ -586,6 +602,10 @@ pull_unless_null <- function(tib, uq_colname) {
 
 # because rsample::nested_cv is a bit buggy when not used interactively
 # (call handling is a bit weird in the inside/outside arguments)
+#' @importFrom rsample vfold_cv
+#' @importFrom rsample training
+#' @importFrom rsample bootstraps
+#' @importFrom purrr map
 tof_nested_cv <-
   function(
     .data,
@@ -649,9 +669,22 @@ tof_nested_cv <-
 
 where <- tidyselect::vars_select_helpers$where
 
-# predictive modeling utilities ------------
 
-# fit all linear models for each fold of the innner cv and save result
+
+# predictive modeling utilities ------------------------------------------------
+
+
+#' @importFrom yardstick metric_set
+#' @importFrom yardstick rmse
+#' @importFrom yardstick roc_auc
+#' @importFrom parallel detectCores
+#' @importFrom parallel makePSOCKcluster
+#' @importFrom parallel stopCluster
+#' @importFrom foreach registerDoSEQ
+#' @importFrom doParallel registerDoParallel
+#' @importFrom tune tune_grid
+#' @importFrom tune control_grid
+#'
 tof_tune <-
   function(
     resample_object, # from the split_data object (should have all inner cv fold info)
@@ -662,14 +695,15 @@ tof_tune <-
     run_parallel = TRUE,
     ... # other arguments to be passed to tune_grid
   ) {
+
     # add default metrics if they aren't specified in the function call
     if (missing(metrics)) {
       if ("linear_reg" %in% class(model_spec)) {
         metrics <- yardstick::metric_set(yardstick::rmse)
       } else if ("logistic_reg" %in% class(model_spec)) {
-        metrics <- yardstick::metric_set(roc_auc)
+        metrics <- yardstick::metric_set(yardstick::roc_auc)
       } else {
-        metrics <- yardstick::metric_set(roc_auc)
+        metrics <- yardstick::metric_set(yardstick::roc_auc)
       }
     }
 
@@ -699,6 +733,23 @@ tof_tune <-
     return(result)
   }
 
+#' @importFrom rlang arg_match
+#' @importFrom rlang enquo
+#' @importFrom tidyselect eval_select
+#' @importFrom recipes recipe
+#' @importFrom recipes step_dummy
+#' @importFrom recipes step_nzv
+#' @importFrom recipes step_impute_knn
+#' @importFrom recipes all_numeric_predictors
+#' @importFrom recipes all_predictors
+#' @importFrom parsnip linear_reg
+#' @importFrom parsnip logistic_reg
+#' @importFrom parsnip set_engine
+#' @importFrom tune tune
+#' @importFrom dials parameters
+#' @importFrom dials grid_max_entropy
+#' @importFrom dials grid_regular
+#'
 tof_setup_glmnet_mod <-
   function(
     feature_tibble,
@@ -738,15 +789,6 @@ tof_setup_glmnet_mod <-
     split_data <-
       feature_tibble %>%
       tof_split_data(split_method = split_method, ...)
-
-    # create a formula for the model specification ---------
-    # model_formula <-
-    #   stringr::str_glue(
-    #     "{response_colname} ~ {predictor_string}",
-    #     predictor_string =
-    #       stringr::str_c("`", predictor_colnames, "`", collapse = "+")
-    #   ) %>%
-    #   stats::as.formula()
 
     # create a recipe to preprocess the data -------------
     if (model_type == "survival") {
@@ -834,6 +876,28 @@ tof_setup_glmnet_mod <-
   }
 
 
+#' @importFrom yardstick rmse
+#' @importFrom yardstick ccc
+#' @importFrom yardstick metric_set
+#' @importFrom yardstick accuracy
+#' @importFrom yardstick precision
+#' @importFrom yardstick recall
+#' @importFrom yardstick f_meas
+#' @importFrom yardstick roc_auc
+#' @importFrom yardstick pr_auc
+#' @importFrom tune collect_metrics
+#' @importFrom tune select_best
+#' @importFrom tune finalize_model
+#' @importFrom workflows workflow
+#' @importFrom workflows add_recipe
+#' @importFrom workflows add_model
+#' @importFrom workflows pull_workflow_fit
+#' @importFrom parsnip fit
+#' @importFrom stats predict
+#' @importFrom stats coef
+#' @importFrom purrr pluck
+#' @importFrom purrr map
+#'
 tof_fit_glmnet_mod <-
   function(
     feature_tibble,
@@ -953,7 +1017,7 @@ tof_fit_glmnet_mod <-
 
       final_mod_perf_metrics <-
         final_mod_perf_metrics %>%
-        bind_rows(auc_metrics)
+        dplyr::bind_rows(auc_metrics)
 
     } else if (model_type == "linear") {
       final_mod_perf_metrics <-
@@ -963,7 +1027,7 @@ tof_fit_glmnet_mod <-
           estimate = .pred
         ) %>%
         dplyr::bind_rows(
-          tibble::tibble(
+          dplyr::tibble(
             .metric = "pearson correlation",
             .estimator = "standard",
             .estimate =
@@ -1000,7 +1064,7 @@ tof_fit_glmnet_mod <-
 
       final_mod_perf_metrics <-
         final_mod_perf_metrics %>%
-        bind_rows(auc_metrics)
+        dplyr::bind_rows(auc_metrics)
 
     }
 
@@ -1015,7 +1079,7 @@ tof_fit_glmnet_mod <-
         final_model %>%
         workflows::pull_workflow_fit() %>%
         purrr::pluck("fit") %>%
-        coef(s = best_lambda) %>%
+        stats::coef(s = best_lambda) %>%
         purrr::map(.f = as.matrix) %>%
         purrr::map(.f = as_tibble, rownames = "predictor_name") %>%
         purrr::map(.f = rename, beta = `1`) %>%
@@ -1028,9 +1092,9 @@ tof_fit_glmnet_mod <-
         final_model %>%
         workflows::pull_workflow_fit() %>%
         purrr::pluck("fit") %>%
-        coef(s = best_lambda) %>%
+        stats::coef(s = best_lambda) %>%
         as.matrix() %>%
-        tibble::as_tibble(rownames = "predictor_name") %>%
+        dplyr::as_tibble(rownames = "predictor_name") %>%
         dplyr::rename(beta = `1`) %>%
         dplyr::filter(abs(beta) > 0)
     }

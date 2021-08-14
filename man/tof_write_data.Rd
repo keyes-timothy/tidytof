@@ -2,11 +2,11 @@
 % Please edit documentation in R/io.R
 \name{tof_write_data}
 \alias{tof_write_data}
-\title{Write cytof data to a file or directory of files}
+\title{Write cytof data to a file or to a directory of files}
 \usage{
 tof_write_data(
   tof_tibble = NULL,
-  group_vars = where(~!(purrr::is_integer(.x) || purrr::is_double(.x))),
+  group_vars = where(~!(tof_is_numeric(.x))),
   out_path = NULL,
   format = c("csv", "fcs"),
   sep = "_"
@@ -35,4 +35,5 @@ Write data (in the form of a tof_tibble) into either a .csv or an .fcs file for 
 }
 \examples{
 NULL
+
 }

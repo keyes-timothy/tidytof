@@ -6,7 +6,7 @@
 \usage{
 tof_write_fcs(
   tof_tibble,
-  group_vars = where(~!(purrr::is_integer(.x) || purrr::is_double(.x))),
+  group_vars = where(~!(tof_is_numeric(.x))),
   out_path,
   sep = "_"
 )
@@ -36,4 +36,5 @@ should be broken into separate .fcs files
 }
 \examples{
 NULL
+
 }

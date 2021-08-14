@@ -39,13 +39,16 @@ For additional details about the Phenograph algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
 }
 \examples{
-tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
+\dontrun{
+tof_tibble <-
+   tof_read_data(tidytof_example_data("aml")) \%>\%
+   dplyr::slice_sample(n = 10000)
 
 phenograph_clusters <-
    tof_cluster_phenograph(
      tof_tibble,
      cluster_cols = contains("CD", ignore.case = FALSE)
    )
-
+}
 
 }

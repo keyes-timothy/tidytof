@@ -115,7 +115,6 @@ tof_dr_pca <-
 #' @examples
 #' NULL
 #'
-#' @importFrom Rtsne Rtsne
 #' @importFrom tibble as_tibble
 #' @importFrom purrr pluck
 #'
@@ -130,6 +129,16 @@ tof_dr_tsne <-
     verbose = FALSE,
     ...
   ) {
+
+    # check that Rtsne is installed
+    has_rtsne <- requireNamespace(package = "Rtsne")
+    if (!has_rtsne) {
+      stop(
+        "This function requires the {Rtsne} package. Install it with this code:\n
+           install.packages(\"Rtsne\")"
+      )
+    }
+
 
     result <-
       Rtsne::Rtsne(

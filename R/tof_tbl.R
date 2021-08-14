@@ -3,9 +3,11 @@
 
 #' Constructor for tof_tibble.
 #'
-#' @param x
+#' @param x A data.frame or tibble containing single-cell mass cytometry data
+#' such that rows are cells and columns are CyTOF measurements.
 #'
-#' @param panel
+#' @param panel A data.frame or tibble containing information about the panel
+#' for the mass cytometry data in x.
 #'
 #' @return A `tof_tbl`, an tibble extension that tracks a few other attributes
 #' that are useful for CyTOF data analysis.

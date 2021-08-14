@@ -46,6 +46,10 @@
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
+#' @importFrom FlowSOM BuildSOM
+#' @importFrom FlowSOM BuildMST
+#'
+#'
 #' @export
 #'
 #' @examples
@@ -175,14 +179,17 @@ tof_cluster_flowsom <-
 #' @export
 #'
 #' @examples
-#' tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
+#' \dontrun{
+#' tof_tibble <-
+#'    tof_read_data(tidytof_example_data("aml")) %>%
+#'    dplyr::slice_sample(n = 10000)
 #'
 #' phenograph_clusters <-
 #'    tof_cluster_phenograph(
 #'      tof_tibble,
 #'      cluster_cols = contains("CD", ignore.case = FALSE)
 #'    )
-#'
+#'}
 #'
 tof_cluster_phenograph <-
   function(
@@ -191,6 +198,18 @@ tof_cluster_phenograph <-
     num_neighbors = 30,
     ...
   ) {
+    # check that Rphenograph is installed
+    has_phenograph <- requireNamespace(package = "Rphenograph")
+    if (!has_phenograph) {
+      stop(
+        "This function requires the {Rphenograph} package. Install it with this code:\n
+           if(!require(devtools)){
+              install.packages(\"devtools\")
+           }
+           devtools::install_github(\"JinmiaoChenLab/Rphenograph\")\n"
+      )
+    }
+
     invisible(
       utils::capture.output(
         suppressMessages(
@@ -252,6 +271,7 @@ tof_cluster_phenograph <-
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
 #'
 #' kmeans_clusters <-
@@ -259,6 +279,7 @@ tof_cluster_phenograph <-
 #'      tof_tibble,
 #'      cluster_cols = contains("CD", ignore.case = FALSE)
 #'    )
+#'}
 #'
 tof_cluster_kmeans <-
   function(

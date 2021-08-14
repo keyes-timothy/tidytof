@@ -7,9 +7,11 @@
 new_tof_tibble(x = tibble::tibble(), panel = tibble::tibble())
 }
 \arguments{
-\item{x}{}
+\item{x}{A data.frame or tibble containing single-cell mass cytometry data
+such that rows are cells and columns are CyTOF measurements.}
 
-\item{panel}{}
+\item{panel}{A data.frame or tibble containing information about the panel
+for the mass cytometry data in x.}
 }
 \value{
 A `tof_tbl`, an tibble extension that tracks a few other attributes

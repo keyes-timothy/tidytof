@@ -1,12 +1,4 @@
 #' @import dplyr
-#' @import tidyr
-#' @import stringr
-#' @import forcats
-#' @import ggplot2
-#' @import readr
-#' @import tibble
-#' @import purrr
-#' @import tidyselect
 #'
 #' @importFrom methods as
 #'
@@ -24,3 +16,6 @@
 #' @importFrom foreach `%dopar%`
 #' @importFrom foreach `%do%`
 NULL
+
+`:=` <- rlang::`:=`
+

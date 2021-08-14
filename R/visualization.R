@@ -14,6 +14,25 @@ tof_plot_sc_histograms <-
     stop("This function is not yet implemented!")
   }
 
+#' Title
+#'
+#' description
+#'
+#' @param tof_tibble
+#' @param dr_cols
+#' @param color_col
+#' @param facet_cols
+#' @param dr_method
+#' @param point_alpha
+#' @param theme
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' NULL
+#'
 tof_plot_sc_dr <-
   function(
     tof_tibble,
@@ -81,6 +100,31 @@ tof_plot_sc_dr <-
 
   }
 
+#' Title
+#'
+#' description
+#'
+#' @param tof_tibble
+#' @param knn_cols
+#' @param color_col
+#' @param facet_cols
+#' @param num_neighbors
+#' @param graph_type
+#' @param graph_layout
+#' @param distance_function
+#' @param knn_error
+#' @param edge_alpha
+#' @param node_size
+#' @param theme
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' NULL
+#'
+#'
 tof_plot_sc_layout <-
   function(
     tof_tibble,
@@ -97,6 +141,8 @@ tof_plot_sc_layout <-
     theme = ggplot2::theme_void(),
     ...
   ) {
+
+
     # check distance function
     distance_function <- rlang::arg_match(distance_function)
 
