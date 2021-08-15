@@ -33,17 +33,17 @@ extraction calculation. Defaults to NULL (i.e. performing the extraction without
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselection.}
 
+\item{stimulation_col}{Optional. An unquoted column name that indicates which
+column in `tof_tibble` contains information about which stimulation condition each cell
+was exposed to during data acquisition. If provided, the feature extraction will be
+further broken down into subgroups by stimulation condition (and features from each stimulation
+condition will be included as their own features in wide format).}
+
 \item{threshold}{A double or integer of length 1 indicating what threshold should be used.}
 
 \item{format}{A string indicating if the data should be returned in "wide" format
 (the default; each cluster feature is given its own column) or in "long" format
 (each cluster feature is provided as its own row).}
-
-\item{stimulation_col.}{Optional. An unquoted column name that indicates which
-column in `tof_tibble` contains information about which stimulation condition each cell
-was exposed to during data acquisition. If provided, the feature extraction will be
-further broken down into subgroups by stimulation condition (and features from each stimulation
-condition will be included as their own features in wide format).}
 }
 \value{
 A tibble.

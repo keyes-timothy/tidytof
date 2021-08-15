@@ -19,6 +19,8 @@ and each column represents a CyTOF measurement.}
 
 \item{distance_function}{A string indicating which distance function to use for the
 nearest-neighbor calculation. Options include "euclidean" (the default) and "cosine" distances.}
+
+\item{...}{Optional additional arguments to pass to RANN::nn2}
 }
 \value{
 A list with two elements: "neighbor_ids" and "neighbor_distances," both of which are n by k
