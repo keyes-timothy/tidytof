@@ -108,6 +108,8 @@ tof_is_numeric <- function(.vec) {
 #' @param distance_function A string indicating which distance function to use for the
 #' nearest-neighbor calculation. Options include "euclidean" (the default) and "cosine" distances.
 #'
+#' @param ... Optional additional arguments to pass to RANN::nn2
+#'
 #' @return A list with two elements: "neighbor_ids" and "neighbor_distances," both of which are n by k
 #' matrices (in which n is the number of cells in the input `.data`. The [i,j]-th entry of "neighbor_ids" represents
 #' the row index for the j-th nearest neighbor of the cell in the i-th row of `.data`. The [i,j]-th entry of
@@ -250,15 +252,8 @@ cosine_similarity <- function(x, y) {
 
 
 
-
-#' @importFrom SummarizedExperiment assays
-#' @importFrom SummarizedExperiment rowData
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
-#' @importFrom diffcyt createFormula
-#' @importFrom diffcyt createDesignMatrix
-#' @importFrom diffcyt createContrast
-#' @importFrom diffcyt prepareData
 #' @importFrom purrr map
 #' @importFrom tidyr nest
 #'

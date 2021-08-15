@@ -20,6 +20,3 @@ that are useful for CyTOF data analysis.
 \description{
 Constructor for tof_tibble.
 }
-\examples{
-
-}

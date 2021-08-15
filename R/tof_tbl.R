@@ -12,8 +12,6 @@
 #' @return A `tof_tbl`, an tibble extension that tracks a few other attributes
 #' that are useful for CyTOF data analysis.
 #'
-#' @examples
-#'
 new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
 
   stopifnot(tibble::is_tibble(x))

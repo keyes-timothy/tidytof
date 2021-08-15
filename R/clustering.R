@@ -52,17 +52,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
-#' tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
-#'
-#' flowsom_clusters <-
-#'    tof_cluster_flowsom(
-#'      tof_tibble,
-#'      cluster_cols = contains("CD", ignore.case = FALSE)
-#'    )
-#'
-#'
 #'
 tof_cluster_flowsom <-
   function(
@@ -253,10 +242,10 @@ tof_cluster_phenograph <-
 #' selection of input variables/CyTOF measurements. It is mostly a convenient
 #' wrapper around \code{\link[stats]{kmeans}}.
 #'
-#' @param tof_tibbleA `tof_tibble`.
+#' @param tof_tibble A `tof_tibble`.
 #'
 #' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
-#' use in computing the flowSOM clusters. Defaults to all numeric columns
+#' use in computing the kmeans clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
 #' @param num_clusters An integer indicating the maximum number of clusters
@@ -270,16 +259,6 @@ tof_cluster_phenograph <-
 #'
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
-#'
-#' kmeans_clusters <-
-#'    tof_cluster_kmeans(
-#'      tof_tibble,
-#'      cluster_cols = contains("CD", ignore.case = FALSE)
-#'    )
-#'}
 #'
 tof_cluster_kmeans <-
   function(

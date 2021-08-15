@@ -12,8 +12,10 @@ tof_cluster_kmeans(
 )
 }
 \arguments{
+\item{tof_tibble}{A `tof_tibble`.}
+
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
-use in computing the flowSOM clusters. Defaults to all numeric columns
+use in computing the kmeans clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{num_clusters}{An integer indicating the maximum number of clusters
@@ -21,8 +23,6 @@ that should be returned Defaults to 20.}
 
 \item{...}{Optional additional arguments that can be passed to
 \code{\link[stats]{kmeans}}.}
-
-\item{tof_tibbleA}{`tof_tibble`.}
 }
 \value{
 An integer vector of length `nrow(tof_tibble)` indicating the id of
@@ -32,16 +32,4 @@ the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assig
 This function performs k-means clustering on CyTOF data using a user-specified
 selection of input variables/CyTOF measurements. It is mostly a convenient
 wrapper around \code{\link[stats]{kmeans}}.
-}
-\examples{
-\dontrun{
-tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
-
-kmeans_clusters <-
-   tof_cluster_kmeans(
-     tof_tibble,
-     cluster_cols = contains("CD", ignore.case = FALSE)
-   )
-}
-
 }

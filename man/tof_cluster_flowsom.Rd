@@ -59,16 +59,3 @@ wrapper around \code{\link[FlowSOM]{BuildSOM}} and \code{\link[FlowSOM]{MetaClus
 For additional details about the FlowSOM algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
 }
-\examples{
-
-tof_tibble <- tof_read_data(tidytof_example_data("phenograph")[[1]])
-
-flowsom_clusters <-
-   tof_cluster_flowsom(
-     tof_tibble,
-     cluster_cols = contains("CD", ignore.case = FALSE)
-   )
-
-
-
-}

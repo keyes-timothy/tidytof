@@ -198,7 +198,7 @@ tof_extract_central_tendency <-
 #' calculation. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselection.
 #'
-#' @param stimulation_col. Optional. An unquoted column name that indicates which
+#' @param stimulation_col Optional. An unquoted column name that indicates which
 #' column in `tof_tibble` contains information about which stimulation condition each cell
 #' was exposed to during data acquisition. If provided, the feature extraction will be
 #' further broken down into subgroups by stimulation condition (and features from each stimulation
@@ -277,7 +277,30 @@ tof_extract_threshold <-
 
 
 
+#' Title
+#'
+#' @param tof_tibble
+#'
+#' @param cluster_col
+#'
+#' @param group_cols
+#'
+#' @param marker_cols
+#'
+#' @param stimulation_col
+#'
+#' @param basal_level
+#'
+#' @param format
+#'
+#' @param num_bins
+#'
+#' @return
+#'
+#' @export
+#'
 tof_extract_emd <-
+
   function(
     tof_tibble,
     cluster_col,
@@ -362,7 +385,30 @@ tof_extract_emd <-
   }
 
 
+#' Title
+#'
+#' @param tof_tibble
+#'
+#' @param cluster_col
+#'
+#' @param group_cols
+#'
+#' @param marker_cols
+#'
+#' @param stimulation_col
+#'
+#' @param basal_level
+#'
+#' @param format
+#'
+#' @param num_bins
+#'
+#' @return
+#'
+#' @export
+#'
 tof_extract_jsd <-
+
   function(
     tof_tibble,
     cluster_col,
@@ -448,10 +494,32 @@ tof_extract_jsd <-
 
 
 
-#
-#
-#
-#
+#' Title
+#'
+#' @param tof_tibble
+#'
+#' @param cluster_col
+#'
+#' @param group_cols
+#'
+#' @param stimulation_col
+#'
+#' @param lineage_cols
+#'
+#' @param signaling_cols
+#'
+#' @param central_tendency_function
+#'
+#' @param signaling_method
+#'
+#' @param basal_level
+#'
+#' @param ...
+#'
+#' @return
+#'
+#' @export
+#'
 tof_extract_features <-
   function(
     tof_tibble,
@@ -499,7 +567,6 @@ tof_extract_features <-
            It should be a character vector (a quoted string) indicating which
            value in stimulation_col represents the basal (unstimulated) state.\n")
     }
-
 
     # find cluster abundance features
     abundance_features <-

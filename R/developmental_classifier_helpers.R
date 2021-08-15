@@ -99,12 +99,7 @@ tof_build_classifier <- function(
 #' be used to calculate the distances between each row of `cancer_data` and the
 #' healthy developmental subpopulations corresponding to each row of `classifier_fit`.
 #'
-#' @return
 #'
-#' @export
-#'
-#' @examples
-#' NULL
 tof_classify_cells <-
   function(
     classifier_fit,
