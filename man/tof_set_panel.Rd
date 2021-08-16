@@ -20,7 +20,3 @@ in the input `tof_tibble`. Two columns are required: "metals" and "antigens".
 \description{
 Set panel information from a tof_tibble
 }
-\examples{
-NULL
-
-}

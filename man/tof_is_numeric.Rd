@@ -7,7 +7,7 @@
 tof_is_numeric(.vec)
 }
 \arguments{
-\item{.vec}{}
+\item{.vec}{A vector.}
 }
 \value{
 A boolean value indicating if .vec is of type integer or double.

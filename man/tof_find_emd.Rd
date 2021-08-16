@@ -20,6 +20,3 @@ A double (of length 1) representing the EMD between the two vectors.
 \description{
 Find the earth-mover's distance between two numeric vectors
 }
-\examples{
-
-}

@@ -279,23 +279,23 @@ tof_extract_threshold <-
 
 #' Title
 #'
-#' @param tof_tibble
+#' @param tof_tibble TO DO
 #'
-#' @param cluster_col
+#' @param cluster_col TO DO
 #'
-#' @param group_cols
+#' @param group_cols TO DO
 #'
-#' @param marker_cols
+#' @param marker_cols TO DO
 #'
-#' @param stimulation_col
+#' @param stimulation_col TO DO
 #'
-#' @param basal_level
+#' @param basal_level TO DO
 #'
-#' @param format
+#' @param format TO DO
 #'
-#' @param num_bins
+#' @param num_bins TO DO
 #'
-#' @return
+#' @return TO DO
 #'
 #' @export
 #'
@@ -387,23 +387,23 @@ tof_extract_emd <-
 
 #' Title
 #'
-#' @param tof_tibble
+#' @param tof_tibble TO DO
 #'
-#' @param cluster_col
+#' @param cluster_col TO DO
 #'
-#' @param group_cols
+#' @param group_cols TO DO
 #'
-#' @param marker_cols
+#' @param marker_cols TO DO
 #'
-#' @param stimulation_col
+#' @param stimulation_col TO DO
 #'
-#' @param basal_level
+#' @param basal_level TO DO
 #'
-#' @param format
+#' @param format TO DO
 #'
-#' @param num_bins
+#' @param num_bins TO DO
 #'
-#' @return
+#' @return TO DO
 #'
 #' @export
 #'
@@ -496,27 +496,27 @@ tof_extract_jsd <-
 
 #' Title
 #'
-#' @param tof_tibble
+#' @param tof_tibble TO DO
 #'
-#' @param cluster_col
+#' @param cluster_col TO DO
 #'
-#' @param group_cols
+#' @param group_cols TO DO
 #'
-#' @param stimulation_col
+#' @param stimulation_col TO DO
 #'
-#' @param lineage_cols
+#' @param lineage_cols TO DO
 #'
-#' @param signaling_cols
+#' @param signaling_cols TO DO
 #'
-#' @param central_tendency_function
+#' @param central_tendency_function TO DO
 #'
-#' @param signaling_method
+#' @param signaling_method TO DO
 #'
-#' @param basal_level
+#' @param basal_level TO DO
 #'
-#' @param ...
+#' @param ... TO DO
 #'
-#' @return
+#' @return TO DO
 #'
 #' @export
 #'

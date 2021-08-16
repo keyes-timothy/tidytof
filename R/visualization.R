@@ -18,28 +18,26 @@ tof_plot_sc_histograms <-
 #'
 #' description
 #'
-#' @param tof_tibble
+#' @param tof_tibble TO DO
 #'
-#' @param dr_cols
+#' @param dr_cols TO DO
 #'
-#' @param color_col
+#' @param color_col TO DO
 #'
-#' @param facet_cols
+#' @param facet_cols TO DO
 #'
-#' @param dr_method
+#' @param dr_method TO DO
 #'
-#' @param point_alpha
+#' @param point_alpha TO DO
 #'
-#' @param theme
+#' @param theme TO DO
 #'
-#' @param ...
+#' @param ... TO DO
 #'
-#' @return
+#' @return TO DO
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 tof_plot_sc_dr <-
   function(
@@ -112,38 +110,36 @@ tof_plot_sc_dr <-
 #'
 #' description
 #'
-#' @param tof_tibble
+#' @param tof_tibble TO DO
 #'
-#' @param knn_cols
+#' @param knn_cols TO DO
 #'
-#' @param color_col
+#' @param color_col TO DO
 #'
-#' @param facet_cols
+#' @param facet_cols TO DO
 #'
-#' @param num_neighbors
+#' @param num_neighbors TO DO
 #'
-#' @param graph_type
+#' @param graph_type TO DO
 #'
-#' @param graph_layout
+#' @param graph_layout TO DO
 #'
-#' @param distance_function
+#' @param distance_function TO DO
 #'
-#' @param knn_error
+#' @param knn_error TO DO
 #'
-#' @param edge_alpha
+#' @param edge_alpha TO DO
 #'
-#' @param node_size
+#' @param node_size TO DO
 #'
-#' @param theme
+#' @param theme TO DO
 #'
-#' @param ...
+#' @param ... TO DO
 #'
-#' @return
+#' @return TO DO
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 #'
 tof_plot_sc_layout <-

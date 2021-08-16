@@ -87,14 +87,16 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 #' integer or a double (i.e. is the type of vector that might encode CyTOF
 #' measurements).
 #'
-#' @param .vec
+#' @param .vec A vector.
 #'
 #' @return A boolean value indicating if .vec is of type integer or double.
 #'
-#' @examples
-#' NULL
+#' @importFrom purrr is_integer
+#' @importFrom purrr is_double
+#'
+#'
 tof_is_numeric <- function(.vec) {
-  return(purrr::is_integer(.vec) || purrr::is_double(.vec))
+  return(purrr::is_integer(.vec) | purrr::is_double(.vec))
 }
 
 
@@ -166,6 +168,8 @@ tof_find_knn <-
 #' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
 #' distances to its nearest neighbors).
 #'
+#' @param normalize TO DO
+#'
 #' @return a vector of length N (number of cells) with the ith
 # entry representing the KNN-estimated density of the ith cell.
 #'
@@ -177,7 +181,8 @@ tof_knn_density <-
   function(
     neighbor_ids, # an N by K matrix representing each cell's knn IDs
     neighbor_distances, # an N by K matrix representing each cell's knn distances
-    method = c("mean_distance", "sum_distance")
+    method = c("mean_distance", "sum_distance"),
+    normalize = TRUE
   ) {
 
     # check method argument
@@ -189,18 +194,20 @@ tof_knn_density <-
     n <- nrow(neighbor_ids)
 
     # find densities using one of 3 methods
-    if (method == "mean_distance") {
+    if (method == "sum_distance") {
       densities <- -base::rowSums(abs(neighbor_distances))
-    } else if (method == "sum_distance") {
+    } else if (method == "mean_distance") {
       densities <- -base::rowMeans(abs(neighbor_distances))
     } else {
     stop("Not a valid method.")
     }
 
-    # normalize densities
-    densities <-
-      (densities - min(densities)) /
-      ((max(densities) - min(densities)))
+    if (normalize) {
+      # normalize densities
+      densities <-
+        (densities - min(densities)) /
+        ((max(densities) - min(densities)))
+    }
 
     return(densities) # a vector of length N (number of cells) with the ith
     # entry representing the KNN-estimated density of the ith cell.
@@ -498,7 +505,6 @@ fit_de_model <- function(data, formula, has_random_effects = TRUE) {
 #'
 #' @importFrom emdist emd2d
 #'
-#' @examples
 #'
 tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
 

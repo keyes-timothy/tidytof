@@ -386,7 +386,7 @@ tof_cluster_ddpr <-
           classifier_fit = classifier_fit,
           distance_function = distance_function,
           num_cores = num_cores,
-          parallel_cols = {{parallel_cols}}
+          parallel_vars = {{parallel_cols}}
         )
     }
 
@@ -401,10 +401,6 @@ tof_cluster_ddpr <-
   }
 
 
-
-
-# tof_cluster_spade -----------------
-# TO DO
 
 # tof_cluster_xshift -----------------
 tof_cluster_xshift <-

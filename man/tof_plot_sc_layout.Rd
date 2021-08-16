@@ -21,40 +21,35 @@ tof_plot_sc_layout(
 )
 }
 \arguments{
-\item{tof_tibble}{}
+\item{tof_tibble}{TO DO}
 
-\item{knn_cols}{}
+\item{knn_cols}{TO DO}
 
-\item{color_col}{}
+\item{color_col}{TO DO}
 
-\item{facet_cols}{}
+\item{facet_cols}{TO DO}
 
-\item{num_neighbors}{}
+\item{num_neighbors}{TO DO}
 
-\item{graph_type}{}
+\item{graph_type}{TO DO}
 
-\item{graph_layout}{}
+\item{graph_layout}{TO DO}
 
-\item{distance_function}{}
+\item{distance_function}{TO DO}
 
-\item{knn_error}{}
+\item{knn_error}{TO DO}
 
-\item{edge_alpha}{}
+\item{edge_alpha}{TO DO}
 
-\item{node_size}{}
+\item{node_size}{TO DO}
 
-\item{theme}{}
+\item{theme}{TO DO}
 
-\item{...}{}
+\item{...}{TO DO}
 }
 \value{
-
+TO DO
 }
 \description{
 description
-}
-\examples{
-NULL
-
-
 }

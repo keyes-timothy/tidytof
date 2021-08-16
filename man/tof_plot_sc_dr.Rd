@@ -16,29 +16,25 @@ tof_plot_sc_dr(
 )
 }
 \arguments{
-\item{tof_tibble}{}
+\item{tof_tibble}{TO DO}
 
-\item{dr_cols}{}
+\item{dr_cols}{TO DO}
 
-\item{color_col}{}
+\item{color_col}{TO DO}
 
-\item{facet_cols}{}
+\item{facet_cols}{TO DO}
 
-\item{dr_method}{}
+\item{dr_method}{TO DO}
 
-\item{point_alpha}{}
+\item{point_alpha}{TO DO}
 
-\item{theme}{}
+\item{theme}{TO DO}
 
-\item{...}{}
+\item{...}{TO DO}
 }
 \value{
-
+TO DO
 }
 \description{
 description
-}
-\examples{
-NULL
-
 }

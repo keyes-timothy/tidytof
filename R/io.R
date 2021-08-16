@@ -31,15 +31,15 @@ tof_find_panel_info <- function(input_flowFrame) {
     dplyr::if_else(
       stringr::str_detect(
         data_names,
-        pattern = str_c(metal_masterlist, collapse = "|")
+        pattern = stringr::str_c(metal_masterlist, collapse = "|")
       ),
       stringr::str_extract(
         data_names,
-        pattern = str_c(metal_masterlist, collapse = "|")
+        pattern = stringr::str_c(metal_masterlist, collapse = "|")
       ),
       stringr::str_extract(
         data_desc,
-        pattern = str_c(metal_masterlist, collapse = "|")
+        pattern = stringr::str_c(metal_masterlist, collapse = "|")
       )
     )
 
@@ -58,8 +58,8 @@ tof_find_panel_info <- function(input_flowFrame) {
   # remains (minus any punctuation) is a candidate antigen name.
   antigens <-
     dplyr::if_else(
-      stringr::str_detect(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
-      stringr::str_remove(data_desc, pattern = str_c(metal_masterlist, collapse = "|")),
+      stringr::str_detect(data_desc, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
+      stringr::str_remove(data_desc, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
       data_desc
     ) %>%
     stringr::str_remove("^[:punct:]|[:punct:]$") %>%
@@ -71,7 +71,7 @@ tof_find_panel_info <- function(input_flowFrame) {
   antigens <-
     dplyr::if_else(
       antigens == "",
-      stringr::str_remove(data_names, pattern = str_c(metal_masterlist, collapse = "|")),
+      stringr::str_remove(data_names, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
       antigens
     ) %>%
     stringr::str_remove("^[:punct:]|[:punct:]$") %>%
@@ -286,7 +286,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
       tibble::tibble(
         file_name = file_names,
         data =
-          map(
+          purrr::map(
             .x = list.files(path, full.names = TRUE),
             .f = tof_read_file,
             sep = sep,
@@ -296,7 +296,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 
     # check how many unique panels are present across all files being read
     panels <-
-      map(.x = tof_tibble$data, ~attr(x = .x, which = "panel"))
+      purrr::map(.x = tof_tibble$data, ~attr(x = .x, which = "panel"))
 
     num_panels <-
       panels %>%
@@ -311,7 +311,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
         nest(data = -panel) %>%
         mutate(
           data =
-            map2(
+            purrr::map2(
               .x = data,
               .y = panel,
               .f = ~new_tof_tibble(x = .x, panel = .y)
@@ -319,11 +319,11 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
         ) %>%
         mutate(
           data =
-            map2(
+            purrr::map2(
               .x = data,
               .y = panel,
               .f = ~
-                new_tof_tibble(x = unnest(.x, cols = data), panel = .y)
+                new_tof_tibble(x = tidyr::unnest(.x, cols = data), panel = .y)
             )
         )
 
@@ -331,7 +331,15 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
       # put everything together
       tof_tibble <-
         tof_tibble %>%
-        unnest(cols = data)
+        tidyr::unnest(cols = data)
+
+      panel <-
+        panels %>%
+        unique() %>%
+        purrr::pluck(1)
+
+      tof_tibble <-
+        new_tof_tibble(x = tof_tibble, panel = panel)
     }
 
   }
@@ -492,8 +500,8 @@ tof_write_fcs <-
       dplyr::transmute(
         # have to change any instances of "|" in column names to another
         # separator, as "|" has special meaning as an .fcs file delimiter
-        name = sstringr::tr_replace(antigen, "\\|", "_"),
-        desc = string::str_replace(antigen, "\\|", "_"),
+        name = stringr::str_replace(antigen, "\\|", "_"),
+        desc = stringr::str_replace(antigen, "\\|", "_"),
         range = max - min,
         minRange = min,
         maxRange = max
@@ -512,7 +520,7 @@ tof_write_fcs <-
       dplyr::transmute(
         prefix,
         flowFrames =
-          purrr:::map(
+          purrr::map(
             .x = data,
             ~ flowCore::flowFrame(
               exprs =

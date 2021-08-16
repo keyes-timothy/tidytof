@@ -70,8 +70,6 @@ tof_get_panel <- function(tof_tibble) {
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 tof_set_panel <- function(tof_tibble, panel) {
   attr(tof_tibble, which = "panel") <- panel
@@ -83,49 +81,45 @@ tof_set_panel <- function(tof_tibble, panel) {
 
 # tidyr methods
 
-#' @export
-nest.tof_tbl <- function(.data, ..., .names_sep = NULL, .key = deprecated()) {
+
+nest.tof_tbl <- function(.data, ..., .names_sep = NULL) {#, .key = deprecated()) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
-# needs to be optimized
-#' @export
 unnest.tof_tbl <- function(data, ...) {
   start_panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = start_panel))
 }
 
 
-#' @export
 pivot_longer.tof_tbl <- function(data, ...) {
   panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
-#' @export
 pivot_wider.tof_tbl <- function(data, ...) {
   panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
-#' @importFrom dplyr group_by_drop_default
-#' @export
 group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
 
-
 # dplyr methods
 
-#' @export
 mutate.tof_tbl <- function(.data, ...) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+slice_sample.tof_tbl <- function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
+  panel <- tof_get_panel(.data)
+  return(new_tof_tibble(x = NextMethod(), panel = panel))
+}
 
 
 # grouped_tof_tbl methods ---------------------------------
