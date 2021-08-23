@@ -23,6 +23,8 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("keyes-timothy/tidytof")
 ```
 
+This readme is still under construction! If you're here and it's not done, come back in a week! ;)
+
 ## Usage
 
 ### Reading data (including example datasets)
@@ -42,5 +44,3 @@ devtools::install_github("keyes-timothy/tidytof")
 ### Post-processing
 
 ### Writing data
-
-<https://github.com/r-lib/actions/tree/master/examples>.
