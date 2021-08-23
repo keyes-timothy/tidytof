@@ -54,7 +54,7 @@ tof_plot_sc_dr <-
     # if no dr_cols are specified, use the dr_method to compute them
     if (missing(dr_cols)) {
       # if there's no dr_method specified, just use PCA (for speed)
-      if (dr_method == c("pca", "tsne", "umap")) {
+      if (identical(dr_method, c("pca", "tsne", "umap"))) {
         message("No dr_cols were specified, and no dr_method was specified.
                 Performing PCA as the default dimensionality reduction method.")
       }

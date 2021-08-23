@@ -66,7 +66,3 @@ user-specified selection of CyTOF markers. These calculations can be done either
 overall (across all cells in the dataset) or after breaking down the cells into
 subgroups using `group_cols`.
 }
-\examples{
-NULL
-
-}

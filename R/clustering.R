@@ -131,7 +131,8 @@ tof_cluster_flowsom <-
 
       flowsom_metaclusters <-
         flowsom_metacluster_object[mst$map$mapping[,1]] %>%
-        as.integer()
+        as.integer() %>%
+        as.character()
 
       return(tibble::tibble(flowsom_metacluster = flowsom_metaclusters))
     }
@@ -149,7 +150,7 @@ tof_cluster_flowsom <-
 #' For additional details about the Phenograph algorithm,
 #' see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
 #'
-#' @param tof_tibble A `tof_tibble`.
+#' @param tof_tibble A `tibble` or `tof_tibble`.
 #'
 #' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the flowSOM clusters. Defaults to all numeric columns
@@ -440,9 +441,70 @@ tof_cluster_xshift <-
 
 # tof_cluster -------------------------
 
-tof_cluster <- function(tof_tibble, method, ...) {
-  # TO DO: Fill this in
-  return(NULL)
+#' Perform k-means clustering on CyTOF data.
+#'
+#' This function is a wrapper around {tidytof}'s tof_cluster_* function family.
+#' It performs clustering on CyTOF data using a user-specified method (of 5 choices)
+#' and each method's corresponding input parameters
+#'
+#' @param tof_tibble A `tibble` or `tof_tibble`.
+#'
+#' @param method A string indicating which clustering methods should be used. Valid
+#' values include "flowsom", "phenograph", "kmeans", "ddpr" (although this will
+#' throw an error and redirect the user), and "xshift".
+#'
+#' @param ... Additional arguments to pass onto the `tof_cluster_*`
+#' function family member corresponding to the chosen method.
+#'
+#' @param add_col A boolean value indicating if the output should column-bind the
+#' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
+#' a single-column tibble including only the cluster ids should be returned (FALSE).
+#'
+#' @return A tibble. If add_col = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' ncol(tof_tibble) + 1 columns - Each of the (unaltered) columns in `tof_tibble`
+#' and an additional column encoding the cluster ids.
+#'
+#' @export
+#'
+tof_cluster <- function(tof_tibble, method, ..., add_col = TRUE) {
+
+  if (method == "flowsom") {
+    clusters <-
+      tof_tibble %>%
+      tof_cluster_flowsom(...)
+
+  } else if (method == "phenograph") {
+    clusters <-
+      tof_tibble %>%
+      tof_cluster_phenograph(...)
+
+  } else if (method == "kmeans") {
+    clusters <-
+      tof_tibble %>%
+      tof_cluster_kmeans(...)
+
+  } else if (method == "ddpr") {
+    stop("DDPR clustering should be called using tof_cluster_ddpr.")
+
+  } else if (method == "xshift") {
+    stop("X-shift is not currently supported.")
+
+  } else {
+    stop("Not a valid clustering method.")
+  }
+
+  if (add_col == TRUE) {
+    result <-
+      dplyr::bind_cols(tof_tibble, clusters)
+  } else {
+    result <- clusters
+  }
+
+  return(result)
+
+
+
 }
 
 

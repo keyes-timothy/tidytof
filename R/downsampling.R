@@ -50,6 +50,28 @@ tof_downsample_prop <- function(tof_tibble, group_cols, prop_cells) {
 }
 
 
+#' Title
+#'
+#' @param tof_tibble A `tibble` or `tof_tibble`.
+#'
+#' @param group_cols TO DO
+#'
+#' @param density_cols TO DO
+#'
+#' @param outlier_percentile TO DO
+#'
+#' @param target_percentile TO DO
+#'
+#' @param num_neighbors TO DO
+#'
+#' @param knn_distance_function TO DO
+#'
+#' @param ... TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
 tof_downsample_density <-
   function(
     tof_tibble,
@@ -61,6 +83,7 @@ tof_downsample_density <-
     knn_distance_function = c("euclidean", "cosine"),
     ...#optional additional arguments for RANN:nn2
   ) {
+
     # check knn_distance_function
     knn_distance_function <- rlang::arg_match(knn_distance_function)
 
@@ -78,8 +101,9 @@ tof_downsample_density <-
     # find knn's for all samples
     knn_results <-
       nested_data %>%
+      group_by({{group_cols}}) %>%
       dplyr::transmute(
-        file_name,
+        {{group_cols}},
         cell_ids,
         knn =
           purrr::map(
@@ -91,6 +115,7 @@ tof_downsample_density <-
         neighbor_ids = purrr::map(.x = knn, ~.x$neighbor_ids),
         neighbor_distances = purrr::map(.x = knn, ~.x$neighbor_distances)
       ) %>%
+      dplyr::ungroup() %>%
       dplyr::select(-knn)
 
     # estimate knn densities for each cell
@@ -108,8 +133,9 @@ tof_downsample_density <-
       )
 
     chosen_cells <-
-      dplyr::tibble(
-        file_name = knn_results$file_name,
+      knn_results %>%
+      dplyr::select({{group_cols}}) %>%
+      dplyr::mutate(
         cell_ids = knn_results$cell_ids,
         densities = densities,
         target_density = purrr::map_dbl(.x = densities, .f = quantile, probs = target_percentile)

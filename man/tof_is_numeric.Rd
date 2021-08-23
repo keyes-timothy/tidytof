@@ -17,6 +17,3 @@ This function takes an input vector `.vec` and checks if it is either an
 integer or a double (i.e. is the type of vector that might encode CyTOF
 measurements).
 }
-\examples{
-NULL
-}

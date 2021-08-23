@@ -179,8 +179,8 @@ tof_find_knn <-
 #' NULL
 tof_knn_density <-
   function(
-    neighbor_ids, # an N by K matrix representing each cell's knn IDs
-    neighbor_distances, # an N by K matrix representing each cell's knn distances
+    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
+    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
     method = c("mean_distance", "sum_distance"),
     normalize = TRUE
   ) {
@@ -283,7 +283,6 @@ prepare_diffcyt_args <-
       rlang::enquo(sample_col) %>%
       tidyselect::eval_select(expr = ., data = tof_tibble) %>%
       names()
-
 
     # extract cluster column name as a string
     cluster_colname <-
@@ -806,7 +805,7 @@ tof_setup_glmnet_mod <-
         vars = c(response_colname, predictor_colnames),
         roles = roles
       ) %>%
-      recipes::step_dummy(all_nominal_predictors())
+      recipes::step_dummy(recipes::all_nominal_predictors())
 
     if (remove_zv_predictors) {
       model_recipe <-

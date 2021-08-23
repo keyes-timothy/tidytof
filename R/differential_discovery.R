@@ -165,6 +165,7 @@ tof_daa_diffcyt <-
       dplyr::select(
         {{sample_col}},
         {{marker_cols}},
+        {{cluster_col}},
         {{fixed_effect_cols}},
         {{random_effect_cols}}
       )

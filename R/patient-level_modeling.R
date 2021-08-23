@@ -47,7 +47,35 @@ tof_split_data <-
 
 # building models -------------------------------------
 
-tof_build_regression <-
+#' Title
+#'
+#' @param feature_tibble TO DO
+#'
+#' @param response_col TO DO
+#'
+#' @param predictor_cols TO DO
+#'
+#' @param split_method TO DO
+#'
+#' @param ... TO DO
+#'
+#' @param normalize_predictors TO DO
+#'
+#' @param remove_zv_predictors TO DO
+#'
+#' @param impute_missing_predictors TO DO
+#'
+#' @param grid_type TO DO
+#'
+#' @param grid_size TO DO
+#'
+#' @param run_parallel TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_train_regression <-
   function(
     feature_tibble,
     response_col,
@@ -61,6 +89,7 @@ tof_build_regression <-
     grid_size = 100,
     run_parallel = FALSE
   ) {
+
     # perform all the setup for a glmnet model from any family
     setup_list <-
       tof_setup_glmnet_mod(
@@ -91,7 +120,37 @@ tof_build_regression <-
 
   }
 
-tof_build_classification <-
+#' Title
+#'
+#' @param feature_tibble TO DO
+#'
+#' @param response_col TO DO
+#'
+#' @param predictor_cols TO DO
+#'
+#' @param split_method TO DO
+#'
+#' @param ... TO DO
+#'
+#' @param model_type TO DO
+#'
+#' @param normalize_predictors TO DO
+#'
+#' @param remove_zv_predictors TO DO
+#'
+#' @param impute_missing_predictors TO DO
+#'
+#' @param grid_type TO DO
+#'
+#' @param grid_size TO DO
+#'
+#' @param run_parallel TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_train_classifier <-
   function(
     feature_tibble,
     response_col,
@@ -106,6 +165,7 @@ tof_build_classification <-
     grid_size = 100,
     run_parallel = FALSE
   ) {
+
     # check mode argument
     model_type <- rlang::arg_match(model_type)
 
@@ -144,7 +204,37 @@ tof_build_classification <-
 
 
 
-tof_build_survival <-
+#' Title
+#'
+#' @param feature_tibble TO DO
+#'
+#' @param time_col TO DO
+#'
+#' @param event_col TO DO
+#'
+#' @param predictor_cols TO DO
+#'
+#' @param split_method TO DO
+#'
+#' @param ... TO DO
+#'
+#' @param remove_zv_predictors TO DO
+#'
+#' @param impute_missing_predictors TO DO
+#'
+#' @param grid_type TO DO
+#'
+#' @param grid_size TO DO
+#'
+#' @param best_model_type TO DO
+#'
+#' @param run_parallel TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_train_survival <-
   function(
     feature_tibble,
     time_col,
@@ -379,6 +469,7 @@ tof_build_survival <-
 
   }
 
+
 # applying models to new data -------------------------------------
 
 
@@ -390,7 +481,7 @@ tof_predict <-
   ) {
     # extract the model from the results list
     NULL
-
+    stop("Prediction is not yet supported.")
     # check if the model is a parsnip model or a coxnet model
     NULL
 

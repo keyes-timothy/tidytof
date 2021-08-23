@@ -12,7 +12,7 @@ tof_cluster_phenograph(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble`.}
+\item{tof_tibble}{A `tibble` or `tof_tibble`.}
 
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the flowSOM clusters. Defaults to all numeric columns

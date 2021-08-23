@@ -225,8 +225,6 @@ tof_extract_central_tendency <-
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 tof_extract_threshold <-
   function(

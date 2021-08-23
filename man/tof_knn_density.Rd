@@ -7,7 +7,8 @@
 tof_knn_density(
   neighbor_ids,
   neighbor_distances,
-  method = c("mean_distance", "sum_distance")
+  method = c("mean_distance", "sum_distance"),
+  normalize = TRUE
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ calculated from the distances between it and each of its k nearest neighbors. Op
 taking the negative average of the distances to its nearest neighbors) and "sum_distance"
 (estimates the relative density for a cell's neighborhood by taking the negative sum of the
 distances to its nearest neighbors).}
+
+\item{normalize}{TO DO}
 }
 \value{
 a vector of length N (number of cells) with the ith

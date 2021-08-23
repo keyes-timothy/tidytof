@@ -165,21 +165,21 @@ tof_classify_cells <-
     # This has to be optimized
     population_names <-
       classifications %>%
-      dplyr::mutate(cell_id = 1:nrow(classifications)) %>%
+      dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
       tidyr::pivot_longer(
-        cols = -cell_id,
+        cols = -..cell_id,
         names_to = "cluster",
         values_to = "distance"
       ) %>%
-      dplyr::group_by(cell_id) %>%
+      dplyr::group_by(..cell_id) %>%
       dplyr::filter(distance == min(distance)) %>%
       dplyr::select(-distance)
 
     classifications <-
       classifications %>%
-      dplyr::mutate(cell_id = 1:nrow(classifications)) %>%
-      dplyr::left_join(population_names, by = "cell_id") %>%
-      dplyr::select(-cell_id)
+      dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
+      dplyr::left_join(population_names, by = "..cell_id") %>%
+      dplyr::select(-..cell_id)
 
     return(classifications)
   }
@@ -285,10 +285,10 @@ tof_apply_classifier <- function(
         all_of(classifier_markers)
       ) %>%
       mutate(
-        cell_id = 1:nrow(cancer_tibble)
+        ..cell_id = 1:nrow(cancer_tibble)
       ) %>%
       #dplyr::group_by({{parallel_vars}}) %>%
-      tidyr::nest(data = -{{parallel_vars}}, cell_ids = cell_id) %>%
+      tidyr::nest(data = -{{parallel_vars}}, ..cell_ids = ..cell_id) %>%
       dplyr::ungroup()
 
     # set up parallel back-end
@@ -310,7 +310,7 @@ tof_apply_classifier <- function(
       ) %my_do%
       tof_classify_cells(
         classifier_fit = classifier_fit,
-        cancer_data = dplyr::select(expression_matrix, -cell_id),
+        cancer_data = dplyr::select(expression_matrix, -..cell_id),
         distance_function = distance_function
       )
 
@@ -323,11 +323,11 @@ tof_apply_classifier <- function(
     classification_data <-
       tibble::tibble(
         classification_data = classification_data,
-        cell_ids = cancer_tibble$cell_ids
+        ..cell_ids = cancer_tibble$..cell_ids
       ) %>%
-      tidyr::unnest(cols = c(classification_data, cell_ids)) %>%
-      dplyr::arrange(cell_id) %>%
-      dplyr::select(-cell_id) %>%
+      tidyr::unnest(cols = c(classification_data, ..cell_ids)) %>%
+      dplyr::arrange(..cell_id) %>%
+      dplyr::select(-..cell_id) %>%
       dplyr::rename_with(function(x) str_c(distance_function, x, sep = "_"), .cols = everything())
 
     return(classification_data)
