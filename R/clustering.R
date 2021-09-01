@@ -407,6 +407,7 @@ tof_cluster_ddpr <-
 tof_cluster_xshift <-
   function(
     tof_tibble,
+    # cluster_cols = some_default, - have to add this!!!
     k = max(20, nrow(tof_tibble)),
     distance_function = c("cosine", "euclidean"),
     p_value = 0.01
@@ -415,24 +416,181 @@ tof_cluster_xshift <-
     distance_function <-
       match.arg(distance_function, choices = c("cosine", "euclidean"))
 
-    # calculate "z" value for nearest-neighbor search during step 2
+    # calculate "z" value for nearest-neighbor search during step 2 according
+    # to statistical criteria in the x-shift methods section
     z <-
       -log(p_value / nrow(tof_tibble), base = 2) %>%
       floor()
 
     # step 1a - find nearest neighbors of each cell in tof_tibble
+    # note that the number of neighbors we find is the larger of k and z,
+    # as this allows us not to repeat the calculation needlessly in step 2
     nn_result <-
       tof_tibble %>%
       tof_find_knn(k = max(z, k), distance_function = distance_function)
 
     # step 1b - compute local densities of each cell using knn density estimation
+    # using only k neighbors (if z > k, only use the first k neighbors)
     densities <-
       xshift_compute_local_densities(
         neighbor_ids = nn_result$neighbor_ids[, 1:k],
         neighbor_distances = nn_result$neighbor_distances[, 1:k]
       )
 
-    # step 2 -
+    # step 2 - identify candidate centroids from all cells in the dataset
+    candidates <-
+      xshift_find_candidate_centroids(
+        neighbor_ids = nn_result$neighbor_ids,
+        densities = densities
+      )
+
+    ## step 3 - merge clusters
+
+    # step 3a - find which candidate centroids are gabriel neighbors
+    gabriel_results <-
+      xshift_find_gabriel_neighbors(candidates, distance_function)
+
+    # candidate centroids' protein measurements extracted from tof_tibble
+    centroids <- gabriel_results$centroids
+
+    # tibble containing information about all gabriel pairs from all 2-wise
+    # combinations of candidate nodes
+    gabriel_pairs <- gabriel_results$gabriel_pairs
+
+
+    # step 3b - for all gabriel pairs,
+    #           test if there is a minimum of density on the segment connecting
+    #           the centroids. If there is not, the lower-density centroid should
+    #           be merged with the larger-density centroid.
+    gabriel_pairs <-
+      xshift_test_density_minima(
+        gabriel_pairs = gabriel_pairs,
+        centroids = centroids,
+        k = k,
+        tof_tibble = tof_tibble
+      )
+
+    # step 4 - Merge centroids based on density connections
+    merge_information <-
+      gabriel_pairs %>%
+      dplyr::filter(should_merge) %>%
+      dplyr::select(-should_merge) %>%
+      tidyr::pivot_longer(
+        cols = c(centroid_1, centroid_2),
+        names_to = "centroid",
+        values_to = "merge_from"
+      ) %>%
+      dplyr::select(-centroid) %>%
+      # potentially remove this line
+      dplyr::filter(merge_into != merge_from)
+
+    #########################
+    merge_information_from <-
+      merge_information %>%
+      dplyr::group_by(merge_from) %>%
+      dplyr::summarize(connected_to = list(unique(merge_into)))
+
+    merge_information_into <-
+      merge_information %>%
+      dplyr::group_by(merge_into) %>%
+      dplyr::summarize(connected_to = list(unique(merge_from)))
+    #########################
+
+    candidates <-
+      candidates %>%
+      dplyr::left_join(
+        merge_information_from,
+        by = c("cell_id" = "merge_from")
+      ) %>%
+      dplyr::mutate(
+        connected_to =
+          purrr::map2(
+            .x = closest_neighbor,
+            .y = connected_to,
+            .f = ~ as.numeric(na.omit(unique(c(.x, .y))))
+          )
+      ) %>%
+      dplyr::select(-higher_density_neighbors)
+
+    eliminated_candidates <-
+      merge_information_from %>%
+      dplyr::pull(merge_from)
+
+    candidates <-
+      candidates %>%
+      dplyr::mutate(
+        still_candidate =
+          dplyr::if_else(cell_id %in% eliminated_candidates, FALSE, is_candidate)
+      )
+
+    cluster_ids <-
+      candidates %>%
+      dplyr::filter(still_candidate) %>%
+      dplyr::transmute(cell_id, cluster_id = 1:dplyr::n())
+
+    # density clusters for candidate centroids
+    density_clusters <-
+      candidates %>%
+      dplyr::left_join(cluster_ids, by = "cell_id")
+
+    edge_list <-
+      candidates %>%
+      select(cell_id, connected_to) %>%
+      mutate(
+        connected_to = purrr::map(connected_to, ~ tibble(to = .x))
+      ) %>%
+      tidyr::unnest(cols = connected_to) %>%
+      rename(from = cell_id)
+
+    node_list <-
+      candidates %>%
+      select(cell_id)
+
+    my_graph <-
+      tidygraph::tbl_graph(
+        nodes = node_list,
+        edges = edge_list,
+        directed = FALSE
+      )
+
+    xshift_clusters <-
+      my_graph %>%
+      tidygraph::activate(nodes) %>%
+      dplyr::mutate(
+        group = tidygraph::group_components(type = "strong")
+      ) %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(xshift_cluster = as.character(group)) %>%
+      dplyr::arrange(cell_id) %>%
+      dplyr::select(xshift_cluster)
+
+
+
+    # step 5 - Merge centroids based on mahalanobis distance (until all clusters
+    # have mahalanobis distance of 2.0 or more between them)
+
+    # TO DO
+
+    # return result
+    return(xshift_clusters)
+
+
+
+    # result <-
+    #   list(
+    #     z = z,
+    #     nn_result = nn_result,
+    #     densities = densities,
+    #     candidates = candidates,
+    #     merge_information = merge_information,
+    #     merge_information_from = merge_information_from,
+    #     merge_information_into = merge_information_into,
+    #     gabriel_pairs = gabriel_pairs,
+    #     cluster_ids = cluster_ids,
+    #     density_clusters = density_clusters
+    #   )
+
+
 
 
 
@@ -488,7 +646,9 @@ tof_cluster <- function(tof_tibble, method, ..., add_col = TRUE) {
     stop("DDPR clustering should be called using tof_cluster_ddpr.")
 
   } else if (method == "xshift") {
-    stop("X-shift is not currently supported.")
+    clusters <-
+      tof_tibble %>%
+      tof_cluster_xshift(...)
 
   } else {
     stop("Not a valid clustering method.")

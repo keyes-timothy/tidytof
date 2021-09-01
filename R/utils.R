@@ -105,17 +105,21 @@ tof_is_numeric <- function(.vec) {
 #' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
 #' and each column represents a CyTOF measurement.
 #'
-#' @param k An integer indicating the number of nearest neighbors to return for each cell.
+#' @param k An integer indicating the number of nearest neighbors to return for
+#' each cell.
 #'
-#' @param distance_function A string indicating which distance function to use for the
-#' nearest-neighbor calculation. Options include "euclidean" (the default) and "cosine" distances.
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
 #'
 #' @param ... Optional additional arguments to pass to RANN::nn2
 #'
-#' @return A list with two elements: "neighbor_ids" and "neighbor_distances," both of which are n by k
-#' matrices (in which n is the number of cells in the input `.data`. The [i,j]-th entry of "neighbor_ids" represents
-#' the row index for the j-th nearest neighbor of the cell in the i-th row of `.data`. The [i,j]-th entry of
-#' "neighbor_distances" represents the distance between those two cells according to `distance_function`.
+#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
+#' both of which are n by k matrices (in which n is the number of cells in the
+#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
+#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
+#' The [i,j]-th entry of "neighbor_distances" represents the distance between
+#' those two cells according to `distance_function`.
 #'
 #' @export
 #'
