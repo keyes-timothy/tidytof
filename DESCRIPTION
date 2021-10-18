@@ -57,6 +57,7 @@ Suggests:
     diffcyt,
     FlowSOM,
     Rtsne,
+    statmod,
     Rphenograph,
     testthat (>= 3.0.0),
     covr

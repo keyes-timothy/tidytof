@@ -4,6 +4,7 @@ library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
+library(diffcyt)
 
 # setup
 set.seed(2020)
