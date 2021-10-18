@@ -43,8 +43,6 @@ new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 tof_get_panel <- function(tof_tibble) {
   panel <-

@@ -3,6 +3,7 @@ library(purrr)
 library(readr)
 library(stringr)
 library(tidytof)
+library(testthat)
 
 # tof_read_fcs -----------------------------------------------------------------
 
@@ -28,12 +29,12 @@ fcs_path_4 <-
   pluck(1)
 
 fcs_path_5 <-
-  tidytof_example_data("scaffold") %>%
+  tidytof_example_data("surgery") %>%
   dir(full.names = TRUE) %>%
   pluck(1)
 
 fcs_path_6 <-
-  tidytof_example_data("statistical_scaffold") %>%
+  tidytof_example_data("surgery") %>%
   dir(full.names = TRUE) %>%
   pluck(1)
 
@@ -58,13 +59,13 @@ invisible(capture.output(
 tof_tibble_list_1 <-
   map(
     .x = fcs_path_list,
-    .f = tof_read_fcs
+    .f = tidytof:::tof_read_fcs
   )
 
 tof_tibble_list_2 <-
   map(
     .x = fcs_path_list,
-    .f = tof_read_fcs,
+    .f = tidytof:::tof_read_fcs,
     sep = "___"
   )
 
@@ -130,11 +131,11 @@ test_that("tof_read_fcs() tof_tbl's have correctly-named columns", {
 # setup
 csv_tibble <-
   csv_path %>%
-  tof_read_csv()
+  tidytof:::tof_read_csv()
 
 csv_tibble_2 <-
   csv_path %>%
-  tof_read_csv(
+  tidytof:::tof_read_csv(
     panel_info =
       tibble(
         antigens = c("CD33", "CD3", "CD333"),
@@ -176,19 +177,19 @@ test_that("tof_read_csv() tof_tbl's have a (correct) panel attribute", {
 
 fcs_fcs <-
   fcs_path_1 %>%
-  tof_read_fcs()
+  tidytof:::tof_read_fcs()
 
 file_fcs <-
   fcs_path_1 %>%
-  tof_read_file()
+  tidytof:::tof_read_file()
 
 csv_csv <-
   csv_path %>%
-  tof_read_csv()
+  tidytof:::tof_read_csv()
 
 file_csv <-
   csv_path %>%
-  tof_read_file()
+  tidytof:::tof_read_file()
 
 test_that("tof_read_fcs and tof_read_file produce identical results for .fcs files", {
   expect_equal(fcs_fcs, file_fcs, ignore_attr = TRUE)
@@ -203,11 +204,11 @@ test_that("tof_read_csv and tof_read_file produce identical results for .csv fil
 # tof_read_data ----------------------------------------------------------------
 
 test_that("tof_read_data can read in a single .fcs file", {
-  expect_equal(tof_read_data(fcs_path_1), tof_read_fcs(fcs_path_1), ignore_attr = TRUE)
+  expect_equal(tof_read_data(fcs_path_1), tidytof:::tof_read_fcs(fcs_path_1), ignore_attr = TRUE)
 })
 
 test_that("tof_read_data can read in a single .csv file", {
-  expect_equal(tof_read_data(csv_path), tof_read_csv(csv_path), ignore_attr = TRUE)
+  expect_equal(tof_read_data(csv_path), tidytof:::tof_read_csv(csv_path), ignore_attr = TRUE)
 })
 
 test_that("tof_read_data can read in multiple .fcs files", {
@@ -252,7 +253,7 @@ test_that("tof_read_data can read in multiple .csv and .fcs files simultaneously
     tidytof_example_data("phenograph") %>%
     dir(full.names = TRUE) %>%
     pluck(1) %>%
-    tof_read_fcs() %>%
+    tidytof:::tof_read_fcs() %>%
     tof_get_panel()
 
   tof_tibble <- tof_read_data(tidytof_example_data("mix2"), panel = my_panel)

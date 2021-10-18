@@ -17,7 +17,3 @@ in `tof_tibble`.
 \description{
 Get panel information from a tof_tibble
 }
-\examples{
-NULL
-
-}

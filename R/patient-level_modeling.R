@@ -297,7 +297,7 @@ tof_train_survival <-
     fold_ids <-
       setup_list %>%
       purrr::pluck("split_data") %>%
-      generics::tidy() %>%
+      rsample::tidy() %>%
       dplyr::filter(Data == "Assessment") %>%
       dplyr::arrange(Row) %>%
       dplyr::pull(Fold) %>%

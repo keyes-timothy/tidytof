@@ -17,6 +17,11 @@ tof_reduce_dimensions(
 \item{method}{A method of dimensionality reduction. Currently, PCA, tSNE, and
 UMAP embedding are supported.}
 
+\item{add_cols}{A boolean value indicating if the output should column-bind the
+dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
+(TRUE, the default) or if a tibble including only the low-dimensionality
+embeddings should be returned (FALSE).}
+
 \item{...}{Arguments to be passed to the tof_reduce_* function corresponding to
 the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
 \code{\link{tof_reduce_umap}}.}
