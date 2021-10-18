@@ -6,6 +6,9 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
+
 <!-- badges: end -->
 
 The goal of `tidytof` is to provide an integrated suite of R functions
@@ -420,12 +423,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           1                     1996
-#> 2 cluster3           2                     1991
-#> 3 cluster1           3                     1927
-#> 4 cluster1           2                       73
-#> 5 cluster3           3                        9
-#> 6 cluster2           2                        4
+#> 1 cluster2           1                     1997
+#> 2 cluster3           2                     1987
+#> 3 cluster1           3                     1984
+#> 4 cluster1           2                       16
+#> 5 cluster3           3                       13
+#> 6 cluster2           2                        3
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -445,16 +448,16 @@ phenograph_data %>%
 #> # A tibble: 6,000 × 1
 #>    .flowsom_metacluster
 #>    <chr>               
-#>  1 3                   
-#>  2 3                   
-#>  3 3                   
-#>  4 3                   
-#>  5 3                   
-#>  6 3                   
-#>  7 3                   
-#>  8 3                   
-#>  9 3                   
-#> 10 3                   
+#>  1 1                   
+#>  2 1                   
+#>  3 1                   
+#>  4 1                   
+#>  5 1                   
+#>  6 1                   
+#>  7 1                   
+#>  8 1                   
+#>  9 1                   
+#> 10 1                   
 #> # … with 5,990 more rows
 ```
 
@@ -475,16 +478,16 @@ phenograph_tsne %>%
 #> # A tibble: 6,000 × 2
 #>    .tsne_1 .tsne_2
 #>      <dbl>   <dbl>
-#>  1   15.3    6.16 
-#>  2    9.29   6.72 
-#>  3   27.7   -1.96 
-#>  4   12.1    0.712
-#>  5   19.2    2.90 
-#>  6   18.5    3.67 
-#>  7   15.8    9.38 
-#>  8   25.0    2.67 
-#>  9   11.1   -0.112
-#> 10   25.3  -10.2  
+#>  1   15.9   -1.65 
+#>  2   11.3   -2.20 
+#>  3   22.0   11.0  
+#>  4   10.1    0.629
+#>  5   16.9    2.56 
+#>  6   16.7    1.65 
+#>  7   18.2   -2.83 
+#>  8   22.7    6.21 
+#>  9    9.10   1.23 
+#> 10   14.1   15.9  
 #> # … with 5,990 more rows
 ```
 
@@ -617,6 +620,9 @@ citrus_data %>%
   ggplot(aes(x = `pStat1|Eu153`, fill = stimulation)) + 
   geom_density() + 
   facet_grid(rows = vars(.flowsom_metacluster))
+#> Warning: Groups with fewer than two data points have been dropped.
+#> Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+#> -Inf
 ```
 
 <img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />

@@ -3,6 +3,7 @@ library(purrr)
 library(readr)
 library(stringr)
 library(tidytof)
+library(testthat)
 
 # setup
 clust_data <-
@@ -13,7 +14,6 @@ clust_data <-
 
 
 # tof_cluster_flowsom ----------------------------------------------------------
-
 
 test_that("flowsom result is a tibble with a single character vector column of correct length", {
   flowsom <-

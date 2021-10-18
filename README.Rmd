@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%", 
+  dpi = 300
 )
 ```
 
@@ -19,6 +20,7 @@ knitr::opts_chunk$set(
 
 [![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
 [![Codecov test coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
+
 <!-- badges: end -->
 
 The goal of `tidytof` is to provide an integrated suite of R functions for CyTOF data analysis using an intuitive and internally consistent set of design principles. As an extension of the `tidyverse` ecosystem of data manipulation tools in R, `tidytof` is both performant and easy-to-use for scientists with a wide range of coding experience (including beginners).
