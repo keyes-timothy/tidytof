@@ -107,7 +107,7 @@ tof_cluster_flowsom <-
         spillover = NULL,
         transform = FALSE,
         scale = NULL,
-        prettyColnames = clustering_markers
+        prettyColnames = setNames(clustering_markers, clustering_markers)
       )
 
     class(fsom) <- "FlowSOM"
@@ -126,7 +126,6 @@ tof_cluster_flowsom <-
     som <-
       FlowSOM::BuildSOM(
         fsom = fsom,
-        colsToUse = clustering_markers,
         silent = TRUE,
         xdim = som_xdim,
         ydim = som_ydim,

@@ -5,6 +5,7 @@ library(stringr)
 library(tidytof)
 library(testthat)
 library(FlowSOM)
+library(Rphenograph)
 library(flowCore)
 
 # setup
@@ -16,6 +17,7 @@ clust_data <-
 
 
 # tof_cluster_flowsom ----------------------------------------------------------
+
 
 test_that("flowsom result is a tibble with a single character vector column of correct length", {
   flowsom <-

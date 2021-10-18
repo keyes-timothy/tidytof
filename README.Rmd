@@ -10,7 +10,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%", 
-  dpi = 300
+  dpi = 300,
+  warning = FALSE, 
+  message = FALSE
 )
 ```
 
@@ -218,7 +220,8 @@ To change which clustering algorithm `tof_cluster` uses, alter the `method` flag
 ```{r}
 phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE)
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE) %>% 
+  head()
 ```
 
 ### Dimensionality reduction
