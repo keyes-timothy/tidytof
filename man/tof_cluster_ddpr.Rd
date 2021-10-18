@@ -5,9 +5,9 @@
 \title{Perform developmental clustering on CyTOF data.}
 \usage{
 tof_cluster_ddpr(
+  tof_tibble,
   healthy_tibble,
-  cancer_tibble,
-  healthy_cell_labels,
+  healthy_label_col,
   cluster_cols = where(tof_is_numeric),
   distance_function = c("mahalanobis", "cosine", "pearson"),
   num_cores = 1L,
@@ -17,15 +17,15 @@ tof_cluster_ddpr(
 )
 }
 \arguments{
+\item{tof_tibble}{A `tibble` or `tof_tbl` containing cells to be classified
+into their nearest healthy subpopulation (generally cancer cells).}
+
 \item{healthy_tibble}{A `tibble` or `tof_tibble` containing cells from only
 healthy control samples (i.e. not disease samples).}
 
-\item{cancer_tibble}{A `tibble` or `tof_tibble` containing cells to be classified
-into their nearest healthy subpopulation (generally cancer cells).}
-
-\item{healthy_cell_labels}{A character or integer vector of length `nrow(healthy_tibble)`.
-Each entry in this vector should represent the cell subpopulation label (or cluster id) for
-the corresponding row in `healthy_tibble`.}
+\item{healthy_label_col}{An unquoted column name indicating which column in
+`healthy_tibble` contains the subpopulation label (or cluster id) for
+each cell in `healthy_tibble`.}
 
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the DDPR clusters. Defaults to all numeric columns
@@ -38,16 +38,16 @@ be used to perform the classification. Options are "mahalanobis" (the default),
 \item{num_cores}{An integer indicating the number of CPU cores used to parallelize
 the classification. Defaults to 1 (a single core).}
 
-\item{parallel_cols}{Optional. Unquoted column names indicating which columns in `cancer_tibble` to
+\item{parallel_cols}{Optional. Unquoted column names indicating which columns in `tof_tibble` to
 use for breaking up the data in order to parallelize the classification using
 `foreach` on a `doParallel` backend.
 Supports tidyselect helpers.}
 
 \item{return_distances}{A boolean value indicating whether or not the returned
 result should include only one column, the cluster ids corresponding to each row
-of `cancer_tibble` (return_distances = FALSE, the default), or if the returned
+of `tof_tibble` (return_distances = FALSE, the default), or if the returned
 result should include additional columns representing the distance between each
-row of `cancer_tibble` and each of the healthy subpopulation centroids
+row of `tof_tibble` and each of the healthy subpopulation centroids
 (return_distances = TRUE).}
 
 \item{verbose}{A boolean value indicating whether progress updates should be
@@ -55,25 +55,25 @@ printed during developmental classification. Default is FALSE.}
 }
 \value{
 If `return_distances = FALSE`, a tibble with one column named
-`{distance_function}_cluster`, a character vector of length `nrow(cancer_tibble)`
+`{distance_function}_cluster`, a character vector of length `nrow(tof_tibble)`
 indicating the id of the developmental cluster to which each cell
-(i.e. each row) in `cancer_tibble` was assigned.
+(i.e. each row) in `tof_tibble` was assigned.
 
-If `return_distances = TRUE`, a tibble with `nrow(cancer_tibble)` rows and `nrow(classifier_fit) + 1`
-columns. Each row represents a cell from `cancer_tibble`, and `nrow(classifier_fit)`
+If `return_distances = TRUE`, a tibble with `nrow(tof_tibble)` rows and `nrow(classifier_fit) + 1`
+columns. Each row represents a cell from `tof_tibble`, and `nrow(classifier_fit)`
 of the columns represent the distance between the cell and each of the healthy
 subpopulations' cluster centroids. The final column represents the cluster id of
 the healthy subpopulation with the minimum distance to the cell represented
 by that row.
+
+If `return_distances = FALSE`, a tibble with one column named `.{distance_function}_cluster`.
+This column will contain an integer vector of length `nrow(tof_tibble)` indicating the id of
+the developmental cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{
 This function performs distance-based clustering on CyTOF data
-by sorting cancer cells (passed into the function as `cancer_tibble`) with
+by sorting cancer cells (passed into the function as `tof_tibble`) with
 their most phenotypically similar healthy cell subpopulation (passed into the
-function using `healthy_tibble` and `healthy_cell_labels`). For details about
+function using `healthy_tibble`). For details about
 the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
-}
-\examples{
-NULL
-
 }

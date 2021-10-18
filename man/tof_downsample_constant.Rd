@@ -2,20 +2,27 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample_constant}
 \alias{tof_downsample_constant}
-\title{Title}
+\title{Downsample CyTOF data by randomly selecting a constant number of cells per group.}
 \usage{
-tof_downsample_constant(tof_tibble, group_cols, num_cells)
+tof_downsample_constant(tof_tibble, group_cols = NULL, num_cells)
 }
 \arguments{
-\item{tof_tibble}{TO DO}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_cols}{TO DO}
+\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
+be used to define groups from which `num_cells` will be downsampled.
+Supports tidyselect helpers. Defaults to `NULL` (no grouping).}
 
-\item{num_cells}{TO DO}
+\item{num_cells}{An integer number of cells that should be sampled from each
+group defined by `group_cols`.}
 }
 \value{
-TO DO
+A `tof_tbl` with the same number of columns as the input `tof_tibble`,
+but fewer rows. Specifically, the number of rows will be `num_cells` multiplied
+by the number of unique combinations of the values in `group_cols`. If any group
+has fewer than `num_cells` number of cells, an error will be thrown.
 }
 \description{
-Title
+This function downsamples the number of cells in a `tof_tbl` by randomly selecting
+`num_cells` cells from each unique combination of values in `group_cols`.
 }

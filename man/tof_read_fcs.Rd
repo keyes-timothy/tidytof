@@ -13,20 +13,16 @@ tof_read_fcs(file_path = NULL, sep = "|")
 metal in the column names of the output tibble. Defaults to "|".}
 }
 \value{
-a `tof_tibble` in which each row represents a single cell and each
+a `tof_tbl` in which each row represents a single cell and each
 column represents a CyTOF antigen channel.
 
-A `tof_tibble` is an S3 class that extends the "tibble" class by storing
+A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 one additional attribute: "panel" (a tibble storing information about the
 panel used during data acquisition).
 }
 \description{
 This function reads CyTOF data from a single .fcs file into a tidy data
-structure called a "tof_tibble." tof_tibbles are identical to normal
+structure called a `tof_tbl` ("tof_tibble"). tof_tibbles are identical to normal
 tibbles except for an additional attribute ("panel") that stores information
 about the CyTOF panel used during data acquisition.
-}
-\examples{
-NULL
-
 }

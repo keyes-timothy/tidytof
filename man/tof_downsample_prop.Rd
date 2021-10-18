@@ -2,20 +2,27 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample_prop}
 \alias{tof_downsample_prop}
-\title{Title}
+\title{Downsample CyTOF data by randomly selecting a proportion of the cells in each group.}
 \usage{
-tof_downsample_prop(tof_tibble, group_cols, prop_cells)
+tof_downsample_prop(tof_tibble, group_cols = NULL, prop_cells)
 }
 \arguments{
-\item{tof_tibble}{TO DO}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_cols}{TO DO}
+\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
+be used to define groups from which `prop_cells` will be downsampled.
+Supports tidyselect helpers. Defaults to `NULL` (no grouping).}
 
-\item{prop_cells}{TO DO}
+\item{prop_cells}{A proportion of cells (between 0 and 1) that should be sampled
+from each group defined by `group_cols`.}
 }
 \value{
-TO DO
+A `tof_tbl` with the same number of columns as the input `tof_tibble`,
+but fewer rows. Specifically, the number of rows should be `prop_cells` times the
+number of rows in the input `tof_tibble`.
 }
 \description{
-Title
+This function downsamples the number of cells in a `tof_tbl` by randomly selecting
+a `prop_cells` proportion of the total number of cells with each unique combination
+of values in `group_cols`.
 }

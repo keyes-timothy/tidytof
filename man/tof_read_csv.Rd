@@ -4,7 +4,7 @@
 \alias{tof_read_csv}
 \title{Read CyTOF data from a .csv file into a tidy tibble.}
 \usage{
-tof_read_csv(file_path = NULL, panel_info = tibble::tibble())
+tof_read_csv(file_path = NULL, panel_info = dplyr::tibble())
 }
 \arguments{
 \item{file_path}{A file path to a single .csv file.}
@@ -14,10 +14,10 @@ panel used during CyTOF data acquisition. Two columns are required:
 "metals" and "antigens".}
 }
 \value{
-A `tof_tibble` in which each row represents a single cell and each
+A `tof_tbl` in which each row represents a single cell and each
 column represents a CyTOF antigen channel.
 
-A `tof_tibble` is an S3 class that extends the "tibble" class by storing
+A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 one additional attribute: "panel" (a tibble storing information about the
 panel used during data acquisition). Because panel information isn't
 obvious from data read as a .csv file, this information must be provided
@@ -25,7 +25,4 @@ manually from the user (unlike in `tof_read_fcs`).
 }
 \description{
 Read CyTOF data from a .csv file into a tidy tibble.
-}
-\examples{
-NULL
 }

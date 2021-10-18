@@ -6,16 +6,16 @@
 \usage{
 tof_write_data(
   tof_tibble = NULL,
-  group_vars = where(~!(tof_is_numeric(.x))),
+  group_cols = where(~!(tof_is_numeric(.x))),
   out_path = NULL,
-  format = c("csv", "fcs"),
+  format = c("fcs", "csv"),
   sep = "_"
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_vars}{group_vars Unquoted names of the columns in `tof_tibble` that should
+\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
 be used to group cells into separate files. Supports tidyselect helpers. Defaults
 to selecting all non-numeric (i.e. non-integer and non-double) columns.}
 
@@ -23,17 +23,13 @@ to selecting all non-numeric (i.e. non-integer and non-double) columns.}
 
 \item{format}{format for the files being written. Currently supports .csv and .fcs files}
 
-\item{sep}{Delimiter that should be used between each of the values of `group_vars`
+\item{sep}{Delimiter that should be used between each of the values of `group_cols`
 to create the output .csv/.fcs file names. Defaults to "_".}
 }
 \value{
 This function does not explicitly return any values. Instead,
-it writes .csv or .fcs files to the specified `out_path`.
+it writes .csv and/or .fcs files to the specified `out_path`.
 }
 \description{
-Write data (in the form of a tof_tibble) into either a .csv or an .fcs file for storage.
-}
-\examples{
-NULL
-
+Write data (in the form of a `tof_tbl`) into either a .csv or an .fcs file for storage.
 }

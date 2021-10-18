@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_flowsom}
 \alias{tof_cluster_flowsom}
-\title{Perform flowSOM clustering on CyTOF data}
+\title{Perform FlowSOM clustering on CyTOF data}
 \usage{
 tof_cluster_flowsom(
   tof_tibble = NULL,
@@ -12,11 +12,12 @@ tof_cluster_flowsom(
   som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
   perform_metaclustering = TRUE,
   num_metaclusters = 20,
+  seed,
   ...
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or `tibble`.}
 
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the flowSOM clusters. Defaults to all numeric columns
@@ -41,11 +42,15 @@ Defaults to TRUE.}
 \item{num_metaclusters}{An integer indicating the maximum number of metaclusters
 that should be returned after metaclustering. Defaults to 20.}
 
+\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+Setting this argument explicitly can be useful for reproducibility purposes.
+Defaults to a random integer}
+
 \item{...}{Optional additional parameters that can be passed to the \code{\link[FlowSOM]{BuildSOM}}
 function.}
 }
 \value{
-A tibble with one column named `flowsom_cluster` or `flowsom_metacluster`
+A tibble with one column named `.flowsom_cluster` or `.flowsom_metacluster`
 depending on the value of `perform_metaclustering`. The column will contain an
 integer vector of length `nrow(tof_tibble)` indicating the id of
 the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.

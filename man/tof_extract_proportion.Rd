@@ -12,14 +12,12 @@ tof_extract_proportion(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble` or a `tibble` in which each row represents a
-single cell and each column represents a CyTOF measurement or a piece of metadata
-(i.e. cluster id, patient id, etc.) about each cell.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
-stores the cluster ids of each cell. These cluster columns can be produced via
-any method the user chooses, such as manual gating, any of the functions in the
-`tof_cluster_*` function family, or another method.}
+stores the cluster ids of the cluster to which each cell belongs.
+Cluster labels can be produced via any method the user chooses - including manual gating,
+any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{group_cols}{Unquoted column names representing which columns in `tof_tibble`
 should be used to break the rows of `tof_tibble` into subgroups for the feature
@@ -36,7 +34,7 @@ If format == "wide", the tibble will have 1 row for each combination of
 the grouping variables provided in `group_cols` and one column for each grouping variable
 as well as one column for the proportion of cells in each cluster. The names of each
 column containing cluster proportions is obtained using the following pattern:
-"prop@{cluster_id}".
+"prop@\{cluster_id\}".
 
 If format == "long", the tibble will have 1 row for each combination of the grouping variables
 in `group_cols` and each cluster id (i.e. level) in `cluster_col`. It will have one column for
@@ -47,7 +45,4 @@ cluster proportions.
 This feature extraction function allows you to calculate the proportion of
 cells in each cluster in a `tof_tibble` - either overall or when broken down
 into subgroups using `group_cols`.
-}
-\examples{
-NULL
 }

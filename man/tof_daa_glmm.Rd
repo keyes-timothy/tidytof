@@ -16,21 +16,22 @@ tof_daa_glmm(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble` or a `tibble` in which each row represents a
-single cell and each column represents a CyTOF measurement or a piece of metadata
-(i.e. cluster id, patient id, etc.) about each cell.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{sample_col}{An unquoted column name indicating which column in `tof_tibble`
-represents the sample id of the sample from which each cell was collected.}
+represents the id of the sample from which each cell was collected. `sample_col`
+should serve as a unique identifier for each sample collected during data acquisition -
+all cells with the same value for `sample_col` will be treated as a part of the same
+observational unit.}
 
 \item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
-stores the cluster ids of each cell. These cluster columns can be produced via
-any method the user chooses, such as manual gating, any of the functions in the
-`tof_cluster_*` function family, or another method.}
+stores the cluster ids of the cluster to which each cell belongs.
+Cluster labels can be produced via any method the user chooses - including manual gating,
+any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{fixed_effect_cols}{Unquoted column names representing which columns in
 `tof_tibble` should be used to model fixed effects during the differential
-abundance analysis. Supports tidyselection.
+abundance analysis. Supports tidyselect helpers.
 
 Generally speaking, fixed effects should represent the
 comparisons of biological interest (often the the variables manipulated during
@@ -67,7 +68,7 @@ differential abundance analysis. Defaults to 0.05.}
 \value{
 A nested tibble with two columns: `tested_effect` and `daa_results`.
 
-The first column, `tested_effect`
+The first column, `tested_effect`,
 is a character vector indicating which term in the differential abundance model
 was used for significance testing. The values in this row are obtained
 by pasting together the column names for each fixed effect variable and each
@@ -82,7 +83,7 @@ note that the first row in `tested_effect` will always represent the "omnibus"
 test, or the test that there were significant differences between any levels of
 any fixed effect variable in the model.
 
-The second column, `daa_results` is a list of tibbles in which each entry gives
+The second column, `daa_results`, is a list of tibbles in which each entry gives
 the differential abundance results for each tested_effect. Within each entry
 of `daa_results`, you will find `p_value`, the p-value associated with each
 tested effect in each input cluster; `p_adj`, the multiple-comparison
@@ -93,12 +94,8 @@ abundance between the levels being compared).
 }
 \description{
 This function performs differential abundance analysis on the cell clusters
-contained within a `tof_tibble` using generalized linear mixed-models. Users
+contained within a `tof_tbl` using generalized linear mixed-models. Users
 specify which columns represent sample, cluster, fixed effect, and random effect
 information, and a (mixed) binomial regression model is fit using either
 \code{\link[lme4]{glmer}} or \code{\link[stats]{glm}}.
-}
-\examples{
-NULL
-
 }

@@ -2,12 +2,12 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster}
 \alias{tof_cluster}
-\title{Perform k-means clustering on CyTOF data.}
+\title{Cluster CyTOF data.}
 \usage{
 tof_cluster(tof_tibble, method, ..., add_col = TRUE)
 }
 \arguments{
-\item{tof_tibble}{A `tibble` or `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or `tibble`.}
 
 \item{method}{A string indicating which clustering methods should be used. Valid
 values include "flowsom", "phenograph", "kmeans", "ddpr" (although this will
@@ -21,10 +21,10 @@ cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or 
 a single-column tibble including only the cluster ids should be returned (FALSE).}
 }
 \value{
-A tibble. If add_col = FALSE, it will have a single column encoding
+A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
 the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
-ncol(tof_tibble) + 1 columns - Each of the (unaltered) columns in `tof_tibble`
-and an additional column encoding the cluster ids.
+ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
+plus an additional column encoding the cluster ids.
 }
 \description{
 This function is a wrapper around {tidytof}'s tof_cluster_* function family.

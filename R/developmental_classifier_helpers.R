@@ -36,8 +36,6 @@
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 tof_build_classifier <- function(
   healthy_tibble = NULL,
   healthy_cell_labels = NULL,
@@ -287,7 +285,6 @@ tof_apply_classifier <- function(
       mutate(
         ..cell_id = 1:nrow(cancer_tibble)
       ) %>%
-      #dplyr::group_by({{parallel_vars}}) %>%
       tidyr::nest(data = -{{parallel_vars}}, ..cell_ids = ..cell_id) %>%
       dplyr::ungroup()
 
@@ -304,7 +301,7 @@ tof_apply_classifier <- function(
         expression_matrix = cancer_tibble$data,
         .combine = list,
         .packages = c("dplyr", "purrr", "tidyr"),
-        .export = c("tof_classify_cells", "tof_cosine_dist"), #  "classifier_fit", "tof_cosine_dist"),
+        .export = c("tof_classify_cells", "tof_cosine_dist"),
         .multicombine = TRUE,
         .maxcombine = nrow(cancer_tibble)
       ) %my_do%
@@ -328,7 +325,10 @@ tof_apply_classifier <- function(
       tidyr::unnest(cols = c(classification_data, ..cell_ids)) %>%
       dplyr::arrange(..cell_id) %>%
       dplyr::select(-..cell_id) %>%
-      dplyr::rename_with(function(x) str_c(distance_function, x, sep = "_"), .cols = everything())
+      dplyr::rename_with(
+        function(x) stringr::str_c(paste0(".", distance_function), x, sep = "_"),
+        .cols = tidyselect::everything()
+      )
 
     return(classification_data)
   }

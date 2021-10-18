@@ -6,24 +6,17 @@
 \usage{
 tof_preprocess(
   tof_tibble = NULL,
-  metadata_vars = NULL,
-  channel_vars = where(is.numeric),
+  channel_cols = where(tof_is_numeric),
   undo_noise = TRUE,
   transform_fun = function(x) asinh(x/5)
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble` or a `tibble`.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{metadata_vars}{Unquoted column names of columns in `tof_tibble` that should
-not be computed over, i.e. file names, patient names, stimulation names, etc.
-Supports tidy selection using tidy_select helpers.
-Not currently used.}
-
-\item{channel_vars}{A vector of non-quoted variables representing columns that contain
-single-cell protein measurements. Anything that works in the first argument of
-dplyr::across will work. See ?across. Supports tidy selection using tidyselect
-helpers. If nothing is specified, the default is to transform all numeric columns.}
+\item{channel_cols}{A vector of non-quoted column names representing columns that contain
+single-cell protein measurements. Supports tidyselect helpers.
+If nothing is specified, the default is to transform all numeric columns.}
 
 \item{undo_noise}{A boolean value indicating whether to remove the uniform noise that
 Fluidigm software adds to each CyTOF measurement for aesthetic
@@ -35,16 +28,12 @@ variance stabilization. Defaults to \code{\link[base]{asinh}} transformation
 (with a co-factor of 5).}
 }
 \value{
-A `tof_tibble` with identical dimensions to the input `tof_tibble`, with all
-columns specified in channel_vars transformed using `transform_fun` (with noise
+A `tof_tbl` with identical dimensions to the input `tof_tibble`, with all
+columns specified in channel_cols transformed using `transform_fun` (with noise
 removed or not removed depending on `undo_noise`).
 }
 \description{
-This function transforms a `tof_tibble` of raw ion counts directly measured on
-a mass cytometer using a user-provided function.
-}
-\examples{
-NULL
-
-
+This function transforms a `tof_tbl` of raw ion counts directly measured on
+a mass cytometer using a user-provided function. It can be used to perform
+standard pre-processing steps before CyTOF data analysis.
 }

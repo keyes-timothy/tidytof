@@ -15,14 +15,12 @@ tof_extract_threshold(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble` or a `tibble` in which each row represents a
-single cell and each column represents a CyTOF measurement or a piece of metadata
-(i.e. cluster id, patient id, etc.) about each cell.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
-stores the cluster ids of each cell. These cluster columns can be produced via
-any method the user chooses, such as manual gating, any of the functions in the
-`tof_cluster_*` function family, or another method.}
+stores the cluster ids of the cluster to which each cell belongs.
+Cluster labels can be produced via any method the user chooses - including manual gating,
+any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{group_cols}{Unquoted column names representing which columns in `tof_tibble`
 should be used to break the rows of `tof_tibble` into subgroups for the feature
@@ -31,7 +29,7 @@ extraction calculation. Defaults to NULL (i.e. performing the extraction without
 \item{marker_cols}{Unquoted column names representing which columns in `tof_tibble`
 (i.e. which CyTOF protein measurements) should be included in the feature extraction
 calculation. Defaults to all numeric (integer or double) columns.
-Supports tidyselection.}
+Supports tidyselect helpers.}
 
 \item{stimulation_col}{Optional. An unquoted column name that indicates which
 column in `tof_tibble` contains information about which stimulation condition each cell
@@ -50,9 +48,10 @@ A tibble.
 
 If format == "wide", the tibble will have 1 row for each combination of
 the grouping variables provided in `group_cols` and one column for each grouping variable,
-one column for each extracted feature (the central tendency of a given marker in a given cluster).
+one column for each extracted feature (the proportion of cells in a given cluster
+over with marker expression values over `threshold`).
 The names of each column containing cluster features is obtained using the following pattern:
-"{marker_id}@{cluster_id}".
+"\{marker_id\}@\{cluster_id\}_threshold".
 
 If format == "long", the tibble will have 1 row for each combination of the grouping variables
 in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.

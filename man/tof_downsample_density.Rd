@@ -2,11 +2,11 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample_density}
 \alias{tof_downsample_density}
-\title{Title}
+\title{Downsample CyTOF data by randomly selecting a proportion of the cells in each group.}
 \usage{
 tof_downsample_density(
   tof_tibble,
-  group_cols,
+  group_cols = NULL,
   density_cols = where(tof_is_numeric),
   outlier_percentile = 0.01,
   target_percentile = 0.1,
@@ -16,25 +16,43 @@ tof_downsample_density(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tibble` or `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_cols}{TO DO}
+\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
+be used to define groups within which the downsampling will be performed.
+Supports tidyselect helpers. Defaults to `NULL` (no grouping).}
 
-\item{density_cols}{TO DO}
+\item{density_cols}{Unquoted names of the columns in `tof_tibble` to use in the
+density estimation for each cell. Defaults to all numeric columns in `tof_tibble`.}
 
-\item{outlier_percentile}{TO DO}
+\item{outlier_percentile}{The local density percentile (i.e. a value between 0 and 1)
+below which cells should be considered outliers (and discarded). Cells with a local
+density below `outlier_percentile` will never be selected during the downsampling
+proceure. Defaults to 0.01 (cells below the 1st local density percentile will be removed).}
 
-\item{target_percentile}{TO DO}
+\item{target_percentile}{The local density percentile (i.e. a value between 0 and 1) to which the downsampling
+procedure should adjust all cells. In short, the algorithm will continue to remove
+cells from the input `tof_tibble` until the local densities of all remaining cells
+is equal to `target_percentile`. Lower values will result in more cells being removed.
+See \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}
+for details. Defaults to 0.1 (the 10th percentile of local densities).}
 
-\item{num_neighbors}{TO DO}
+\item{num_neighbors}{An integer indicating the number of neighbors to use
+in the k-nearest neighbor local density estimation. Defaults to 15.}
 
-\item{knn_distance_function}{TO DO}
+\item{knn_distance_function}{A character vector indicating which
+distance function should be used to compute the k-nearest neighbors of each
+input cell in `tof_tibble`. Valid options are "euclidean" (the default) and "cosine".}
 
-\item{...}{TO DO}
+\item{...}{Optional additional arguments to pass to \code{\link[RANN]{nn2}}.}
 }
 \value{
-TO DO
+A `tof_tbl` with the same number of columns as the input `tof_tibble`,
+but fewer rows. The number of rows will depend on the chosen value of `target_percentile`,
+with fewer cells selected with lower values of `target_percentile`.
 }
 \description{
-Title
+This function downsamples the number of cells in a `tof_tbl` using the
+density-dependent downsampling algorithm described in
+\href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}.
 }

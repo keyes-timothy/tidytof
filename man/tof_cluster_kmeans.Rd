@@ -8,6 +8,7 @@ tof_cluster_kmeans(
   tof_tibble,
   cluster_cols = where(tof_is_numeric),
   num_clusters = 20,
+  seed,
   ...
 )
 }
@@ -15,17 +16,22 @@ tof_cluster_kmeans(
 \item{tof_tibble}{A `tof_tibble`.}
 
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
-use in computing the kmeans clusters. Defaults to all numeric columns
+use in computing the k-means clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{num_clusters}{An integer indicating the maximum number of clusters
 that should be returned Defaults to 20.}
 
+\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+Setting this argument explicitly can be useful for reproducibility purposes.
+Defaults to a random integer}
+
 \item{...}{Optional additional arguments that can be passed to
 \code{\link[stats]{kmeans}}.}
 }
 \value{
-An integer vector of length `nrow(tof_tibble)` indicating the id of
+A tibble with one column named `.kmeans_cluster`. This column will contain an
+integer vector of length `nrow(tof_tibble)` indicating the id of
 the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{

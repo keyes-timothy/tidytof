@@ -1,5 +1,5 @@
 
-# tidytof_example_data ------------------
+# tidytof_example_data ---------------------------------------------------------
 
 #' Get paths to tidytof example data
 #'
@@ -316,6 +316,10 @@ prepare_diffcyt_args <-
             c(cluster_colname, sample_colname, fixed_effect_colnames, random_effect_colnames)
         )
       ]
+
+    if (length(marker_names) < 2) {
+      stop("At least 2 markers must be selected (due to diffcyt's underlying implementation).")
+    }
 
     # create diffcyt experiment_info
     experiment_info <-
@@ -1118,3 +1122,19 @@ tof_fit_glmnet_mod <-
     return(results)
 
   }
+
+tof_ttest <-
+  function(enough_samples, x, y, paired = FALSE) {
+    if (enough_samples) {
+      return(t.test(x = x, y = y, paired = paired))
+    } else {
+      return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
+    }
+  }
+
+deframe <- function(x) {
+  value <- x[[2L]]
+  name <- x[[2L]]
+  result <- setNames(value, nm = name)
+  return(result)
+}

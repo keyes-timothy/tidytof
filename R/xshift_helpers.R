@@ -283,7 +283,7 @@ xshift_merge_centroids <- function(candidates, centroids, distance_function) {
   # Determine which candidate centroids are Gabriel neighbors - aka do not have
   # another centroid closer to their midpoint
   gabriel_pairs <-
-    xshift_find_gabriel_neighbors(candidates, centroids, distance_function)
+    xshift_find_gabriel_neighbors(candidates, distance_function)
 
 
 }

@@ -3,7 +3,9 @@
 \docType{data}
 \name{ddpr_data}
 \alias{ddpr_data}
-\title{CyTOF data from 10,000 healthy immune cells from a single patient.}
+\title{CyTOF data from two samples: 5,000 B-cell lineage cells from a healthy
+patient and 5,000 B-cell lineage cells from a B-cell precursor Acute
+Lymphoblastic Leukemia (BCP-ALL) patient.}
 \format{
 A data frame with 10000 rows and 24 variables:
 \describe{

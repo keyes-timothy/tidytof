@@ -2,53 +2,45 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_phenograph}
 \alias{tof_cluster_phenograph}
-\title{Perform Phenograph clustering on CyTOF data.}
+\title{Perform PhenoGraph clustering on CyTOF data.}
 \usage{
 tof_cluster_phenograph(
   tof_tibble,
   cluster_cols = where(tof_is_numeric),
   num_neighbors = 30,
+  seed,
   ...
 )
 }
 \arguments{
-\item{tof_tibble}{A `tibble` or `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or `tibble`.}
 
 \item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
-use in computing the flowSOM clusters. Defaults to all numeric columns
+use in computing the PhenoGraph clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{num_neighbors}{An integer indicating the number of neighbors to use when
-constructing Phenograph's k-nearest-neighbor graph. Smaller values emphasize
+constructing PhenoGraph's k-nearest-neighbor graph. Smaller values emphasize
 local graph structure; larger values emphasize global graph structure (and
 will add time to the computation). Defaults to 30.}
+
+\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+Setting this argument explicitly can be useful for reproducibility purposes.
+Defaults to a random integer}
 
 \item{...}{Optional additional parameters that can be passed to \code{\link[Rphenograph]{Rphenograph}}.}
 }
 \value{
-An integer vector of length `nrow(tof_tibble)` indicating the id of
-the Phenograph cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
+A tibble with one column named `.phenograph_cluster`. This column will contain an
+integer vector of length `nrow(tof_tibble)` indicating the id of
+the PhenoGraph cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{
-This function performs Phenograph clustering on CyTOF data using a user-specified
+This function performs PhenoGraph clustering on CyTOF data using a user-specified
 selection of input variables/CyTOF measurements. It is mostly a convenient
 wrapper around \code{\link[Rphenograph]{Rphenograph}}.
 }
 \details{
 For additional details about the Phenograph algorithm,
-see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
-}
-\examples{
-\dontrun{
-tof_tibble <-
-   tof_read_data(tidytof_example_data("aml")) \%>\%
-   dplyr::slice_sample(n = 10000)
-
-phenograph_clusters <-
-   tof_cluster_phenograph(
-     tof_tibble,
-     cluster_cols = contains("CD", ignore.case = FALSE)
-   )
-}
-
+see \href{https://pubmed.ncbi.nlm.nih.gov/26095251/}{this paper}.
 }

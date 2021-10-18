@@ -2,6 +2,7 @@
 # This file contains functions relevant to extracting patient- or sample-level
 # features by aggregating single-cell data in tof_tibble objects.
 
+# tof_extract_proportion -------------------------------------------------------
 
 #' Extract the proportion of cells in each cluster in a `tof_tibble`.
 #'
@@ -9,14 +10,12 @@
 #' cells in each cluster in a `tof_tibble` - either overall or when broken down
 #' into subgroups using `group_cols`.
 #'
-#' @param tof_tibble A `tof_tibble` or a `tibble` in which each row represents a
-#' single cell and each column represents a CyTOF measurement or a piece of metadata
-#' (i.e. cluster id, patient id, etc.) about each cell.
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
-#' stores the cluster ids of each cell. These cluster columns can be produced via
-#' any method the user chooses, such as manual gating, any of the functions in the
-#' `tof_cluster_*` function family, or another method.
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param group_cols Unquoted column names representing which columns in `tof_tibble`
 #' should be used to break the rows of `tof_tibble` into subgroups for the feature
@@ -32,7 +31,7 @@
 #' the grouping variables provided in `group_cols` and one column for each grouping variable
 #' as well as one column for the proportion of cells in each cluster. The names of each
 #' column containing cluster proportions is obtained using the following pattern:
-#' "prop@{cluster_id}".
+#' "prop@\{cluster_id\}".
 #'
 #' If format == "long", the tibble will have 1 row for each combination of the grouping variables
 #' in `group_cols` and each cluster id (i.e. level) in `cluster_col`. It will have one column for
@@ -41,8 +40,9 @@
 #'
 #' @export
 #'
-#' @examples
-#' NULL
+#' @importFrom tidyr pivot_wider
+#'
+#'
 tof_extract_proportion <-
   function(
     tof_tibble,
@@ -60,7 +60,6 @@ tof_extract_proportion <-
       # two lines below can be compressed into a transmute if multidplyr is not being used
       dplyr::mutate(
         prop = abundance / sum(abundance)
-        #"{{cluster_col}}" := str_c("prop", {{cluster_col}}, sep = "@")
       ) %>%
       dplyr::select({{group_cols}}, {{cluster_col}}, prop)
 
@@ -80,6 +79,8 @@ tof_extract_proportion <-
     return(dplyr::ungroup(abundances))
   }
 
+# tof_extract_central_tendency -------------------------------------------------
+
 
 #' Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`.
 #'
@@ -94,9 +95,9 @@ tof_extract_proportion <-
 #' (i.e. cluster id, patient id, etc.) about each cell.
 #'
 #' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
-#' stores the cluster ids of each cell. These cluster columns can be produced via
-#' any method the user chooses, such as manual gating, any of the functions in the
-#' `tof_cluster_*` function family, or another method.
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param group_cols Unquoted column names representing which columns in `tof_tibble`
 #' should be used to break the rows of `tof_tibble` into subgroups for the feature
@@ -121,7 +122,7 @@ tof_extract_proportion <-
 #' the grouping variables provided in `group_cols` and one column for each grouping variable,
 #' one column for each extracted feature (the central tendency of a given marker in a given cluster).
 #' The names of each column containing cluster features is obtained using the following pattern:
-#' "{marker_id}@{cluster_id}".
+#' "\{marker_id\}@\{cluster_id\}".
 #'
 #' If format == "long", the tibble will have 1 row for each combination of the grouping variables
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
@@ -130,8 +131,9 @@ tof_extract_proportion <-
 #'
 #' @export
 #'
-#' @examples
-#' NULL
+#' @importFrom rlang arg_match
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
 #'
 tof_extract_central_tendency <-
   function(
@@ -172,6 +174,11 @@ tof_extract_central_tendency <-
   }
 
 
+
+
+# tof_extract_threshold --------------------------------------------------------
+
+
 #' Extract aggregated features from CyTOF data using a binary threshold
 #'
 #' This feature extraction function calculates the proportion of cells in a given cluster
@@ -180,14 +187,12 @@ tof_extract_central_tendency <-
 #' overall (across all cells in the dataset) or after breaking down the cells into
 #' subgroups using `group_cols`.
 #'
-#' @param tof_tibble A `tof_tibble` or a `tibble` in which each row represents a
-#' single cell and each column represents a CyTOF measurement or a piece of metadata
-#' (i.e. cluster id, patient id, etc.) about each cell.
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
-#' stores the cluster ids of each cell. These cluster columns can be produced via
-#' any method the user chooses, such as manual gating, any of the functions in the
-#' `tof_cluster_*` function family, or another method.
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param group_cols Unquoted column names representing which columns in `tof_tibble`
 #' should be used to break the rows of `tof_tibble` into subgroups for the feature
@@ -196,7 +201,7 @@ tof_extract_central_tendency <-
 #' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
 #' (i.e. which CyTOF protein measurements) should be included in the feature extraction
 #' calculation. Defaults to all numeric (integer or double) columns.
-#' Supports tidyselection.
+#' Supports tidyselect helpers.
 #'
 #' @param stimulation_col Optional. An unquoted column name that indicates which
 #' column in `tof_tibble` contains information about which stimulation condition each cell
@@ -214,9 +219,10 @@ tof_extract_central_tendency <-
 #'
 #' If format == "wide", the tibble will have 1 row for each combination of
 #' the grouping variables provided in `group_cols` and one column for each grouping variable,
-#' one column for each extracted feature (the central tendency of a given marker in a given cluster).
+#' one column for each extracted feature (the proportion of cells in a given cluster
+#' over with marker expression values over `threshold`).
 #' The names of each column containing cluster features is obtained using the following pattern:
-#' "{marker_id}@{cluster_id}".
+#' "\{marker_id\}@\{cluster_id\}_threshold".
 #'
 #' If format == "long", the tibble will have 1 row for each combination of the grouping variables
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
@@ -225,6 +231,10 @@ tof_extract_central_tendency <-
 #'
 #' @export
 #'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#' @importFrom stringr str_c
+#' @importFrom stringr str_remove
 #'
 tof_extract_threshold <-
   function(
@@ -258,7 +268,7 @@ tof_extract_threshold <-
         dplyr::group_by(dplyr::across({{group_cols}})) %>%
         dplyr::transmute(
           col_names =
-            stringr::str_c({{stimulation_col}}, "_", channel, "@", {{cluster_col}}) %>%
+            stringr::str_c({{stimulation_col}}, "_", channel, "@", {{cluster_col}}, "_threshold") %>%
             stringr::str_remove("^_"),
           values
         ) %>%
@@ -273,39 +283,83 @@ tof_extract_threshold <-
 
 
 
+# tof_extract_emd --------------------------------------------------------------
 
-
-#' Title
+#' Extract aggregated features from CyTOF data using earth-mover's distance (EMD)
 #'
-#' @param tof_tibble TO DO
+#' This feature extraction function calculates the earth-mover's distance (EMD) between
+#' the stimulated and unstimulated ("basal") experimental conditions of samples in a
+#' CyTOF experiment. This calculation is performed across a
+#' user-specified selection of CyTOF antigens and can be performed either
+#' overall (across all cells in the dataset) or after breaking down the cells into
+#' subgroups using `group_cols`.
 #'
-#' @param cluster_col TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param group_cols TO DO
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
-#' @param marker_cols TO DO
+#' @param group_cols Unquoted column names representing which columns in `tof_tibble`
+#' should be used to break the rows of `tof_tibble` into subgroups for the feature
+#' extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).
 #'
-#' @param stimulation_col TO DO
+#' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
+#' (i.e. which CyTOF protein measurements) should be included in the feature extraction
+#' calculation. Defaults to all numeric (integer or double) columns.
+#' Supports tidyselect helpers.
 #'
-#' @param basal_level TO DO
+#' @param stimulation_col Optional. An unquoted column name that indicates which
+#' column in `tof_tibble` contains information about which stimulation condition each cell
+#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' further broken down into subgroups by stimulation condition (and features from each stimulation
+#' condition will be included as their own features in wide format).
 #'
-#' @param format TO DO
+#' @param basal_level A string indicating what the value in `stimulation_col`
+#' corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").
 #'
-#' @param num_bins TO DO
+#' @param format A string indicating if the data should be returned in "wide" format
+#' (the default; each cluster feature is given its own column) or in "long" format
+#' (each cluster feature is provided as its own row).
 #'
-#' @return TO DO
+#' @param num_bins Optional. The number of bins to use in dividing one-dimensional
+#' marker distributions into discrete segments for the EMD calculation. Defaults to 100.
+#'
+#' @return A tibble.
+#'
+#' If format == "wide", the tibble will have 1 row for each combination of
+#' the grouping variables provided in `group_cols` and one column for each grouping variable,
+#' one column for each extracted feature (the EMD between the distribution of a
+#' given marker in a given cluster in the basal condition and the distribution of
+#' that marker in a given cluster in a stimulated condition).
+#' The names of each column containing cluster features is obtained using the following pattern:
+#' "\{stimulation_id\}_\{marker_id\}@\{cluster_id\}_emd".
+#'
+#' If format == "long", the tibble will have 1 row for each combination of the grouping variables
+#' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
+#' It will have one column for each grouping variable, one column for the cluster ids, one
+#' column for the CyTOF channel names, and one column (`value`) containing the features.
 #'
 #' @export
 #'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#' @importFrom tidyr nest
+#' @importFrom purrr map
+#' @importFrom purrr map_lgl
+#' @importFrom purrr map2_dbl
+#' @importFrom tidyselect all_of
+#' @importFrom stringr str_c
+#'
 tof_extract_emd <-
-
   function(
     tof_tibble,
     cluster_col,
     group_cols = NULL,
     marker_cols = where(tof_is_numeric),
     stimulation_col,
-    basal_level, # a string indicating what the basal condition is called in stimulation_col,
+    basal_level,
     format = c("wide", "long"),
     num_bins = 100
   ) {
@@ -313,13 +367,19 @@ tof_extract_emd <-
     format <- rlang::arg_match(format)
 
     # extract the stimulation "levels" present in the original tof_tibble
+    if (missing(stimulation_col)) {
+      stop("`stimulation_col` must be provided.")
+    } else if (missing(basal_level)) {
+      stop("`basal_level` must be provided.")
+    }
+
     stim_levels <-
       tof_tibble %>%
       dplyr::pull({{stimulation_col}}) %>%
-      base::unique()
+      unique()
 
     non_basal_stim_levels <-
-      generics::setdiff(stim_levels, basal_level)
+      setdiff(stim_levels, basal_level)
 
     # nest data
     nested_data <-
@@ -339,7 +399,7 @@ tof_extract_emd <-
           tidyselect::all_of(stim_levels),
           ~ purrr::map(
             .x = .x,
-            .f = ~pull_unless_null(.x, expression)
+            .f = ~ pull_unless_null(.x, expression)
           )
         )
       )
@@ -347,12 +407,12 @@ tof_extract_emd <-
     emd_tibble <-
       nested_data %>%
       dplyr::transmute(
-        {{group_cols}},
+        dplyr::across({{group_cols}}),
         {{cluster_col}},
         marker,
         dplyr::across(
           tidyselect::all_of(non_basal_stim_levels),
-          .fns = ~purrr::map2_dbl(
+          .fns = ~ purrr::map2_dbl(
             .x = .x,
             .y = .data[[basal_level]],
             .f = ~tof_find_emd(.y, .x, num_bins = num_bins)
@@ -368,7 +428,7 @@ tof_extract_emd <-
     if (format == "wide") {
       emd_tibble <-
         emd_tibble %>%
-        mutate(
+        dplyr::mutate(
           col_name =
             stringr::str_c(stimulation, "_", marker, "@", {{cluster_col}}, "_emd")
         ) %>%
@@ -383,37 +443,84 @@ tof_extract_emd <-
   }
 
 
-#' Title
+
+# tof_extract_jsd --------------------------------------------------------------
+
+#' Extract aggregated features from CyTOF data using the Jensen-Shannon Distance (JSD)
 #'
-#' @param tof_tibble TO DO
+#' This feature extraction function calculates the Jensen-Shannon Distance (JSD) between
+#' the stimulated and unstimulated ("basal") experimental conditions of samples in a
+#' CyTOF experiment. This calculation is performed across a
+#' user-specified selection of CyTOF antigens and can be performed either
+#' overall (across all cells in the dataset) or after breaking down the cells into
+#' subgroups using `group_cols`.
 #'
-#' @param cluster_col TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param group_cols TO DO
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
-#' @param marker_cols TO DO
+#' @param group_cols Unquoted column names representing which columns in `tof_tibble`
+#' should be used to break the rows of `tof_tibble` into subgroups for the feature
+#' extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).
 #'
-#' @param stimulation_col TO DO
+#' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
+#' (i.e. which CyTOF protein measurements) should be included in the feature extraction
+#' calculation. Defaults to all numeric (integer or double) columns.
+#' Supports tidyselect helpers.
 #'
-#' @param basal_level TO DO
+#' @param stimulation_col Optional. An unquoted column name that indicates which
+#' column in `tof_tibble` contains information about which stimulation condition each cell
+#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' further broken down into subgroups by stimulation condition (and features from each stimulation
+#' condition will be included as their own features in wide format).
 #'
-#' @param format TO DO
+#' @param basal_level A string indicating what the value in `stimulation_col`
+#' corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").
 #'
-#' @param num_bins TO DO
+#' @param format A string indicating if the data should be returned in "wide" format
+#' (the default; each cluster feature is given its own column) or in "long" format
+#' (each cluster feature is provided as its own row).
 #'
-#' @return TO DO
+#' @param num_bins Optional. The number of bins to use in dividing one-dimensional
+#' marker distributions into discrete segments for the JSD calculation. Defaults to 100.
+#'
+#' @return A tibble.
+#'
+#' If format == "wide", the tibble will have 1 row for each combination of
+#' the grouping variables provided in `group_cols` and one column for each grouping variable,
+#' one column for each extracted feature (the JSD between the distribution of a
+#' given marker in a given cluster in the basal condition and the distribution of
+#' that marker in the same cluster in a stimulated condition).
+#' The names of each column containing cluster features is obtained using the following pattern:
+#' "\{stimulation_id\}_\{marker_id\}@\{cluster_id\}_jsd".
+#'
+#' If format == "long", the tibble will have 1 row for each combination of the grouping variables
+#' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
+#' It will have one column for each grouping variable, one column for the cluster ids, one
+#' column for the CyTOF channel names, and one column (`value`) containing the features.
 #'
 #' @export
 #'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#' @importFrom tidyr nest
+#' @importFrom purrr map
+#' @importFrom purrr map_lgl
+#' @importFrom purrr map2_dbl
+#' @importFrom tidyselect all_of
+#' @importFrom stringr str_c
+#'
 tof_extract_jsd <-
-
   function(
     tof_tibble,
     cluster_col,
     group_cols = NULL,
     marker_cols = where(tof_is_numeric),
     stimulation_col,
-    basal_level, # a string indicating what the basal condition is called in stimulation_col,
+    basal_level,
     format = c("wide", "long"),
     num_bins = 100
   ) {
@@ -421,13 +528,20 @@ tof_extract_jsd <-
     format <- rlang::arg_match(format)
 
     # extract the stimulation "levels" present in the original tof_tibble
+
+    if (missing(stimulation_col)) {
+      stop("`stimulation_col` must be provided.")
+    } else if (missing(basal_level)) {
+      stop("`basal_level` must be provided.")
+    }
+
     stim_levels <-
       tof_tibble %>%
       dplyr::pull({{stimulation_col}}) %>%
-      base::unique()
+      unique()
 
     non_basal_stim_levels <-
-      generics::setdiff(stim_levels, basal_level)
+      setdiff(stim_levels, basal_level)
 
     # nest data
     nested_data <-
@@ -455,7 +569,7 @@ tof_extract_jsd <-
     jsd_tibble <-
       nested_data %>%
       dplyr::transmute(
-        {{group_cols}},
+        dplyr::across({{group_cols}}),
         {{cluster_col}},
         marker,
         dplyr::across(
@@ -492,29 +606,83 @@ tof_extract_jsd <-
 
 
 
-#' Title
+#' Extract aggregated, sample-level features from CyTOF data.
 #'
-#' @param tof_tibble TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param cluster_col TO DO
+#' This function wraps other members of the `tof_extract_*` function family to extract
+#' sample-level features from both lineage (i.e. cell surface antigen) CyTOF channels
+#' assumed to be stable across stimulation conditions and signaling CyTOF channels
+#' assumed to change across stimulation conditions. Features are extracted for
+#' each cluster within each independent sample (as defined with the `group_cols` argument).
 #'
-#' @param group_cols TO DO
+#' Lineage channels are specified using the `lineage_cols` argument, and their
+#' extracted features will be measurements of central tendency (as computed by the
+#' user-supplied `central_tendency_function`).
 #'
-#' @param stimulation_col TO DO
+#' Signaling channels are specified
+#' using the `signaling_cols` argument, and their extracted features will depend
+#' on the user's chosen `signaling_method`. If `signaling method` == "threshold"
+#' (the default), \code{\link{tof_extract_threshold}} will be used to calculate the proportion of
+#' cells in each cluster with signaling marker expression over `threshold` in each
+#' stimulation condition. If `signaling_method` == "emd" or `signaling_method` == "jsd",
+#' \code{\link{tof_extract_emd}} or \code{\link{tof_extract_jsd}} will be used to calculate the earth-mover's
+#' distance (EMD) or Jensen-Shannon Distance (JSD), respectively, between the basal
+#' condition and each of the stimulated conditions in each cluster for each sample.
+#' Finally, if none of these options are chosen, \code{\link{tof_extract_central_tendency}}
+#' will be used to calculate measurements of central tendency.
 #'
-#' @param lineage_cols TO DO
+#' In addition, \code{\link{tof_extract_proportion}} will be used to extract
+#' the proportion of cells in each cluster will be computed for each sample.
 #'
-#' @param signaling_cols TO DO
+#' These calculations can be performed either
+#' overall (across all cells in the dataset) or after breaking down the cells into
+#' subgroups using `group_cols`.
 #'
-#' @param central_tendency_function TO DO
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the cluster ids of the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
-#' @param signaling_method TO DO
+#' @param group_cols Unquoted column names representing which columns in `tof_tibble`
+#' should be used to break the rows of `tof_tibble` into subgroups for the feature
+#' extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).
 #'
-#' @param basal_level TO DO
+#' @param stimulation_col Optional. An unquoted column name that indicates which
+#' column in `tof_tibble` contains information about which stimulation condition each cell
+#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' further broken down into subgroups by stimulation condition (and features from each stimulation
+#' condition will be included as their own features in wide format).
 #'
-#' @param ... TO DO
+#' @param lineage_cols Unquoted column names representing which columns in `tof_tibble`
+#' (i.e. which CyTOF protein measurements) should be considered lineage markers in the
+#' feature extraction calculation. Supports tidyselect helpers.
 #'
-#' @return TO DO
+#' @param signaling_cols  Unquoted column names representing which columns in `tof_tibble`
+#' (i.e. which CyTOF protein measurements) should be considered signaling markers in the
+#' feature extraction calculation. Supports tidyselect helpers.
+#'
+#' @param central_tendency_function The function that will be used to calculate
+#' the measurement of central tendency for each cluster (to be used
+#' as the dependent variable in the linear model). Defaults to \code{\link[stats]{median}}.
+#'
+#' @param signaling_method A string indicating which feature extraction method to use
+#' for signaling markers (as identified by the `signaling_cols` argument). Options are
+#' "threshold" (the default), "emd", "jsd", and "central tendency".
+#'
+#' @param basal_level A string indicating what the value in `stimulation_col`
+#' corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").
+#'
+#' @param ... Optional additional arguments to be passed to tof_extract_threshold,
+#' \code{\link{tof_extract_emd}}, or \code{\link{tof_extract_jsd}}.
+#'
+#' @return A tibble.
+#'
+#' The output tibble will have 1 row for each combination of
+#' the grouping variables provided in `group_cols` (thus, each row will represent
+#' what is considered a single "sample" based on the grouping provided).
+#' It will have one column for each grouping variable and one column for each
+#' extracted feature ("wide" format).
 #'
 #' @export
 #'
@@ -526,7 +694,7 @@ tof_extract_features <-
     stimulation_col = NULL,
     lineage_cols,
     signaling_cols,
-    central_tendency_function = mean,
+    central_tendency_function = stats::median,
     signaling_method = c("threshold", "emd", "jsd", "central tendency"),
     basal_level = NULL,
     ... # Optional additional arguments to be passed to tof_extract_threshold, tof_extract_emd, or tof_extract_jsd
@@ -703,24 +871,25 @@ tof_extract_features <-
             dplyr::left_join(signaling_features, by = group_colnames)
         }
       }
-
-      # if there are no grouping variables
-      if (length(group_colnames) == 0) {
-        final_features <-
-          abundance_features %>%
-          dplyr::bind_cols(lineage_features) %>%
-          dplyr::bind_cols(signaling_features)
-
-      } else {
-        # if there are grouping columns
-        final_features <-
-          abundance_features %>%
-          dplyr::left_join(lineage_features, by = group_colnames) %>%
-          dplyr::left_join(signaling_features, by = group_colnames)
-      }
-
-      return(final_features)
     }
+
+    # if there are no grouping variables
+    if (length(group_colnames) == 0) {
+      final_features <-
+        abundance_features %>%
+        dplyr::bind_cols(lineage_features) %>%
+        dplyr::bind_cols(signaling_features)
+
+    } else {
+      # if there are grouping columns
+      final_features <-
+        abundance_features %>%
+        dplyr::left_join(lineage_features, by = group_colnames) %>%
+        dplyr::left_join(signaling_features, by = group_colnames)
+    }
+
+    return(final_features)
+
   }
 
 

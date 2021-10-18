@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{tof_find_panel_info}
 \alias{tof_find_panel_info}
-\title{Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs}
+\title{Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
+from a flowFrame (read from a .fcs file.)}
 \usage{
 tof_find_panel_info(input_flowFrame)
 }
@@ -18,8 +19,4 @@ metals and antigens of the CyTOF panel used during data acquisition.
 Using the character vectors obtained from the `name` and `desc` columns of
 the parameters of the data of a flowFrame, figure out the CyTOF panel used
 to collect the data and return it as a tidy tibble.
-}
-\examples{
-NULL
-
 }

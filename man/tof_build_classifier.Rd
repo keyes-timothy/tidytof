@@ -40,6 +40,3 @@ cell subpopulation to which each cell belongs. It uses these values to calculate
 several values required to perform "developmental classification" as described in
 \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
 }
-\examples{
-NULL
-}

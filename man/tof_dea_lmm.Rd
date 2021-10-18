@@ -18,17 +18,18 @@ tof_dea_lmm(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble` or a `tibble` in which each row represents a
-single cell and each column represents a CyTOF measurement or a piece of metadata
-(i.e. cluster id, patient id, etc.) about each cell.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{sample_col}{An unquoted column name indicating which column in `tof_tibble`
-represents the sample id of the sample from which each cell was collected.}
+represents the id of the sample from which each cell was collected. `sample_col`
+should serve as a unique identifier for each sample collected during data acquisition -
+all cells with the same value for `sample_col` will be treated as a part of the same
+observational unit.}
 
 \item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
-stores the cluster ids of each cell. These cluster columns can be produced via
-any method the user chooses, such as manual gating, any of the functions in the
-`tof_cluster_*` function family, or another method.}
+stores the cluster ids of the cluster to which each cell belongs.
+Cluster labels can be produced via any method the user chooses - including manual gating,
+any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{marker_cols}{Unquoted column names representing which columns in `tof_tibble`
 (i.e. which CyTOF protein measurements) should be included in the differential
@@ -44,14 +45,14 @@ comparisons of biological interest (often the the variables manipulated during
 experiments), such as treated vs. non-treated, before-treatment vs. after-treatment,
 or healthy vs. non-healthy.}
 
-\item{random_effect_cols}{Unquoted column names representing which columns in
+\item{random_effect_cols}{Optional. Unquoted column names representing which columns in
 `tof_tibble` should be used to model random effects during the differential
 expression analysis. Supports tidyselection.
 
 Generally speaking, random effects should represent variables
 that a researcher wants to control/account for, but that are not necessarily
 of biological interest. Example random effect variables might include batch id,
-patient id (in a paired design), or patient age.}
+patient id (in a paired design), or patient age. Most analyses will not include random effects.}
 
 \item{central_tendency_function}{The function that will be used to calculate
 the measurement of central tendency for each cluster/marker pair (to be used
@@ -97,11 +98,11 @@ tested effect in each input cluster/marker pair; `p_adj`, the multiple-compariso
 adjusted p-value (using the \code{\link[stats]{p.adjust}} function), and
 other values associated with the underlying method used to perform the
 differential expression analysis (such as the log-fold change of clusters' median
-marker expression values between the levels being compared).#'
+marker expression values between the levels being compared).
 }
 \description{
 This function performs differential expression analysis on the cell clusters
-contained within a `tof_tibble` using linear mixed-models. Users
+contained within a `tof_tbl` using linear mixed-models. Users
 specify which columns represent sample, cluster, marker, fixed effect, and random effect
 information, and a (mixed) linear regression model is fit using either
 \code{\link[lmerTest]{lmer}} or \code{\link[stats]{glm}}.
@@ -115,8 +116,4 @@ linear model with `fixed_effect_cols` as fixed effects predictors and `random_ef
 as random effects predictors. Once all models (one per each cluster/marker pair) are fit,
 p-values for each coefficient in each model are multiple-comparisons adjusted using the
 \code{\link[stats]{p.adjust}} function.
-}
-\examples{
-NULL
-
 }

@@ -2,26 +2,26 @@
 % Please edit documentation in R/io.R
 \name{tof_write_csv}
 \alias{tof_write_csv}
-\title{Write a series of .csv files from a tof_tibble}
+\title{Write a series of .csv files from a tof_tbl}
 \usage{
 tof_write_csv(
   tof_tibble,
-  group_vars = where(~!(purrr::is_integer(.x) || purrr::is_double(.x))),
+  group_cols = where(~!tof_is_numeric(.x)),
   out_path,
   sep = "_"
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tibble`.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_vars}{Unquoted names of the columns in `tof_tibble` that should
+\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
 be used to group cells into separate files. Supports tidyselect helpers. Defaults
 to selecting all non-numeric (i.e. non-integer and non-double) columns.}
 
 \item{out_path}{A system path indicating the directory where the output .csv
 files should be saved. If the directory doesn't exist, it will be created.}
 
-\item{sep}{Delimiter that should be used between each of the values of `group_vars`
+\item{sep}{Delimiter that should be used between each of the values of `group_cols`
 to create the output .csv file names. Defaults to "_".}
 }
 \value{
@@ -29,12 +29,8 @@ This function does not return anything. Instead, it has the side-effect
 of saving .csv files to `out_path`.
 }
 \description{
-This function takes a given `tof_tibble` and writes the single-cell data
+This function takes a given `tof_tbl` and writes the single-cell data
 it contains into .csv files within the directory located at `out_path`. The
-`group_vars` argument specifies how the rows of the `tof_tibble` (each cell)
+`group_cols` argument specifies how the rows of the `tof_tbl` (each cell)
 should be broken into separate .csv files
-}
-\examples{
-NULL
-
 }

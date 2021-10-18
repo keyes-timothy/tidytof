@@ -1,5 +1,7 @@
 
-#' CyTOF data from 10,000 healthy immune cells from a single patient.
+#' CyTOF data from two samples: 5,000 B-cell lineage cells from a healthy
+#' patient and 5,000 B-cell lineage cells from a B-cell precursor Acute
+#' Lymphoblastic Leukemia (BCP-ALL) patient.
 #'
 #' A dataset containing CyTOF measurements from immune cells originally studied
 #' in the following paper:

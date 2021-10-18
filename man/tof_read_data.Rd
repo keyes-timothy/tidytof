@@ -29,8 +29,3 @@ of the .fcs file from which each cell was read.
 \description{
 Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 }
-\examples{
-NULL
-
-
-}

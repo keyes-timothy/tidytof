@@ -2,21 +2,17 @@
 # This file contains functions relevant to performing dimensionality reduction
 # on tof_tibble objects containing CyTOF data.
 
-
-# tof_dr_pca ----------------------------
+# tof_reduce_pca ----------------------------
 #
-# Note: Maybe change the pca_vars argument to be a bit more intuitive?
-
-
 #' Perform principal component analysis on CyTOF data
 #'
 #' This function calculates principal components using single-cell data from a `tof_tibble`.
 #'
-#' @param tof_tibble A `tof_tibble`
+#' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
-#' @param pca_vars Unquoted column names indicating which columns in `tof_tibble` to
-#' use in computing the principal components. Defaults to all numeric columns
-#' in `tof_tibble`. Supports tidyselect helpers.
+#' @param pca_cols Unquoted column names indicating which columns in `tof_tibble` to
+#' use for computing the principal components. Defaults to all numeric columns.
+#' Supports tidyselect helpers.
 #'
 #' @param num_comp The number of PCA components to calculate. Defaults
 #' to 5. See \code{\link[recipes]{step_pca}}.
@@ -37,8 +33,6 @@
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 #' @importFrom recipes recipe
 #' @importFrom recipes all_numeric
@@ -47,17 +41,17 @@
 #' @importFrom recipes step_pca
 #'
 #'
-tof_dr_pca <-
+tof_reduce_pca <-
   function(
     tof_tibble,
-    pca_vars = where(tof_is_numeric),
+    pca_cols = where(tof_is_numeric),
     num_comp = 5,
     threshold = NA,
     center = TRUE,
     scale = TRUE
   ) {
 
-    recipes::recipe(~ ., data = select(tof_tibble, {{pca_vars}})) %>%
+    recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) %>%
       # remove any variables that have 0 variance
       recipes::step_zv(recipes::all_numeric()) %>%
       recipes::step_pca(
@@ -67,22 +61,23 @@ tof_dr_pca <-
         options = list(center = center, scale. = scale)
       ) %>%
       recipes::prep() %>%
-      recipes::juice()
+      recipes::juice() %>%
+      dplyr::rename_with(.fn = ~ paste0(".", .x))
   }
 
 
 
 
 
-# tof_dr_tsne ----------------------------
+# tof_reduce_tsne ----------------------------
 
 #' Perform t-distributed stochastic neighborhood embedding on CyTOF data
 #'
 #' This function calculates a tSNE embedding using single-cell data from a `tof_tibble`.
 #'
-#' @param tof_tibble A `tof_tibble`.
+#' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
-#' @param tsne_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param tsne_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the tSNE embedding. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -112,16 +107,14 @@ tof_dr_pca <-
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
-#' @importFrom tibble as_tibble
+#' @importFrom dplyr as_tibble
 #' @importFrom purrr pluck
 #'
-tof_dr_tsne <-
+tof_reduce_tsne <-
   function(
     tof_tibble,
-    tsne_vars = where(tof_is_numeric),
+    tsne_cols = where(tof_is_numeric),
     num_comp = 2,
     perplexity = 30,
     theta = 0.5,
@@ -139,10 +132,9 @@ tof_dr_tsne <-
       )
     }
 
-
     result <-
       Rtsne::Rtsne(
-        X = as.matrix(select(tof_tibble, {{tsne_vars}})),
+        X = as.matrix(select(tof_tibble, {{tsne_cols}})),
         dims = num_comp,
         perplexity = perplexity,
         theta = theta,
@@ -152,9 +144,9 @@ tof_dr_tsne <-
         ...
       ) %>%
       purrr::pluck("Y") %>%
-      tibble::as_tibble()
+      dplyr::as_tibble(.name_repair = "minimal")
 
-    colnames(result) <- paste0("tsne_", 1:num_comp)
+    colnames(result) <- paste0(".tsne_", 1:num_comp)
 
     return(result)
 
@@ -163,15 +155,15 @@ tof_dr_tsne <-
 
 
 
-# tof_dr_umap ----------------------------
+# tof_reduce_umap --------------------------------------------------------------
 
 #' Perform uniform manifold approzimation and projection on CyTOF data
 #'
 #' This function calculates a UMAP embedding from single-cell data in a `tof_tibble`.
 #'
-#' @param tof_tibble A `tof_tibble`.
+#' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
-#' @param umap_vars Unquoted column names indicating which columns in `tof_tibble` to
+#' @param umap_cols Unquoted column names indicating which columns in `tof_tibble` to
 #' use in computing the UMAP embedding. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
@@ -202,16 +194,14 @@ tof_dr_tsne <-
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 #' @importFrom embed step_umap
 #'
 #'
-tof_dr_umap <-
+tof_reduce_umap <-
   function(
     tof_tibble,
-    umap_vars = where(tof_is_numeric),
+    umap_cols = where(tof_is_numeric),
     num_comp = 2,
     neighbors = 5,
     min_dist = 0.01,
@@ -222,36 +212,43 @@ tof_dr_umap <-
     ...
   ) {
 
-    recipes::recipe(~ ., data = select(tof_tibble, {{umap_vars}})) %>%
-      # remove any variables that have 0 variance
-      recipes::step_zv(recipes::all_numeric()) %>%
-      embed::step_umap(
-        recipes::all_numeric(),
-        num_comp = num_comp,
-        neighbors = neighbors,
-        min_dist = min_dist,
-        learn_rate = learn_rate,
-        epochs = epochs,
-        options = list(verbose = verbose, n_threads = n_threads, ...)
-      ) %>%
-      recipes::prep() %>%
-      recipes::juice()
+    suppressWarnings(
+      recipes::recipe(~ ., data = select(tof_tibble, {{umap_cols}})) %>%
+        # remove any variables that have 0 variance
+        recipes::step_zv(recipes::all_numeric()) %>%
+        embed::step_umap(
+          recipes::all_numeric(),
+          num_comp = num_comp,
+          neighbors = neighbors,
+          min_dist = min_dist,
+          learn_rate = learn_rate,
+          epochs = epochs,
+          options = list(verbose = verbose, n_threads = n_threads, ...)
+        ) %>%
+        recipes::prep() %>%
+        recipes::juice() %>%
+        dplyr::rename_with(.fn = ~ paste0(".", .x))
+    )
   }
 
 
 
-# tof_dr ---------------------------------
+# tof_reduce_dimensions --------------------------------------------------------
 
-#' Apply dimensionality reduction to a CyTOF dataset
+#' Apply dimensionality reduction to a CyTOF dataset.
 #'
-#' @param tof_tibble A `tof_tibble`.
+#' This function is a wrapper around {tidytof}'s tof_reduce_* function family.
+#' It performs dimensionality reduction on CyTOF data using a user-specified method
+#' (of 3 choices) and each method's corresponding input parameters
+#'
+#' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
 #' @param method A method of dimensionality reduction. Currently, PCA, tSNE, and
 #' UMAP embedding are supported.
 #'
-#' @param ... Arguments to be passed to the tof_dr_* function corresponding to
-#' the embedding method. See \code{\link{tof_dr_pca}}, \code{\link{tof_dr_tsne}}, and
-#' \code{\link{tof_dr_umap}}.
+#' @param ... Arguments to be passed to the tof_reduce_* function corresponding to
+#' the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
+#' \code{\link{tof_reduce_umap}}.
 #'
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
@@ -259,24 +256,28 @@ tof_dr_umap <-
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
-tof_dr <- function(tof_tibble, method = c("pca", "tsne", "umap"), ...) {
+tof_reduce_dimensions <- function(tof_tibble, method = c("pca", "tsne", "umap"), add_cols = TRUE, ...) {
 
   # check validity of method
   method <- match.arg(method, choices = c("pca", "tsne", "umap"))
 
   if (method == "pca") {
-    return(tof_dr_pca(tof_tibble, ...))
+    result <- tof_reduce_pca(tof_tibble, ...)
   } else if (method == "tsne") {
-    return(tof_dr_tsne(tof_tibble, ...))
+    result <- tof_reduce_tsne(tof_tibble, ...)
   } else if (method == "umap") {
-    return(tof_dr_umap(tof_tibble, ...))
+    result <- tof_reduce_umap(tof_tibble, ...)
   } else {
       stop("Method no implemented")
   }
 
+  if (add_cols == TRUE) {
+    result <-
+      bind_cols(tof_tibble, result)
+  }
+
+  return(result)
 
 }
 
