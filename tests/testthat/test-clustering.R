@@ -4,6 +4,8 @@ library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
+library(FlowSOM)
+library(flowCore)
 
 # setup
 clust_data <-

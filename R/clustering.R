@@ -110,6 +110,8 @@ tof_cluster_flowsom <-
         prettyColnames = clustering_markers
       )
 
+    class(fsom) <- "FlowSOM"
+
     # build self-organizing map and extract cluster labels
     distf <-
       # convert character distance function name to a number that BuildSOM understands
@@ -192,7 +194,6 @@ tof_cluster_flowsom <-
 #'
 #' @export
 #'
-#' @importFrom igraph membership
 #'
 tof_cluster_phenograph <-
   function(
@@ -231,7 +232,8 @@ tof_cluster_phenograph <-
         )
       )
     )
-    phenograph_clusters <- igraph::membership(phenograph_result[[2]])
+
+    phenograph_clusters <- phenograph_result[[2]]$membership
 
     # deal with cells not assigned to any cluster
     if(length(phenograph_clusters) != nrow(tof_tibble)) {

@@ -36,7 +36,7 @@ devtools::install_github("keyes-timothy/tidytof")
 
 Once `{tidytof}` is installed, we can load the packages we need for this vignette: 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(tidytof)
 library(tidyverse)
 ```
