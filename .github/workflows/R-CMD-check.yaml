@@ -28,6 +28,9 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
+       - if: runner.os == 'macOS'
+         run: brew install --cask xquartz
+
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-pandoc@v1

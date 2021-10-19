@@ -33,31 +33,7 @@ vignette:
 
 ``` r
 library(tidytof)
-#> Registered S3 methods overwritten by 'parameters':
-#>   method                           from      
-#>   as.double.parameters_kurtosis    datawizard
-#>   as.double.parameters_skewness    datawizard
-#>   as.double.parameters_smoothness  datawizard
-#>   as.numeric.parameters_kurtosis   datawizard
-#>   as.numeric.parameters_skewness   datawizard
-#>   as.numeric.parameters_smoothness datawizard
-#>   print.parameters_distribution    datawizard
-#>   print.parameters_kurtosis        datawizard
-#>   print.parameters_skewness        datawizard
-#>   summary.parameters_kurtosis      datawizard
-#>   summary.parameters_skewness      datawizard
-#> Registered S3 method overwritten by 'tune':
-#>   method                   from   
-#>   required_pkgs.model_spec parsnip
 library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-#> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-#> ✓ tibble  3.1.5     ✓ dplyr   1.0.7
-#> ✓ tidyr   1.1.4     ✓ stringr 1.4.0
-#> ✓ readr   2.0.2     ✓ forcats 0.5.1
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> x dplyr::filter() masks stats::filter()
-#> x dplyr::lag()    masks stats::lag()
 ```
 
 ## Usage
@@ -84,7 +60,7 @@ use the following command:
 
 ``` r
 tidytof_example_data("phenograph")
-#> [1] "/Library/Frameworks/R.framework/Versions/4.0/Resources/library/tidytof/extdata/phenograph"
+#> [1] "/Library/Frameworks/R.framework/Versions/4.1/Resources/library/tidytof/extdata/phenograph"
 ```
 
 Using one of these directories (or any other directory containing CyTOF
@@ -388,7 +364,6 @@ phenograph_clusters <-
   phenograph_data %>% 
   tof_preprocess() %>% 
   tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
-#> Loading required namespace: FlowSOM
 
 phenograph_clusters
 #> # A tibble: 6,000 × 27
@@ -420,15 +395,16 @@ clustering.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 6 × 3
+#> # A tibble: 7 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           1                     1997
-#> 2 cluster3           2                     1987
+#> 1 cluster2           2                     2000
+#> 2 cluster3           1                     1991
 #> 3 cluster1           3                     1984
-#> 4 cluster1           2                       16
-#> 5 cluster3           3                       13
-#> 6 cluster2           2                        3
+#> 4 cluster1           1                       15
+#> 5 cluster3           3                        5
+#> 6 cluster3           2                        4
+#> 7 cluster1           2                        1
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -444,21 +420,17 @@ added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`.
 ``` r
 phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE)
-#> # A tibble: 6,000 × 1
-#>    .flowsom_metacluster
-#>    <chr>               
-#>  1 1                   
-#>  2 1                   
-#>  3 1                   
-#>  4 1                   
-#>  5 1                   
-#>  6 1                   
-#>  7 1                   
-#>  8 1                   
-#>  9 1                   
-#> 10 1                   
-#> # … with 5,990 more rows
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE) %>% 
+  head()
+#> # A tibble: 6 × 1
+#>   .flowsom_metacluster
+#>   <chr>               
+#> 1 1                   
+#> 2 1                   
+#> 3 1                   
+#> 4 1                   
+#> 5 1                   
+#> 6 1
 ```
 
 ### Dimensionality reduction
@@ -471,23 +443,22 @@ PCA, tSNE, and UMAP. To apply these to a dataset, use
 phenograph_tsne <- 
   phenograph_clusters %>% 
   tof_reduce_dimensions(method = "tsne")
-#> Loading required namespace: Rtsne
 
 phenograph_tsne %>% 
   select(contains("tsne"))
 #> # A tibble: 6,000 × 2
 #>    .tsne_1 .tsne_2
 #>      <dbl>   <dbl>
-#>  1   15.9   -1.65 
-#>  2   11.3   -2.20 
-#>  3   22.0   11.0  
-#>  4   10.1    0.629
-#>  5   16.9    2.56 
-#>  6   16.7    1.65 
-#>  7   18.2   -2.83 
-#>  8   22.7    6.21 
-#>  9    9.10   1.23 
-#> 10   14.1   15.9  
+#>  1    9.89   15.7 
+#>  2    5.70   12.3 
+#>  3   20.4     6.18
+#>  4    5.71   11.0 
+#>  5   12.9    11.6 
+#>  6   12.4    12.5 
+#>  7   11.3    18.0 
+#>  8   21.9    11.9 
+#>  9    4.87    9.61
+#> 10   17.4    -1.06
 #> # … with 5,990 more rows
 ```
 
@@ -620,9 +591,6 @@ citrus_data %>%
   ggplot(aes(x = `pStat1|Eu153`, fill = stimulation)) + 
   geom_density() + 
   facet_grid(rows = vars(.flowsom_metacluster))
-#> Warning: Groups with fewer than two data points have been dropped.
-#> Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
-#> -Inf
 ```
 
 <img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
