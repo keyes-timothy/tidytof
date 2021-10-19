@@ -28,8 +28,6 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-       - if: runner.os == 'macOS'
-         run: brew install --cask xquartz
 
       - uses: actions/checkout@v2
 
