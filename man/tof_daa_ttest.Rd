@@ -8,7 +8,7 @@ tof_daa_ttest(
   tof_tibble,
   cluster_col,
   effect_col,
-  group_cols = NULL,
+  group_cols,
   test_type = c("unpaired", "paired"),
   min_cells = 3,
   min_samples = 5,
@@ -28,7 +28,7 @@ any of the functions in the `tof_cluster_*` function family, or any other method
 `tof_tibble` should be used to break samples into groups for the t-test. Should
 only have 2 unique values.}
 
-\item{group_cols}{Optional. Unquoted names of the columns other than `effect_col`
+\item{group_cols}{Unquoted names of the columns other than `effect_col`
 that should be used to group cells into independent observations. Fills a similar role
 to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
 analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),
@@ -80,7 +80,7 @@ A tibble with 7 columns:
 
 The "levels" attribute of the result indicates the order in which the different
 levels of the `effect_col` were considered. The `mean_diff` value for each
-row of the output is computed subtracting the second level from the first level,
+row of the output is computed by subtracting the second level from the first level,
 and the `mean_fc` value for each row is computed by dividing the first level
 by the second level.
 }

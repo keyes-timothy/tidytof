@@ -36,12 +36,18 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("keyes-timothy/tidytof")
 ```
 
-Once `{tidytof}` is installed, we can load the packages we need for this vignette: 
+Once `{tidytof}` is installed, you can load it to your current R session using the following code: 
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidytof)
+```
+
+In addition, we can load the other packages we need for this vignette: 
+
+```{r}
 library(tidyverse)
 ```
+
 
 ## Usage
 
@@ -59,21 +65,26 @@ To obtain the file path for the directory containing each dataset, call `tidytof
 tidytof_example_data("phenograph")
 ```
 
-Using one of these directories (or any other directory containing CyTOF data on your local machine), we can use `tof_read_data` to read in CyTOF data from raw files. `tof_read_data` is smart enough to read single .fcs/.csv files or multiple .fcs/.csv files depending on whether its first argument (`path`) leads to a single file or to a directory of files. 
+Using one of these directories (or any other directory containing CyTOF data on your local machine), we can use `tof_read_data` to read CyTOF data from raw files. `tof_read_data` is smart enough to read single .fcs/.csv files or multiple .fcs/.csv files depending on whether its first argument (`path`) leads to a single file or to a directory of files. 
+
+Here, we can use `tof_read_data` to read in all of the .fcs files in the "phenograph" example dataset bundled into `{tidytof}` and store it in the `phenograph` variable.
 
 ```{r}
 phenograph <- 
   tidytof_example_data("phenograph") %>% 
   tof_read_data()
 
-phenograph
+phenograph %>% 
+  head()
 ```
 
-Data are read into an extended `tibble` called a `tof_tbl`, an S3 class identical to `tbl_df`'s, but with one additional attribute ("panel"). `{tidytof}` stores this additional attribute in `tof_tbl`'s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments (to find common markers or to compare which metals are associated with particular markers across panels). 
+Regardless of its input format, `{tidytof}` reads data into an extended `tibble` called a `tof_tbl`, an S3 class identical to `tbl_df`, but with one additional attribute ("panel"). `{tidytof}` stores this additional attribute in `tof_tbl`'s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments to find common markers or to compare which metals are associated with particular markers across panels. 
 
-Note that the output `tof_tbl` contains one cell per row and one channel per column (to provide the data in its "tidy" format). Also note that `tof_read_data` adds an additional column to the output `tof_tbl` encoding the name of the file from which each cell was read (the "file_name" column). 
+A few notes about `tof_tbl`'s: 
 
-Because `tof_tbl`'s inherit from the `tbl` class, all methods available to tibbles are also available to `tof_tbl`'s. For example, `{dplyr}`'s useful `mutate` method can be applied to our `phenograph` `tof_tbl` above to convert the columns encoding the phenograph cluster and stimulation condition to which each cell belongs into character vectors (instead of their original numeric codes in the uncleaned dataset). 
+* `tof_tbl` contains one cell per row and one channel per column (to provide the data in its "tidy" format).
+* `tof_read_data` adds an additional column to the output `tof_tbl` encoding the name of the file from which each cell was read (the "file_name" column). 
+* Because `tof_tbl`'s inherit from the `tbl_df` class, all methods available to tibbles are also available to `tof_tbl`'s. For example, `{dplyr}`'s useful `mutate` method can be applied to our `tof_tbl` named `phenograph` above to convert the columns encoding the phenograph cluster and stimulation condition to which each cell belongs into character vectors (instead of their original numeric codes in the uncleaned dataset). 
 
 ```{r}
 phenograph <- 
@@ -104,22 +115,33 @@ phenograph %>%
   tof_get_panel()
 ```
 
-Importantly, `tof_read_data` uses an opinionated heuristic to mine different keyword slots of input .fcs file(s) to guess which metals and antigens were used during data collection. Thus, when .csv files are being read using `tof_read_data`, it is recommended to use the `panel_info` argument to provide the panel manually (as .csv files, unlike .fcs files, do not provide built-in metadata about the columns they contain).
+Importantly, `tof_read_data` uses an opinionated heuristic to mine different keyword slots of input .fcs file(s) and guess which metals and antigens were used during data collection. Thus, when .csv files are being read using `tof_read_data`, it is recommended to use the `panel_info` argument to provide the panel manually (as .csv files, unlike .fcs files, do not provide built-in metadata about the columns they contain).
 
 ### Pre-processing
 
-Generally, the raw ion counts for each analyte measured on a mass cytometer need to be transformed before CyTOF data analysis. Common preprocessing steps may include variance-stabilizing transformations (such as the hyperbolic arcsine (arcsinh) transformation or a log transformation), scaling/centering, and/or denoising. 
+Generally, the raw ion counts for each analyte measured on a mass cytometer need to be transformed before CyTOF data analysis. Common preprocessing steps may include variance-stabilizing transformations - such as the hyperbolic arcsine (arcsinh) transformation or a log transformation - scaling/centering, and/or denoising. 
 
-To perform standard preprocessing tasks with `{tidytof}`, use `tof_preprocess`. `tof_preprocess`'s default behavior is to apply the arcsinh transformation (with a cofactor of 5) to each numeric column in the input `tof_tibble` as well as to remove the gaussian noise that Fluidigm software adds to each ion count (this noise is added for visualization purposes, but for most analyses, removing this noise is recommended). 
+To perform standard preprocessing tasks with `{tidytof}`, use `tof_preprocess`. `tof_preprocess`'s default behavior is to apply the arcsinh transformation (with a cofactor of 5) to each numeric column in the input `tof_tibble` as well as to remove the gaussian noise that Fluidigm software adds to each ion count (this noise is added for visualization purposes, but for most analyses, removing it is recommended). 
 
-As an example, we can preprocess our `phenograph` `tof_tibble` above. 
+As an example, we can preprocess our `phenograph` `tof_tibble` above and see how our first few measurements change before and after. 
 
 ```{r}
+# before preprocessing
+phenograph %>% 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+  head()
+```
+
+```{r}
+# perform preprocessing
 phenograph <- 
   phenograph %>% 
   tof_preprocess()
 
-phenograph
+# visualize new values
+phenograph %>% 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+  head()
 ```
 
 To alter `tof_preprocess`'s default behavior, change the `channel_cols` argument (to specify which columns of `tof_tibble` should be transformed) and the `transform_fun` argument (to specify which vector-valued function should be used to transform each of the `channel_cols`). To keep the gaussian noise added by Fluidigm software (or if you are working with a dataset that does not have this noise), set the `undo_noise` argument to `FALSE`. 
@@ -128,7 +150,7 @@ To alter `tof_preprocess`'s default behavior, change the `channel_cols` argument
 
 Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. To do this, `{tidytof}` implements the `tof_downsample` verb, which allows downsampling using 3 methods. 
 
-Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller version of the dataset we read in above), we can see that the original size of the dataset is 2000 cells per cluster, or 6000 cells in total:
+Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 2000 cells per cluster, or 6000 cells in total:
 
 ```{r}
 phenograph_data %>% 
@@ -139,11 +161,13 @@ To randomly sample 200 cells per cluster, we can use `tof_downsample` using the 
 
 ```{r}
 phenograph_data %>% 
+  # downsample 
   tof_downsample(
     method = "constant", 
     group_cols = phenograph_cluster, 
     num_cells = 200
   ) %>% 
+  # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 ```
 
@@ -151,26 +175,30 @@ Alternatively, if we wanted to sample 50% of the cells in each cluster, we could
 
 ```{r}
 phenograph_data %>% 
+  # downsample
   tof_downsample(
     method = "prop",
     group_cols = phenograph_cluster, 
     prop_cells = 0.5
   ) %>% 
+  # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 ```
 
-Alternatively, you might be interested in taking a slightly different approach to downsampling that downsamples the number of cells not to a fixed constant or proportion, but to a fixed *density* in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density that contain more cells than others along the cd34/cd38 axes:
+Alternatively, you might be interested in taking a slightly different approach to downsampling that downsamples the number of cells not to a fixed constant or proportion, but to a fixed *density* in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density in `phenograph_data` that contain more cells than others along the cd34/cd38 axes:
 
 ```{r, warning = FALSE, message = FALSE}
 phenograph_data %>% 
+  # preprocess all numeric columns in the dataset
   tof_preprocess(undo_noise = FALSE) %>% 
+  # make a scatterplot
   ggplot(aes(x = cd34, y = cd38)) + 
   geom_point(alpha = 0.5) + 
   scale_x_continuous(limits = c(NA, 1.5)) + 
   scale_y_continuous(limits = c(NA, 4))
 ```
 
-To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the "density" `method` of `tof_downsample` (or simply call `tof_downsample_density` directly): 
+To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the "density" `method` of `tof_downsample`: 
 
 ```{r, warning = FALSE, message = FALSE}
 phenograph_data %>% 
@@ -182,7 +210,7 @@ phenograph_data %>%
   scale_y_continuous(limits = c(NA, 4))
 ```
 
-For more details, check out the documentation for the 3 underlying members of the `tof_downsample_*` function family: 
+For more details, check out the documentation for the 3 underlying members of the `tof_downsample_*` function family (which are wrapped by `tof_downsample`): 
 
 * `tof_downsample_constant`
 * `tof_downsample_prop`
@@ -190,11 +218,11 @@ For more details, check out the documentation for the 3 underlying members of th
 
 ### Clustering
 
-Once data are read into a tabular format and preprocessed, we might be interested in clustering the data to define communities of cells with shared characteristics. 
+Once input files are read into a tabular format and preprocessed/downsampled, we might be interested in clustering our data to define communities of cells with shared characteristics. 
 
-To do so, we can use the `tof_cluster` verb. Several clustering methods are implemented in `{tidytof}`, including FlowSOM, PhenoGraph, k-means, and others. 
+To do so, we can use the `tof_cluster` verb. Several clustering methods are implemented in `{tidytof}`, including [FlowSOM](https://pubmed.ncbi.nlm.nih.gov/25573116/), [PhenoGraph](https://pubmed.ncbi.nlm.nih.gov/26095251/), k-means, and others. 
 
-To demonstrate, we use one of `{tidytof}`'s built-in datasets, `phenograph_data` and apply the flowsom clustering method to it. Note that `phenograph_data` contains 6000 total cells (2000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)). 
+To demonstrate, we can apply the FlowSOM clustering algorithm to our `phenograph_data` from above. Note that `phenograph_data` contains 6000 total cells (2000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)). 
 
 ```{r}
 phenograph_clusters <- 
@@ -202,22 +230,26 @@ phenograph_clusters <-
   tof_preprocess() %>% 
   tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
 
-phenograph_clusters
-
+phenograph_clusters %>% 
+  select(sample_name, .flowsom_metacluster, everything()) %>% 
+  head()
 ```
 
-The output of `tof_cluster` is a `tof_tbl` identical to the input tibble, now with the addition of an additional column (".flowsom_metacluster") that encodes the cluster id for each cell in the input `tof_tbl`. Because the output is a `tof_tbl`, we can use the `count` method for tibbles to assess the accuracy of the FlowSOM clustering.
+The output of `tof_cluster` is a `tof_tbl` identical to the input tibble, now with the addition of an additional column (".flowsom_metacluster") that encodes the cluster id for each cell in the input `tof_tbl`. Note that all output columns added to a tibble or `tof_tbl` by `{tidytof}` begin with a full-stop (".") to reduce the likelihood of collisions with existing column names. 
+
+Because the output of `tof_cluster` is a `tof_tbl`, we can use the `count` method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.
 
 ```{r}
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
 ```
 
-Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a few mistakes per PhenoGraph cluster). 
+Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster). 
 
-To change which clustering algorithm `tof_cluster` uses, alter the `method` flag; to change the columns used to perform the clustering, change the `cluster_cols` flag. And finally, if you want to return a `tibble` that only includes the cluster labels (not the cluster labels added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`. 
+To change which clustering algorithm `tof_cluster` uses, alter the `method` flag; to change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a `tibble` that only includes the cluster labels (not the cluster labels added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`. 
 
 ```{r}
+# will result in a tibble with only 1 column (the cluster labels)
 phenograph_data %>% 
   tof_preprocess() %>% 
   tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE) %>% 
@@ -226,100 +258,270 @@ phenograph_data %>%
 
 ### Dimensionality reduction
 
-`{tidytof}` includes several algorithms for dimensionality reduction: PCA, tSNE, and UMAP. To apply these to a dataset, use `tof_reduce_dimensions`: 
+`{tidytof}` includes several algorithms for dimensionality reduction, a process whereby high-dimensional datasets can be represented in a smaller, easier-to-visualize number of dimensions. `{tidytof}` supports 3 dimensionality reduction methods: PCA, tSNE, and UMAP. To apply these to a dataset, use `tof_reduce_dimensions`: 
 
 ```{r}
+# perform the dimensionality reduction
 phenograph_tsne <- 
   phenograph_clusters %>% 
   tof_reduce_dimensions(method = "tsne")
 
+# select only the tsne embedding columns using a tidyselect helper (contains)
 phenograph_tsne %>% 
   select(contains("tsne"))
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` as its result. To return only the features embeddings themselves, set `add_cols` to `FALSE` (as in `tof_cluster`). 
 
-These feature embeddings can be used for visualization using `{ggplot2}` (or any graphics package): 
+Regardless of the method used, reduced-dimension feature embeddings can be used for visualization using `{ggplot2}` (or any graphics package): 
 
 ```{r}
+# plot the tsne embeddings using color to distinguish between clusters
 phenograph_tsne %>% 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = phenograph_cluster)) + 
   geom_point(shape = 21) + 
   theme_bw() + 
   labs(fill = NULL)
+
+# plot the tsne embeddings using color to represent CD34 expression
+phenograph_tsne %>% 
+  ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
+  geom_point(shape = 21) + 
+  scale_fill_viridis_c() +
+  theme_bw() + 
+  labs(fill = "CD11b expression")
 ```
 
-### Differential Expression Analysis
+Such visualizations can be helpful in qualitatively describing the phenotypic distinctions between the clusters present in a dataset. 
 
 
+### Differential Discovery Analysis
+
+While dimensionality reduction can be used to visualize a clustering result, many CyTOF users also want to use statistical tools to rigorously quantify which clusters(s) in their dataset associated with a particular experimental or clinical variable. 
+
+Such analyses are often grouped under the umbrella term **differential discovery analysis** and include both comparing the relative *size* of clusters between experimental conditions (**differential abundance analysis; DAA**) as well as comparing marker expression patterns of clusters between experimental conditions (**differential expression analysis; DEA**). `{tidytof}` provides the `tof_daa` and `tof_dea` verbs for differential abundance and differential expression analyses, respectively. 
+
+To demonstrate how to use these verbs, we'll first download a dataset originally 
+collected for the development of the [CITRUS](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/) algorithm. These data are available in the `{HDCytoData}` package, which is available on Bioconductor and can be downloaded with the following command: 
+
+```{r, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("HDCytoData")
+```
+
+To load the CITRUS data into our current R session, we can call a function from the `{HDCytoData}`, which will provide it to us in a format from the `{flowCore}` package (called a "flowSet"). To convert this into a tidy tibble, we can use `{tidytof}` built-in method for converting flowCore objects into `tof_tbl`'s . 
 
 ```{r}
-url <- "http://imlspenticton.uzh.ch/robinson_lab/cytofWorkflow"
-zip <- "PBMC8_fcs_files.zip"
+citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
 
-download.file(
-  paste0(url, "/", zip), 
-  destfile = file.path("~", "Desktop", zip), # will download to desktop
-  mode = "wb"
-)
+citrus_data <- 
+  citrus_raw %>% 
+  as_tof_tbl(sep = "_")
 
-unzip(
-  zipfile = file.path("~", "Desktop", zip), 
-  exdir = file.path("~", "Desktop", "tidytof_files")
-)
+dim(citrus_data)
 ```
 
+Thus, we can see that `citrus_data` is a `tof_tbl` with `r nrow(citrus_data)` cells (one in each row) and `r ncol(citrus_data)` pieces of information about each cell (one in each column). 
+
+We can also extract some metadata from the raw data and join it with our single-cell data using some `tidyverse` functions:
 
 ```{r}
-citrus_data <-
-  file.path("~", "Desktop", "tidytof_files") %>% 
-  tof_read_data() %>% 
-  tof_preprocess()
+citrus_metadata <- 
+  tibble(
+    file_name = as.character(flowCore::pData(citrus_raw)[[1]]), 
+    sample_id = 1:length(file_name),
+    patient = str_extract(file_name, "patient[:digit:]"), 
+    stimulation = str_extract(file_name, "(BCR-XL)|Reference")
+  ) %>% 
+  mutate(
+    stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
+  )
 
-citrus_data
+citrus_metadata %>%
+  head()
 ```
-
-```{r}
-citrus_data %>% 
-  count(file_name)
-```
-
+Finally, we can join the metadata with our single-cell `tof_tbl` to obtain the cleaned dataset. 
 
 ```{r}
 citrus_data <- 
   citrus_data %>% 
-  mutate(
-    stimulation = str_extract(file_name, pattern = "Reference|BCR-XL"), 
-    patient = str_extract(file_name, pattern = "patient[:digit:]")
-  ) 
-
-citrus_data %>% 
-  count(patient, stimulation)
-
+  left_join(citrus_metadata, by = "sample_id")
 ```
-channels I'm interested in: pStat5, pStat3, pStat1
+
+
+After this data cleaning, we have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
+
+We might be interested if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question of differential abundance analysis (DAA). `{tidytof}`'s `tof_daa` verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:
+
 
 ```{r}
-citrus_data %>% 
-  tof_preprocess(undo_noise = FALSE) %>% 
-  tof_cluster(method = "flowsom") %>% 
-  ggplot(aes(x = `pStat1|Eu153`, fill = stimulation)) + 
-  geom_density() + 
-  facet_grid(rows = vars(.flowsom_metacluster))
-  
+daa_result <- 
+  citrus_data %>% 
+  tof_daa(
+    daa_method = "ttest", 
+    cluster_col = population_id, 
+    effect_col = stimulation, 
+    group_cols = patient, 
+    test_type = "paired"
+  )
+
+daa_result
+```
+
+Based on this output, we can see that 6 of our 8 clusters have statistically different abundance in our two stimulation conditions. Using `{tidytof}` easy integration with `{tidyverse}` packages, we can use this result to visualize the fold-changes of each cluster (within each patient) in the BCR-XL condition compared to the Basal condition using `{ggplot2}`: 
+
+```{r}
+plot_data <- 
+  citrus_data %>% 
+  mutate(population_id = as.character(population_id)) %>%
+  left_join(
+    select(daa_result, population_id, significant, mean_fc), 
+    by = "population_id"
+  ) %>% 
+  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") %>% 
+  group_by(patient, stimulation) %>% 
+  mutate(prop = n / sum(n)) %>% 
+  ungroup() %>% 
+  pivot_wider(
+    names_from = stimulation, 
+    values_from = c(prop, n), 
+  ) %>% 
+  mutate(
+    diff = `prop_BCR-XL` - prop_Basal, 
+    fc = `prop_BCR-XL` / prop_Basal,
+    population_id = fct_reorder(population_id, diff),
+    direction = 
+      case_when(
+        mean_fc > 1 & significant == "*" ~ "increase",
+        mean_fc < 1 & significant == "*" ~ "decrease", 
+        TRUE ~ NA_character_
+      )
+  ) 
+
+significance_data <- 
+  plot_data %>% 
+  group_by(population_id, significant, direction) %>% 
+  summarize(diff = max(diff), fc = max(fc)) %>% 
+  ungroup()
+
+significance_data
+
+plot_data %>% 
+  ggplot(aes(x = population_id, y = fc, fill = direction)) + 
+  geom_violin(trim = FALSE) +
+  geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) + 
+  geom_point() + 
+  geom_text(
+    aes(x = population_id, y = fc, label = significant), 
+    data = significance_data, 
+    size = 8, 
+    nudge_x = 0.2,
+    nudge_y = 0.06
+  ) +
+  scale_x_discrete(labels = function(x) str_c("cluster ", x)) + 
+  scale_fill_discrete(na.translate = FALSE) + 
+  labs(
+    x = NULL, 
+    y = "Abundance fold-chance (stimulated / basal)", 
+    fill = "Effect", 
+    caption = "Asterisks indicate significance at an adjusted p-value of 0.05"
+  )
+```
+
+
+Importantly, the output of `tof_daa` depends slightly on the underlying statistical method being used, and details can be found in the documentation for each `tof_daa_*` function family member: 
+
+* `tof_daa_diffcyt`
+* `tof_daa_glmm`
+* `tof_daa_ttest`
+
+
+Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_dea` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each of our signaling markers. 
+
+```{r}
+signaling_markers <- 
+  c(
+    "pNFkB_Nd142", "pStat5_Nd150", "pAkt_Sm152", "pStat1_Eu153", "pStat3_Gd158", 
+    "pSlp76_Dy164", "pBtk_Er166", "pErk_Er168", "pS6_Yb172", "pZap70_Gd156"
+  )
+
+dea_result <- 
+  citrus_data %>% 
+  tof_dea(
+    dea_method = "ttest", 
+    cluster_col = population_id, 
+    marker_cols = any_of(signaling_markers), 
+    effect_col = stimulation,
+    group_cols = patient, 
+    test_type = "paired"
+  )
+
+dea_result %>% 
+  head()
+```
+
+While the output of `tof_dea` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pBtk in cluster 3 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair. 
+
+This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs: 
+
+```{r}
+volcano_data <- 
+  dea_result %>% 
+  mutate(
+    log2_fc = log(mean_fc, base = 2), 
+    log_p = -log(p_adj), 
+    significance = 
+      case_when(
+        p_adj < 0.05 & mean_fc > 1 ~ "increased", 
+        p_adj < 0.05 & mean_fc < 1 ~ "decreased",
+        TRUE ~ NA_character_
+      ), 
+    marker = 
+      str_extract(marker, ".+_") %>% 
+      str_remove("_"), 
+    pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
+  )
+
+volcano_data %>% 
+  ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
+  geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
+  geom_point(shape = 21, size = 2) + 
+  ggrepel::geom_text_repel(
+    aes(label = pair), 
+    data = slice_head(volcano_data, n = 10L), 
+    size = 2
+  ) + 
+  scale_fill_manual(
+    values = c("decreased" = "#cd5241", "increased" = "#207394"), 
+    na.value = "#cdcdcd"
+  ) + 
+  labs(
+    x = "log2(Fold-change)", 
+    y = "-log10(p-value)", 
+    fill = NULL
+  )
 ```
 
 
 ### Patient-level feature extraction
 
+[Under construction]
+
 ### Outcomes modeling
+
+[Under construction]
 
 ### Post-processing
 
+[Under construction]
+
 ### Writing data
 
+[Under construction]
 
 
-<https://github.com/r-lib/actions/tree/master/examples>.
 
 

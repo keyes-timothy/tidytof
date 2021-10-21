@@ -67,6 +67,10 @@
 #' if they do not have at least `min_cells` in at least `min_samples` samples.
 #' Defaults to 3.
 #'
+#' @param alpha A numeric value between 0 and 1 indicating which significance
+#' level should be applied to multiple-comparison adjusted p-values during the
+#' differential abundance analysis. Defaults to 0.05.
+#'
 #' @param min_samples An integer value used to filter clusters out of the differential
 #' abundance analysis. Clusters are not included in the differential abundance testing
 #' if they do not have at least `min_cells` in at least `min_samples` samples.
@@ -126,6 +130,7 @@ tof_daa_diffcyt <-
     include_observation_level_random_effects = FALSE,
     min_cells = 3,
     min_samples = 5,
+    alpha = 0.05,
     ...
   ) {
 
@@ -224,7 +229,8 @@ tof_daa_diffcyt <-
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                   dplyr::as_tibble() %>%
-                  dplyr::arrange(p_adj)
+                  dplyr::arrange(p_adj) %>%
+                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
               }
             )
         )
@@ -274,7 +280,8 @@ tof_daa_diffcyt <-
                     ) %>%
                       diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                       dplyr::as_tibble() %>%
-                      dplyr::arrange(p_adj)
+                      dplyr::arrange(p_adj) %>%
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
                   }
                 )
             )
@@ -302,10 +309,19 @@ tof_daa_diffcyt <-
                 ) %>%
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                   dplyr::as_tibble() %>%
-                  dplyr::arrange(p_adj)
+                  dplyr::arrange(p_adj) %>%
+                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
               }
             )
         )
+    }
+
+
+    if (nrow(result_tibble) == 2) {
+      result_tibble <-
+        result_tibble %>%
+        dplyr::filter(tested_effect != "omnibus") %>%
+        tidyr::unnest(cols = daa_results)
     }
 
     return(result_tibble)
@@ -382,6 +398,10 @@ tof_daa_diffcyt <-
 #' if they do not have at least `min_cells` in at least `min_samples` samples.
 #' Defaults to 5.
 #'
+#' @param alpha A numeric value between 0 and 1 indicating which significance
+#' level should be applied to multiple-comparison adjusted p-values during the
+#' differential abundance analysis. Defaults to 0.05.
+#'
 #' @param ... Optional additional arguments to pass to the under-the-hood diffcyt
 #' function being used to perform the differential expression analysis. See
 #' \code{\link[diffcyt]{testDS_LMM}} and \code{\link[diffcyt]{testDS_limma}}
@@ -433,6 +453,7 @@ tof_dea_diffcyt <-
     include_observation_level_random_effects = FALSE,
     min_cells = 3,
     min_samples = 5,
+    alpha = 0.05,
     ...
   ) {
 
@@ -520,7 +541,8 @@ tof_dea_diffcyt <-
                       dplyr::rename(
                         marker = marker_id,
                         "{{cluster_col}}" := cluster_id
-                      )
+                      ) %>%
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
                   }
                 )
             )
@@ -572,7 +594,8 @@ tof_dea_diffcyt <-
                       dplyr::rename(
                         marker = marker_id,
                         "{{cluster_col}}" := cluster_id
-                      )
+                      ) %>%
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
                   }
                 )
             )
@@ -801,8 +824,16 @@ tof_daa_glmm <-
         p_val = p.value,
         f_statistic = statistic
       ) %>%
+      dplyr::select(-group) %>%
       dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") %>%
       tidyr::nest(daa_results = c(-tested_effect))
+
+    # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
+    # unnest it (which is more intuitive)
+    if (nrow(fit_data) == 1) {
+      fit_data <-
+        tidyr::unnest(fit_data, cols = daa_results)
+    }
 
     return(fit_data)
   }
@@ -1081,7 +1112,7 @@ tof_dea_lmm <-
 #' `tof_tibble` should be used to break samples into groups for the t-test. Should
 #' only have 2 unique values.
 #'
-#' @param group_cols Optional. Unquoted names of the columns other than `effect_col`
+#' @param group_cols Unquoted names of the columns other than `effect_col`
 #' that should be used to group cells into independent observations. Fills a similar role
 #' to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
 #' analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),
@@ -1132,7 +1163,7 @@ tof_dea_lmm <-
 #'
 #' The "levels" attribute of the result indicates the order in which the different
 #' levels of the `effect_col` were considered. The `mean_diff` value for each
-#' row of the output is computed subtracting the second level from the first level,
+#' row of the output is computed by subtracting the second level from the first level,
 #' and the `mean_fc` value for each row is computed by dividing the first level
 #' by the second level.
 #'
@@ -1151,7 +1182,7 @@ tof_daa_ttest <-
     tof_tibble,
     cluster_col,
     effect_col,
-    group_cols = NULL,
+    group_cols,
     test_type = c("unpaired", "paired"),
     min_cells = 3,
     min_samples = 5,
@@ -1161,6 +1192,11 @@ tof_daa_ttest <-
 
     # check the test_type argument
     test_type <- rlang::arg_match(test_type, values = c("unpaired", "paired"))
+
+    # check for the number of unique levels in effect_col
+    if (missing(group_cols)) {
+      stop("The `group_cols` argument must be specified.")
+    }
 
     # check for the number of unique levels in effect_col
     if (missing(effect_col)) {
@@ -1184,7 +1220,6 @@ tof_daa_ttest <-
       dplyr::group_by(across({{group_cols}}), {{effect_col}}) %>%
       dplyr::mutate(prop = n / sum(n)) %>%
       dplyr::ungroup()
-
 
     # find the clusters that should be removed due to not having enough cells in
     # enough samples
@@ -1334,7 +1369,7 @@ tof_daa_ttest <-
 #' levels of the `effect_col`. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselect helpers.
 #'
-#' @param group_cols Optional. Unquoted names of the columns other than `effect_col`
+#' @param group_cols Unquoted names of the columns other than `effect_col`
 #' that should be used to group cells into independent observations. Fills a similar role
 #' to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
 #' analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),
@@ -1416,7 +1451,7 @@ tof_dea_ttest <-
     cluster_col,
     marker_cols = where(tof_is_numeric),
     effect_col,
-    group_cols = NULL,
+    group_cols,
     test_type = c("unpaired", "paired"),
     summary_function = mean,
     min_cells = 3,
@@ -1430,6 +1465,11 @@ tof_dea_ttest <-
     # check for the number of unique levels in effect_col
     if (missing(effect_col)) {
       stop("The `effect_col` argument must be specified.")
+    }
+
+    # check for the number of unique levels in effect_col
+    if (missing(group_cols)) {
+      stop("The `group_cols` argument must be specified.")
     }
 
     effect_levels <-
@@ -1576,5 +1616,114 @@ tof_dea_ttest <-
 
     return(t_df)
   }
+
+# wrapper functions ------------------------------------------------------------
+
+#' Perform Differential Abundance Analysis (DAA) on CyTOF data
+#'
+#' This function performs differential abundance analysis on the cell clusters
+#' contained within a `tof_tbl` using one of three methods
+#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_daa_*`
+#' function family: \code{\link{tof_daa_diffcyt}},
+#' \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}}.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param daa_method A string indicating which statistical method should be used. Valid
+#' values include "diffcyt", "glmm", and "ttest".
+#'
+#' @param ... Additional arguments to pass onto the `tof_daa_*`
+#' function family member corresponding to the chosen method.
+#'
+#' @return A tibble or nested tibble containing the differential abundance results
+#' from the chosen method. See \code{\link{tof_daa_diffcyt}},
+#' \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}} for details.
+#'
+#' @export
+#'
+#' @importFrom rlang arg_match
+#'
+tof_daa <-
+  function(
+    tof_tibble,
+    daa_method = c("diffcyt", "glmm", "ttest"),
+    ...
+  ) {
+    # check method argument
+    method <-
+      rlang::arg_match(arg = daa_method, values = c("diffcyt", "glmm", "ttest"))
+
+    if (daa_method == "diffcyt") {
+      result <-
+        tof_tibble %>%
+        tof_daa_diffcyt(...)
+    } else if (daa_method == "glmm") {
+      result <-
+        tof_tibble %>%
+        tof_daa_glmm(...)
+    } else {
+      result <-
+        tof_tibble %>%
+        tof_daa_ttest(...)
+    }
+    # return result
+    return(result)
+  }
+
+
+
+#' Perform Differential Expression Analysis (DEA) on CyTOF data
+#'
+#' This function performs differential expression analysis on the cell clusters
+#' contained within a `tof_tbl` using one of three methods
+#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_dea_*`
+#' function family: \code{\link{tof_dea_diffcyt}},
+#' \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}}.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param dea_method A string indicating which statistical method should be used. Valid
+#' values include "diffcyt", "lmm", and "ttest".
+#'
+#' @param ... Additional arguments to pass onto the `tof_dea_*`
+#' function family member corresponding to the chosen method.
+#'
+#' @return A tibble or nested tibble containing the differential abundance results
+#' from the chosen method. See \code{\link{tof_dea_diffcyt}},
+#' \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}} for details.
+#'
+#' @export
+#'
+#' @importFrom rlang arg_match
+#'
+tof_dea <-
+  function(
+    tof_tibble,
+    dea_method = c("diffcyt", "glmm", "ttest"),
+    ...
+  ) {
+    # check method argument
+    method <-
+      rlang::arg_match(arg = dea_method, values = c("diffcyt", "glmm", "ttest"))
+
+    if (dea_method == "diffcyt") {
+      result <-
+        tof_tibble %>%
+        tof_dea_diffcyt(...)
+    } else if (dea_method == "lmm") {
+      result <-
+        tof_tibble %>%
+        tof_dea_lmm(...)
+    } else {
+      result <-
+        tof_tibble %>%
+        tof_dea_ttest(...)
+    }
+    # return result
+    return(result)
+  }
+
+
+
 
 

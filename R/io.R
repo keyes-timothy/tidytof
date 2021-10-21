@@ -160,7 +160,7 @@ tof_read_fcs <-
       tof_flowFrame %>%
       {
         setNames(
-          object = as_tibble(flowCore::exprs(.)),
+          object = tibble::as_tibble(flowCore::exprs(.)),
           nm = col_names
         )
       }
