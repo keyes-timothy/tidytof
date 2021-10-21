@@ -80,23 +80,55 @@ test_that("All proportions are 0.5", {
 })
 
 
-
 # tof_extract_central_tendency -------------------------------------------------
 ct_1 <-
   dat %>%
-  tof_extract_central_tendency(cluster_col = cluster, group_cols = condition, marker_cols = c(cd45, cd34))
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    group_cols = condition,
+    marker_cols = c(cd45, cd34)
+    )
 
 ct_2 <-
   dat %>%
-  tof_extract_central_tendency(cluster_col = cluster, group_cols = c(condition, replicate), marker_cols = c(cd45, cd34))
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    group_cols = c(condition, replicate),
+    marker_cols = c(cd45, cd34)
+    )
 
 ct_no_groups <-
   dat %>%
-  tof_extract_central_tendency(cluster_col = cluster, marker_cols = c(cd45, cd34))
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    marker_cols = c(cd45, cd34)
+    )
+
+ct_no_groups_stim <-
+  dat %>%
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    marker_cols = c(cd45, cd34),
+    stimulation_col = replicate
+  )
+
+ct_stim <-
+  dat %>%
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    marker_cols = c(cd45, cd34),
+    group_cols = condition,
+    stimulation_col = replicate
+  )
 
 ct_long <-
   dat %>%
-  tof_extract_central_tendency(cluster_col = cluster, group_cols = condition, format = "long", marker_cols = c(cd45, cd34))
+  tof_extract_central_tendency(
+    cluster_col = cluster,
+    group_cols = condition,
+    format = "long",
+    marker_cols = c(cd45, cd34)
+    )
 
 my_list <-
   ls()[str_detect(ls(), "^ct")]

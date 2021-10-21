@@ -18,36 +18,7 @@ tof_extract_features(
 )
 }
 \arguments{
-\item{tof_tibble}{A `tof_tbl` or a `tibble`.
-
-This function wraps other members of the `tof_extract_*` function family to extract
-sample-level features from both lineage (i.e. cell surface antigen) CyTOF channels
-assumed to be stable across stimulation conditions and signaling CyTOF channels
-assumed to change across stimulation conditions. Features are extracted for
-each cluster within each independent sample (as defined with the `group_cols` argument).
-
-Lineage channels are specified using the `lineage_cols` argument, and their
-extracted features will be measurements of central tendency (as computed by the
-user-supplied `central_tendency_function`).
-
-Signaling channels are specified
-using the `signaling_cols` argument, and their extracted features will depend
-on the user's chosen `signaling_method`. If `signaling method` == "threshold"
-(the default), \code{\link{tof_extract_threshold}} will be used to calculate the proportion of
-cells in each cluster with signaling marker expression over `threshold` in each
-stimulation condition. If `signaling_method` == "emd" or `signaling_method` == "jsd",
-\code{\link{tof_extract_emd}} or \code{\link{tof_extract_jsd}} will be used to calculate the earth-mover's
-distance (EMD) or Jensen-Shannon Distance (JSD), respectively, between the basal
-condition and each of the stimulated conditions in each cluster for each sample.
-Finally, if none of these options are chosen, \code{\link{tof_extract_central_tendency}}
-will be used to calculate measurements of central tendency.
-
-In addition, \code{\link{tof_extract_proportion}} will be used to extract
-the proportion of cells in each cluster will be computed for each sample.
-
-These calculations can be performed either
-overall (across all cells in the dataset) or after breaking down the cells into
-subgroups using `group_cols`.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
 stores the cluster ids of the cluster to which each cell belongs.
@@ -96,5 +67,33 @@ It will have one column for each grouping variable and one column for each
 extracted feature ("wide" format).
 }
 \description{
-Extract aggregated, sample-level features from CyTOF data.
+This function wraps other members of the `tof_extract_*` function family to extract
+sample-level features from both lineage (i.e. cell surface antigen) CyTOF channels
+assumed to be stable across stimulation conditions and signaling CyTOF channels
+assumed to change across stimulation conditions. Features are extracted for
+each cluster within each independent sample (as defined with the `group_cols` argument).
+}
+\details{
+Lineage channels are specified using the `lineage_cols` argument, and their
+extracted features will be measurements of central tendency (as computed by the
+user-supplied `central_tendency_function`).
+
+Signaling channels are specified
+using the `signaling_cols` argument, and their extracted features will depend
+on the user's chosen `signaling_method`. If `signaling method` == "threshold"
+(the default), \code{\link{tof_extract_threshold}} will be used to calculate the proportion of
+cells in each cluster with signaling marker expression over `threshold` in each
+stimulation condition. If `signaling_method` == "emd" or `signaling_method` == "jsd",
+\code{\link{tof_extract_emd}} or \code{\link{tof_extract_jsd}} will be used to calculate the earth-mover's
+distance (EMD) or Jensen-Shannon Distance (JSD), respectively, between the basal
+condition and each of the stimulated conditions in each cluster for each sample.
+Finally, if none of these options are chosen, \code{\link{tof_extract_central_tendency}}
+will be used to calculate measurements of central tendency.
+
+In addition, \code{\link{tof_extract_proportion}} will be used to extract
+the proportion of cells in each cluster will be computed for each sample.
+
+These calculations can be performed either
+overall (across all cells in the dataset) or after breaking down the cells into
+subgroups using `group_cols`.
 }

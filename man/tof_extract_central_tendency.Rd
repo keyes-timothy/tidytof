@@ -9,6 +9,7 @@ tof_extract_central_tendency(
   cluster_col,
   group_cols = NULL,
   marker_cols = where(tof_is_numeric),
+  stimulation_col = NULL,
   central_tendency_function = stats::median,
   format = c("wide", "long")
 )
@@ -31,6 +32,12 @@ extraction calculation. Defaults to NULL (i.e. performing the extraction without
 (i.e. which CyTOF protein measurements) should be included in the feature extraction
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselection.}
+
+\item{stimulation_col}{Optional. An unquoted column name that indicates which
+column in `tof_tibble` contains information about which stimulation condition each cell
+was exposed to during data acquisition. If provided, the feature extraction will be
+further broken down into subgroups by stimulation condition (and features from each stimulation
+condition will be included as their own features in wide format).}
 
 \item{central_tendency_function}{The function that will be used to calculate
 the measurement of central tendency for each cluster (to be used

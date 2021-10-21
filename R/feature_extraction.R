@@ -81,7 +81,6 @@ tof_extract_proportion <-
 
 # tof_extract_central_tendency -------------------------------------------------
 
-
 #' Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`.
 #'
 #' This feature extraction function calculates a user-specified measurement of central tendency
@@ -107,6 +106,12 @@ tof_extract_proportion <-
 #' (i.e. which CyTOF protein measurements) should be included in the feature extraction
 #' calculation. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselection.
+#'
+#' @param stimulation_col Optional. An unquoted column name that indicates which
+#' column in `tof_tibble` contains information about which stimulation condition each cell
+#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' further broken down into subgroups by stimulation condition (and features from each stimulation
+#' condition will be included as their own features in wide format).
 #'
 #' @param central_tendency_function The function that will be used to calculate
 #' the measurement of central tendency for each cluster (to be used
@@ -141,6 +146,7 @@ tof_extract_central_tendency <-
     cluster_col,
     group_cols = NULL,
     marker_cols = where(tof_is_numeric),
+    stimulation_col = NULL,
     central_tendency_function = stats::median,
     format = c("wide", "long")
   ) {
@@ -150,25 +156,32 @@ tof_extract_central_tendency <-
 
     central_tendencies <-
       tof_tibble %>%
-      # if cluster_col is not a character, make it one
+      # if cluster_col isn't a character vector, make it one
       dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) %>%
-      dplyr::group_by({{cluster_col}}, dplyr::across({{group_cols}})) %>%
+      dplyr::group_by(dplyr::across({{group_cols}}), {{cluster_col}}, {{stimulation_col}}) %>%
       dplyr::summarize(dplyr::across({{marker_cols}}, central_tendency_function)) %>%
       tidyr::pivot_longer(
         cols = {{marker_cols}},
         names_to = "channel",
-        values_to = "value"
+        values_to = "values"
       )
 
     if (format == "wide") {
       central_tendencies <-
         central_tendencies %>%
+        dplyr::group_by(dplyr::across({{group_cols}})) %>%
+        dplyr::transmute(
+          col_names =
+            stringr::str_c({{stimulation_col}}, "_", channel, "@", {{cluster_col}}, "_ct") %>%
+            stringr::str_remove("^_"),
+          values
+        ) %>%
         tidyr::pivot_wider(
-          names_from = c(channel, {{cluster_col}}),
-          values_from = value,
-          names_sep = "@"
+          names_from = col_names,
+          values_from = values
         )
     }
+
 
     return(dplyr::ungroup(central_tendencies))
   }
@@ -177,7 +190,6 @@ tof_extract_central_tendency <-
 
 
 # tof_extract_threshold --------------------------------------------------------
-
 
 #' Extract aggregated features from CyTOF data using a binary threshold
 #'
@@ -608,8 +620,6 @@ tof_extract_jsd <-
 
 #' Extract aggregated, sample-level features from CyTOF data.
 #'
-#' @param tof_tibble A `tof_tbl` or a `tibble`.
-#'
 #' This function wraps other members of the `tof_extract_*` function family to extract
 #' sample-level features from both lineage (i.e. cell surface antigen) CyTOF channels
 #' assumed to be stable across stimulation conditions and signaling CyTOF channels
@@ -638,6 +648,8 @@ tof_extract_jsd <-
 #' These calculations can be performed either
 #' overall (across all cells in the dataset) or after breaking down the cells into
 #' subgroups using `group_cols`.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
 #' stores the cluster ids of the cluster to which each cell belongs.
