@@ -181,9 +181,17 @@ tof_cluster_flowsom <-
 #' local graph structure; larger values emphasize global graph structure (and
 #' will add time to the computation). Defaults to 30.
 #'
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
+#'
 #' @param seed An integer used to set the random seed for the FlowSOM clustering.
 #' Setting this argument explicitly can be useful for reproducibility purposes.
 #' Defaults to a random integer
+#'
+#' @param legacy A boolean value indicating if the Chen Lab implementation of
+#' phenograph (Rphenograph) should be used (TRUE) or if tidytof's native
+#' implementation of phenograph should be used (FALSE; the default).
 #'
 #' @param ... Optional additional parameters that can be passed to \code{\link[Rphenograph]{Rphenograph}}.
 #'
@@ -199,60 +207,77 @@ tof_cluster_phenograph <-
     tof_tibble,
     cluster_cols = where(tof_is_numeric),
     num_neighbors = 30,
+    distance_function = c("euclidean", "cosine"),
     seed,
+    legacy = FALSE,
     ...
   ) {
-    # check that Rphenograph is installed
-    has_phenograph <- requireNamespace(package = "Rphenograph")
-    if (!has_phenograph) {
-      stop(
-        "This function requires the {Rphenograph} package. Install it with this code:\n
+    if (legacy) {
+      # check that Rphenograph is installed
+      has_phenograph <- requireNamespace(package = "Rphenograph")
+      if (!has_phenograph) {
+        stop(
+          "This function requires the {Rphenograph} package. Install it with this code:\n
            if(!require(devtools)){
               install.packages(\"devtools\")
            }
            devtools::install_github(\"JinmiaoChenLab/Rphenograph\")\n"
-      )
-    }
+        )
+      }
 
 
-    # set random seed
-    if(!missing(seed)) {
-      set.seed(seed)
-    }
+      # set random seed
+      if(!missing(seed)) {
+        set.seed(seed)
+      }
 
-    invisible(
-      utils::capture.output(
-        suppressMessages(
-          phenograph_result <-
-            Rphenograph::Rphenograph(
-              data = dplyr::select(tof_tibble, {{cluster_cols}}),
-              k = num_neighbors
-            )
+      invisible(
+        utils::capture.output(
+          suppressMessages(
+            phenograph_result <-
+              Rphenograph::Rphenograph(
+                data = dplyr::select(tof_tibble, {{cluster_cols}}),
+                k = num_neighbors
+              )
+          )
         )
       )
-    )
 
-    phenograph_clusters <- phenograph_result[[2]]$membership
+      phenograph_clusters <- phenograph_result[[2]]$membership
 
-    # deal with cells not assigned to any cluster
-    if(length(phenograph_clusters) != nrow(tof_tibble)) {
-      # assign all cells an id
-      cell_ids <- as.character(as.numeric(1:nrow(tof_tibble)))
+      # deal with cells not assigned to any cluster
+      if(length(phenograph_clusters) != nrow(tof_tibble)) {
+        # assign all cells an id
+        cell_ids <- as.character(as.numeric(1:nrow(tof_tibble)))
 
-      # find the cells not assigned to a cluster and assign them to NA
-      unassigned_cells <- which(!(cell_ids %in% names(phenograph_clusters)))
-      unassigned_cell_clusters <- rep(NA, length(unassigned_cells))
-      names(unassigned_cell_clusters) <- as.character(unassigned_cells)
+        # find the cells not assigned to a cluster and assign them to NA
+        unassigned_cells <- which(!(cell_ids %in% names(phenograph_clusters)))
+        unassigned_cell_clusters <- rep(NA, length(unassigned_cells))
+        names(unassigned_cell_clusters) <- as.character(unassigned_cells)
 
-      # concatenate
-      phenograph_clusters <- c(phenograph_clusters, unassigned_cell_clusters)
-      phenograph_clusters <-
-        phenograph_clusters[order(as.numeric(names(phenograph_clusters)))]
+        # concatenate
+        phenograph_clusters <- c(phenograph_clusters, unassigned_cell_clusters)
+        phenograph_clusters <-
+          phenograph_clusters[order(as.numeric(names(phenograph_clusters)))]
+      }
+
+      #return final result
+      phenograph_clusters <- as.integer(phenograph_clusters)
+      return(dplyr::tibble(.phenograph_cluster = as.character(phenograph_clusters)))
+
+    } else {
+      result <-
+        phenograph_cluster(
+          tof_tibble,
+          cluster_cols = {{cluster_cols}},
+          num_neighbors = num_neighbors,
+          distance_function = distance_function,
+          seed = seed,
+          ...
+        )
+
+      return(result)
     }
-
-    #return final result
-    phenograph_clusters <- as.integer(phenograph_clusters)
-    return(dplyr::tibble(.phenograph_cluster = as.character(phenograph_clusters)))
   }
 
 
@@ -453,202 +478,6 @@ tof_cluster_ddpr <-
 
 
 
-# tof_cluster_xshift -----------------------------------------------------------
-tof_cluster_xshift <-
-  function(
-    tof_tibble,
-    # cluster_cols = some_default, - have to add this!!!
-    k = max(20, nrow(tof_tibble)),
-    distance_function = c("cosine", "euclidean"),
-    p_value = 0.01
-  ) {
-    # check distance_function argument
-    distance_function <-
-      match.arg(distance_function, choices = c("cosine", "euclidean"))
-
-    # calculate "z" value for nearest-neighbor search during step 2 according
-    # to statistical criteria in the x-shift methods section
-    z <- floor(-log(p_value / nrow(tof_tibble), base = 2))
-
-
-    # step 1a - find nearest neighbors of each cell in tof_tibble
-    # note that the number of neighbors we find is the larger of k and z,
-    # as this allows us not to repeat the calculation needlessly in step 2
-    nn_result <-
-      tof_tibble %>%
-      tof_find_knn(k = max(z, k), distance_function = distance_function)
-
-    # step 1b - compute local densities of each cell using knn density estimation
-    # using only k neighbors (if z > k, only use the first k neighbors)
-    densities <-
-      xshift_compute_local_densities(
-        neighbor_ids = nn_result$neighbor_ids[, 1:k],
-        neighbor_distances = nn_result$neighbor_distances[, 1:k]
-      )
-
-    # step 2 - identify candidate centroids from all cells in the dataset
-    candidates <-
-      xshift_find_candidate_centroids(
-        neighbor_ids = nn_result$neighbor_ids,
-        densities = densities
-      )
-
-    ## step 3 - merge clusters
-
-    # step 3a - find which candidate centroids are gabriel neighbors
-    gabriel_results <-
-      xshift_find_gabriel_neighbors(
-        candidates = candidates,
-        distance_function = distance_function
-      )
-
-    # candidate centroids' protein measurements extracted from tof_tibble
-    centroids <- gabriel_results$centroids
-
-    # tibble containing information about all gabriel pairs from all 2-wise
-    # combinations of candidate nodes
-    gabriel_pairs <- gabriel_results$gabriel_pairs
-
-
-    # step 3b - for all gabriel pairs,
-    #           test if there is a minimum of density on the segment connecting
-    #           the centroids. If there is not, the lower-density centroid should
-    #           be merged with the larger-density centroid.
-    gabriel_pairs <-
-      xshift_test_density_minima(
-        gabriel_pairs = gabriel_pairs,
-        centroids = centroids,
-        k = k,
-        tof_tibble = tof_tibble
-      )
-
-    # step 4 - Merge centroids based on density connections
-    merge_information <-
-      gabriel_pairs %>%
-      dplyr::filter(should_merge) %>%
-      dplyr::select(-should_merge) %>%
-      tidyr::pivot_longer(
-        cols = c(centroid_1, centroid_2),
-        names_to = "centroid",
-        values_to = "merge_from"
-      ) %>%
-      dplyr::select(-centroid) %>%
-      # potentially remove this line
-      dplyr::filter(merge_into != merge_from)
-
-    #########################
-    merge_information_from <-
-      merge_information %>%
-      dplyr::group_by(merge_from) %>%
-      dplyr::summarize(connected_to = list(unique(merge_into)))
-
-    merge_information_into <-
-      merge_information %>%
-      dplyr::group_by(merge_into) %>%
-      dplyr::summarize(connected_to = list(unique(merge_from)))
-    #########################
-
-    candidates <-
-      candidates %>%
-      dplyr::left_join(
-        merge_information_from,
-        by = c("cell_id" = "merge_from")
-      ) %>%
-      dplyr::mutate(
-        connected_to =
-          purrr::map2(
-            .x = closest_neighbor,
-            .y = connected_to,
-            .f = ~ as.numeric(na.omit(unique(c(.x, .y))))
-          )
-      ) %>%
-      dplyr::select(-higher_density_neighbors)
-
-    eliminated_candidates <-
-      merge_information_from %>%
-      dplyr::pull(merge_from)
-
-    candidates <-
-      candidates %>%
-      dplyr::mutate(
-        still_candidate =
-          dplyr::if_else(cell_id %in% eliminated_candidates, FALSE, is_candidate)
-      )
-
-    cluster_ids <-
-      candidates %>%
-      dplyr::filter(still_candidate) %>%
-      dplyr::transmute(cell_id, cluster_id = 1:dplyr::n())
-
-    # density clusters for candidate centroids
-    density_clusters <-
-      candidates %>%
-      dplyr::left_join(cluster_ids, by = "cell_id")
-
-    edge_list <-
-      candidates %>%
-      select(cell_id, connected_to) %>%
-      mutate(
-        connected_to = purrr::map(connected_to, ~ tibble(to = .x))
-      ) %>%
-      tidyr::unnest(cols = connected_to) %>%
-      rename(from = cell_id)
-
-    node_list <-
-      candidates %>%
-      select(cell_id)
-
-    my_graph <-
-      tidygraph::tbl_graph(
-        nodes = node_list,
-        edges = edge_list,
-        directed = FALSE
-      )
-
-    xshift_clusters <-
-      my_graph %>%
-      tidygraph::activate(nodes) %>%
-      dplyr::mutate(
-        group = tidygraph::group_components(type = "strong")
-      ) %>%
-      dplyr::as_tibble() %>%
-      dplyr::mutate(xshift_cluster = as.character(group)) %>%
-      dplyr::arrange(cell_id) %>%
-      dplyr::select(xshift_cluster)
-
-
-
-    # step 5 - Merge centroids based on mahalanobis distance (until all clusters
-    # have mahalanobis distance of 2.0 or more between them)
-
-    # TO DO
-
-    # return result
-    return(xshift_clusters)
-
-
-
-    # result <-
-    #   list(
-    #     z = z,
-    #     nn_result = nn_result,
-    #     densities = densities,
-    #     candidates = candidates,
-    #     merge_information = merge_information,
-    #     merge_information_from = merge_information_from,
-    #     merge_information_into = merge_information_into,
-    #     gabriel_pairs = gabriel_pairs,
-    #     cluster_ids = cluster_ids,
-    #     density_clusters = density_clusters
-    #   )
-
-
-
-
-
-  }
-
-
 # tof_cluster ------------------------------------------------------------------
 
 #' Cluster CyTOF data.
@@ -660,8 +489,7 @@ tof_cluster_xshift <-
 #' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
 #' @param method A string indicating which clustering methods should be used. Valid
-#' values include "flowsom", "phenograph", "kmeans", "ddpr" (although this will
-#' throw an error and redirect the user), and "xshift".
+#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
 #' @param ... Additional arguments to pass onto the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
@@ -700,10 +528,10 @@ tof_cluster <- function(tof_tibble, method, ..., add_col = TRUE) {
       tof_cluster_ddpr(...)
 
   } else if (method == "xshift") {
-    clusters <-
-      tof_tibble %>%
-      tof_cluster_xshift(...)
-
+    # clusters <-
+    #   tof_tibble %>%
+    #   tof_cluster_xshift(...)
+    stop("X-shift is not yet implemented.")
   } else {
     stop("Not a valid clustering method.")
   }
