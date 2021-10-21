@@ -123,8 +123,6 @@ tof_is_numeric <- function(.vec) {
 #'
 #' @export
 #'
-#' @examples
-#' NULL
 #'
 tof_find_knn <-
   function(
@@ -1137,4 +1135,72 @@ deframe <- function(x) {
   name <- x[[2L]]
   result <- setNames(value, nm = name)
   return(result)
+}
+
+#' @export
+as_tof_tbl <- function(flow_data, sep = "|") {
+  UseMethod("as_tof_tbl")
+}
+
+#' @export
+as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
+  # check if flowset is empty
+  if (length(flow_data) < 1) {
+    stop("This flowSet is empty.")
+  }
+  panel_info <-
+    flow_data[[1]] %>%
+    tof_find_panel_info()
+
+  flowset_exprs <-
+    flow_data %>%
+    flowCore::fsApply(FUN = flowCore::exprs) %>%
+    tibble::as_tibble()
+
+  col_names <-
+    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+
+  # prevent repeating names twice when antigen and metal are identical
+  repeat_indices <-
+    which(panel_info$metals == panel_info$antigens)
+  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+  colnames(flowset_exprs) <- col_names
+
+  result <- new_tof_tibble(x = flowset_exprs, panel = panel_info)
+
+  return(result)
+}
+
+#' @export
+as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
+  panel_info <-
+    flow_data %>%
+    tof_find_panel_info()
+
+  col_names <-
+    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+
+  # prevent repeating names twice when antigen and metal are identical
+  repeat_indices <-
+    which(panel_info$metals == panel_info$antigens)
+  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+  flowframe_exprs <-
+    flow_data %>%
+    {
+      setNames(
+        object = tibble::as_tibble(flowCore::exprs(.)),
+        nm = col_names
+      )
+    }
+
+  result <-
+    new_tof_tibble(
+      x = flowframe_exprs,
+      panel = panel_info
+    )
+
+  return(result)
+
 }

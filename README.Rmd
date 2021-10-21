@@ -313,7 +313,7 @@ BiocManager::install("HDCytoData")
 
 To load the CITRUS data into our current R session, we can call a function from the `{HDCytoData}`, which will provide it to us in a format from the `{flowCore}` package (called a "flowSet"). To convert this into a tidy tibble, we can use `{tidytof}` built-in method for converting flowCore objects into `tof_tbl`'s . 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
 
 citrus_data <- 
@@ -351,7 +351,7 @@ citrus_data <-
 ```
 
 
-After this data cleaning, we have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
+After data cleaning, we have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
 
 We might be interested if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question of differential abundance analysis (DAA). `{tidytof}`'s `tof_daa` verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:
 
@@ -438,7 +438,7 @@ Importantly, the output of `tof_daa` depends slightly on the underlying statisti
 * `tof_daa_ttest`
 
 
-Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_dea` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each of our signaling markers. 
+Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_dea` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each cluster's expression of our signaling markers between stimulation conditions. 
 
 ```{r}
 signaling_markers <- 
@@ -449,6 +449,7 @@ signaling_markers <-
 
 dea_result <- 
   citrus_data %>% 
+  tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
   tof_dea(
     dea_method = "ttest", 
     cluster_col = population_id, 
@@ -462,7 +463,7 @@ dea_result %>%
   head()
 ```
 
-While the output of `tof_dea` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pBtk in cluster 3 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair. 
+While the output of `tof_dea` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair. 
 
 This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs: 
 
@@ -501,14 +502,37 @@ volcano_data %>%
   labs(
     x = "log2(Fold-change)", 
     y = "-log10(p-value)", 
-    fill = NULL
+    fill = NULL, 
+    caption = "Labels indicate the 10 most significant marker-cluster pairs"
+  )
+```
+
+### Patient- and sample-level feature extraction
+
+In addition to its functions for analyzing and visualizing CyTOF data at the single-cell and cluster levels, `{tidytof}`'s `tof_extract_features` verb allows users to aggregate single-cell and cluster-level information in order to summarize whole-samples (or whole-patients) from which cells were collected. These features can be useful for visualizing the differences between patients and samples in different experimental conditions or for building machine learning models. 
+
+By default, `tof_extract_features` 
+
+```{r}
+# preprocess the numeric columns in the citrus dataset
+citrus_data <- 
+  citrus_data %>% 
+  mutate(cluster = str_c(cluster, population_id)) %>% 
+  tof_preprocess()
+
+citrus_data %>% 
+  tof_extract_features(
+    cluster_col = population_id, 
+    group_cols = patient, 
+    stimulation_col = stimulation,
+    lineage_cols = any_of(c("CD45_In115", "CD20_Sm147", "CD33_Nd148")), 
+    signaling_cols = any_of(signaling_markers), 
+    signaling_method = "central tendency"
   )
 ```
 
 
-### Patient-level feature extraction
 
-[Under construction]
 
 ### Outcomes modeling
 
@@ -522,6 +546,6 @@ volcano_data %>%
 
 [Under construction]
 
-
+## `{tidytof}`'s Design Principles (and Tips)
 
 

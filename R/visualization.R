@@ -2,7 +2,7 @@
 
 # single-cell visualizations ----------------------------
 
-tof_plot_sc_histograms <-
+tof_plot_cells_histograms <-
   function(
     tof_tibble,
     x_col,
@@ -39,7 +39,7 @@ tof_plot_sc_histograms <-
 #' @export
 #'
 #'
-tof_plot_sc_dr <-
+tof_plot_cells_dr <-
   function(
     tof_tibble,
     dr_cols,
@@ -142,7 +142,7 @@ tof_plot_sc_dr <-
 #'
 #'
 #'
-tof_plot_sc_layout <-
+tof_plot_cells_layout <-
   function(
     tof_tibble,
     knn_cols = where(tof_is_numeric),
@@ -158,7 +158,6 @@ tof_plot_sc_layout <-
     theme = ggplot2::theme_void(),
     ...
   ) {
-
 
     # check distance function
     distance_function <- rlang::arg_match(distance_function)
