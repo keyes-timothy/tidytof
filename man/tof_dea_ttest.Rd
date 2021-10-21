@@ -9,7 +9,7 @@ tof_dea_ttest(
   cluster_col,
   marker_cols = where(tof_is_numeric),
   effect_col,
-  group_cols = NULL,
+  group_cols,
   test_type = c("unpaired", "paired"),
   summary_function = mean,
   min_cells = 3,
@@ -35,7 +35,7 @@ Supports tidyselect helpers.}
 `tof_tibble` should be used to break samples into groups for the t-test. Should
 only have 2 unique values.}
 
-\item{group_cols}{Optional. Unquoted names of the columns other than `effect_col`
+\item{group_cols}{Unquoted names of the columns other than `effect_col`
 that should be used to group cells into independent observations. Fills a similar role
 to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
 analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),

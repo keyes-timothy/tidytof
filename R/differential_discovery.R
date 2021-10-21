@@ -230,7 +230,8 @@ tof_daa_diffcyt <-
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                   dplyr::as_tibble() %>%
                   dplyr::arrange(p_adj) %>%
-                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
+                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+                  dplyr::rename("{{cluster_col}}" := cluster_id)
               }
             )
         )
@@ -281,12 +282,18 @@ tof_daa_diffcyt <-
                       diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                       dplyr::as_tibble() %>%
                       dplyr::arrange(p_adj) %>%
-                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+                      dplyr::select(
+                        "{{cluster_col}}" := cluster_id,
+                        p_val,
+                        p_adj,
+                        significant,
+                        tidyselect::everything()
+                      )
                   }
                 )
             )
         ))
-
     }
 
     else {
@@ -310,13 +317,22 @@ tof_daa_diffcyt <-
                   diffcyt::topTable(all = TRUE, show_all_cols = TRUE) %>%
                   dplyr::as_tibble() %>%
                   dplyr::arrange(p_adj) %>%
-                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
+                  dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+                  dplyr::select(
+                    "{{cluster_col}}" := cluster_id,
+                    p_val,
+                    p_adj,
+                    significant,
+                    tidyselect::everything()
+                  )
               }
             )
         )
     }
 
-
+    # remove the omnibus test information (and unnest the results tibble)
+    # if there are only 2 levels to the fixed effects being tested (because
+    # this means the omnibus test and the individual effect will be identical)
     if (nrow(result_tibble) == 2) {
       result_tibble <-
         result_tibble %>%
@@ -542,7 +558,15 @@ tof_dea_diffcyt <-
                         marker = marker_id,
                         "{{cluster_col}}" := cluster_id
                       ) %>%
-                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+                      dplyr::select(
+                        {{cluster_col}},
+                        marker,
+                        p_val,
+                        p_adj,
+                        significant,
+                        tidyselect::everything()
+                      )
                   }
                 )
             )
@@ -595,11 +619,29 @@ tof_dea_diffcyt <-
                         marker = marker_id,
                         "{{cluster_col}}" := cluster_id
                       ) %>%
-                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", ""))
+                      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+                      dplyr::select(
+                        {{cluster_col}},
+                        marker,
+                        p_val,
+                        p_adj,
+                        significant,
+                        tidyselect::everything()
+                      )
                   }
                 )
             )
         ))
+    }
+
+    # remove the omnibus test information (and unnest the results tibble)
+    # if there are only 2 levels to the fixed effects being tested (because
+    # this means the omnibus test and the individual effect will be identical)
+    if (nrow(result_tibble) == 2) {
+      result_tibble <-
+        result_tibble %>%
+        dplyr::filter(tested_effect != "omnibus") %>%
+        tidyr::unnest(cols = dea_results)
     }
 
     return(result_tibble)
@@ -818,14 +860,26 @@ tof_daa_glmm <-
       dplyr::filter(term != "(Intercept)", !is.na(p.value)) %>%
       dplyr::mutate(p_adj = stats::p.adjust(p.value, method = "fdr")) %>%
       dplyr::arrange(p_adj) %>%
-      dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+      dplyr::mutate(
+        significant = dplyr::if_else(p_adj < alpha, "*", ""),
+        mean_fc = exp(estimate)
+      ) %>%
       dplyr::rename(
         tested_effect = term,
         p_val = p.value,
         f_statistic = statistic
-      ) %>%
-      dplyr::select(-group) %>%
+      )
+
+    if (has_random_effects) {
+      fit_data <-
+        fit_data %>%
+        dplyr::select(-group, -effect)
+    }
+
+    fit_data <-
+      fit_data %>%
       dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") %>%
+      dplyr::select({{cluster_col}}, p_val, p_adj, significant, tidyselect::everything()) %>%
       tidyr::nest(daa_results = c(-tested_effect))
 
     # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
@@ -837,7 +891,6 @@ tof_daa_glmm <-
 
     return(fit_data)
   }
-
 
 
 #' Differential Expression Analysis (DEA) with linear mixed-models (LMMs)
@@ -1075,15 +1128,42 @@ tof_dea_lmm <-
           dplyr::filter(term != "(Intercept)", !is.na(p.value)) %>%
           dplyr::mutate(p_adj = stats::p.adjust(p.value, method = "fdr")) %>%
           dplyr::arrange(p_adj) %>%
-          dplyr::mutate(significant = dplyr::if_else(p_adj < alpha, "*", "")) %>%
+          dplyr::mutate(
+            significant = dplyr::if_else(p_adj < alpha, "*", ""),
+            mean_diff = estimate
+          ) %>%
           dplyr::rename(
             tested_effect = term,
             p_val = p.value,
             f_statistic = statistic
           ) %>%
           dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") %>%
-          tidyr::nest(dea_results = c(-tested_effect))
+          dplyr::select(
+            {{cluster_col}},
+            marker,
+            p_val,
+            p_adj,
+            significant,
+            tidyselect::everything()
+          )
       ))
+
+    if (has_random_effects) {
+      fit_data <-
+        fit_data %>%
+        dplyr::select(-group, -effect)
+    }
+
+    fit_data <-
+      fit_data %>%
+      tidyr::nest(dea_results = c(-tested_effect))
+
+    # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
+    # unnest it (which is more intuitive)
+    if (nrow(fit_data) == 1) {
+      fit_data <-
+        tidyr::unnest(fit_data, cols = dea_results)
+    }
 
     return(fit_data)
   }
@@ -1327,8 +1407,10 @@ tof_daa_ttest <-
     }
 
     # convert cluster column back to a character vector for consistency with
-    # other tidytof functions
-    t_df <- dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{cluster_col}}))
+    # other tidytof functions and arrange columns into standard order
+    t_df <-
+      dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{cluster_col}})) %>%
+      dplyr::select({{cluster_col}}, p_val, p_adj, significant, tidyselect::everything())
 
     if (!quiet) {
       if (any(is.na(t_df$t))) {
@@ -1557,6 +1639,7 @@ tof_dea_ttest <-
             )
         ) %>%
         dplyr::select(-t_test, -data) %>%
+        dplyr::select({{cluster_col}}, marker, p_val, p_adj, significant, tidyselect::everything()) %>%
         dplyr::arrange(p_adj)
 
     } else {
@@ -1597,6 +1680,7 @@ tof_dea_ttest <-
             )
         ) %>%
         dplyr::select(-t_test, -any_of(effect_levels), -enough_samples) %>%
+        dplyr::select({{cluster_col}}, marker, p_val, p_adj, significant, tidyselect::everything()) %>%
         dplyr::arrange(p_adj)
     }
 

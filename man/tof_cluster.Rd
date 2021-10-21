@@ -10,8 +10,7 @@ tof_cluster(tof_tibble, method, ..., add_col = TRUE)
 \item{tof_tibble}{A `tof_tbl` or `tibble`.}
 
 \item{method}{A string indicating which clustering methods should be used. Valid
-values include "flowsom", "phenograph", "kmeans", "ddpr" (although this will
-throw an error and redirect the user), and "xshift".}
+values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".}
 
 \item{...}{Additional arguments to pass onto the `tof_cluster_*`
 function family member corresponding to the chosen method.}

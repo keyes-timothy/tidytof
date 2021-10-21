@@ -15,6 +15,7 @@ tof_dea_diffcyt(
   include_observation_level_random_effects = FALSE,
   min_cells = 3,
   min_samples = 5,
+  alpha = 0.05,
   ...
 )
 }
@@ -74,6 +75,10 @@ Defaults to 3.}
 expression analysis. Clusters are not included in the differential expression testing
 if they do not have at least `min_cells` in at least `min_samples` samples.
 Defaults to 5.}
+
+\item{alpha}{A numeric value between 0 and 1 indicating which significance
+level should be applied to multiple-comparison adjusted p-values during the
+differential abundance analysis. Defaults to 0.05.}
 
 \item{...}{Optional additional arguments to pass to the under-the-hood diffcyt
 function being used to perform the differential expression analysis. See

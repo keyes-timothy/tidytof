@@ -8,7 +8,9 @@ tof_cluster_phenograph(
   tof_tibble,
   cluster_cols = where(tof_is_numeric),
   num_neighbors = 30,
+  distance_function = c("euclidean", "cosine"),
   seed,
+  legacy = FALSE,
   ...
 )
 }
@@ -24,9 +26,17 @@ constructing PhenoGraph's k-nearest-neighbor graph. Smaller values emphasize
 local graph structure; larger values emphasize global graph structure (and
 will add time to the computation). Defaults to 30.}
 
+\item{distance_function}{A string indicating which distance function to use
+for the nearest-neighbor calculation. Options include "euclidean"
+(the default) and "cosine" distances.}
+
 \item{seed}{An integer used to set the random seed for the FlowSOM clustering.
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
+
+\item{legacy}{A boolean value indicating if the Chen Lab implementation of
+phenograph (Rphenograph) should be used (TRUE) or if tidytof's native
+implementation of phenograph should be used (FALSE; the default).}
 
 \item{...}{Optional additional parameters that can be passed to \code{\link[Rphenograph]{Rphenograph}}.}
 }

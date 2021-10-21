@@ -35,7 +35,3 @@ those two cells according to `distance_function`.
 \description{
 Find the k-nearest neighbors of each cell in a CyTOF dataset.
 }
-\examples{
-NULL
-
-}

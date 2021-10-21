@@ -4,7 +4,6 @@ library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
-library(diffcyt)
 
 # setup
 set.seed(2020)
@@ -83,37 +82,36 @@ test_that("diffcyt results tibbles have the right dimensions", {
   expect_s3_class(diffcyt_edgeR, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(diffcyt_glmm), 2L)
-  expect_equal(nrow(diffcyt_voom), 2L)
-  expect_equal(nrow(diffcyt_edgeR), 2L)
+  expect_equal(nrow(diffcyt_glmm), 5L)
+  expect_equal(nrow(diffcyt_voom), 5L)
+  expect_equal(nrow(diffcyt_edgeR), 5L)
 
   # have correct number of columns
-  expect_equal(ncol(diffcyt_glmm), 2L)
-  expect_equal(ncol(diffcyt_voom), 2L)
-  expect_equal(ncol(diffcyt_edgeR), 2L)
-
+  expect_equal(ncol(diffcyt_glmm), 5L)
+  expect_equal(ncol(diffcyt_voom), 9L)
+  expect_equal(ncol(diffcyt_edgeR), 8L)
 })
 
 test_that("diffcyt daa_results have the right content", {
   # glmm
   expect_true(all(
-      c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_glmm$daa_results[[1]])
+      c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_glmm)
     ))
 
   # voom
   expect_true(all(
-      c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_voom$daa_results[[1]])
+      c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_voom)
     ))
   expect_true(all(
-    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_voom$daa_results[[1]])
+    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_voom)
   ))
 
   # edgeR
   expect_true(all(
-    c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_edgeR$daa_results[[1]])
+    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_edgeR)
   ))
   expect_true(all(
-    c("logFC", "logCPM", "LR") %in% colnames(diffcyt_edgeR$daa_results[[1]])
+    c("logFC", "logCPM", "LR") %in% colnames(diffcyt_edgeR)
   ))
 })
 
@@ -162,26 +160,19 @@ test_that("Using only a fixed-effect doesn't break anything", {
   expect_s3_class(diffcyt_voom_fixed, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(diffcyt_glmm_fixed), 2L)
-  expect_equal(nrow(diffcyt_voom_fixed), 2L)
+  expect_equal(nrow(diffcyt_glmm_fixed), nrow(diffcyt_glmm))
+  expect_equal(nrow(diffcyt_voom_fixed), nrow(diffcyt_voom))
 
   # have correct number of columns
-  expect_equal(ncol(diffcyt_glmm_fixed), 2L)
-  expect_equal(ncol(diffcyt_voom_fixed), 2L)
+  expect_equal(ncol(diffcyt_glmm_fixed), ncol(diffcyt_glmm))
+  expect_equal(ncol(diffcyt_voom_fixed), ncol(diffcyt_voom))
 
   # content
-  expect_true(all(
-    c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_glmm$daa_results[[1]])
-  ))
-  expect_true(all(
-    c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_voom$daa_results[[1]])
-  ))
-  expect_true(all(
-    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_voom$daa_results[[1]])
-  ))
+  expect_identical(colnames(diffcyt_glmm), colnames(diffcyt_glmm_fixed))
+  expect_identical(colnames(diffcyt_voom), colnames(diffcyt_voom_fixed))
 })
 
-test_that("Using a fixed-effect with more than 2 levels results in a larger output tibble", {
+test_that("Using a fixed-effect with more than 2 levels results in a nested output tibble", {
   expect_equal(
     dd_data %>%
       tof_daa_diffcyt(
@@ -222,88 +213,35 @@ test_that("glmm results tibbles have the right dimensions", {
   expect_s3_class(daa_glmm_fixed, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(daa_glmm), 1L)
-  expect_equal(nrow(daa_glmm_fixed), 1L)
+  expect_equal(nrow(daa_glmm), 5L)
+  expect_equal(nrow(daa_glmm_fixed), 5L)
 
   # have correct number of columns
-  expect_equal(ncol(daa_glmm), 2L)
-  expect_equal(ncol(daa_glmm_fixed), 2L)
+  expect_equal(ncol(daa_glmm), 9L)
+  expect_equal(ncol(daa_glmm_fixed), 9L)
 
 })
+
 
 test_that("glmm daa_results have the right content", {
-  # glmm
   expect_true(all(
-    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(daa_glmm$daa_results[[1]])
+    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(daa_glmm)
   ))
 
-  expect_true(all(
-
-  ))
+  expect_identical(colnames(daa_glmm), colnames(daa_glmm_fixed))
 })
 
-### test arguments
-
-test_that("OLRE give a warning for any method that isn't GLMMs", {
-  expect_warning(
-    dd_data %>%
-      tof_daa_diffcyt(
-        sample_col = sample_name,
-        cluster_col = .flowsom_metacluster,
-        fixed_effect_cols = condition,
-        method = "edgeR",
-        include_observation_level_random_effects = TRUE
-      )
-  )
-
-  expect_warning(
-    dd_data %>%
-      tof_daa_diffcyt(
-        sample_col = sample_name,
-        cluster_col = .flowsom_metacluster,
-        fixed_effect_cols = condition,
-        method = "voom",
-        include_observation_level_random_effects = TRUE
-      )
-  )
-})
-
-test_that("Using only a fixed-effect doesn't break anything", {
-  # are tibbles
-  expect_s3_class(diffcyt_glmm_fixed, "tbl_df")
-  expect_s3_class(diffcyt_voom_fixed, "tbl_df")
-
-  # have correct number of rows
-  expect_equal(nrow(diffcyt_glmm_fixed), 2L)
-  expect_equal(nrow(diffcyt_voom_fixed), 2L)
-
-  # have correct number of columns
-  expect_equal(ncol(diffcyt_glmm_fixed), 2L)
-  expect_equal(ncol(diffcyt_voom_fixed), 2L)
-
-  # content
-  expect_true(all(
-    c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_glmm$daa_results[[1]])
-  ))
-  expect_true(all(
-    c("cluster_id", "p_val", "p_adj") %in% colnames(diffcyt_voom$daa_results[[1]])
-  ))
-  expect_true(all(
-    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_voom$daa_results[[1]])
-  ))
-})
 
 test_that("Using a fixed-effect with more than 2 levels results in a larger output tibble", {
   expect_equal(
     dd_data %>%
-      tof_daa_diffcyt(
+      tof_daa_glmm(
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
-        fixed_effect_cols = stim_2,
-        method = "glmm"
+        fixed_effect_cols = stim_2
       ) %>%
       nrow(),
-    3L
+    2L
   )
 })
 
@@ -370,10 +308,9 @@ test_that("choosing effect_col with more than 2 levels throws an error", {
   )
 })
 
-test_that("omitting group_cols doesn't break anything, but should throw a warning if there aren't enough replicates", {
+test_that("omitting group_cols should give an error", {
   # unpaired
-  expect_warning(
-    daa_no_groups <-
+  expect_error(
       dd_data %>%
       tof_daa_ttest(
         cluster_col = .flowsom_metacluster,
@@ -384,11 +321,8 @@ test_that("omitting group_cols doesn't break anything, but should throw a warnin
       )
   )
 
-  expect_s3_class(daa_no_groups, class = "tbl_df")
-
   # paired
-  expect_warning(
-    daa_no_groups <-
+  expect_error(
       dd_data %>%
       tof_daa_ttest(
         cluster_col = .flowsom_metacluster,
@@ -398,8 +332,6 @@ test_that("omitting group_cols doesn't break anything, but should throw a warnin
         min_samples = 0,
       )
   )
-
-  expect_s3_class(daa_no_groups, class = "tbl_df")
 
 })
 
@@ -469,16 +401,16 @@ test_that("diffcyt result tibbles have the right dimensions", {
   expect_s3_class(diffcyt_limma_fixed, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(diffcyt_lmm), 2L)
-  expect_equal(nrow(diffcyt_lmm_fixed), 2L)
-  expect_equal(nrow(diffcyt_limma), 2L)
-  expect_equal(nrow(diffcyt_limma_fixed), 2L)
+  expect_equal(nrow(diffcyt_lmm), 10L)
+  expect_equal(nrow(diffcyt_lmm_fixed), 10L)
+  expect_equal(nrow(diffcyt_limma), 10L)
+  expect_equal(nrow(diffcyt_limma_fixed), 10L)
 
   # have correct number of columns
-  expect_equal(ncol(diffcyt_lmm), 2L)
-  expect_equal(ncol(diffcyt_lmm_fixed), 2L)
-  expect_equal(ncol(diffcyt_limma), 2L)
-  expect_equal(ncol(diffcyt_limma_fixed), 2L)
+  expect_equal(ncol(diffcyt_lmm), 6L)
+  expect_equal(ncol(diffcyt_lmm_fixed), 6L)
+  expect_equal(ncol(diffcyt_limma), 10L)
+  expect_equal(ncol(diffcyt_limma_fixed), 10L)
 
 })
 
@@ -486,16 +418,16 @@ test_that("diffcyt dea_results have the right content", {
   # lmm
   expect_true(all(
     c(".flowsom_metacluster", "marker", "p_val", "p_adj") %in%
-      colnames(diffcyt_lmm$dea_results[[1]])
+      colnames(diffcyt_lmm)
   ))
 
   # limma
   expect_true(all(
     c(".flowsom_metacluster", "marker", "p_val", "p_adj") %in%
-      colnames(diffcyt_limma$dea_results[[1]])
+      colnames(diffcyt_limma)
   ))
   expect_true(all(
-    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_limma$dea_results[[1]])
+    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_limma)
   ))
 })
 
@@ -519,23 +451,15 @@ test_that("Using only a fixed-effect doesn't break anything", {
   expect_s3_class(diffcyt_lmm_fixed, "tbl_df")
   expect_s3_class(diffcyt_limma_fixed, "tbl_df")
 
-  # have correct number of rows
-  expect_equal(nrow(diffcyt_lmm_fixed), 2L)
-  expect_equal(nrow(diffcyt_limma_fixed), 2L)
-
-  # have correct number of columns
-  expect_equal(ncol(diffcyt_lmm_fixed), 2L)
-  expect_equal(ncol(diffcyt_limma_fixed), 2L)
-
   # content
   expect_true(all(
-    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_lmm_fixed$dea_results[[1]])
+    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_lmm_fixed)
   ))
   expect_true(all(
-    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_limma_fixed$dea_results[[1]])
+    c(".flowsom_metacluster", "p_val", "p_adj") %in% colnames(diffcyt_limma_fixed)
   ))
   expect_true(all(
-    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_limma_fixed$dea_results[[1]])
+    c("logFC", "AveExpr", "t", "B") %in% colnames(diffcyt_limma_fixed)
   ))
 })
 
@@ -596,24 +520,23 @@ test_that("lmm result tibbles have the right dimensions", {
   expect_s3_class(dea_lmm_tidyselection, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(dea_lmm), 1L)
-  expect_equal(nrow(dea_lmm_fixed), 1L)
-  expect_equal(nrow(dea_lmm_tidyselection), 1L)
+  expect_equal(nrow(dea_lmm), 10L)
+  expect_equal(nrow(dea_lmm_fixed), 10L)
+  expect_equal(nrow(dea_lmm_tidyselection), 15L)
 
   # have correct number of columns
-  expect_equal(ncol(dea_lmm), 2L)
-  expect_equal(ncol(dea_lmm_fixed), 2L)
-  expect_equal(ncol(dea_lmm_tidyselection), 2L)
+  expect_equal(ncol(dea_lmm), 11L)
+  expect_equal(ncol(dea_lmm_fixed), 10L)
+  expect_equal(ncol(dea_lmm_tidyselection), 11L)
 
 })
 
 test_that("lmm dea_results have the right content", {
   # lmm
   expect_true(all(
-    c(".flowsom_metacluster", "marker", "p_val", "p_adj") %in%
-      colnames(dea_lmm$dea_results[[1]])
+    c(".flowsom_metacluster", "marker", "p_val", "p_adj", "mean_diff") %in%
+      colnames(dea_lmm)
   ))
-
 })
 
 
@@ -635,7 +558,6 @@ test_that("Using a fixed-effect with more than 2 levels results in a larger outp
 # tof_dea_ttest ----------------------------------------------------------------
 
 #setup
-
 dea_t_unpaired <-
   dd_data %>%
   tof_dea_ttest(
@@ -723,10 +645,9 @@ test_that("changing the summary function works", {
 })
 
 
-test_that("omitting group_cols doesn't break anything, but should throw a warning if there aren't enough replicates", {
+test_that("omitting group_cols should throw an error", {
   # unpaired
-  expect_warning(
-    dea_no_groups <-
+  expect_error(
       dd_data %>%
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
@@ -739,11 +660,8 @@ test_that("omitting group_cols doesn't break anything, but should throw a warnin
       )
   )
 
-  expect_s3_class(dea_no_groups, class = "tbl_df")
-
   # paired
-  expect_warning(
-    dea_no_groups <-
+  expect_error(
       dd_data %>%
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
@@ -755,8 +673,6 @@ test_that("omitting group_cols doesn't break anything, but should throw a warnin
         min_samples = 0,
       )
   )
-
-  expect_s3_class(dea_no_groups, class = "tbl_df")
 
 })
 
