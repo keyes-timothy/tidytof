@@ -28,8 +28,8 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("keyes-timothy/tidytof")
 ```
 
-Once `{tidytof}` is installed, you can load it to your current R session
-using the following code:
+Once `{tidytof}` is installed, you can attach it to your current R
+session using the following code:
 
 ``` r
 library(tidytof)
@@ -107,20 +107,20 @@ phenograph %>%
 Regardless of its input format, `{tidytof}` reads data into an extended
 `tibble` called a `tof_tbl`, an S3 class identical to `tbl_df`, but with
 one additional attribute (“panel”). `{tidytof}` stores this additional
-attribute in `tof_tbl`’s because, in addition to analyzing CyTOF data
+attribute in `tof_tbl`s because, in addition to analyzing CyTOF data
 from individual experiments, CyTOF users often want to compare panels
 between experiments to find common markers or to compare which metals
 are associated with particular markers across panels.
 
 A few notes about `tof_tbl`’s:
 
--   `tof_tbl` contains one cell per row and one channel per column (to
+-   `tof_tbl`s contains one cell per row and one channel per column (to
     provide the data in its “tidy” format).
 -   `tof_read_data` adds an additional column to the output `tof_tbl`
     encoding the name of the file from which each cell was read (the
     “file\_name” column).
--   Because `tof_tbl`’s inherit from the `tbl_df` class, all methods
-    available to tibbles are also available to `tof_tbl`’s. For example,
+-   Because `tof_tbl`s inherit from the `tbl_df` class, all methods
+    available to tibbles are also available to `tof_tbl`s. For example,
     `{dplyr}`’s useful `mutate` method can be applied to our `tof_tbl`
     named `phenograph` above to convert the columns encoding the
     phenograph cluster and stimulation condition to which each cell
@@ -396,12 +396,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 27
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 2                 cluster1         0.199  2.19 0      4.56 0.569
-#> 2 H1_PhenoGrap… 2                 cluster1         0      2.92 0      5.33 1.61 
-#> 3 H1_PhenoGrap… 2                 cluster1         0      1.99 0.390  4.62 0    
-#> 4 H1_PhenoGrap… 2                 cluster1         0.881  1.53 0.199  4.61 1.02 
-#> 5 H1_PhenoGrap… 2                 cluster1         0.881  2.05 0.199  4.80 0.733
-#> 6 H1_PhenoGrap… 2                 cluster1         0      1.25 0.733  5.01 0.733
+#> 1 H1_PhenoGrap… 3                 cluster1         0.199  2.19 0      4.56 0.569
+#> 2 H1_PhenoGrap… 3                 cluster1         0      2.92 0      5.33 1.61 
+#> 3 H1_PhenoGrap… 3                 cluster1         0      1.99 0.390  4.62 0    
+#> 4 H1_PhenoGrap… 3                 cluster1         0.881  1.53 0.199  4.61 1.02 
+#> 5 H1_PhenoGrap… 3                 cluster1         0.881  2.05 0.199  4.80 0.733
+#> 6 H1_PhenoGrap… 3                 cluster1         0      1.25 0.733  5.01 0.733
 #> # … with 19 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd15 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -425,12 +425,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster3           1                     1999
-#> 2 cluster2           3                     1989
-#> 3 cluster1           2                     1961
-#> 4 cluster1           1                       39
-#> 5 cluster2           1                       11
-#> 6 cluster3           2                        1
+#> 1 cluster3           2                     1995
+#> 2 cluster2           1                     1989
+#> 3 cluster1           3                     1971
+#> 4 cluster1           2                       29
+#> 5 cluster2           2                       11
+#> 6 cluster3           3                        5
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -480,16 +480,16 @@ phenograph_tsne %>%
 #> # A tibble: 6,000 × 2
 #>    .tsne_1 .tsne_2
 #>      <dbl>   <dbl>
-#>  1   -8.92  -13.9 
-#>  2   -7.26   -8.23
-#>  3  -21.8   -16.7 
-#>  4   -8.79   -7.99
-#>  5  -13.2   -15.7 
-#>  6  -12.3   -15.6 
-#>  7   -6.98  -16.8 
-#>  8  -16.4   -24.1 
-#>  9   -9.97   -6.32
-#> 10  -25.2    -9.99
+#>  1  -15.4   -2.19 
+#>  2  -12.7   -4.00 
+#>  3  -25.8    6.87 
+#>  4  -10.9    1.40 
+#>  5  -18.3    1.14 
+#>  6  -17.8    0.222
+#>  7  -18.2   -5.06 
+#>  8  -29.6    2.22 
+#>  9   -9.76   2.45 
+#> 10  -21.2   14.9  
 #> # … with 5,990 more rows
 ```
 
@@ -513,7 +513,7 @@ phenograph_tsne %>%
 <img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
 
 ``` r
-# plot the tsne embeddings using color to represent CD34 expression
+# plot the tsne embeddings using color to represent CD11b expression
 phenograph_tsne %>% 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
   geom_point(shape = 21) + 

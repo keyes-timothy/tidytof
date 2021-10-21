@@ -36,7 +36,7 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("keyes-timothy/tidytof")
 ```
 
-Once `{tidytof}` is installed, you can load it to your current R session using the following code: 
+Once `{tidytof}` is installed, you can attach it to your current R session using the following code: 
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidytof)
@@ -78,13 +78,13 @@ phenograph %>%
   head()
 ```
 
-Regardless of its input format, `{tidytof}` reads data into an extended `tibble` called a `tof_tbl`, an S3 class identical to `tbl_df`, but with one additional attribute ("panel"). `{tidytof}` stores this additional attribute in `tof_tbl`'s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments to find common markers or to compare which metals are associated with particular markers across panels. 
+Regardless of its input format, `{tidytof}` reads data into an extended `tibble` called a `tof_tbl`, an S3 class identical to `tbl_df`, but with one additional attribute ("panel"). `{tidytof}` stores this additional attribute in `tof_tbl`s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments to find common markers or to compare which metals are associated with particular markers across panels. 
 
 A few notes about `tof_tbl`'s: 
 
-* `tof_tbl` contains one cell per row and one channel per column (to provide the data in its "tidy" format).
+* `tof_tbl`s contains one cell per row and one channel per column (to provide the data in its "tidy" format).
 * `tof_read_data` adds an additional column to the output `tof_tbl` encoding the name of the file from which each cell was read (the "file_name" column). 
-* Because `tof_tbl`'s inherit from the `tbl_df` class, all methods available to tibbles are also available to `tof_tbl`'s. For example, `{dplyr}`'s useful `mutate` method can be applied to our `tof_tbl` named `phenograph` above to convert the columns encoding the phenograph cluster and stimulation condition to which each cell belongs into character vectors (instead of their original numeric codes in the uncleaned dataset). 
+* Because `tof_tbl`s inherit from the `tbl_df` class, all methods available to tibbles are also available to `tof_tbl`s. For example, `{dplyr}`'s useful `mutate` method can be applied to our `tof_tbl` named `phenograph` above to convert the columns encoding the phenograph cluster and stimulation condition to which each cell belongs into character vectors (instead of their original numeric codes in the uncleaned dataset). 
 
 ```{r}
 phenograph <- 
@@ -283,7 +283,7 @@ phenograph_tsne %>%
   theme_bw() + 
   labs(fill = NULL)
 
-# plot the tsne embeddings using color to represent CD34 expression
+# plot the tsne embeddings using color to represent CD11b expression
 phenograph_tsne %>% 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
   geom_point(shape = 21) + 
