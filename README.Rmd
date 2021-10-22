@@ -424,7 +424,7 @@ plot_data %>%
   scale_fill_discrete(na.translate = FALSE) + 
   labs(
     x = NULL, 
-    y = "Abundance fold-chance (stimulated / basal)", 
+    y = "Abundance fold-change (stimulated / basal)", 
     fill = "Effect", 
     caption = "Asterisks indicate significance at an adjusted p-value of 0.05"
   )

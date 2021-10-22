@@ -1137,6 +1137,14 @@ deframe <- function(x) {
   return(result)
 }
 
+#' Coerce flowFrames or flowSets into tof_tbl's.
+#'
+#' @param flow_data A flowFrame or flowSet
+#'
+#' @param sep A string indicating which symbol should be used to separate
+#' antigen names and metal names in the columns of the output tof_tbl.
+#'
+#'
 #' @export
 as_tof_tbl <- function(flow_data, sep = "|") {
   UseMethod("as_tof_tbl")
