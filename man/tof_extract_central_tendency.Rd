@@ -54,7 +54,7 @@ If format == "wide", the tibble will have 1 row for each combination of
 the grouping variables provided in `group_cols` and one column for each grouping variable,
 one column for each extracted feature (the central tendency of a given marker in a given cluster).
 The names of each column containing cluster features is obtained using the following pattern:
-"\{marker_id\}@\{cluster_id\}".
+"\{marker_id\}@\{cluster_id\}_ct".
 
 If format == "long", the tibble will have 1 row for each combination of the grouping variables
 in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
