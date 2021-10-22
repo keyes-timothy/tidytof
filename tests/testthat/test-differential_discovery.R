@@ -23,6 +23,11 @@ dd_data <-
   tof_preprocess() %>%
   tof_cluster(method = "flowsom")
 
+num_clusters <-
+  dd_data$.flowsom_metacluster %>%
+  unique() %>%
+  length()
+
 # tof_daa_diffcyt --------------------------------------------------------------
 
 ### test basic results
@@ -82,9 +87,9 @@ test_that("diffcyt results tibbles have the right dimensions", {
   expect_s3_class(diffcyt_edgeR, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(diffcyt_glmm), 5L)
-  expect_equal(nrow(diffcyt_voom), 5L)
-  expect_equal(nrow(diffcyt_edgeR), 5L)
+  expect_equal(nrow(diffcyt_glmm), num_clusters)
+  expect_equal(nrow(diffcyt_voom), num_clusters)
+  expect_equal(nrow(diffcyt_edgeR), num_clusters)
 
   # have correct number of columns
   expect_equal(ncol(diffcyt_glmm), 5L)
@@ -213,8 +218,8 @@ test_that("glmm results tibbles have the right dimensions", {
   expect_s3_class(daa_glmm_fixed, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(daa_glmm), 5L)
-  expect_equal(nrow(daa_glmm_fixed), 5L)
+  expect_equal(nrow(daa_glmm), num_clusters)
+  expect_equal(nrow(daa_glmm_fixed), num_clusters)
 
   # have correct number of columns
   expect_equal(ncol(daa_glmm), 9L)
@@ -401,10 +406,10 @@ test_that("diffcyt result tibbles have the right dimensions", {
   expect_s3_class(diffcyt_limma_fixed, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(diffcyt_lmm), 10L)
-  expect_equal(nrow(diffcyt_lmm_fixed), 10L)
-  expect_equal(nrow(diffcyt_limma), 10L)
-  expect_equal(nrow(diffcyt_limma_fixed), 10L)
+  expect_equal(nrow(diffcyt_lmm), num_clusters * 2)
+  expect_equal(nrow(diffcyt_lmm_fixed), num_clusters * 2)
+  expect_equal(nrow(diffcyt_limma), num_clusters * 2)
+  expect_equal(nrow(diffcyt_limma_fixed), num_clusters * 2)
 
   # have correct number of columns
   expect_equal(ncol(diffcyt_lmm), 6L)
@@ -520,9 +525,9 @@ test_that("lmm result tibbles have the right dimensions", {
   expect_s3_class(dea_lmm_tidyselection, "tbl_df")
 
   # have correct number of rows
-  expect_equal(nrow(dea_lmm), 10L)
-  expect_equal(nrow(dea_lmm_fixed), 10L)
-  expect_equal(nrow(dea_lmm_tidyselection), 15L)
+  expect_equal(nrow(dea_lmm), num_clusters * 2)
+  expect_equal(nrow(dea_lmm_fixed), num_clusters * 2)
+  expect_equal(nrow(dea_lmm_tidyselection), num_clusters * 3)
 
   # have correct number of columns
   expect_equal(ncol(dea_lmm), 11L)
