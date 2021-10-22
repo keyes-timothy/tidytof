@@ -532,6 +532,7 @@ tof_cluster <- function(tof_tibble, method, ..., add_col = TRUE) {
     #   tof_tibble %>%
     #   tof_cluster_xshift(...)
     stop("X-shift is not yet implemented.")
+
   } else {
     stop("Not a valid clustering method.")
   }

@@ -127,7 +127,7 @@ tof_extract_proportion <-
 #' the grouping variables provided in `group_cols` and one column for each grouping variable,
 #' one column for each extracted feature (the central tendency of a given marker in a given cluster).
 #' The names of each column containing cluster features is obtained using the following pattern:
-#' "\{marker_id\}@\{cluster_id\}".
+#' "\{marker_id\}@\{cluster_id\}_ct".
 #'
 #' If format == "long", the tibble will have 1 row for each combination of the grouping variables
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
@@ -378,13 +378,29 @@ tof_extract_emd <-
     # check format argument
     format <- rlang::arg_match(format)
 
-    # extract the stimulation "levels" present in the original tof_tibble
+    # make sure that stimulation information is provided
     if (missing(stimulation_col)) {
       stop("`stimulation_col` must be provided.")
     } else if (missing(basal_level)) {
       stop("`basal_level` must be provided.")
     }
 
+    # check that the stimulation_col is not one of the group_cols
+    stimulation_colname <-
+      rlang::enquo(stimulation_col) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    group_colnames <-
+      rlang::enquo(group_cols) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    if (stimulation_colname %in% group_colnames) {
+      stop("`stimulation_col` should not be one of the `group_cols`")
+    }
+
+    # extract the stimulation "levels" present in the original tof_tibble
     stim_levels <-
       tof_tibble %>%
       dplyr::pull({{stimulation_col}}) %>%
@@ -539,14 +555,29 @@ tof_extract_jsd <-
     # check format argument
     format <- rlang::arg_match(format)
 
-    # extract the stimulation "levels" present in the original tof_tibble
-
+    # make sure that stimulation information is provided
     if (missing(stimulation_col)) {
       stop("`stimulation_col` must be provided.")
     } else if (missing(basal_level)) {
       stop("`basal_level` must be provided.")
     }
 
+    # check that the stimulation_col is not one of the group_cols
+    stimulation_colname <-
+      rlang::enquo(stimulation_col) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    group_colnames <-
+      rlang::enquo(group_cols) %>%
+      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      names()
+
+    if (stimulation_colname %in% group_colnames) {
+      stop("`stimulation_col` should not be one of the `group_cols`")
+    }
+
+    # extract the stimulation "levels" present in the original tof_tibble
     stim_levels <-
       tof_tibble %>%
       dplyr::pull({{stimulation_col}}) %>%
@@ -616,6 +647,9 @@ tof_extract_jsd <-
     return(jsd_tibble)
   }
 
+
+
+# tof_extract_features ---------------------------------------------------------
 
 
 #' Extract aggregated, sample-level features from CyTOF data.

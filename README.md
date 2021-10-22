@@ -112,7 +112,7 @@ from individual experiments, CyTOF users often want to compare panels
 between experiments to find common markers or to compare which metals
 are associated with particular markers across panels.
 
-A few notes about `tof_tbl`’s:
+A few notes about `tof_tbl`s:
 
 -   `tof_tbl`s contains one cell per row and one channel per column (to
     provide the data in its “tidy” format).
@@ -396,12 +396,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 27
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 3                 cluster1         0.199  2.19 0      4.56 0.569
-#> 2 H1_PhenoGrap… 3                 cluster1         0      2.92 0      5.33 1.61 
-#> 3 H1_PhenoGrap… 3                 cluster1         0      1.99 0.390  4.62 0    
-#> 4 H1_PhenoGrap… 3                 cluster1         0.881  1.53 0.199  4.61 1.02 
-#> 5 H1_PhenoGrap… 3                 cluster1         0.881  2.05 0.199  4.80 0.733
-#> 6 H1_PhenoGrap… 3                 cluster1         0      1.25 0.733  5.01 0.733
+#> 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569
+#> 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 
+#> 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    
+#> 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 
+#> 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733
+#> 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733
 #> # … with 19 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd15 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -425,12 +425,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster3           2                     1995
-#> 2 cluster2           1                     1989
-#> 3 cluster1           3                     1971
-#> 4 cluster1           2                       29
-#> 5 cluster2           2                       11
-#> 6 cluster3           3                        5
+#> 1 cluster1           1                     1997
+#> 2 cluster2           3                     1973
+#> 3 cluster3           2                     1955
+#> 4 cluster3           1                       45
+#> 5 cluster2           2                       27
+#> 6 cluster1           2                        3
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -480,16 +480,16 @@ phenograph_tsne %>%
 #> # A tibble: 6,000 × 2
 #>    .tsne_1 .tsne_2
 #>      <dbl>   <dbl>
-#>  1  -15.4   -2.19 
-#>  2  -12.7   -4.00 
-#>  3  -25.8    6.87 
-#>  4  -10.9    1.40 
-#>  5  -18.3    1.14 
-#>  6  -17.8    0.222
-#>  7  -18.2   -5.06 
-#>  8  -29.6    2.22 
-#>  9   -9.76   2.45 
-#> 10  -21.2   14.9  
+#>  1   15.4    4.90 
+#>  2   11.8    3.48 
+#>  3   27.0   -5.30 
+#>  4   10.4    0.450
+#>  5   17.9    0.486
+#>  6   17.4    1.41 
+#>  7   17.2    6.73 
+#>  8   28.4    0.970
+#>  9    9.77  -0.401
+#> 10   22.7  -12.9  
 #> # … with 5,990 more rows
 ```
 
@@ -615,9 +615,9 @@ citrus_data <-
   left_join(citrus_metadata, by = "sample_id")
 ```
 
-After this data cleaning, we have `citrus_data`, a `tof_tbl` containing
-cells collected from 8 patients. Specifically, 2 samples were taken from
-each patient: one in which the cells’ B-cell receptors were stimulated
+After data cleaning, we have `citrus_data`, a `tof_tbl` containing cells
+collected from 8 patients. Specifically, 2 samples were taken from each
+patient: one in which the cells’ B-cell receptors were stimulated
 (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each
 cell’s patient of origin is stored in the `patient` column, and each
 cell’s stimulation condition is stored in the `stimulation` column. In
@@ -648,16 +648,16 @@ daa_result <-
 
 daa_result
 #> # A tibble: 8 × 8
-#>   population_id      t    df    p_val   p_adj significant mean_diff mean_fc
-#>   <chr>          <dbl> <dbl>    <dbl>   <dbl> <chr>           <dbl>   <dbl>
-#> 1 1             -5.48      7 0.000924 0.00535 "*"          -0.00743   0.644
-#> 2 2             -3.86      7 0.00623  0.0166  "*"          -0.0156    0.674
-#> 3 3             -2.88      7 0.0235   0.0314  "*"          -0.0638    0.849
-#> 4 4              2.88      7 0.0235   0.0314  "*"           0.0832    1.38 
-#> 5 5              3.39      7 0.0116   0.0232  "*"           0.00246   1.08 
-#> 6 6             -0.955     7 0.371    0.371   ""           -0.0168    0.919
-#> 7 7              5.14      7 0.00134  0.00535 "*"           0.0202    1.14 
-#> 8 8             -1.30      7 0.236    0.270   ""           -0.00228   0.901
+#>   population_id    p_val   p_adj significant      t    df mean_diff mean_fc
+#>   <chr>            <dbl>   <dbl> <chr>        <dbl> <dbl>     <dbl>   <dbl>
+#> 1 1             0.000924 0.00535 "*"         -5.48      7  -0.00743   0.644
+#> 2 2             0.00623  0.0166  "*"         -3.86      7  -0.0156    0.674
+#> 3 3             0.0235   0.0314  "*"         -2.88      7  -0.0638    0.849
+#> 4 4             0.0235   0.0314  "*"          2.88      7   0.0832    1.38 
+#> 5 5             0.0116   0.0232  "*"          3.39      7   0.00246   1.08 
+#> 6 6             0.371    0.371   ""          -0.955     7  -0.0168    0.919
+#> 7 7             0.00134  0.00535 "*"          5.14      7   0.0202    1.14 
+#> 8 8             0.236    0.270   ""          -1.30      7  -0.00228   0.901
 ```
 
 Based on this output, we can see that 6 of our 8 clusters have
@@ -751,7 +751,8 @@ proteins change their expression levels between our two stimulation
 conditions in each of our clusters. This is a Differential Expression
 Analysis (DEA) and can be performed using `{tidytof}`’s `tof_dea` verb.
 As above, we can use paired t-tests with multiple-hypothesis correction
-to to test for significant differences in each of our signaling markers.
+to to test for significant differences in each cluster’s expression of
+our signaling markers between stimulation conditions.
 
 ``` r
 signaling_markers <- 
@@ -762,6 +763,7 @@ signaling_markers <-
 
 dea_result <- 
   citrus_data %>% 
+  tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
   tof_dea(
     dea_method = "ttest", 
     cluster_col = population_id, 
@@ -774,14 +776,14 @@ dea_result <-
 dea_result %>% 
   head()
 #> # A tibble: 6 × 9
-#>   population_id marker     t    df   p_val   p_adj significant mean_diff mean_fc
-#>   <chr>         <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>           <dbl>   <dbl>
-#> 1 3             pBtk_… -22.3     7 9.10e-8 7.28e-6 *               -4.50   0.273
-#> 2 4             pBtk_… -17.5     7 4.89e-7 1.30e-5 *               -4.33   0.296
-#> 3 7             pBtk_… -18.2     7 3.72e-7 1.30e-5 *               -4.76   0.273
-#> 4 8             pBtk_… -13.4     7 2.95e-6 5.90e-5 *               -4.41   0.373
-#> 5 2             pS6_Y…  11.3     7 9.52e-6 1.52e-4 *              157.     9.08 
-#> 6 1             pAkt_…  11.0     7 1.14e-5 1.52e-4 *               21.9    1.72
+#>   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc
+#>   <chr>         <chr>    <dbl>   <dbl> <chr>       <dbl> <dbl>     <dbl>   <dbl>
+#> 1 1             pS6_Y… 7.98e-8 2.36e-6 *            22.8     7     2.50    3.95 
+#> 2 2             pS6_Y… 1.12e-7 2.36e-6 *            21.7     7     2.09    2.41 
+#> 3 3             pBtk_… 1.47e-7 2.36e-6 *           -20.8     7    -0.459   0.383
+#> 4 7             pBtk_… 1.28e-7 2.36e-6 *           -21.3     7    -0.500   0.374
+#> 5 8             pBtk_… 1.10e-7 2.36e-6 *           -21.7     7    -0.500   0.403
+#> 6 4             pBtk_… 8.24e-7 1.10e-5 *           -16.2     7    -0.447   0.392
 ```
 
 While the output of `tof_dea` also depends on the underlying test being
@@ -789,7 +791,7 @@ used, we can see that the result above looks relatively similar to the
 output from `tof_daa`. Above, the output is a tibble in which each row
 represents the differential expression results from a single
 cluster-marker pair - for example, the first row represents the
-difference in expression of pBtk in cluster 3 between the BCR-XL and
+difference in expression of pS6 in cluster 1 between the BCR-XL and
 Basal conditions. Each row includes the raw p-value and
 multiple-hypothesis-corrected p-value for each cluster-marker pair.
 
@@ -831,15 +833,237 @@ volcano_data %>%
   labs(
     x = "log2(Fold-change)", 
     y = "-log10(p-value)", 
-    fill = NULL
+    fill = NULL, 
+    caption = "Labels indicate the 10 most significant marker-cluster pairs"
   )
 ```
 
 <img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
-### Patient-level feature extraction
+### Patient- and sample-level feature extraction
 
-\[Under construction\]
+In addition to its functions for analyzing and visualizing CyTOF data at
+the single-cell and cluster levels, `{tidytof}`’s `tof_extract_features`
+verb allows users to aggregate single-cell and cluster-level information
+in order to summarize whole-samples (or whole-patients) from which cells
+were collected. These features can be useful for visualizing the
+differences between patients and samples in different experimental
+conditions or for building machine learning models.
+
+To understand how the `tof_extract_features` verb works, it’s easiest to
+look at each of its subroutines (the members of the `tof_extract_*`
+function family) independently.
+
+First, we have `tof_extract_proportion`, which extracts the proportion
+of cells in each cluster within each sample (with samples defined using
+the `group_cols` argument):
+
+``` r
+# preprocess the numeric columns in the citrus dataset
+citrus_data <- 
+  citrus_data %>% 
+  mutate(cluster = str_c("cluster", population_id)) %>% 
+  tof_preprocess()
+
+citrus_data %>% 
+  tof_extract_proportion(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation)
+  ) %>% 
+  head()
+#> # A tibble: 6 × 10
+#>   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`
+#>   <chr>    <chr>                 <dbl>           <dbl>           <dbl>
+#> 1 patient1 Basal                0.0190          0.0482           0.447
+#> 2 patient1 BCR-XL               0.0109          0.0395           0.268
+#> 3 patient2 Basal                0.0130          0.0280           0.491
+#> 4 patient2 BCR-XL               0.0101          0.0143           0.358
+#> 5 patient3 Basal                0.0326          0.0830           0.397
+#> 6 patient3 BCR-XL               0.0200          0.0412           0.323
+#> # … with 5 more variables: prop@cluster4 <dbl>, prop@cluster5 <dbl>,
+#> #   prop@cluster6 <dbl>, prop@cluster7 <dbl>, prop@cluster8 <dbl>
+```
+
+Like all members of the `tof_extract_*` function family,
+`tof_extract_proportion` returns one row for each sample (defined as a
+unique combination of values of the `group_cols`) and one column for
+each extracted feature (above, one column for the proportion of each of
+the 8 clusters in `citrus_data`). These values can also be returned in
+“long” format by changing the `format` argument:
+
+``` r
+citrus_data %>% 
+  tof_extract_proportion(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    format = "long"
+  ) %>% 
+  head()
+#> # A tibble: 6 × 4
+#>   patient  stimulation cluster     prop
+#>   <chr>    <chr>       <chr>      <dbl>
+#> 1 patient1 Basal       cluster1 0.0190 
+#> 2 patient1 Basal       cluster2 0.0482 
+#> 3 patient1 Basal       cluster3 0.447  
+#> 4 patient1 Basal       cluster4 0.237  
+#> 5 patient1 Basal       cluster5 0.00219
+#> 6 patient1 Basal       cluster6 0.0759
+```
+
+Another member of the same function family,
+`tof_extract_central_tendency`, computes the central tendency (e.g. mean
+or median) of user-specified markers in each cluster.
+
+``` r
+citrus_data %>% 
+  tof_extract_central_tendency(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    central_tendency_function = mean
+  ) %>% 
+  head()
+#> # A tibble: 6 × 26
+#>   patient  stimulation `CD45_In115@cluster1` `CD4_Nd145@clust… `CD20_Sm147@clus…
+#>   <chr>    <chr>                       <dbl>             <dbl>             <dbl>
+#> 1 patient1 Basal                        4.68            0.834               3.72
+#> 2 patient1 BCR-XL                       4.80            0.186               4.11
+#> 3 patient2 Basal                        4.89            0.879               3.55
+#> 4 patient2 BCR-XL                       5.00            0.0379              3.91
+#> 5 patient3 Basal                        4.98            0.818               3.60
+#> 6 patient3 BCR-XL                       5.04            0.0516              3.92
+#> # … with 21 more variables: CD45_In115@cluster2 <dbl>,
+#> #   CD4_Nd145@cluster2 <dbl>, CD20_Sm147@cluster2 <dbl>,
+#> #   CD45_In115@cluster3 <dbl>, CD4_Nd145@cluster3 <dbl>,
+#> #   CD20_Sm147@cluster3 <dbl>, CD45_In115@cluster4 <dbl>,
+#> #   CD4_Nd145@cluster4 <dbl>, CD20_Sm147@cluster4 <dbl>,
+#> #   CD45_In115@cluster5 <dbl>, CD4_Nd145@cluster5 <dbl>,
+#> #   CD20_Sm147@cluster5 <dbl>, CD45_In115@cluster6 <dbl>, …
+```
+
+`tof_extract_threshold` is similar to `tof_extract_central_tendency`,
+but calculates the proportion of cells above a user-specified expression
+value for each marker instead of a measure of central tendency:
+
+``` r
+citrus_data %>% 
+  tof_extract_threshold(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    threshold = 5
+  ) %>% 
+  head()
+#> # A tibble: 6 × 26
+#>   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…
+#>   <chr>    <chr>                     <dbl>              <dbl>              <dbl>
+#> 1 patient1 Basal                     0.365                  0             0.0769
+#> 2 patient1 BCR-XL                    0.516                  0             0.0968
+#> 3 patient2 Basal                     0.452                  0             0.0323
+#> 4 patient2 BCR-XL                    0.554                  0             0.101 
+#> 5 patient3 Basal                     0.549                  0             0.0552
+#> 6 patient3 BCR-XL                    0.547                  0             0.0816
+#> # … with 21 more variables: CD45_In115@cluster2_threshold <dbl>,
+#> #   CD4_Nd145@cluster2_threshold <dbl>, CD20_Sm147@cluster2_threshold <dbl>,
+#> #   CD45_In115@cluster3_threshold <dbl>, CD4_Nd145@cluster3_threshold <dbl>,
+#> #   CD20_Sm147@cluster3_threshold <dbl>, CD45_In115@cluster4_threshold <dbl>,
+#> #   CD4_Nd145@cluster4_threshold <dbl>, CD20_Sm147@cluster4_threshold <dbl>,
+#> #   CD45_In115@cluster5_threshold <dbl>, CD4_Nd145@cluster5_threshold <dbl>,
+#> #   CD20_Sm147@cluster5_threshold <dbl>, CD45_In115@cluster6_threshold <dbl>, …
+```
+
+The two final members of the `tof_extract_*` function family –
+`tof_extract_emd` and `tof_extract_jsd` are designed specifically for
+comparing distributions of marker expression between stimulation
+conditions. As such, they must be given a `stimulation_col` that
+identifies which stimulation condition each cell is in, and a
+`basal_level` that specifies the reference (i.e. unstimulated) condition
+within the `stimulation_col`. With these additional arguments,
+`tof_extract_emd` computes the Earth-mover’s distance between each
+marker’s distribution in the stimulation conditions (within each
+cluster) and the basal condition; similarly, `tof_extract_jsd` computes
+the Jensen-Shannon divergence index between the same distributions. Both
+of these values are ways to compare how different 2 distributions are to
+one another and are more computationally expensive (but also
+higher-resolution) than simply comparing measures of central tendency.
+
+``` r
+# Earth-mover's distance
+citrus_data %>% 
+  tof_extract_emd(
+    cluster_col = cluster, 
+    group_cols = patient, 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    stimulation_col = stimulation, 
+    basal_level = "Basal"
+  ) %>% 
+  head()
+#> # A tibble: 6 × 25
+#>   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…
+#>   <chr>                <dbl>             <dbl>            <dbl>            <dbl>
+#> 1 patient1             0.870              2.48            12.5             1.45 
+#> 2 patient2             1.11               7.02            10.9             0.730
+#> 3 patient3             0.756              6.19            10.5             0.639
+#> 4 patient4             2.64               6.78             9.47            3.27 
+#> 5 patient5             0.593              7.49             7.70            0.781
+#> 6 patient6             0.656              4.74             8.72            1.57 
+#> # … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_emd <dbl>,
+#> #   BCR-XL_CD20_Sm147@cluster7_emd <dbl>, BCR-XL_CD45_In115@cluster4_emd <dbl>,
+#> #   BCR-XL_CD4_Nd145@cluster4_emd <dbl>, BCR-XL_CD20_Sm147@cluster4_emd <dbl>,
+#> #   BCR-XL_CD45_In115@cluster2_emd <dbl>, BCR-XL_CD4_Nd145@cluster2_emd <dbl>,
+#> #   BCR-XL_CD20_Sm147@cluster2_emd <dbl>, BCR-XL_CD45_In115@cluster6_emd <dbl>,
+#> #   BCR-XL_CD4_Nd145@cluster6_emd <dbl>, BCR-XL_CD20_Sm147@cluster6_emd <dbl>,
+#> #   BCR-XL_CD45_In115@cluster8_emd <dbl>, …
+```
+
+``` r
+# Jensen-Shannon Divergence
+citrus_data %>% 
+  tof_extract_jsd(
+    cluster_col = cluster, 
+    group_cols = patient,  
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    stimulation_col = stimulation, 
+    basal_level = "Basal"
+  ) %>% 
+  head()
+#> # A tibble: 6 × 25
+#>   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…
+#>   <chr>                <dbl>             <dbl>            <dbl>            <dbl>
+#> 1 patient1           0.0331             0.0479            0.348           0.0580
+#> 2 patient2           0.00805            0.168             0.402           0.0159
+#> 3 patient3           0.0114             0.113             0.358           0.0205
+#> 4 patient4           0.0303             0.136             0.205           0.0390
+#> 5 patient5           0.00908            0.0782            0.283           0.0261
+#> 6 patient6           0.00919            0.0341            0.222           0.0450
+#> # … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_jsd <dbl>,
+#> #   BCR-XL_CD20_Sm147@cluster7_jsd <dbl>, BCR-XL_CD45_In115@cluster4_jsd <dbl>,
+#> #   BCR-XL_CD4_Nd145@cluster4_jsd <dbl>, BCR-XL_CD20_Sm147@cluster4_jsd <dbl>,
+#> #   BCR-XL_CD45_In115@cluster2_jsd <dbl>, BCR-XL_CD4_Nd145@cluster2_jsd <dbl>,
+#> #   BCR-XL_CD20_Sm147@cluster2_jsd <dbl>, BCR-XL_CD45_In115@cluster6_jsd <dbl>,
+#> #   BCR-XL_CD4_Nd145@cluster6_jsd <dbl>, BCR-XL_CD20_Sm147@cluster6_jsd <dbl>,
+#> #   BCR-XL_CD45_In115@cluster8_jsd <dbl>, …
+```
+
+Finally, the `tof_extract_features` verb provides a wrapper to each of
+the members of its function family, allowing users to extract multiple
+features types at once. For example, the following code extracts the
+proportion of each cluster, median of several markers in each cluster,
+and EMD between the basal condition and stimulated condition in each
+cluster for all patients in `citrus_data`.
+
+``` r
+citrus_data %>% 
+  tof_extract_features(
+    cluster_col = cluster, 
+    group_cols = patient, 
+    stimulation_col = stimulation,
+    lineage_cols = any_of(c("CD45_In115", "CD20_Sm147", "CD33_Nd148")), 
+    signaling_cols = any_of(signaling_markers), 
+    signaling_method = "emd", 
+    basal_level = "Basal"
+  ) 
+```
 
 ### Outcomes modeling
 
@@ -850,5 +1074,9 @@ volcano_data %>%
 \[Under construction\]
 
 ### Writing data
+
+\[Under construction\]
+
+## `{tidytof}`’s Design Principles (and Tips)
 
 \[Under construction\]
