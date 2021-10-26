@@ -450,8 +450,7 @@ tof_cluster_ddpr <-
           classifier_fit = classifier_fit,
           distance_function = distance_function,
           num_cores = num_cores
-        ) %>%
-        dplyr::rename_with(.fn = ~ paste0(".", .x))
+        )
 
     } else {
       result <-
@@ -461,8 +460,7 @@ tof_cluster_ddpr <-
           distance_function = distance_function,
           num_cores = num_cores,
           parallel_vars = {{parallel_cols}}
-        ) %>%
-        dplyr::rename_with(.fn = ~ paste0(".", .x))
+        )
 
     }
 

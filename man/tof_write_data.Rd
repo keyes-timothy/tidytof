@@ -6,18 +6,19 @@
 \usage{
 tof_write_data(
   tof_tibble = NULL,
-  group_cols = where(~!(tof_is_numeric(.x))),
+  group_cols = NULL,
   out_path = NULL,
   format = c("fcs", "csv"),
-  sep = "_"
+  sep = "_",
+  file_name
 )
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
-be used to group cells into separate files. Supports tidyselect helpers. Defaults
-to selecting all non-numeric (i.e. non-integer and non-double) columns.}
+be used to group cells into separate files. Supports tidyselect helpers. Defaults to
+NULL (all cells are written into a single file).}
 
 \item{out_path}{Path to the directory where output files should be saved.}
 
@@ -25,6 +26,9 @@ to selecting all non-numeric (i.e. non-integer and non-double) columns.}
 
 \item{sep}{Delimiter that should be used between each of the values of `group_cols`
 to create the output .csv/.fcs file names. Defaults to "_".}
+
+\item{file_name}{If `group_cols` isn't specified, the name (without an extension)
+that should be used for the saved .csv file.}
 }
 \value{
 This function does not explicitly return any values. Instead,

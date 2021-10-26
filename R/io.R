@@ -396,13 +396,15 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 #' should be broken into separate .csv files
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
-#' @param group_cols Unquoted names of the columns in `tof_tibble` that should
-#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
-#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#' @param group_cols Optional. Unquoted names of the columns in `tof_tibble` that should
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults to
+#' NULL (all cells are written into a single file).
 #' @param out_path A system path indicating the directory where the output .csv
 #' files should be saved. If the directory doesn't exist, it will be created.
 #' @param sep Delimiter that should be used between each of the values of `group_cols`
 #' to create the output .csv file names. Defaults to "_".
+#' @param file_name If `group_cols` isn't specified, the name (without an extension)
+#' that should be used for the saved .csv file.
 #'
 #' @return This function does not return anything. Instead, it has the side-effect
 #' of saving .csv files to `out_path`.
@@ -418,19 +420,38 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 tof_write_csv <-
   function(
     tof_tibble,
-    group_cols = where(~ !tof_is_numeric(.x)),
+    group_cols = NULL,
     out_path,
-    sep = "_"
+    sep = "_",
+    file_name
   ) {
 
+    # create the output directory if it doesn't already exist
     dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
 
+    # if groups_cols is NULL, make sure there's a filename
+    if (is.null(group_cols) & missing(file_name)) {
+      stop("if `group_cols` are not provided, you must specify a `file_name.`")
+    }
+
+    # group cells using group_cols
     tof_tibble <-
-      tof_tibble %>%
-      dplyr::group_by(across({{group_cols}})) %>%
-      tidyr::nest() %>%
-      dplyr::ungroup() %>%
-      tidyr::unite(col = "prefix", -data, sep = sep)
+      suppressWarnings(
+        tof_tibble %>%
+          dplyr::group_by(across({{group_cols}})) %>%
+          tidyr::nest() %>%
+          dplyr::ungroup()
+      )
+
+    if (!is.null(group_cols)) {
+      tof_tibble <-
+        tof_tibble %>%
+        tidyr::unite(col = "prefix", -data, sep = sep)
+    } else {
+      tof_tibble <-
+        tof_tibble %>%
+        dplyr::mutate(prefix = file_name)
+    }
 
     purrr::walk2(
       .x = tof_tibble$prefix,
@@ -457,14 +478,17 @@ tof_write_csv <-
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param group_cols Unquoted names of the columns in `tof_tibble` that should
-#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
-#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults to
+#' NULL (all cells are written into a single file).
 #'
 #' @param out_path A system path indicating the directory where the output .csv
 #' files should be saved. If the directory doesn't exist, it will be created.
 #'
 #' @param sep Delimiter that should be used between each of the values of `group_cols`
 #' to create the output .fcs file names. Defaults to "_".
+#'
+#' @param file_name If `group_cols` isn't specified, the name (without an extension)
+#' that should be used for the saved .csv file.
 #'
 #' @return This function does not return anything. Instead, it has the side-effect
 #' of saving .fcs files to `out_path`.
@@ -486,9 +510,10 @@ tof_write_csv <-
 tof_write_fcs <-
   function(
     tof_tibble,
-    group_cols = where(~ !(tof_is_numeric(.x))),
+    group_cols = NULL,
     out_path,
-    sep = "_"
+    sep = "_",
+    file_name
   ) {
 
     # create out_path
@@ -527,11 +552,22 @@ tof_write_fcs <-
 
     # nest tof_tibble
     tof_tibble <-
-      tof_tibble %>%
-      dplyr::group_by(across({{group_cols}})) %>%
-      tidyr::nest() %>%
-      dplyr::ungroup() %>%
-      tidyr::unite(col = "prefix", -data, sep = sep)
+      suppressWarnings(
+        tof_tibble %>%
+          dplyr::group_by(across({{group_cols}})) %>%
+          tidyr::nest() %>%
+          dplyr::ungroup()
+      )
+
+    if (!is.null(group_cols)) {
+      tof_tibble <-
+        tof_tibble %>%
+        tidyr::unite(col = "prefix", -data, sep = sep)
+    } else {
+      tof_tibble <-
+        tof_tibble %>%
+        dplyr::mutate(prefix = file_name)
+    }
 
     # make components of parameters AnnotatedDataFrame
     fcs_varMetadata <-
@@ -613,8 +649,8 @@ tof_write_fcs <-
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param group_cols Unquoted names of the columns in `tof_tibble` that should
-#' be used to group cells into separate files. Supports tidyselect helpers. Defaults
-#' to selecting all non-numeric (i.e. non-integer and non-double) columns.
+#' be used to group cells into separate files. Supports tidyselect helpers. Defaults to
+#' NULL (all cells are written into a single file).
 #'
 #' @param out_path Path to the directory where output files should be saved.
 #'
@@ -622,6 +658,9 @@ tof_write_fcs <-
 #'
 #' @param sep Delimiter that should be used between each of the values of `group_cols`
 #' to create the output .csv/.fcs file names. Defaults to "_".
+#'
+#' @param file_name If `group_cols` isn't specified, the name (without an extension)
+#' that should be used for the saved .csv file.
 #'
 #' @return This function does not explicitly return any values. Instead,
 #' it writes .csv and/or .fcs files to the specified `out_path`.
@@ -633,10 +672,11 @@ tof_write_fcs <-
 tof_write_data <-
   function(
     tof_tibble = NULL,
-    group_cols = where(~ !(tof_is_numeric(.x))),
+    group_cols = NULL,
     out_path = NULL,
     format = c("fcs", "csv"),
-    sep = "_"
+    sep = "_",
+    file_name
   ) {
     # check that the format argument is correctly specified
     format <- rlang::arg_match(arg = format)
@@ -647,7 +687,8 @@ tof_write_data <-
         tof_tibble = tof_tibble,
         group_cols = {{group_cols}},
         out_path = out_path,
-        sep = sep
+        sep = sep,
+        file_name = file_name
       )
     }
 
@@ -657,7 +698,8 @@ tof_write_data <-
         tof_tibble = tof_tibble,
         group_cols = {{group_cols}},
         out_path = out_path,
-        sep = sep
+        sep = sep,
+        file_name = file_name
       )
     }
   }

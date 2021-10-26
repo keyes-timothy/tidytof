@@ -4,25 +4,23 @@
 \alias{tof_write_csv}
 \title{Write a series of .csv files from a tof_tbl}
 \usage{
-tof_write_csv(
-  tof_tibble,
-  group_cols = where(~!tof_is_numeric(.x)),
-  out_path,
-  sep = "_"
-)
+tof_write_csv(tof_tibble, group_cols = NULL, out_path, sep = "_", file_name)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
-be used to group cells into separate files. Supports tidyselect helpers. Defaults
-to selecting all non-numeric (i.e. non-integer and non-double) columns.}
+\item{group_cols}{Optional. Unquoted names of the columns in `tof_tibble` that should
+be used to group cells into separate files. Supports tidyselect helpers. Defaults to
+NULL (all cells are written into a single file).}
 
 \item{out_path}{A system path indicating the directory where the output .csv
 files should be saved. If the directory doesn't exist, it will be created.}
 
 \item{sep}{Delimiter that should be used between each of the values of `group_cols`
 to create the output .csv file names. Defaults to "_".}
+
+\item{file_name}{If `group_cols` isn't specified, the name (without an extension)
+that should be used for the saved .csv file.}
 }
 \value{
 This function does not return anything. Instead, it has the side-effect
