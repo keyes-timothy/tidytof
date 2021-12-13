@@ -5,7 +5,6 @@ library(stringr)
 library(tidytof)
 library(testthat)
 library(FlowSOM)
-library(Rphenograph)
 
 # setup
 clust_data <-
