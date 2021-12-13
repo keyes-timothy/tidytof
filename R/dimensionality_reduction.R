@@ -2,7 +2,7 @@
 # This file contains functions relevant to performing dimensionality reduction
 # on tof_tibble objects containing CyTOF data.
 
-# tof_reduce_pca ----------------------------
+# tof_reduce_pca ---------------------------------------------------------------
 #
 #' Perform principal component analysis on CyTOF data
 #'

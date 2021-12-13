@@ -464,7 +464,11 @@ tof_cluster_ddpr <-
 
     }
 
-    # return desired result
+    # return result
+    result <-
+      result %>%
+      dplyr::rename_with(.fn = function(x) paste0(".", x))
+
     if (!return_distances) {
       result <-
         result %>%

@@ -123,7 +123,7 @@ test_that("tof_read_fcs() tof_tbl's have correctly-named columns", {
   expect_true(all(map_lgl(colnames_list_2, ~ all(!is.na(.x)))))
 
   # the sep argument works
-  expect_true(all(map_lgl(colnames_list_2, ~ all(str_detect(.x, pattern = "___")))))
+  expect_true(all(map_lgl(colnames_list_2, ~ any(str_detect(.x, pattern = "___")))))
 })
 
 # tof_read_csv -----------------------------------------------------------------

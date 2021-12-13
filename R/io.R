@@ -154,7 +154,13 @@ tof_read_fcs <-
 
     # derive and set the column names to use for the output tof_tibble
     col_names <-
-      stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+      # if the antigen and the metal name are the same,
+      # use a simplified column name
+      if_else(
+        panel_info$antigens == panel_info$metals,
+        panel_info$antigens,
+        stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+      )
 
     tof_tibble <-
       tof_flowFrame %>%
@@ -416,11 +422,12 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 #' @importFrom purrr walk2
 #' @importFrom readr write_csv
 #' @importFrom stringr str_c
+#' @importFrom stringr str_replace
 #'
 tof_write_csv <-
   function(
     tof_tibble,
-    group_cols = NULL,
+    group_cols,
     out_path,
     sep = "_",
     file_name
@@ -430,29 +437,35 @@ tof_write_csv <-
     dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
 
     # if groups_cols is NULL, make sure there's a filename
-    if (is.null(group_cols) & missing(file_name)) {
+    if (missing(group_cols) & missing(file_name)) {
       stop("if `group_cols` are not provided, you must specify a `file_name.`")
+    } else if (missing(group_cols)) {
+      file_name <- stringr::str_replace(file_name, "\\.csv$", "")
     }
 
-    # group cells using group_cols
-    tof_tibble <-
-      suppressWarnings(
-        tof_tibble %>%
-          dplyr::group_by(across({{group_cols}})) %>%
-          tidyr::nest() %>%
-          dplyr::ungroup()
-      )
-
-    if (!is.null(group_cols)) {
+    # nest cells using group_cols if they are provided, otherwise nest
+    # all cells into a single tof_tibble
+    if (missing(group_cols)) {
       tof_tibble <-
-        tof_tibble %>%
-        tidyr::unite(col = "prefix", -data, sep = sep)
+        suppressWarnings(
+          tof_tibble %>%
+            tidyr::nest() %>%
+            dplyr::ungroup()
+        ) %>%
+        dplyr::mutate(prefix = file_name)
+
     } else {
       tof_tibble <-
-        tof_tibble %>%
-        dplyr::mutate(prefix = file_name)
+        suppressWarnings(
+          tof_tibble %>%
+            dplyr::group_by(dplyr::across({{group_cols}})) %>%
+            tidyr::nest() %>%
+            dplyr::ungroup()
+        ) %>%
+        tidyr::unite(col = "prefix", -data, sep = sep)
     }
 
+    # save each tof_tbl in the nested tibble as its own file
     purrr::walk2(
       .x = tof_tibble$prefix,
       .y = tof_tibble$data,
@@ -510,7 +523,7 @@ tof_write_csv <-
 tof_write_fcs <-
   function(
     tof_tibble,
-    group_cols = NULL,
+    group_cols,
     out_path,
     sep = "_",
     file_name
@@ -519,12 +532,26 @@ tof_write_fcs <-
     # create out_path
     dir.create(path = out_path, showWarnings = FALSE, recursive = TRUE)
 
+    # if groups_cols is NULL, make sure there's a filename
+    if (missing(group_cols) & missing(file_name)) {
+      stop("if `group_cols` are not provided, you must specify a `file_name.`")
+    } else if (missing(group_cols)) {
+      file_name <- stringr::str_replace(file_name, "\\.fcs$", "")
+    }
+
     # eliminate all non-grouping and non-numeric columns from tof_tibble
+    if (!missing(group_cols)) {
     tof_tibble <-
       tof_tibble %>%
       dplyr::select({{group_cols}}, where(tof_is_numeric))
+    } else {
+      tof_tibble <-
+        tof_tibble %>%
+        dplyr::select(where(tof_is_numeric))
+    }
 
     # find max and min values for all non-grouping columns in tof_tibble
+    if (!missing(group_cols)) {
     maxes_and_mins <-
       tof_tibble %>%
       dplyr::summarize(
@@ -532,10 +559,26 @@ tof_write_fcs <-
           -{{group_cols}},
           .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
           # use the many underscores because it's unlikely this will come up
-          # in column names on their own...maybe make more rigorous?
+          # in column names on their own
           .names = "{.col}_____{.fn}"
         )
-      ) %>%
+      )
+    } else {
+      maxes_and_mins <-
+        tof_tibble %>%
+        dplyr::summarize(
+          dplyr::across(
+            dplyr::everything(),
+            .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+            # use the many underscores because it's unlikely this will come up
+            # in column names on their own
+            .names = "{.col}_____{.fn}"
+          )
+        )
+    }
+
+    maxes_and_mins <-
+      maxes_and_mins %>%
       tidyr::pivot_longer(
         cols = tidyselect::everything(),
         names_to = c("antigen", "value_type"),
@@ -550,23 +593,45 @@ tof_write_fcs <-
     # extract the names of all non-grouping columns to be saved to the .fcs file
     data_cols <- maxes_and_mins$antigen
 
-    # nest tof_tibble
-    tof_tibble <-
-      suppressWarnings(
-        tof_tibble %>%
-          dplyr::group_by(across({{group_cols}})) %>%
-          tidyr::nest() %>%
-          dplyr::ungroup()
-      )
+    # # nest tof_tibble
+    # tof_tibble <-
+    #   suppressWarnings(
+    #     tof_tibble %>%
+    #       dplyr::group_by(dplyr::across({{group_cols}})) %>%
+    #       tidyr::nest() %>%
+    #       dplyr::ungroup()
+    #   )
+    #
+    # if (!is.null(group_cols)) {
+    #   tof_tibble <-
+    #     tof_tibble %>%
+    #     tidyr::unite(col = "prefix", -data, sep = sep)
+    # } else {
+    #   tof_tibble <-
+    #     tof_tibble %>%
+    #     dplyr::mutate(prefix = file_name)
+    # }
 
-    if (!is.null(group_cols)) {
+    # nest cells using group_cols if they are provided, otherwise nest
+    # all cells into a single tof_tibble
+    if (missing(group_cols)) {
       tof_tibble <-
-        tof_tibble %>%
-        tidyr::unite(col = "prefix", -data, sep = sep)
+        suppressWarnings(
+          tof_tibble %>%
+            tidyr::nest() %>%
+            dplyr::ungroup()
+        ) %>%
+        dplyr::mutate(prefix = file_name)
+
     } else {
       tof_tibble <-
-        tof_tibble %>%
-        dplyr::mutate(prefix = file_name)
+        suppressWarnings(
+          tof_tibble %>%
+            dplyr::group_by(dplyr::across({{group_cols}})) %>%
+            tidyr::nest() %>%
+            dplyr::ungroup()
+        ) %>%
+        tidyr::unite(col = "prefix", -data, sep = sep)
     }
 
     # make components of parameters AnnotatedDataFrame

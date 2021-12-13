@@ -1,7 +1,7 @@
 
-# new_tof_tibble ------------------
+# new_tof_tibble ---------------------------------------------------------------
 
-#' Constructor for tof_tibble.
+#' Constructor for a tof_tibble.
 #'
 #' @param x A data.frame or tibble containing single-cell mass cytometry data
 #' such that rows are cells and columns are CyTOF measurements.

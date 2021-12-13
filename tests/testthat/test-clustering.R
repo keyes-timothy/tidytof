@@ -6,7 +6,6 @@ library(tidytof)
 library(testthat)
 library(FlowSOM)
 library(Rphenograph)
-library(flowCore)
 
 # setup
 clust_data <-
@@ -108,8 +107,8 @@ test_that("num_clusters argument works", {
 test_that("ddpr result is a tibble with a single character vector column of correct length", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
-    mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
+    dplyr::filter(str_detect(sample_name, "Healthy")) %>%
+    dplyr::mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   ddpr <-
     ddpr_data %>%
