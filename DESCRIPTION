@@ -21,7 +21,6 @@ Imports:
     Biobase,
     broom,
     broomExtra,
-    dials,
     doParallel,
     dplyr,
     embed,
@@ -32,7 +31,6 @@ Imports:
     glmnet,
     methods,
     parallel,
-    parsnip,
     purrr,
     RANN,
     readr,
@@ -44,8 +42,6 @@ Imports:
     tidygraph,
     tidyr,
     tidyselect,
-    tune,
-    workflows,
     yardstick,
     lme4,
     lmerTest,
@@ -59,15 +55,13 @@ Suggests:
     FlowSOM,
     Rtsne,
     statmod,
-    Rphenograph,
     testthat (>= 3.0.0),
     covr,
     HDCytoData
-Remotes:
-    JinmiaoChenLab/Rphenograph
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 LinkingTo: 
     Rcpp
+URL: https://keyes-timothy.github.io/tidytof

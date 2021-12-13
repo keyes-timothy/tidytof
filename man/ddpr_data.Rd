@@ -10,29 +10,29 @@ Lymphoblastic Leukemia (BCP-ALL) patient.}
 A data frame with 10000 rows and 24 variables:
 \describe{
   \item{sample_name}{name of the sample from which the data was read}
-  \item{cd45}{A CyTOF measurement in raw ion counts"}
-  \item{cd19}{A CyTOF measurement in raw ion counts"}
-  \item{cd22}{A CyTOF measurement in raw ion counts"}
-  \item{cd79b}{A CyTOF measurement in raw ion counts"}
-  \item{cd20}{A CyTOF measurement in raw ion counts"}
-  \item{cd34}{A CyTOF measurement in raw ion counts"}
-  \item{cd179a}{A CyTOF measurement in raw ion counts"}
-  \item{cd123}{A CyTOF measurement in raw ion counts"}
-  \item{cd10}{A CyTOF measurement in raw ion counts"}
-  \item{cd179b}{A CyTOF measurement in raw ion counts"}
-  \item{cd24}{A CyTOF measurement in raw ion counts"}
-  \item{cd127}{A CyTOF measurement in raw ion counts"}
-  \item{cd43}{A CyTOF measurement in raw ion counts"}
-  \item{cd38}{A CyTOF measurement in raw ion counts"}
-  \item{cd58}{A CyTOF measurement in raw ion counts"}
-  \item{cd3}{A CyTOF measurement in raw ion counts"}
-  \item{psyk}{A CyTOF measurement in raw ion counts"}
-  \item{p4ebp1}{A CyTOF measurement in raw ion counts"}
-  \item{pstat5}{A CyTOF measurement in raw ion counts"}
-  \item{pakt}{A CyTOF measurement in raw ion counts"}
-  \item{ps6}{A CyTOF measurement in raw ion counts"}
-  \item{perk}{A CyTOF measurement in raw ion counts"}
-  \item{pcreb}{A CyTOF measurement in raw ion counts"}
+  \item{cd45}{A CyTOF measurement in raw ion counts}
+  \item{cd19}{A CyTOF measurement in raw ion counts}
+  \item{cd22}{A CyTOF measurement in raw ion counts}
+  \item{cd79b}{A CyTOF measurement in raw ion counts}
+  \item{cd20}{A CyTOF measurement in raw ion counts}
+  \item{cd34}{A CyTOF measurement in raw ion counts}
+  \item{cd179a}{A CyTOF measurement in raw ion counts}
+  \item{cd123}{A CyTOF measurement in raw ion counts}
+  \item{cd10}{A CyTOF measurement in raw ion counts}
+  \item{cd179b}{A CyTOF measurement in raw ion counts}
+  \item{cd24}{A CyTOF measurement in raw ion counts}
+  \item{cd127}{A CyTOF measurement in raw ion counts}
+  \item{cd43}{A CyTOF measurement in raw ion counts}
+  \item{cd38}{A CyTOF measurement in raw ion counts}
+  \item{cd58}{A CyTOF measurement in raw ion counts}
+  \item{cd3}{A CyTOF measurement in raw ion counts}
+  \item{psyk}{A CyTOF measurement in raw ion counts}
+  \item{p4ebp1}{A CyTOF measurement in raw ion counts}
+  \item{pstat5}{A CyTOF measurement in raw ion counts}
+  \item{pakt}{A CyTOF measurement in raw ion counts}
+  \item{ps6}{A CyTOF measurement in raw ion counts}
+  \item{perk}{A CyTOF measurement in raw ion counts}
+  \item{pcreb}{A CyTOF measurement in raw ion counts}
 }
 }
 \source{
@@ -43,7 +43,7 @@ ddpr_data
 }
 \description{
 A dataset containing CyTOF measurements from immune cells originally studied
-in the following paper:
+in the following paper:  \cr \cr
 Good Z, Sarno J, et al.
 Single-cell developmental classification of B cell precursor acute
 lymphoblastic leukemia at diagnosis reveals predictors of relapse.
