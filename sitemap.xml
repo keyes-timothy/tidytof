@@ -22,6 +22,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/ddpr_data.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/ddpr_metadata.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/dot.html</loc>
   </url>
   <url>
@@ -35,6 +38,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/metal_masterlist.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/new_tof_model.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/new_tof_tibble.html</loc>
@@ -58,6 +64,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_classify_cells.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_clean_metric_names.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_cluster.html</loc>
   </url>
   <url>
@@ -74,6 +83,12 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_cosine_dist.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_create_grid.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_create_recipe.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_daa.html</loc>
@@ -142,6 +157,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_panel_info.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_fit_split.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_get_panel.html</loc>
   </url>
   <url>
@@ -158,6 +176,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_postprocess.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_prep_recipe.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_preprocess.html</loc>
@@ -190,13 +211,10 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_set_panel.html</loc>
   </url>
   <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_train_classifier.html</loc>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_split_data.html</loc>
   </url>
   <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_train_regression.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_train_survival.html</loc>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_tune_glmnet.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_write_csv.html</loc>
