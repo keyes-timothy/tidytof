@@ -4,7 +4,7 @@
 \alias{tof_write_csv}
 \title{Write a series of .csv files from a tof_tbl}
 \usage{
-tof_write_csv(tof_tibble, group_cols = NULL, out_path, sep = "_", file_name)
+tof_write_csv(tof_tibble, group_cols, out_path, sep = "_", file_name)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}

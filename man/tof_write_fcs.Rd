@@ -4,7 +4,7 @@
 \alias{tof_write_fcs}
 \title{Write a series of .fcs files from a tof_tbl}
 \usage{
-tof_write_fcs(tof_tibble, group_cols = NULL, out_path, sep = "_", file_name)
+tof_write_fcs(tof_tibble, group_cols, out_path, sep = "_", file_name)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}

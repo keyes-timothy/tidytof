@@ -2,7 +2,7 @@
 % Please edit documentation in R/tof_tbl.R
 \name{new_tof_tibble}
 \alias{new_tof_tibble}
-\title{Constructor for tof_tibble.}
+\title{Constructor for a tof_tibble.}
 \usage{
 new_tof_tibble(x = tibble::tibble(), panel = tibble::tibble())
 }
@@ -18,5 +18,5 @@ A `tof_tbl`, an tibble extension that tracks a few other attributes
 that are useful for CyTOF data analysis.
 }
 \description{
-Constructor for tof_tibble.
+Constructor for a tof_tibble.
 }

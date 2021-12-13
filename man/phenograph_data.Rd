@@ -9,30 +9,30 @@ A data frame with 6000 rows and 26 variables:
 \describe{
   \item{sample_name}{Name of the sample from which the data was read}
   \item{phenograph_cluster}{Numeric ID of the cluster assignment of each row}
-  \item{cd19}{A CyTOF measurement in raw ion counts"}
-  \item{cd11b}{A CyTOF measurement in raw ion counts"}
-  \item{cd34}{A CyTOF measurement in raw ion counts"}
-  \item{cd45}{A CyTOF measurement in raw ion counts"}
-  \item{cd123}{A CyTOF measurement in raw ion counts"}
-  \item{cd33}{A CyTOF measurement in raw ion counts"}
-  \item{cd47}{A CyTOF measurement in raw ion counts"}
-  \item{cd7}{A CyTOF measurement in raw ion counts"}
-  \item{cd15}{A CyTOF measurement in raw ion counts"}
-  \item{cd44}{A CyTOF measurement in raw ion counts"}
-  \item{cd38}{A CyTOF measurement in raw ion counts"}
-  \item{cd3}{A CyTOF measurement in raw ion counts"}
-  \item{cd117}{A CyTOF measurement in raw ion counts"}
-  \item{cd64}{A CyTOF measurement in raw ion counts"}
-  \item{cd41}{A CyTOF measurement in raw ion counts"}
-  \item{pstat3}{A CyTOF measurement in raw ion counts"}
-  \item{pstat5}{A CyTOF measurement in raw ion counts"}
-  \item{pampk}{A CyTOF measurement in raw ion counts"}
-  \item{p4ebp1}{A CyTOF measurement in raw ion counts"}
-  \item{ps6}{A CyTOF measurement in raw ion counts"}
-  \item{pcreb}{A CyTOF measurement in raw ion counts"}
-  \item{pzap70-syk}{A CyTOF measurement in raw ion counts"}
-  \item{prb}{A CyTOF measurement in raw ion counts"}
-  \item{perk1-2}{A CyTOF measurement in raw ion counts"}
+  \item{cd19}{A CyTOF measurement in raw ion counts}
+  \item{cd11b}{A CyTOF measurement in raw ion counts}
+  \item{cd34}{A CyTOF measurement in raw ion counts}
+  \item{cd45}{A CyTOF measurement in raw ion counts}
+  \item{cd123}{A CyTOF measurement in raw ion counts}
+  \item{cd33}{A CyTOF measurement in raw ion counts}
+  \item{cd47}{A CyTOF measurement in raw ion counts}
+  \item{cd7}{A CyTOF measurement in raw ion counts}
+  \item{cd15}{A CyTOF measurement in raw ion counts}
+  \item{cd44}{A CyTOF measurement in raw ion counts}
+  \item{cd38}{A CyTOF measurement in raw ion counts}
+  \item{cd3}{A CyTOF measurement in raw ion counts}
+  \item{cd117}{A CyTOF measurement in raw ion counts}
+  \item{cd64}{A CyTOF measurement in raw ion counts}
+  \item{cd41}{A CyTOF measurement in raw ion counts}
+  \item{pstat3}{A CyTOF measurement in raw ion counts}
+  \item{pstat5}{A CyTOF measurement in raw ion counts}
+  \item{pampk}{A CyTOF measurement in raw ion counts}
+  \item{p4ebp1}{A CyTOF measurement in raw ion counts}
+  \item{ps6}{A CyTOF measurement in raw ion counts}
+  \item{pcreb}{A CyTOF measurement in raw ion counts}
+  \item{pzap70-syk}{A CyTOF measurement in raw ion counts}
+  \item{prb}{A CyTOF measurement in raw ion counts}
+  \item{perk1-2}{A CyTOF measurement in raw ion counts}
 }
 }
 \source{
@@ -43,7 +43,7 @@ phenograph_data
 }
 \description{
 A dataset containing CyTOF measurements from healthy control cells originally studied
-in the following paper:
+in the following paper:  \cr \cr
 Levine JH, Simonds EF, et al.
 Data-Driven Phenotypic Dissection of AML Reveals Progenitor-like Cells that
 Correlate with Prognosis. Cell. 2015 Jul 2;162(1):184-97.
