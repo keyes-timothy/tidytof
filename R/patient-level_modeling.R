@@ -169,23 +169,7 @@ tof_create_grid <-
     # check grid_type argument
     grid_type <- rlang::arg_match(grid_type)
 
-    # create grid
-    if (!missing(penalty_values) & !missing(mixture_values)) {
-      hyperparam_grid <-
-        tidyr::expand_grid(penalty_values, mixture_values) %>%
-        dplyr::rename(
-          penalty = penalty_values,
-          mixture = mixture_values
-        )
-
-    } else if (grid_type == "regular") {
-      hyperparam_grid <-
-        tidyr::expand_grid(
-          penalty = 10^(seq(-10, 0, length.out = round(sqrt(grid_size)))),
-          mixture = seq(0, 1, length.out = round(sqrt(grid_size)))
-        )
-
-    } else if (grid_type == "entropy") {
+    if (grid_type == "entropy") {
       # conditionally load the dials package for an entropy grid
       has_dials <- requireNamespace(package = "dials")
       if (!has_dials) {
@@ -200,6 +184,22 @@ tof_create_grid <-
 
       hyperparam_grid <-
         dials::grid_max_entropy(hyperparams, size = grid_size)
+
+    } else if (grid_type == "regular") {
+      hyperparam_grid <-
+        tidyr::expand_grid(
+          penalty = 10^(seq(-10, 0, length.out = round(sqrt(grid_size)))),
+          mixture = seq(0, 1, length.out = round(sqrt(grid_size)))
+        )
+
+    } else if (!missing(penalty_values) & !missing(mixture_values)) {
+      hyperparam_grid <-
+        tidyr::expand_grid(penalty_values, mixture_values) %>%
+        dplyr::rename(
+          penalty = penalty_values,
+          mixture = mixture_values
+        )
+
     } else {
       stop("If both `penalty_values` and `mixture_values` are unspecified, the grid
            type must be either regular or entropy.")
