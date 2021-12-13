@@ -10,7 +10,6 @@ tof_cluster_phenograph(
   num_neighbors = 30,
   distance_function = c("euclidean", "cosine"),
   seed,
-  legacy = FALSE,
   ...
 )
 }
@@ -34,11 +33,7 @@ for the nearest-neighbor calculation. Options include "euclidean"
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
 
-\item{legacy}{A boolean value indicating if the Chen Lab implementation of
-phenograph (Rphenograph) should be used (TRUE) or if tidytof's native
-implementation of phenograph should be used (FALSE; the default).}
-
-\item{...}{Optional additional parameters that can be passed to \code{\link[Rphenograph]{Rphenograph}}.}
+\item{...}{Optional additional parameters that can be passed to \code{\link{tof_find_knn}}.}
 }
 \value{
 A tibble with one column named `.phenograph_cluster`. This column will contain an

@@ -189,11 +189,8 @@ tof_cluster_flowsom <-
 #' Setting this argument explicitly can be useful for reproducibility purposes.
 #' Defaults to a random integer
 #'
-#' @param legacy A boolean value indicating if the Chen Lab implementation of
-#' phenograph (Rphenograph) should be used (TRUE) or if tidytof's native
-#' implementation of phenograph should be used (FALSE; the default).
 #'
-#' @param ... Optional additional parameters that can be passed to \code{\link[Rphenograph]{Rphenograph}}.
+#' @param ... Optional additional parameters that can be passed to \code{\link{tof_find_knn}}.
 #'
 #' @return A tibble with one column named `.phenograph_cluster`. This column will contain an
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
@@ -209,75 +206,24 @@ tof_cluster_phenograph <-
     num_neighbors = 30,
     distance_function = c("euclidean", "cosine"),
     seed,
-    legacy = FALSE,
     ...
   ) {
-    if (legacy) {
-      # check that Rphenograph is installed
-      has_phenograph <- requireNamespace(package = "Rphenograph")
-      if (!has_phenograph) {
-        stop(
-          "This function requires the {Rphenograph} package. Install it with this code:\n
-           if(!require(devtools)){
-              install.packages(\"devtools\")
-           }
-           devtools::install_github(\"JinmiaoChenLab/Rphenograph\")\n"
-        )
-      }
+    # set random seed
+    if(!missing(seed)) {
+      set.seed(seed)
+    }
 
-
-      # set random seed
-      if(!missing(seed)) {
-        set.seed(seed)
-      }
-
-      invisible(
-        utils::capture.output(
-          suppressMessages(
-            phenograph_result <-
-              Rphenograph::Rphenograph(
-                data = dplyr::select(tof_tibble, {{cluster_cols}}),
-                k = num_neighbors
-              )
-          )
-        )
+    result <-
+      phenograph_cluster(
+        tof_tibble,
+        cluster_cols = {{cluster_cols}},
+        num_neighbors = num_neighbors,
+        distance_function = distance_function,
+        seed = seed,
+        ...
       )
 
-      phenograph_clusters <- phenograph_result[[2]]$membership
-
-      # deal with cells not assigned to any cluster
-      if(length(phenograph_clusters) != nrow(tof_tibble)) {
-        # assign all cells an id
-        cell_ids <- as.character(as.numeric(1:nrow(tof_tibble)))
-
-        # find the cells not assigned to a cluster and assign them to NA
-        unassigned_cells <- which(!(cell_ids %in% names(phenograph_clusters)))
-        unassigned_cell_clusters <- rep(NA, length(unassigned_cells))
-        names(unassigned_cell_clusters) <- as.character(unassigned_cells)
-
-        # concatenate
-        phenograph_clusters <- c(phenograph_clusters, unassigned_cell_clusters)
-        phenograph_clusters <-
-          phenograph_clusters[order(as.numeric(names(phenograph_clusters)))]
-      }
-
-      #return final result
-      phenograph_clusters <- as.integer(phenograph_clusters)
-      return(dplyr::tibble(.phenograph_cluster = as.character(phenograph_clusters)))
-
-    } else {
-      result <-
-        phenograph_cluster(
-          tof_tibble,
-          cluster_cols = {{cluster_cols}},
-          num_neighbors = num_neighbors,
-          distance_function = distance_function,
-          seed = seed,
-          ...
-        )
-
-      return(result)
-    }
+    return(result)
   }
 
 
