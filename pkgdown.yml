@@ -2,7 +2,7 @@ pandoc: 2.7.3
 pkgdown: 2.0.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2021-12-13T08:51Z
+last_built: 2021-12-13T17:09Z
 urls:
   reference: https://keyes-timothy.github.io/tidytof/reference
   article: https://keyes-timothy.github.io/tidytof/articles
