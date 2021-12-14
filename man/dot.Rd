@@ -17,7 +17,3 @@ The dot product between x and y.
 \description{
 Find the dot product between two vectors.
 }
-\examples{
-NULL
-
-}

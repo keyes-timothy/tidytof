@@ -4,12 +4,34 @@
 \alias{new_tof_model}
 \title{Constructor for a tof_model.}
 \usage{
-new_tof_model(model, recipe)
+new_tof_model(
+  model,
+  recipe,
+  penalty,
+  mixture,
+  model_type = c("linear", "two-class", "multiclass", "survival"),
+  outcome_colnames,
+  train_x = NULL,
+  train_y = NULL
+)
 }
 \arguments{
 \item{model}{A glmnet model.}
 
 \item{recipe}{A prepped recipe object.}
+
+\item{penalty}{A double indicating which lambda value should be used within the
+glmnet path.}
+
+\item{mixture}{A double indicating which alpha value was used to fit the glmnet model.}
+
+\item{model_type}{A string indicating which type of glmnet model is being fit.}
+
+\item{outcome_colnames}{TO DO}
+
+\item{train_x}{TO DO}
+
+\item{train_y}{TO DO}
 }
 \value{
 A `tof_model`, an S3 class that includes a trained glmnet model and
