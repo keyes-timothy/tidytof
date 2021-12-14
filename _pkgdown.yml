@@ -1,4 +1,64 @@
 url: https://keyes-timothy.github.io/tidytof
 template:
   bootstrap: 5
-
+  bootswatch: lux
+  bslib:
+    pkgdown-nav-height: 100px
+reference:
+- title: "Reading and writing data"
+  desc: "Functions for reading and writing CyTOF data to and from file storage"
+  contents:
+  - starts_with("tof_read")
+  - starts_with("tof_write")
+  - tidytof_example_data
+  - new_tof_tibble
+  - as_tof_tbl
+  - tof_get_panel
+  - tof_set_panel
+- title: "Single-cell data analysis"
+  desc: "Functions for data processing tasks at the single-cell level"
+  contents:
+  - tof_preprocess
+  - tof_postprocess
+  - starts_with("tof_downsample")
+  - starts_with("tof_reduce")
+  - starts_with("tof_cluster")
+- title: "Cluster-level data analysis"
+  desc: "Functions for data processing tasks at the cluster or cell subpopulation level"
+  contents:
+  - starts_with("tof_daa")
+  - starts_with("tof_dea")
+  - starts_with("tof_extract")
+- title: "Sample- or patient-level data analysis"
+  desc: "Functions for data processing tasks at the whole-sample or whole-patient level"
+  contents:
+  - tof_split_data
+  - tof_train_model
+  - tof_predict
+  - tof_assess_model
+  - tof_create_grid
+  - new_tof_model
+  - starts_with("tof_get_model")
+- title: "Visualization"
+  desc: "Functions for visualizing CyTOF data"
+  contents:
+  - starts_with("tof_plot")
+- title: "Utilities"
+  desc: "Utility functions for performing miscellaneous CyTOF data processing tasks"
+  contents:
+  - get_extension
+  - rev_asinh
+  - tof_is_numeric
+  - tof_find_knn
+  - tof_knn_density
+  - tof_find_emd
+  - tof_find_jsd
+  - tof_create_recipe
+  - tof_prep_recipe
+- title: "Built-in data"
+  desc: "Example CyTOF datasets built into {tidytof}"
+  contents:
+  - ddpr_data
+  - ddpr_metadata
+  - phenograph_data
+  - metal_masterlist

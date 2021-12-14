@@ -144,9 +144,11 @@ tof_split_data <-
 #' `mixture_values` are provided. If "entropy" is chosen, the {dials} package
 #' is required.
 #'
-#' @param grid_size An integer indicating how many combinations of penalty and mixture
-#' values should be searched during model tuning. Defaults to 25 (5 unique values
-#' of `penalty` and 5 unique values of `mixture`).
+#' @param num_penalty_values TO DO
+#'
+#' @param num_mixture_values TO DO
+#'
+#' @param entropy_grid_size TO DO
 #'
 #' @return A tibble with two numeric columns: `penalty` and `mixture`.
 #'
@@ -162,8 +164,10 @@ tof_create_grid <-
   function(
     penalty_values,
     mixture_values,
+    num_penalty_values = 5,
+    num_mixture_values = 5,
     grid_type = c("regular", "entropy"),
-    grid_size = 25
+    entropy_grid_size = 25
   ) {
 
     # check grid_type argument
@@ -183,16 +187,18 @@ tof_create_grid <-
         dials::parameters(list(dials::penalty(), dials::mixture()))
 
       hyperparam_grid <-
-        dials::grid_max_entropy(hyperparams, size = grid_size)
+        dials::grid_max_entropy(hyperparams, size = entropy_grid_size)
 
     } else if (grid_type == "regular") {
-      hyperparam_grid <-
-        tidyr::expand_grid(
-          penalty = 10^(seq(-10, 0, length.out = round(sqrt(grid_size)))),
-          mixture = seq(0, 1, length.out = round(sqrt(grid_size)))
-        )
 
-    } else if (!missing(penalty_values) & !missing(mixture_values)) {
+      if (missing(penalty_values)) {
+        penalty_values <- 10^(seq(-10, 0, length.out = num_penalty_values))
+      }
+
+      if (missing(mixture_values)) {
+        mixture_values <- seq(0, 1, length.out = num_mixture_values)
+      }
+
       hyperparam_grid <-
         tidyr::expand_grid(penalty_values, mixture_values) %>%
         dplyr::rename(
@@ -201,8 +207,7 @@ tof_create_grid <-
         )
 
     } else {
-      stop("If both `penalty_values` and `mixture_values` are unspecified, the grid
-           type must be either regular or entropy.")
+      stop("The grid type must be either regular or entropy.")
     }
 
     return(hyperparam_grid)
@@ -212,83 +217,55 @@ tof_create_grid <-
 
 # Building Models --------------------------------------------------------------
 
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param split_data TO DO
+#' @param predictor_cols TO DO
+#' @param response_col TO DO
+#' @param time_col TO DO
+#' @param event_col TO DO
+#' @param model_type TO DO
+#' @param hyperparameter_grid TO DO
+#' @param standardize_predictors TO DO
+#' @param remove_zv_predictors TO DO
+#' @param impute_missing_predictors TO DO
+#' @param optimization_metric TO DO
+#' @param best_model_type TO DO
+#' @param num_cores TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
 tof_train_model <-
   function(
     split_data,
     predictor_cols,
-    response_col, # classification and regression
-    time_col, # survival
-    event_col, # survival
+    response_col = NULL, # classification and regression
+    time_col = NULL, # survival
+    event_col = NULL, # survival
     model_type = c("linear", "two-class", "multiclass", "survival"),
     hyperparameter_grid = tof_create_grid(),
     standardize_predictors = TRUE,
     remove_zv_predictors = FALSE,
     impute_missing_predictors = FALSE,
     optimization_metric = "tidytof_default",
-    best_model_type = c("best", "best with sparsity"),
+    best_model_type = c("best", "best with sparsity"), # not currently used
     num_cores = 1
   ) {
 
     # check arguments ----------------------------------------------------------
-
-    # split_data
-    if (inherits(split_data, "rsplit")) {
-      feature_tibble <-
-        split_data %>%
-        rsample::training()
-    } else if (inherits(split_data, "rset")) {
-      feature_tibble <-
-        split_data$splits[[1]] %>%
-        rsample::training()
-    } else {
-      stop("split_data must be either an rsplit or an rset object.")
-    }
-
-    # string arguments
-    model_type <- rlang::arg_match(model_type)
-    best_model_type <- rlang::arg_match(best_model_type)
-
-    # outcome variables
-    if (model_type %in% c("linear", "two-class", "multiclass") & !missing(response_col)) {
-      response <-
-        feature_tibble %>%
-        dplyr::pull({{response_col}})
-
-      if (model_type == "linear") {
-        if (!is.numeric(response)) {
-          stop("`response_col` must specify a numeric column for linear regression.")
-        }
-      } else if (model_type %in% c("two-class", "multiclass")) {
-        if (!is.factor(response)) {
-          stop("`response_col` must specify a factor column for logistic and multinomial regression.")
-        }
-      }
-    } else if (model_type == "survival" & !missing(time_col) & !missing(event_col)) {
-      time <-
-        feature_tibble %>%
-        dplyr::pull({{time_col}})
-
-      event <-
-        feature_tibble %>%
-        dplyr::pull({{event_col}})
-
-      if (!is.numeric(time)) {
-        stop("All values in time_col must be numeric - they represent the time
-           to event outcome for each patient (i.e. each row of feature_tibble.")
-      }
-
-      if (!all(event %in% c(0, 1))) {
-        stop("All values in event_col must be either 0 or 1 (with 1 indicating
-           the adverse event) or FALSE and TRUE (with TRUE indicating the
-           adverse event.")
-      }
-
-    } else {
-      stop(
-        "Either `response_col` (for linear, two-class, and multiclass models)
-           or both `time_col` and `event_col` (for survival models) must be specified."
+    feature_tibble <-
+      tof_check_model_args(
+        split_data = split_data,
+        model_type = model_type,
+        best_model_type = best_model_type,
+        response_col = {{response_col}},
+        time_col = {{time_col}},
+        event_col = {{event_col}}
       )
-    }
 
     # create and prep recipe ---------------------------------------------------
 
@@ -325,248 +302,198 @@ tof_train_model <-
 
     # tune the model using the resampling, the recipes, and the
     # hyperparameter grid ------------------------------------------------------
-    if (model_type == "survival") {
-      tuning_metrics <-
-        tof_tune_glmnet(
-          split_data = split_data,
-          prepped_recipe = prepped_recipe,
-          hyperparameter_grid = hyperparameter_grid,
-          model_type = model_type,
-          outcome_cols = c({{time_col}}, {{event_col}}),
-          optimization_metric = optimization_metric,
-          num_cores = num_cores
-        )
+    tuning_metrics <-
+      tof_tune_glmnet(
+        split_data = split_data,
+        prepped_recipe = prepped_recipe,
+        hyperparameter_grid = hyperparameter_grid,
+        model_type = model_type,
+        outcome_cols = c({{response_col}}, {{time_col}}, {{event_col}}),
+        optimization_metric = optimization_metric,
+        num_cores = num_cores
+      )
 
+    # find the best hyperparameters using the tuning metrics -------------------
+
+
+    # find hyperparameters with best performance
+    best_model_parameters <-
+      tuning_metrics %>%
+      tof_find_best(model_type = model_type, optimization_metric = optimization_metric)
+
+    #return(list(tuning_metrics = tuning_metrics, best_model_parameters = best_model_parameters))
+
+    # combine data into a single preprocessing pipeline and glmnet model--------
+    all_data <- tof_all_data(split_data = split_data)
+
+    final_recipe <-
+      all_data %>%
+      tof_prep_recipe(unprepped_recipe = unprepped_recipe)
+
+    all_data_glmnet <-
+      recipes::bake(
+        object = final_recipe,
+        new_data = all_data
+      ) %>%
+      tof_setup_glmnet_xy(
+        outcome_cols = c({{response_col}}, {{time_col}}, {{event_col}}),
+        model_type = model_type
+      )
+
+    # extract response column names
+    response_colname <- time_colname <- event_colname <- NULL
+
+    if (model_type %in% c("linear", "two-class", "multiclass")) {
+      response_colname <- rlang::as_name(rlang::ensym(response_col))
     } else {
-      tuning_metrics <-
-        tof_tune_glmnet(
-          split_data = split_data,
-          prepped_recipe = prepped_recipe,
-          hyperparameter_grid = hyperparameter_grid,
-          model_type = model_type,
-          outcome_cols = {{response_col}},
-          optimization_metric = optimization_metric,
-          num_cores = num_cores
-        )
+      time_colname <- rlang::as_name(rlang::ensym(time_col))
+      event_colname <- rlang::as_name(rlang::ensym(event_col))
     }
 
-    # find the best model using the tuning metrics -----------------------------
-
-    return(tuning_metrics)
-
-
-
-
-
-    # pull out some values in the format glmnet wants them ---------------------
-
-    # the ids of which fold each row of feature_tibble is "in", i.e. the
-    # fold in which each row is in the assessment set
-    # currently this will only work for cross-validation
-    fold_ids <-
-      setup_list %>%
-      purrr::pluck("split_data") %>%
-      rsample::tidy() %>%
-      dplyr::filter(Data == "Assessment") %>%
-      dplyr::arrange(Row) %>%
-      dplyr::pull(Fold) %>%
-      stringr::str_remove("Fold") %>%
-      as.numeric()
-
-    # the preprocessed feature_tibble (without standardization, which glmnet
-    # will do for each fold internally)
-    preprocessed_data <-
-      setup_list %>%
-      # there is some information leak here because all folds are being
-      # used to impute and remove nzv predictors
-      purrr::pluck("model_recipe") %>%
-      recipes::prep() %>%
-      recipes::juice()
-
-    # vector containing all alpha values to try
-    alphas <-
-      setup_list %>%
-      purrr::pluck("hyperparam_grid") %>%
-      dplyr::pull(mixture)
-
-    # vector containing all lambda values to try
-    # lambdas <-
-    #   setup_list %>%
-    #   purrr::pluck("hyperparam_grid") %>%
-    #   dplyr::pull(penalty) %>%
-    #   sort(decreasing = TRUE)
-
-    # predictors and survival outcome objects in the form glmnet needs them
-    x <-
-      preprocessed_data %>%
-      dplyr::select(-{{time_col}}, -{{event_col}}) %>%
-      as.matrix()
-
-    y <-
-      survival::Surv(
-        time = time,
-        event = status
+    tof_model <-
+      tof_finalize_model(
+        best_model_parameters = best_model_parameters,
+        recipe = final_recipe,
+        glmnet_x = all_data_glmnet$x,
+        glmnet_y = all_data_glmnet$y,
+        model_type = model_type,
+        outcome_colnames = c(response_colname, time_colname, event_colname)
       )
 
-    # fit full lambda path for each alpha value
-    if (run_parallel) {
-      num_cores <- min(parallel::detectCores() - 1, nrow(setup_list$split_data))
-      doParallel::registerDoParallel(num_cores)
-    }
+    return(tof_model)
 
-    surv_models <-
-      purrr::map(
-        .x = alphas,
-        .f = ~ glmnet::cv.glmnet(
-          x = x,
-          y = y,
-          alpha = .x,
-          family = "cox",
-          standardize = TRUE
-        )
-      )
-
-    if (run_parallel) {
-      foreach::registerDoSEQ()
-    }
-
-    tuning_results <-
-      tibble(
-        mixture = alphas,
-        models = surv_models
-      )
-
-    # extract some performance metrics from each model
-
-    tuning_perf_metrics <-
-      tuning_results %>%
-      dplyr::mutate(
-        .metrics = purrr::map(.x = models, .f = broom::tidy)
-      ) %>%
-      dplyr::select(mixture, .metrics) %>%
-      tidyr::unnest(cols = .metrics) %>%
-      dplyr::rename_with(.fn = ~stringr::str_replace(.x, "\\.", "_")) %>%
-      dplyr::mutate(
-        .metric = "partial likelihood deviance",
-        n = nrow(setup_list$split_data)
-      ) %>%
-      dplyr::rename(
-        penalty = lambda,
-        mean = estimate,
-        num_nonzero_coefficients = nzero,
-        std_err = std_error
-      ) %>%
-      dplyr::relocate(
-        penalty,
-        mixture,
-        .metric,
-        mean,
-        n,
-        std_err
-      )
-
-    # find best model overall
-    best_model_info <-
-      tuning_perf_metrics %>%
-      dplyr::slice_min(order_by = mean, with_ties = FALSE, n = 1) %>%
-      dplyr::select(penalty, mixture)
-
-    best_alpha <- best_model_info$mixture
-    best_lambda <- best_model_info$penalty
-
-    if (best_model_type == "best with sparsity") {
-      sparse_lambda <-
-        tuning_results %>%
-        dplyr::filter(mixture == best_alpha) %>%
-        dplyr::mutate(
-          best_penalty = purrr::map_dbl(.x = models, .f = ~.x$lambda.1se),
-        ) %>%
-        dplyr::pull(best_penalty)
-
-      best_model_info$penalty <- sparse_lambda
-
-    }
-
-    # fit model with best hyperparameters on all data
-    final_model <-
-      glmnet::glmnet(
-        x = x,
-        y = y,
-        family = "cox",
-        alpha = best_model_info$mixture,
-        lambda = best_model_info$penalty
-      )
-
-    # make predictions with final model
-    final_mod_predictions <-
-      final_model %>%
-      stats::predict(newx = x, s = best_model_info$penalty)
-
-    # find final model performance metrics
-    final_mod_deviance <- final_model$dev.ratio
-    final_mod_perf_metrics <-
-      tibble::tibble(
-        .metric = "deviance ratio",
-        .estimator = "glmnet",
-        .estimate = final_mod_deviance
-      )
-
-    # extract coefficients from final model
-    final_coefficients <-
-      final_model %>%
-      stats::coef() %>%
-      as.matrix() %>%
-      tibble::as_tibble(rownames = "feature_name") %>%
-      dplyr::rename(beta = s0) %>%
-      dplyr::filter(abs(beta) > 0)
-
-    results <-
-      list(
-        tuning_results = tuning_results,
-        tuning_perf_metrics = tuning_perf_metrics,
-        final_mod_predictions = final_mod_predictions,
-        final_mod_hyperparams = best_model_info,
-        final_mod_perf_metrics = final_mod_perf_metrics,
-        final_model = final_model,
-        final_coefficients = final_coefficients
-      )
-
-    return(results)
   }
 
 
 # applying models to new data --------------------------------------------------
 
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#' @param new_data TO DO
+#' @param prediction_type TO DO
+#' @param ... TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
 tof_predict <-
   function(
-    model,
+    tof_model,
     new_data,
+    prediction_type = c("response", "class", "link"),
     ...
   ) {
-    # extract the model from the results list
-    NULL
-    stop("Prediction is not yet supported.")
-    # check if the model is a parsnip model or a coxnet model
-    NULL
 
-    # make predictions
+    # set up -------------------------------------------------------------------
+    # check prediction_type
+    prediction_type <- rlang::arg_match(prediction_type)
+
+    # extract the recipe and the glmnet model
+    model <- tof_model$model
+    recipe <- tof_model$recipe
+    lambda <- tof_get_model_penalty(tof_model)
+
+    # extract the model type and outcome colnames
+    model_type <- tof_get_model_type(tof_model)
+    outcome_colnames <- tof_get_model_outcomes(tof_model)
+
+    # preprocess the new_data
+    preprocessed_data <-
+      recipes::bake(
+        recipe,
+        new_data = new_data
+      ) %>%
+      tof_setup_glmnet_xy(
+        outcome_cols = dplyr::any_of(outcome_colnames),
+        model_type = model_type
+      )
+
+    # make predictions ---------------------------------------------------------
+    predictions <-
+      predict(
+        object = model,
+        newx = preprocessed_data$x,
+        s = lambda,
+        type = prediction_type,
+        exact = TRUE,
+        x = tof_get_model_x(tof_model),
+        y = tof_get_model_y(tof_model)
+      ) %>%
+      as.vector()
+
+    return(predictions)
 
   }
 
 # assessing model performance --------------------------------------------------
-
-tof_assess <-
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#' @param new_data TO DO
+#' @param ... TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_assess_model <-
   function(
-    model,
-    predictions,
+    tof_model,
+    new_data = NULL,
     ...
   ) {
-    # extract the model from the results list
-    NULL
-    stop("Assessment is not yet supported.")
-    # check if the model is a parsnip model or a coxnet model
-    NULL
 
-    # depending on the type of model, provide some performance metrics
+    # set up -------------------------------------------------------------------
+    # extract the recipe and the glmnet model
+    model <- tof_model$model
+    recipe <- tof_model$recipe
+    lambda <- tof_get_model_penalty(tof_model)
+
+    # extract the model type and outcome colnames
+    model_type <- tof_get_model_type(tof_model)
+    outcome_colnames <- tof_get_model_outcomes(tof_model)
+
+    # preprocess the new_data
+    if (!missing(new_data)) {
+      preprocessed_data <-
+        recipes::bake(
+          recipe,
+          new_data = new_data
+        ) %>%
+        tof_setup_glmnet_xy(
+          outcome_cols = dplyr::any_of(outcome_colnames),
+          model_type = model_type
+        )
+    } else {
+      preprocessed_data <-
+        list(
+          x = tof_get_model_x(tof_model),
+          y = tof_get_model_y(tof_model)
+        )
+    }
+
+    # calculate metrics --------------------------------------------------------
+
+    model_metrics <-
+      glmnet::assess.glmnet(
+        object = model,
+        newx = preprocessed_data$x,
+        newy = preprocessed_data$y,
+        family = tof_find_glmnet_family(model_type),
+        s = lambda
+      ) %>%
+      tibble::as_tibble() %>%
+      tof_clean_metric_names(model_type = model_type)
+
+    return(model_metrics)
+
+
+
 
   }

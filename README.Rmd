@@ -30,6 +30,10 @@ knitr::opts_chunk$set(
 
 The goal of `{tidytof}` is to provide an integrated suite of R functions for CyTOF data analysis with an intuitive and internally consistent set of design principles. As an extension of the `tidyverse` ecosystem of data manipulation tools in R, `{tidytof}` is both performant and easy-to-use for scientists with a wide range of coding experience (including beginners).
 
+## Getting started
+
+[Under construction]
+
 ## Installation
 
 You can install the development version of tidytof from GitHub with the following command:
@@ -822,9 +826,11 @@ end <- Sys.time()
 
 time_cost <- end - start
 
-time_cost
+class_mod %>% 
+  tof_assess_model()
 
-class_mod
+
+
 
 
 ```
@@ -838,17 +844,18 @@ class_mod <-
   dplyr::mutate(relapse_status = as.factor(relapse_status)) %>%
   filter(!is.na(relapse_status)) %>% 
   tof_split_data(
-    split_method = "bootstrap", 
+    split_method = "k-fold", 
     strata = relapse_status, 
-    num_bootstraps = 3
+    num_cv_folds = 5
   ) %>% 
   tof_train_model(
-    predictor_cols = contains("Pop1"), 
+    predictor_cols = contains("Pop2"), 
     response_col = relapse_status,
     model_type = "two-class", 
-    hyperparameter_grid = tof_create_grid(grid_size = 20),
+    hyperparameter_grid = tof_create_grid(mixture_values = 1),
     impute_missing_predictors = TRUE, 
-    num_cores = 10
+    remove_zv_predictors = TRUE,
+    num_cores = 1
   )
 
 end <- Sys.time()
@@ -856,6 +863,7 @@ end <- Sys.time()
 time_cost <- end - start
 
 time_cost
+
 
 
 class_mod

@@ -127,10 +127,15 @@ tof_prep_recipe <-
     } else if (inherits(split_data, "rsplit")) {
       result <-
         unprepped_recipe %>%
-        recipes::prep(retain = FALSE)
+        recipes::prep(training = rsample::training(split_data), retain = FALSE)
+
+    } else if (inherits(split_data, "tbl_df")) {
+      result <-
+        unprepped_recipe %>%
+        recipes::prep(training = split_data, retrain = FALSE)
 
     } else {
-      stop("split_data must be either an rset or an rsplit object")
+      stop("split_data must be a tibble or an rset or rsplit object")
     }
 
     return(result)
@@ -182,9 +187,6 @@ tof_tune_glmnet <-
         tidyselect::eval_select(data = rsample::training(split_data$splits[[1]])) %>%
         names()
 
-      # initialize cluster
-      my_cluster <- NULL
-
       if (num_cores == 1) {
         performance_metrics <-
           purrr::map2(
@@ -223,10 +225,7 @@ tof_tune_glmnet <-
             outcome_colnames = outcome_colnames
           )
 
-        # stop cluster if it was set up
-        if (!is.null(my_cluster)) {
           parallel::stopCluster(my_cluster)
-        }
       }
 
       performance_metrics <-
@@ -255,15 +254,8 @@ tof_tune_glmnet <-
       stop("split_data must be an rsplit or rset object.")
     }
 
-    # extract best hyperparameters
-    best_model_parameters <-
-      tof_find_best(performance_metrics, model_type, optimization_metric)
+    return(performance_metrics)
 
-    # finalize model
-
-    tof_model <- tof_finalize_model(best_model_parameters, split_data)
-
-    return(tof_model)
   }
 
 #' Fit a glmnet model and calculate performance metrics using a single rsplit object
@@ -391,7 +383,7 @@ tof_fit_split <-
       lambdas <- NULL
     }
 
-    # "linear", "two-class", "multiclass", "survival"
+    # convert model type into a glmnet family
     glmnet_family <-
       switch(
         model_type,
@@ -624,22 +616,195 @@ tof_find_best <- function(performance_metrics, model_type, optimization_metric) 
 
   best_hyperparameters <-
     best_metrics %>%
-    dplyr::select(penalty, mixture)
+    dplyr::select(penalty, mixture, dplyr::any_of(optimization_metric))
 
   return(best_hyperparameters)
 
 }
 
+tof_find_glmnet_family <- function(model_type) {
+  glmnet_family <-
+    switch(
+      model_type,
+      "linear" = "gaussian",
+      "two-class" = "binomial",
+      "multiclass" = "multinomial",
+      "survival" = "cox"
+    )
+  return(glmnet_family)
+}
+
 tof_finalize_model <-
   function(
     best_model_parameters,
-    split_data
+    recipe,
+    glmnet_x,
+    glmnet_y,
+    model_type,
+    outcome_colnames
   ) {
+    glmnet_family <- tof_find_glmnet_family(model_type)
 
+    # if there is more than 1 optimal set of hyperparamters, choose the sparsest
+    # model and then the one that is closest to the lasso (alpha = 1).
+    best_models <-
+      best_model_parameters %>%
+      dplyr::slice_max(order_by = penalty) %>%
+      dplyr::slice_max(order_by = mixture)
+
+    best_alpha <- best_models$mixture
+    best_lambda <- best_models$penalty
+
+    # fit best glmnet model
+    best_model <-
+      glmnet::glmnet(
+        x = glmnet_x,
+        y = glmnet_y,
+        alpha = best_alpha,
+        family = glmnet_family,
+        standardize = FALSE
+      )
+
+    # assess model on the full dataset
+
+    # hack glmnet a bit to fix a bug in the predict.glmnet function
+    new_call <- best_model$call
+    new_call$family <- tof_find_glmnet_family(model_type)
+    new_call$alpha <- best_alpha
+
+    best_model$call <- new_call
+
+    # construct final model
+    tof_model <-
+      new_tof_model(
+        model = best_model,
+        recipe = recipe,
+        penalty = best_lambda,
+        mixture = best_alpha,
+        model_type = model_type,
+        outcome_colnames = outcome_colnames,
+        train_x = glmnet_x,
+        train_y = glmnet_y
+      )
+
+    return(tof_model)
   }
 
-tof_fit_glmnet <- function(training_data) {
-  NULL
+tof_setup_glmnet_xy <- function(feature_tibble, outcome_cols, model_type) {
+
+  y <-
+    feature_tibble %>%
+    dplyr::select({{outcome_cols}})
+
+  predictor_colnames <-
+    setdiff(colnames(feature_tibble), colnames(y))
+
+  x <-
+    feature_tibble %>%
+    dplyr::select(dplyr::any_of(predictor_colnames)) %>%
+    as.matrix()
+
+  if (model_type == "survival") {
+    y <-
+      survival::Surv(
+        time = y[[1]],
+        event = y[[2]]
+      )
+
+  } else {
+    y <- y[[colnames(y)]]
+  }
+
+  return(list(x = x, y = y))
+}
+
+tof_check_model_args <-
+  function(
+    split_data,
+    model_type  = c("linear", "two-class", "multiclass", "survival"),
+    best_model_type = c("best", "best with sparsity"),
+    response_col,
+    time_col,
+    event_col
+  ) {
+
+    # check split_data
+    if (inherits(split_data, "rsplit")) {
+      feature_tibble <-
+        split_data %>%
+        rsample::training()
+    } else if (inherits(split_data, "rset")) {
+      feature_tibble <-
+        split_data$splits[[1]] %>%
+        rsample::training()
+    } else {
+      stop("split_data must be either an rsplit or an rset object.")
+    }
+
+    # check string arguments
+    model_type <- rlang::arg_match(model_type)
+    best_model_type <- rlang::arg_match(best_model_type)
+
+    # check outcome variables
+    if (model_type %in% c("linear", "two-class", "multiclass") & !missing(response_col)) {
+      response <-
+        feature_tibble %>%
+        dplyr::pull({{response_col}})
+
+      if (model_type == "linear") {
+        if (!is.numeric(response)) {
+          stop("`response_col` must specify a numeric column for linear regression.")
+        }
+      } else if (model_type %in% c("two-class", "multiclass")) {
+        if (!is.factor(response)) {
+          stop("`response_col` must specify a factor column for logistic and multinomial regression.")
+        }
+      }
+    } else if (model_type == "survival" & !missing(time_col) & !missing(event_col)) {
+      time <-
+        feature_tibble %>%
+        dplyr::pull({{time_col}})
+
+      event <-
+        feature_tibble %>%
+        dplyr::pull({{event_col}})
+
+      if (!is.numeric(time)) {
+        stop("All values in time_col must be numeric - they represent the time
+           to event outcome for each patient (i.e. each row of feature_tibble.")
+      }
+
+      if (!all(event %in% c(0, 1))) {
+        stop("All values in event_col must be either 0 or 1 (with 1 indicating
+           the adverse event) or FALSE and TRUE (with TRUE indicating the
+           adverse event.")
+      }
+
+    } else {
+      stop(
+        "Either `response_col` (for linear, two-class, and multiclass models)
+           or both `time_col` and `event_col` (for survival models) must be specified."
+      )
+    }
+
+    return(feature_tibble)
+  }
+
+tof_all_data <- function(split_data) {
+
+  if (inherits(split_data, "rsplit")) {
+    feature_tibble <-
+      rsample::training(split_data) %>%
+      dplyr::bind_rows(rsample::testing(split_data))
+
+  } else if (inherits(split_data, "rset")) {
+    feature_tibble <-
+      rsample::training(split_data$splits[[1]]) %>%
+      dplyr::bind_rows(rsample::testing(split_data$splits[[1]]))
+
+  } else {
+    stop("split_data must be either an rsplit or an rset object.")
+  }
 }
 
 # new_tof_model ----------------------------------------------------------------
@@ -650,16 +815,181 @@ tof_fit_glmnet <- function(training_data) {
 #'
 #' @param recipe A prepped recipe object.
 #'
+#' @param penalty A double indicating which lambda value should be used within the
+#' glmnet path.
+#'
+#' @param mixture A double indicating which alpha value was used to fit the glmnet model.
+#'
+#' @param model_type A string indicating which type of glmnet model is being fit.
+#' @param outcome_colnames TO DO
+#' @param train_x TO DO
+#' @param train_y TO DO
+#'
 #' @return A `tof_model`, an S3 class that includes a trained glmnet model and
 #' the recipe used to perform its associated preprocessing.
 #'
-new_tof_model <- function(model, recipe) {
+new_tof_model <-
+  function(
+    model,
+    recipe,
+    penalty,
+    mixture,
+    model_type = c("linear", "two-class", "multiclass", "survival"),
+    outcome_colnames,
+    train_x = NULL,
+    train_y = NULL
+  ) {
 
-  stopifnot(inherits(recipe, "recipe"))
-  stopifnot(inherits(recipe, "glmnet"))
+    # check arguments
+    stopifnot(inherits(recipe, "recipe"))
+    stopifnot(inherits(model, "glmnet"))
+    stopifnot(is.numeric(penalty))
+    stopifnot(is.numeric(mixture))
+    model_type <- rlang::arg_match(model_type)
 
-  tof_model <- list(model = model, recipe = recipe)
+    # assemble tof_model
+    tof_model <- list(model = model, recipe = recipe)
 
-  return(tof_model)
+    # add attributes
+    attr(tof_model, which = "mixture") <- mixture
+    attr(tof_model, which = "penalty") <- penalty
+    attr(tof_model, which = "model_type") <- model_type
+    attr(tof_model, which = "outcome_colnames") <- outcome_colnames
+    attr(tof_model, which = "train_x") <- train_x
+    attr(tof_model, which = "train_y") <- train_y
+
+    class(tof_model) <- "tof_model"
+
+    return(tof_model)
+  }
+
+#' @exportS3Method
+print.tof_model <- function(x, ...) {
+  model_type <- attr(x, which = "model_type")
+  mixture <- attr(x, which = "mixture")
+  penalty <- attr(x, which = "penalty")
+
+  coefficients <-
+    x$model %>%
+    glmnet::coef.glmnet(s = penalty) %>%
+    as.matrix() %>%
+    tibble::as_tibble(rownames = "feature")
+
+  colnames(coefficients) <- c("feature", "coefficient")
+
+  coefficients <- dplyr::filter(coefficients, coefficient != 0)
+
+  cat("A", model_type, "`tof_model` with a mixture parameter (alpha) of",
+      round(mixture, 3),
+      "and a penalty parameter (lambda) of",
+      format(penalty, digits = 4, scientific = TRUE), "\n")
+
+  print(coefficients)
 }
+
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_x <-
+  function(tof_model) {
+    model_x <-
+      attr(tof_model, "train_x")
+
+    return(model_x)
+  }
+
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_y <-
+  function(tof_model) {
+    model_y <-
+      attr(tof_model, "train_y")
+
+    return(model_y)
+  }
+
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_penalty <-
+  function(tof_model) {
+    model_penalty <-
+      attr(tof_model, "penalty")
+
+    return(model_penalty)
+  }
+
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_mixture <-
+  function(tof_model) {
+    model_mixture <-
+      attr(tof_model, "mixture")
+
+    return(model_mixture)
+  }
+
+#' TO DO
+#'
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_type <-
+  function(tof_model) {
+    model_type <-
+      attr(tof_model, "model_type")
+
+    return(model_type)
+  }
+
+#' TO DO
+#'
+#' @param tof_model TO DO
+#'
+#' @return TO DO
+#'
+#' @export
+#'
+tof_get_model_outcomes <-
+  function(tof_model) {
+    model_colnames <-
+      attr(tof_model, "outcome_colnames")
+
+    return(model_colnames)
+  }
 

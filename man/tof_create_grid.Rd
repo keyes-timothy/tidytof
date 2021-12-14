@@ -7,8 +7,10 @@
 tof_create_grid(
   penalty_values,
   mixture_values,
+  num_penalty_values = 5,
+  num_mixture_values = 5,
   grid_type = c("regular", "entropy"),
-  grid_size = 25
+  entropy_grid_size = 25
 )
 }
 \arguments{
@@ -20,14 +22,16 @@ hyperparamter grid. If unspecified, {tidytof}'s default values will be used:
 hyperparamter grid. If unspecified, {tidytof}'s default values will be used:
 `seq(0, 1, length.out = 10)`.}
 
+\item{num_penalty_values}{TO DO}
+
+\item{num_mixture_values}{TO DO}
+
 \item{grid_type}{A string indicating if a regular grid ("regular"; the default) or maximum-entropy
 ("entropy") search grid should be returned. Ignored if both `penalty_values` and
 `mixture_values` are provided. If "entropy" is chosen, the {dials} package
 is required.}
 
-\item{grid_size}{An integer indicating how many combinations of penalty and mixture
-values should be searched during model tuning. Defaults to 25 (5 unique values
-of `penalty` and 5 unique values of `mixture`).}
+\item{entropy_grid_size}{TO DO}
 }
 \value{
 A tibble with two numeric columns: `penalty` and `mixture`.
