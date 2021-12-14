@@ -63,8 +63,10 @@ hyperparameter values can be created.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_create_grid</span><span class="op">(</span>
   <span class="va">penalty_values</span>,
   <span class="va">mixture_values</span>,
+  num_penalty_values <span class="op">=</span> <span class="fl">5</span>,
+  num_mixture_values <span class="op">=</span> <span class="fl">5</span>,
   grid_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"regular"</span>, <span class="st">"entropy"</span><span class="op">)</span>,
-  grid_size <span class="op">=</span> <span class="fl">25</span>
+  entropy_grid_size <span class="op">=</span> <span class="fl">25</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -78,15 +80,17 @@ hyperparamter grid. If unspecified, tidytof's default values will be used:
 <dd><p>A numeric vector of all penalty values to include in the
 hyperparamter grid. If unspecified, tidytof's default values will be used:
 `seq(0, 1, length.out = 10)`.</p></dd>
+<dt>num_penalty_values</dt>
+<dd><p>TO DO</p></dd>
+<dt>num_mixture_values</dt>
+<dd><p>TO DO</p></dd>
 <dt>grid_type</dt>
 <dd><p>A string indicating if a regular grid ("regular"; the default) or maximum-entropy
 ("entropy") search grid should be returned. Ignored if both `penalty_values` and
 `mixture_values` are provided. If "entropy" is chosen, the dials package
 is required.</p></dd>
-<dt>grid_size</dt>
-<dd><p>An integer indicating how many combinations of penalty and mixture
-values should be searched during model tuning. Defaults to 25 (5 unique values
-of `penalty` and 5 unique values of `mixture`).</p></dd>
+<dt>entropy_grid_size</dt>
+<dd><p>TO DO</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>

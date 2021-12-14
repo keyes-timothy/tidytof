@@ -1012,7 +1012,7 @@
 <span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>relapse_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">mutate</span><span class="op">(</span>event <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">tof_train_model</span><span class="op">(</span>
+  <span class="fu"><a href="reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span>
     predictor_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span>, 
     <span class="co">#response_col = relapse_status,</span>
     time_col <span class="op">=</span> <span class="va">age_at_diagnosis</span>,

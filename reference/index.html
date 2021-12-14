@@ -35,9 +35,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="reading-and-writing-data">Reading and writing data<a class="anchor" aria-label="anchor" href="#reading-and-writing-data"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Functions for reading and writing CyTOF data to and from file storage</p>
 
       
     </div><div id="" class="section level2">
@@ -47,61 +47,39 @@
 
       <dl><dt>
           
-          <code><a href="as_tof_tbl.html">as_tof_tbl()</a></code> 
+          <code><a href="tof_read_csv.html">tof_read_csv()</a></code> 
         </dt>
-        <dd>Coerce flowFrames or flowSets into tof_tbl's.</dd>
+        <dd>Read CyTOF data from a .csv file into a tidy tibble.</dd>
       </dl><dl><dt>
           
-          <code><a href="ddpr_data.html">ddpr_data</a></code> 
+          <code><a href="tof_read_data.html">tof_read_data()</a></code> 
         </dt>
-        <dd>CyTOF data from two samples: 5,000 B-cell lineage cells from a healthy
-patient and 5,000 B-cell lineage cells from a B-cell precursor Acute
-Lymphoblastic Leukemia (BCP-ALL) patient.</dd>
+        <dd>Read data from an .fcs/.csv file or a directory of .fcs/.csv files.</dd>
       </dl><dl><dt>
           
-          <code><a href="ddpr_metadata.html">ddpr_metadata</a></code> 
+          <code><a href="tof_read_fcs.html">tof_read_fcs()</a></code> 
         </dt>
-        <dd>Clinical metadata for each patient sample in Good &amp; Sarno et al. (2018).</dd>
+        <dd>Read CyTOF data from an .fcs file into a tidy tibble.</dd>
       </dl><dl><dt>
           
-          <code><a href="dot.html">dot()</a></code> 
+          <code><a href="tof_read_file.html">tof_read_file()</a></code> 
         </dt>
-        <dd>Find the dot product between two vectors.</dd>
+        <dd>Read CyTOF data from a single .fcs or .csv file into a tidy tibble.</dd>
       </dl><dl><dt>
           
-          <code><a href="get_extension.html">get_extension()</a></code> 
+          <code><a href="tof_write_csv.html">tof_write_csv()</a></code> 
         </dt>
-        <dd>Find the extension for a file</dd>
+        <dd>Write a series of .csv files from a tof_tbl</dd>
       </dl><dl><dt>
           
-          <code><a href="magnitude.html">magnitude()</a></code> 
+          <code><a href="tof_write_data.html">tof_write_data()</a></code> 
         </dt>
-        <dd>Find the magnitude of a vector.</dd>
+        <dd>Write cytof data to a file or to a directory of files</dd>
       </dl><dl><dt>
           
-          <code><a href="metal_masterlist.html">metal_masterlist</a></code> 
+          <code><a href="tof_write_fcs.html">tof_write_fcs()</a></code> 
         </dt>
-        <dd>A character vector of metal name patterns supported by tidytof.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="new_tof_model.html">new_tof_model()</a></code> 
-        </dt>
-        <dd>Constructor for a tof_model.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="new_tof_tibble.html">new_tof_tibble()</a></code> 
-        </dt>
-        <dd>Constructor for a tof_tibble.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="phenograph_data.html">phenograph_data</a></code> 
-        </dt>
-        <dd>CyTOF data from 6,000 healthy immune cells from a single patient.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="rev_asinh.html">rev_asinh()</a></code> 
-        </dt>
-        <dd>Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.</dd>
+        <dd>Write a series of .fcs files from a tof_tbl</dd>
       </dl><dl><dt>
           
           <code><a href="tidytof_example_data.html">tidytof_example_data()</a></code> 
@@ -109,26 +87,91 @@ Lymphoblastic Leukemia (BCP-ALL) patient.</dd>
         <dd>Get paths to tidytof example data</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_apply_classifier.html">tof_apply_classifier()</a></code> 
+          <code><a href="new_tof_tibble.html">new_tof_tibble()</a></code> 
         </dt>
-        <dd>Perform developmental clustering on CyTOF data using a pre-fit classifier</dd>
+        <dd>Constructor for a tof_tibble.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_build_classifier.html">tof_build_classifier()</a></code> 
+          <code><a href="as_tof_tbl.html">as_tof_tbl()</a></code> 
         </dt>
-        <dd>Calculate centroids and covariance matrices for each cell subpopulation in
-healthy CyTOF data.</dd>
+        <dd>Coerce flowFrames or flowSets into tof_tbl's.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_classify_cells.html">tof_classify_cells()</a></code> 
+          <code><a href="tof_get_panel.html">tof_get_panel()</a></code> 
         </dt>
-        <dd>Classify each cell (i.e. each row) in a matrix of cancer cells into its most
-similar healthy developmental subpopulation.</dd>
+        <dd>Get panel information from a tof_tibble</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_clean_metric_names.html">tof_clean_metric_names()</a></code> 
+          <code><a href="tof_set_panel.html">tof_set_panel()</a></code> 
         </dt>
-        <dd>Title</dd>
+        <dd>Set panel information from a tof_tibble</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_find_panel_info.html">tof_find_panel_info()</a></code> 
+        </dt>
+        <dd>Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
+from a flowFrame (read from a .fcs file.)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="single-cell-data-analysis">Single-cell data analysis<a class="anchor" aria-label="anchor" href="#single-cell-data-analysis"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for data processing tasks at the single-cell level</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="tof_preprocess.html">tof_preprocess()</a></code> 
+        </dt>
+        <dd>Preprocess raw CyTOF data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_postprocess.html">tof_postprocess()</a></code> 
+        </dt>
+        <dd>Post-process transformed CyTOF data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_downsample.html">tof_downsample()</a></code> 
+        </dt>
+        <dd>Downsample CyTOF data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_downsample_constant.html">tof_downsample_constant()</a></code> 
+        </dt>
+        <dd>Downsample CyTOF data by randomly selecting a constant number of cells per group.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_downsample_density.html">tof_downsample_density()</a></code> 
+        </dt>
+        <dd>Downsample CyTOF data by randomly selecting a proportion of the cells in each group.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_downsample_prop.html">tof_downsample_prop()</a></code> 
+        </dt>
+        <dd>Downsample CyTOF data by randomly selecting a proportion of the cells in each group.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_reduce_dimensions.html">tof_reduce_dimensions()</a></code> 
+        </dt>
+        <dd>Apply dimensionality reduction to a CyTOF dataset.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_reduce_pca.html">tof_reduce_pca()</a></code> 
+        </dt>
+        <dd>Perform principal component analysis on CyTOF data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_reduce_tsne.html">tof_reduce_tsne()</a></code> 
+        </dt>
+        <dd>Perform t-distributed stochastic neighborhood embedding on CyTOF data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_reduce_umap.html">tof_reduce_umap()</a></code> 
+        </dt>
+        <dd>Perform uniform manifold approzimation and projection on CyTOF data</dd>
       </dl><dl><dt>
           
           <code><a href="tof_cluster.html">tof_cluster()</a></code> 
@@ -156,21 +199,33 @@ similar healthy developmental subpopulation.</dd>
         <dd>Perform PhenoGraph clustering on CyTOF data.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_cosine_dist.html">tof_cosine_dist()</a></code> 
+          <code><a href="tof_apply_classifier.html">tof_apply_classifier()</a></code> 
         </dt>
-        <dd>A function for finding the cosine distance between each of the rows of a numeric
-matrix and a numeric vector.</dd>
+        <dd>Perform developmental clustering on CyTOF data using a pre-fit classifier</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_create_grid.html">tof_create_grid()</a></code> 
+          <code><a href="tof_build_classifier.html">tof_build_classifier()</a></code> 
         </dt>
-        <dd>Create a glmnet hyperparameter search grid of a specified size</dd>
+        <dd>Calculate centroids and covariance matrices for each cell subpopulation in
+healthy CyTOF data.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_create_recipe.html">tof_create_recipe()</a></code> 
+          <code><a href="tof_classify_cells.html">tof_classify_cells()</a></code> 
         </dt>
-        <dd>Title</dd>
-      </dl><dl><dt>
+        <dd>Classify each cell (i.e. each row) in a matrix of cancer cells into its most
+similar healthy developmental subpopulation.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="cluster-level-data-analysis">Cluster-level data analysis<a class="anchor" aria-label="anchor" href="#cluster-level-data-analysis"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for data processing tasks at the cluster or cell subpopulation level</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="tof_daa.html">tof_daa()</a></code> 
         </dt>
@@ -212,26 +267,6 @@ matrix and a numeric vector.</dd>
         <dd>Differential Expression Analysis (DEA) with t-tests</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_downsample.html">tof_downsample()</a></code> 
-        </dt>
-        <dd>Downsample CyTOF data.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_downsample_constant.html">tof_downsample_constant()</a></code> 
-        </dt>
-        <dd>Downsample CyTOF data by randomly selecting a constant number of cells per group.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_downsample_density.html">tof_downsample_density()</a></code> 
-        </dt>
-        <dd>Downsample CyTOF data by randomly selecting a proportion of the cells in each group.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_downsample_prop.html">tof_downsample_prop()</a></code> 
-        </dt>
-        <dd>Downsample CyTOF data by randomly selecting a proportion of the cells in each group.</dd>
-      </dl><dl><dt>
-          
           <code><a href="tof_extract_central_tendency.html">tof_extract_central_tendency()</a></code> 
         </dt>
         <dd>Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`.</dd>
@@ -260,6 +295,165 @@ matrix and a numeric vector.</dd>
           <code><a href="tof_extract_threshold.html">tof_extract_threshold()</a></code> 
         </dt>
         <dd>Extract aggregated features from CyTOF data using a binary threshold</dd>
+      </dl></div><div class="section level2">
+      <h2 id="sample-or-patient-level-data-analysis">Sample- or patient-level data analysis<a class="anchor" aria-label="anchor" href="#sample-or-patient-level-data-analysis"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for data processing tasks at the whole-sample or whole-patient level</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="tof_split_data.html">tof_split_data()</a></code> 
+        </dt>
+        <dd>Split CyTOF data into a training and test set</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_train_model.html">tof_train_model()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_predict.html">tof_predict()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_assess_model.html">tof_assess_model()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_clean_metric_names.html">tof_clean_metric_names()</a></code> 
+        </dt>
+        <dd>Title</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_create_grid.html">tof_create_grid()</a></code> 
+        </dt>
+        <dd>Create a glmnet hyperparameter search grid of a specified size</dd>
+      </dl><dl><dt>
+          
+          <code><a href="new_tof_model.html">new_tof_model()</a></code> 
+        </dt>
+        <dd>Constructor for a tof_model.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_mixture.html">tof_get_model_mixture()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_outcomes.html">tof_get_model_outcomes()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_penalty.html">tof_get_model_penalty()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_type.html">tof_get_model_type()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_x.html">tof_get_model_x()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_get_model_y.html">tof_get_model_y()</a></code> 
+        </dt>
+        <dd>TO DO</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_fit_split.html">tof_fit_split()</a></code> 
+        </dt>
+        <dd>Fit a glmnet model and calculate performance metrics using a single rsplit object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_tune_glmnet.html">tof_tune_glmnet()</a></code> 
+        </dt>
+        <dd>Title</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for visualizing CyTOF data</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="tof_plot_cells_dr.html">tof_plot_cells_dr()</a></code> 
+        </dt>
+        <dd>Title</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_cells_layout.html">tof_plot_cells_layout()</a></code> 
+        </dt>
+        <dd>Title</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
+      
+      <p class="section-desc"></p><p>Utility functions for performing miscellaneous CyTOF data processing tasks</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="get_extension.html">get_extension()</a></code> 
+        </dt>
+        <dd>Find the extension for a file</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rev_asinh.html">rev_asinh()</a></code> 
+        </dt>
+        <dd>Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="dot.html">dot()</a></code> 
+        </dt>
+        <dd>Find the dot product between two vectors.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="magnitude.html">magnitude()</a></code> 
+        </dt>
+        <dd>Find the magnitude of a vector.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_cosine_dist.html">tof_cosine_dist()</a></code> 
+        </dt>
+        <dd>A function for finding the cosine distance between each of the rows of a numeric
+matrix and a numeric vector.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_is_numeric.html">tof_is_numeric()</a></code> 
+        </dt>
+        <dd>Find if a vector is numeric</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_find_knn.html">tof_find_knn()</a></code> 
+        </dt>
+        <dd>Find the k-nearest neighbors of each cell in a CyTOF dataset.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_knn_density.html">tof_knn_density()</a></code> 
+        </dt>
+        <dd>Find the KNN density estimate for each cell in a CyTOF dataset.</dd>
       </dl><dl><dt>
           
           <code><a href="tof_find_emd.html">tof_find_emd()</a></code> 
@@ -272,132 +466,50 @@ matrix and a numeric vector.</dd>
         <dd>Find the Jensen-Shannon Divergence (JSD) between two numeric vectors</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_find_knn.html">tof_find_knn()</a></code> 
-        </dt>
-        <dd>Find the k-nearest neighbors of each cell in a CyTOF dataset.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_find_panel_info.html">tof_find_panel_info()</a></code> 
-        </dt>
-        <dd>Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
-from a flowFrame (read from a .fcs file.)</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_fit_split.html">tof_fit_split()</a></code> 
-        </dt>
-        <dd>Fit a glmnet model and calculate performance metrics using a single rsplit object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_get_panel.html">tof_get_panel()</a></code> 
-        </dt>
-        <dd>Get panel information from a tof_tibble</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_is_numeric.html">tof_is_numeric()</a></code> 
-        </dt>
-        <dd>Find if a vector is numeric</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_knn_density.html">tof_knn_density()</a></code> 
-        </dt>
-        <dd>Find the KNN density estimate for each cell in a CyTOF dataset.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_plot_cells_dr.html">tof_plot_cells_dr()</a></code> 
+          <code><a href="tof_create_recipe.html">tof_create_recipe()</a></code> 
         </dt>
         <dd>Title</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_plot_cells_layout.html">tof_plot_cells_layout()</a></code> 
-        </dt>
-        <dd>Title</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_postprocess.html">tof_postprocess()</a></code> 
-        </dt>
-        <dd>Post-process transformed CyTOF data.</dd>
       </dl><dl><dt>
           
           <code><a href="tof_prep_recipe.html">tof_prep_recipe()</a></code> 
         </dt>
         <dd>Title</dd>
+      </dl></div><div class="section level2">
+      <h2 id="built-in-data">Built-in data<a class="anchor" aria-label="anchor" href="#built-in-data"></a></h2>
+      
+      <p class="section-desc"></p><p>Example CyTOF datasets built into {tidytof}</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="ddpr_data.html">ddpr_data</a></code> 
+        </dt>
+        <dd>CyTOF data from two samples: 5,000 B-cell lineage cells from a healthy
+patient and 5,000 B-cell lineage cells from a B-cell precursor Acute
+Lymphoblastic Leukemia (BCP-ALL) patient.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_preprocess.html">tof_preprocess()</a></code> 
+          <code><a href="ddpr_metadata.html">ddpr_metadata</a></code> 
         </dt>
-        <dd>Preprocess raw CyTOF data.</dd>
+        <dd>Clinical metadata for each patient sample in Good &amp; Sarno et al. (2018).</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_read_csv.html">tof_read_csv()</a></code> 
+          <code><a href="phenograph_data.html">phenograph_data</a></code> 
         </dt>
-        <dd>Read CyTOF data from a .csv file into a tidy tibble.</dd>
+        <dd>CyTOF data from 6,000 healthy immune cells from a single patient.</dd>
       </dl><dl><dt>
           
-          <code><a href="tof_read_data.html">tof_read_data()</a></code> 
+          <code><a href="metal_masterlist.html">metal_masterlist</a></code> 
         </dt>
-        <dd>Read data from an .fcs/.csv file or a directory of .fcs/.csv files.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_read_fcs.html">tof_read_fcs()</a></code> 
-        </dt>
-        <dd>Read CyTOF data from an .fcs file into a tidy tibble.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_read_file.html">tof_read_file()</a></code> 
-        </dt>
-        <dd>Read CyTOF data from a single .fcs or .csv file into a tidy tibble.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_reduce_dimensions.html">tof_reduce_dimensions()</a></code> 
-        </dt>
-        <dd>Apply dimensionality reduction to a CyTOF dataset.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_reduce_pca.html">tof_reduce_pca()</a></code> 
-        </dt>
-        <dd>Perform principal component analysis on CyTOF data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_reduce_tsne.html">tof_reduce_tsne()</a></code> 
-        </dt>
-        <dd>Perform t-distributed stochastic neighborhood embedding on CyTOF data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_reduce_umap.html">tof_reduce_umap()</a></code> 
-        </dt>
-        <dd>Perform uniform manifold approzimation and projection on CyTOF data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_set_panel.html">tof_set_panel()</a></code> 
-        </dt>
-        <dd>Set panel information from a tof_tibble</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_split_data.html">tof_split_data()</a></code> 
-        </dt>
-        <dd>Split CyTOF data into a training and test set</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_tune_glmnet.html">tof_tune_glmnet()</a></code> 
-        </dt>
-        <dd>Title</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_write_csv.html">tof_write_csv()</a></code> 
-        </dt>
-        <dd>Write a series of .csv files from a tof_tbl</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_write_data.html">tof_write_data()</a></code> 
-        </dt>
-        <dd>Write cytof data to a file or to a directory of files</dd>
-      </dl><dl><dt>
-          
-          <code><a href="tof_write_fcs.html">tof_write_fcs()</a></code> 
-        </dt>
-        <dd>Write a series of .fcs files from a tof_tbl</dd>
+        <dd>A character vector of metal name patterns supported by tidytof.</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
