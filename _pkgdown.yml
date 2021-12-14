@@ -15,6 +15,7 @@ reference:
   - as_tof_tbl
   - tof_get_panel
   - tof_set_panel
+  - tof_find_panel_info
 - title: "Single-cell data analysis"
   desc: "Functions for data processing tasks at the single-cell level"
   contents:
@@ -23,6 +24,9 @@ reference:
   - starts_with("tof_downsample")
   - starts_with("tof_reduce")
   - starts_with("tof_cluster")
+  - tof_apply_classifier
+  - tof_build_classifier
+  - tof_classify_cells
 - title: "Cluster-level data analysis"
   desc: "Functions for data processing tasks at the cluster or cell subpopulation level"
   contents:
@@ -36,9 +40,12 @@ reference:
   - tof_train_model
   - tof_predict
   - tof_assess_model
+  - tof_clean_metric_names
   - tof_create_grid
   - new_tof_model
   - starts_with("tof_get_model")
+  - tof_fit_split
+  - tof_tune_glmnet
 - title: "Visualization"
   desc: "Functions for visualizing CyTOF data"
   contents:
@@ -48,6 +55,9 @@ reference:
   contents:
   - get_extension
   - rev_asinh
+  - dot
+  - magnitude
+  - tof_cosine_dist
   - tof_is_numeric
   - tof_find_knn
   - tof_knn_density

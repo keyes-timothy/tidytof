@@ -231,8 +231,6 @@ make_binary_vector <- function(length, indices) {
 #' @return The dot product between x and y.
 #'
 #'
-#' @examples
-#' NULL
 #'
 dot <- function(x, y) {
   return(as.numeric(t(x) %*% y))
