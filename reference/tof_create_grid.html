@@ -5,7 +5,7 @@ hyperparameters of a generalized linear model using the glmnet package:
 the regularization penalty term
 and the lasso/ridge regression mixture term. Either a regular or maximum-entropy
 search grid (of a specified size) or a grid with a user-specified range of
-hyperparameter values can be created."><title>Create a glmnet hyperparameter search grid of a specified size — tof_create_grid • tidytof</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Create a glmnet hyperparameter search grid of a specified size — tof_create_grid"><meta property="og:description" content="This function creates a hyperparameter search grid (in the form of a
+hyperparameter values can be created."><title>Create an elastic net hyperparameter search grid of a specified size — tof_create_grid • tidytof</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Create an elastic net hyperparameter search grid of a specified size — tof_create_grid"><meta property="og:description" content="This function creates a hyperparameter search grid (in the form of a
 tibble) specifying the search space for the two
 hyperparameters of a generalized linear model using the glmnet package:
 the regularization penalty term
@@ -43,7 +43,7 @@ hyperparameter values can be created."><!-- mathjax --><script src="https://cdnj
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Create a glmnet hyperparameter search grid of a specified size</h1>
+      <img src="" class="logo" alt=""><h1>Create an elastic net hyperparameter search grid of a specified size</h1>
       
       <div class="d-none name"><code>tof_create_grid.Rd</code></div>
     </div>
@@ -73,24 +73,33 @@ hyperparameter values can be created.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>penalty_values</dt>
-<dd><p>A numeric vector of all penalty values to include in the
-hyperparamter grid. If unspecified, tidytof's default values will be used:
-10^(-10), 10^(-7.5), 10^(-5), 10^(-2.5), 10^(0).</p></dd>
+<dd><p>A numeric vector of the unique elastic net penalty values ("lambda")
+to include in the
+hyperparameter grid. If unspecified, a regular grid with `num_penalty_values` between
+10^(-10) and 10^(0) will be used.</p></dd>
 <dt>mixture_values</dt>
-<dd><p>A numeric vector of all penalty values to include in the
-hyperparamter grid. If unspecified, tidytof's default values will be used:
-`seq(0, 1, length.out = 10)`.</p></dd>
+<dd><p>A numeric vector of all elastic net mixture values ("alpha") to include in the
+hyperparameter grid. If unspecified, a regular grid with `num_mixture_values` between
+0 and 1 will be used.</p></dd>
 <dt>num_penalty_values</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>Optional. If `penalty_values` is not supplied, `num_penalty_values`
+(an integer) can be given to specify how many equally-spaced penalty values between
+10^(-10) and 1 should be included in the hyperparameter grid. If this method is used,
+the regular grid will always be returned. Defaults to 5.</p></dd>
 <dt>num_mixture_values</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>Optional. If `mixture_values` is not supplied, `num_mixture_values`
+(an integer) can be given to specify how many equally-spaced penalty values between
+0 (ridge regression) and 1 (lasso) should be included in the hyperparameter grid. If this method is used,
+the regular grid will always be returned. Defaults to 5.</p></dd>
 <dt>grid_type</dt>
 <dd><p>A string indicating if a regular grid ("regular"; the default) or maximum-entropy
 ("entropy") search grid should be returned. Ignored if both `penalty_values` and
 `mixture_values` are provided. If "entropy" is chosen, the dials package
-is required.</p></dd>
+is required (and a message will prompt you to install it).</p></dd>
 <dt>entropy_grid_size</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>An integer indicating how many combinations of
+penalty and mixture should be generated by the max entropy hyperparameter grid. Ignored
+if `grid_type` is not set to "entropy".</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
