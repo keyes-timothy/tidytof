@@ -11,8 +11,7 @@ new_tof_model(
   mixture,
   model_type = c("linear", "two-class", "multiclass", "survival"),
   outcome_colnames,
-  train_x = NULL,
-  train_y = NULL
+  training_data
 )
 }
 \arguments{
@@ -29,9 +28,7 @@ glmnet path.}
 
 \item{outcome_colnames}{TO DO}
 
-\item{train_x}{TO DO}
-
-\item{train_y}{TO DO}
+\item{training_data}{TO DO}
 }
 \value{
 A `tof_model`, an S3 class that includes a trained glmnet model and

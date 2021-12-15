@@ -524,10 +524,10 @@ tof_predict <-
         object = model,
         newx = preprocessed_data$x,
         s = lambda,
-        type = prediction_type,
-        exact = TRUE,
-        x = tof_get_model_x(tof_model),
-        y = tof_get_model_y(tof_model)
+        type = prediction_type#,
+        # exact = TRUE,
+        # x = tof_get_model_x(tof_model),
+        # y = tof_get_model_y(tof_model)
       ) %>%
       as.vector()
 
@@ -612,8 +612,6 @@ tof_assess_model <-
       )
 
     if (model_type == "two-class") {
-      auc <- model_metrics$roc_auc
-
       roc_curve <-
         glmnet::roc.glmnet(
           object = model,
@@ -677,10 +675,8 @@ tof_assess_model <-
         dplyr::select(-.timepoint_index) %>%
         tidyr::nest(survival_curve = -row_index)
 
-      return(survival_curves)
-
     } else {
-      survival_curve <- NULL
+      survival_curves <- NULL
     }
 
     # return result ------------------------------------------------------------
@@ -690,7 +686,7 @@ tof_assess_model <-
         model_metrics = model_metrics,
         roc_curve = roc_curve,
         confusion_matrix = confusion_matrix,
-        survival_curve = survival_curve
+        survival_curves = survival_curves
       )
 
     result <- purrr::discard(result, is.null)

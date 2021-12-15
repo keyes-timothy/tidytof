@@ -2,20 +2,21 @@
 % Please edit documentation in R/patient-level_modeling.R
 \name{tof_assess_model}
 \alias{tof_assess_model}
-\title{TO DO}
+\title{Assess a trained elastic net model when applied to new data}
 \usage{
-tof_assess_model(tof_model, new_data = NULL, ...)
+tof_assess_model(tof_model, new_data)
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A `tof_model` trained using \code{\link{tof_train_model}}}
 
-\item{new_data}{TO DO}
-
-\item{...}{TO DO}
+\item{new_data}{A tibble of new observations that should be used to evaluate `tof_model`.
+If new_data isn't provided, model evaluation will will be performed using the
+training data used to fit the model.}
 }
 \value{
-TO DO
+A list of performance metrics that depends on the model type.
 }
 \description{
-TO DO
+This function assesses a trained `tof_model`'s performance on new data by
+computing model type-specific performance measurements.
 }

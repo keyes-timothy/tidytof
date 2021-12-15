@@ -132,7 +132,7 @@ tof_prep_recipe <-
     } else if (inherits(split_data, "tbl_df")) {
       result <-
         unprepped_recipe %>%
-        recipes::prep(training = split_data, retrain = FALSE)
+        recipes::prep(training = split_data, retain = FALSE)
 
     } else {
       stop("split_data must be a tibble or an rset or rsplit object")
@@ -927,7 +927,9 @@ print.tof_model <- function(x, ...) {
 
     colnames(coefficients) <- c("feature", "coefficient")
 
-    coefficients <- dplyr::filter(coefficients, coefficient != 0)
+    coefficients <-
+      dplyr::filter(coefficients, coefficient != 0) %>%
+      dplyr::arrange(-abs(coefficient))
 
   } else {
     coefficients <-
@@ -941,7 +943,9 @@ print.tof_model <- function(x, ...) {
 
           colnames(result) <- c("feature", "coefficient")
 
-          result <- dplyr::filter(result, coefficient != 0)
+          result <-
+            dplyr::filter(result, coefficient != 0) %>%
+            dplyr::arrange(-abs(coefficient))
 
           return(result)
         }
