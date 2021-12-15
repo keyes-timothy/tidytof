@@ -64,6 +64,13 @@
 <li>
 <a href="#tidytof-an-ecosystem-for-tidy-and-highly-reproducible-cytof-data-analysis">tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis</a>
 <ul>
+<li>
+<a href="#getting-started">Getting started</a>
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#package-structure">Package structure</a></li>
+</ul>
+</li>
 <li><a href="#installation">Installation</a></li>
 <li>
 <a href="#usage">Usage</a>
@@ -111,7 +118,32 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>The goal of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is to provide an integrated suite of R functions for CyTOF data analysis with an intuitive and internally consistent set of design principles. As an extension of the <code>tidyverse</code> ecosystem of data manipulation tools in R, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is both performant and easy-to-use for scientists with a wide range of coding experience (including beginners).</p>
+<p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is an R package that implements an open-source, integrated “grammar” of single-cell data analysis for <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/" class="external-link">mass cytometry (CyTOF)</a> data. Specifically, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> provides an easy-to-use pipeline for handling CyTOF data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common <a href="https://r4ds.had.co.nz/tidy-data.html" class="external-link">“tidy data”</a> interface.</p>
+<p>As an extension of the <code>tidyverse</code> ecosystem of data manipulation tools in R, all of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s functions have been developed with an internally consistent, human-centered set of design principles. This means that using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> should be equally intuitive among scientists with a wide range of coding experience (including beginners).</p>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<div class="section level3">
+<h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
+</h3>
+<p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> makes heavy use of two concepts that R beginners may be unfamiliar with. The first is the <a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a> pipe (<code>%&gt;%</code>), which you can read about <a href="https://r4ds.had.co.nz/pipes.html" class="external-link">here</a>. The second is “grouping” data in a <code>data.frame</code> or <code>tibble</code> using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by</a></code>, which you can read about <a href="https://dplyr.tidyverse.org/articles/grouping.html" class="external-link">here</a>.</p>
+<p>Everything else should be self-explanatory for beginner and advanced R users, though if you have <em>zero</em> background in running R code, you should read <a href="https://r4ds.had.co.nz/workflow-basics.html" class="external-link">this chapter</a> of <a href="https://r4ds.had.co.nz/index.html" class="external-link">R for Data Science</a> by Hadley Wickham.</p>
+</div>
+<div class="section level3">
+<h3 id="package-structure">Package structure<a class="anchor" aria-label="anchor" href="#package-structure"></a>
+</h3>
+<p>Broadly speaking, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s functionality is organized to support 3 levels of analysis inherent in single-cell data:</p>
+<ol style="list-style-type: decimal">
+<li>Reading, writing, preprocessing, and visualizing data at the level of <strong>single cells</strong>
+</li>
+<li>Identifying and describing cell <strong>subpopulations</strong> or <strong>clusters</strong>
+</li>
+<li>Building models (for inference or prediction) at the level of <strong>patients</strong> or <strong>samples</strong>
+</li>
+</ol>
+<p>How to use <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> at each of these levels of CyTOF data analysis is detailed in the “Usage” section below.</p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -122,23 +154,17 @@
 <p>Once <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is installed, you can attach it to your current R session using the following code:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span></code></pre></div>
-<p>In addition, we can load the other packages we need for this vignette:</p>
+<p>In addition, we can install and load the other packages we need for this vignette:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">FlowSOM</a></span><span class="op">)</span><span class="op">)</span> <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"FlowSOM"</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">FlowSOM</a></span><span class="op">)</span>
+
+<span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tidyverse"</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>Broadly speaking, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s functionality is organized to support 3 levels of analysis inherent in single-cell data:</p>
-<ol style="list-style-type: decimal">
-<li>Reading, writing, preprocessing, and visualizing data at the level of <strong>single cells</strong>
-</li>
-<li>Identifying and describing cell <strong>subpopulations</strong> or <strong>clusters</strong>
-</li>
-<li>Building models (for inference or prediction) at the level of <strong>patients</strong> or <strong>samples</strong>
-</li>
-</ol>
-<p>How to use <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> for each of these levels of CyTOF data analysis is detailed below.</p>
 <div class="section level3">
 <h3 id="analyzing-data-at-the-single-cell-level">Analyzing data at the single-cell level<a class="anchor" aria-label="anchor" href="#analyzing-data-at-the-single-cell-level"></a>
 </h3>
@@ -161,10 +187,10 @@
 <p>Here, we can use <code>tof_read_data</code> to read in all of the .fcs files in the “phenograph” example dataset bundled into <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> and store it in the <code>phenograph</code> variable.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">phenograph</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"</span></code></pre></div>
 <p>Regardless of its input format, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> reads data into an extended <code>tibble</code> called a <code>tof_tbl</code> (pronounced “tof tibble”), an S3 class identical to <code>tbl_df</code>, but with one additional attribute (“panel”). <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> stores this additional attribute in <code>tof_tbl</code>s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments to find common markers or to compare which metals are associated with particular markers across panels.</p>
@@ -178,16 +204,16 @@
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph</span> <span class="op">&lt;-</span> 
-  <span class="va">phenograph</span> <span class="op">%&gt;%</span> 
+  <span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># mutate the input tof_tbl</span>
   <span class="fu">mutate</span><span class="op">(</span>
     PhenoGraph <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">PhenoGraph</span><span class="op">)</span>, 
     Condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">Condition</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">phenograph</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># use dplyr's select method to show that the columns have been changed</span>
-  <span class="fu">select</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   file_name              PhenoGraph Condition</span>
@@ -200,13 +226,13 @@
 <span class="co">#&gt; 6 H1_PhenoGraph_cluster1 12         12</span></code></pre></div>
 <p>The <code>tof_tbl</code> class is preserved even after these transformations.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"</span></code></pre></div>
 <p>Finally, to retrieve panel information from a <code>tof_tbl</code>, use <code>tof_get_panel</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   metals      antigens   </span>
@@ -228,8 +254,8 @@
 <p>As an example, we can preprocess our <code>phenograph</code> <code>tof_tibble</code> above and see how our first few measurements change before and after.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># before preprocessing</span>
-<span class="va">phenograph</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="va">`CD45|Sm154`</span>, <span class="va">`CD34|Nd148`</span>, <span class="va">`CD38|Er167`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">`CD45|Sm154`</span>, <span class="va">`CD34|Nd148`</span>, <span class="va">`CD38|Er167`</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`</span>
@@ -243,12 +269,12 @@
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># perform preprocessing</span>
 <span class="va">phenograph</span> <span class="op">&lt;-</span> 
-  <span class="va">phenograph</span> <span class="op">%&gt;%</span> 
+  <span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># inspect new values</span>
-<span class="va">phenograph</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="va">`CD45|Sm154`</span>, <span class="va">`CD34|Nd148`</span>, <span class="va">`CD38|Er167`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">`CD45|Sm154`</span>, <span class="va">`CD34|Nd148`</span>, <span class="va">`CD38|Er167`</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`</span>
@@ -269,7 +295,7 @@
 <p>Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. To do this, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements the <code>tof_downsample</code> verb, which allows downsampling using 3 methods.</p>
 <p>Using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in dataset <code>phenograph_data</code> (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 2000 cells per cluster, or 6000 cells in total:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 3 × 2</span>
 <span class="co">#&gt;   phenograph_cluster     n</span>
@@ -279,13 +305,13 @@
 <span class="co">#&gt; 3 cluster3            2000</span></code></pre></div>
 <p>To randomly sample 200 cells per cluster, we can use <code>tof_downsample</code> using the “constant” <code>method</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># downsample </span>
   <span class="fu"><a href="reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
     method <span class="op">=</span> <span class="st">"constant"</span>, 
     group_cols <span class="op">=</span> <span class="va">phenograph_cluster</span>, 
     num_cells <span class="op">=</span> <span class="fl">200</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># count the number of downsampled cells in each cluster</span>
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 3 × 2</span>
@@ -296,13 +322,13 @@
 <span class="co">#&gt; 3 cluster3             200</span></code></pre></div>
 <p>Alternatively, if we wanted to sample 50% of the cells in each cluster, we could use the “prop” <code>method</code>:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># downsample</span>
   <span class="fu"><a href="reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
     method <span class="op">=</span> <span class="st">"prop"</span>,
     group_cols <span class="op">=</span> <span class="va">phenograph_cluster</span>, 
     prop_cells <span class="op">=</span> <span class="fl">0.5</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># count the number of downsampled cells in each cluster</span>
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 3 × 2</span>
@@ -313,9 +339,9 @@
 <span class="co">#&gt; 3 cluster3            1000</span></code></pre></div>
 <p>And finally, you might also be interested in taking a slightly different approach to downsampling that downsamples the number of cells not to a fixed constant or proportion, but to a fixed <em>density</em> in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density in <code>phenograph_data</code> that contain more cells than others along the <code>cd34</code>/<code>cd38</code> axes:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># preprocess all numeric columns in the dataset</span>
-  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>undo_noise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>undo_noise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># make a scatterplot</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">cd34</span>, y <span class="op">=</span> <span class="va">cd38</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
@@ -324,9 +350,9 @@
 <p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
 <p>To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the “density” <code>method</code> of <code>tof_downsample</code>:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>undo_noise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"density"</span>, density_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>undo_noise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"density"</span>, density_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">cd34</span>, y <span class="op">=</span> <span class="va">cd38</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_x_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -349,7 +375,7 @@
 <span class="co"># to wherever you'd like to save your output files</span>
 <span class="va">my_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~"</span>, <span class="st">"Desktop"</span>, <span class="st">"tidytof_vignette_files"</span><span class="op">)</span>
 
-<span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span>
     group_cols <span class="op">=</span> <span class="va">phenograph_cluster</span>, 
     out_path <span class="op">=</span> <span class="va">my_path</span>,
@@ -361,12 +387,12 @@
 <li>cluster2.fcs</li>
 <li>cluster3.fcs</li>
 </ul>
-<p>However, suppose we wanted to write multiple files for each cluster by breaking cells into two groups: those that express high levels of <code>pstat5</code>. We can use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate</a></code> to create a new column in <code>phenograph_data</code> that breaks cells into high- and low-<code>pstat5</code> expression groups, then add this column to our <code>group_cols</code> specification:</p>
+<p>However, suppose we wanted to write multiple files for each cluster by breaking cells into two groups: those that express high levels of <code>pstat5</code> and those that express low levels of <code>pstat5</code>. We can use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate</a></code> to create a new column in <code>phenograph_data</code> that breaks cells into high- and low-<code>pstat5</code> expression groups, then add this column to our <code>group_cols</code> specification:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># create a variable representing if a cell is above or below the median </span>
   <span class="co"># expression level of pstat5</span>
-  <span class="fu">mutate</span><span class="op">(</span>expression_group <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">mutate</span><span class="op">(</span>expression_group <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span>
     group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">expression_group</span><span class="op">)</span>, 
     out_path <span class="op">=</span> <span class="va">my_path</span>, 
@@ -396,22 +422,22 @@
 <p>To demonstrate, we can apply the FlowSOM clustering algorithm to our <code>phenograph_data</code> from above. Note that <code>phenograph_data</code> contains 6000 total cells (2000 each from 3 clusters identified in the <a href="https://pubmed.ncbi.nlm.nih.gov/26095251/" class="external-link">original PhenoGraph publication</a>).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op">&lt;-</span> 
-  <span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"flowsom"</span>, cluster_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">phenograph_clusters</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.flowsom_metacluster</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_clusters</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.flowsom_metacluster</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 27</span>
 <span class="co">#&gt;   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
 <span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569</span>
-<span class="co">#&gt; 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 </span>
-<span class="co">#&gt; 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    </span>
-<span class="co">#&gt; 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 </span>
-<span class="co">#&gt; 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733</span>
-<span class="co">#&gt; 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733</span>
+<span class="co">#&gt; 1 H1_PhenoGrap… 3                 cluster1         0.199  2.19 0      4.56 0.569</span>
+<span class="co">#&gt; 2 H1_PhenoGrap… 3                 cluster1         0      2.92 0      5.33 1.61 </span>
+<span class="co">#&gt; 3 H1_PhenoGrap… 3                 cluster1         0      1.99 0.390  4.62 0    </span>
+<span class="co">#&gt; 4 H1_PhenoGrap… 3                 cluster1         0.881  1.53 0.199  4.61 1.02 </span>
+<span class="co">#&gt; 5 H1_PhenoGrap… 3                 cluster1         0.881  2.05 0.199  4.80 0.733</span>
+<span class="co">#&gt; 6 H1_PhenoGrap… 3                 cluster1         0      1.25 0.733  5.01 0.733</span>
 <span class="co">#&gt; # … with 19 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd15 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;,</span>
@@ -419,34 +445,34 @@
 <p>The output of <code>tof_cluster</code> is a <code>tof_tbl</code> identical to the input tibble, now with the addition of an additional column (“.flowsom_metacluster”) that encodes the cluster id for each cell in the input <code>tof_tbl</code>. Note that all output columns added to a tibble or <code>tof_tbl</code> by <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> begin with a full-stop (“.”) to reduce the likelihood of collisions with existing column names.</p>
 <p>Because the output of <code>tof_cluster</code> is a <code>tof_tbl</code>, we can use <code>dplyr</code>’s <code>count</code> method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">.flowsom_metacluster</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;                &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster2           3                     1993</span>
+<span class="co">#&gt; 1 cluster2           1                     1996</span>
 <span class="co">#&gt; 2 cluster3           2                     1993</span>
-<span class="co">#&gt; 3 cluster1           1                     1981</span>
+<span class="co">#&gt; 3 cluster1           3                     1981</span>
 <span class="co">#&gt; 4 cluster1           2                       19</span>
-<span class="co">#&gt; 5 cluster2           2                        7</span>
-<span class="co">#&gt; 6 cluster3           1                        7</span></code></pre></div>
+<span class="co">#&gt; 5 cluster3           3                        7</span>
+<span class="co">#&gt; 6 cluster2           2                        4</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag; to change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a <code>tibble</code> that only includes the cluster labels (not the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>add_col</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># will result in a tibble with only 1 column (the cluster labels)</span>
-<span class="va">phenograph_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"flowsom"</span>, cluster_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, add_col <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"flowsom"</span>, cluster_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, add_col <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 1</span>
 <span class="co">#&gt;   .flowsom_metacluster</span>
 <span class="co">#&gt;   &lt;chr&gt;               </span>
-<span class="co">#&gt; 1 2                   </span>
-<span class="co">#&gt; 2 2                   </span>
-<span class="co">#&gt; 3 2                   </span>
-<span class="co">#&gt; 4 2                   </span>
-<span class="co">#&gt; 5 2                   </span>
-<span class="co">#&gt; 6 2</span></code></pre></div>
+<span class="co">#&gt; 1 3                   </span>
+<span class="co">#&gt; 2 3                   </span>
+<span class="co">#&gt; 3 3                   </span>
+<span class="co">#&gt; 4 3                   </span>
+<span class="co">#&gt; 5 3                   </span>
+<span class="co">#&gt; 6 3</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="dimensionality-reduction-with-tof_reduce">Dimensionality reduction with <code>tof_reduce</code>
@@ -457,27 +483,27 @@
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># perform the dimensionality reduction</span>
 <span class="va">phenograph_tsne</span> <span class="op">&lt;-</span> 
-  <span class="va">phenograph_clusters</span> <span class="op">%&gt;%</span> 
+  <span class="va">phenograph_clusters</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span>
 
 <span class="co"># select only the tsne embedding columns using a tidyselect helper (contains)</span>
-<span class="va">phenograph_tsne</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_tsne</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   .tsne_1 .tsne_2</span>
 <span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  -14.9     6.17</span>
-<span class="co">#&gt; 2  -13.0    13.4 </span>
-<span class="co">#&gt; 3  -21.4    -5.21</span>
-<span class="co">#&gt; 4   -9.81    5.05</span>
-<span class="co">#&gt; 5  -16.4     2.55</span>
-<span class="co">#&gt; 6  -16.1     3.25</span></code></pre></div>
+<span class="co">#&gt; 1  -14.7    -2.70</span>
+<span class="co">#&gt; 2   -9.46   -1.67</span>
+<span class="co">#&gt; 3  -20.4   -15.4 </span>
+<span class="co">#&gt; 4   -8.67   -4.77</span>
+<span class="co">#&gt; 5  -15.2    -7.24</span>
+<span class="co">#&gt; 6  -15.0    -6.31</span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add reduced-dimension feature embeddings to the input <code>tof_tbl</code> and return the augmented <code>tof_tbl</code> (that is, a <code>tof_tbl</code> with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set <code>add_cols</code> to <code>FALSE</code> (as in <code>tof_cluster</code>).</p>
 <p>Regardless of the method used, reduced-dimension feature embeddings can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics package):</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the tsne embeddings using color to distinguish between clusters</span>
-<span class="va">phenograph_tsne</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_tsne</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.tsne_1</span>, y <span class="op">=</span> <span class="va">.tsne_2</span>, fill <span class="op">=</span> <span class="va">phenograph_cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -485,7 +511,7 @@
 <p><img src="reference/figures/README-unnamed-chunk-24-1.png" width="100%"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the tsne embeddings using color to represent CD11b expression</span>
-<span class="va">phenograph_tsne</span> <span class="op">%&gt;%</span> 
+<span class="va">phenograph_tsne</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.tsne_1</span>, y <span class="op">=</span> <span class="va">.tsne_2</span>, fill <span class="op">=</span> <span class="va">cd11b</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_fill_viridis_c</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -511,7 +537,7 @@
 <code class="sourceCode R"><span class="va">citrus_raw</span> <span class="op">&lt;-</span> <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">Bodenmiller_BCR_XL_flowSet</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_raw</span> <span class="op">%&gt;%</span> 
+  <span class="va">citrus_raw</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span>sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></code></pre></div>
 <p>Thus, we can see that <code>citrus_data</code> is a <code>tof_tbl</code> with 172791 cells (one in each row) and 39 pieces of information about each cell (one in each column).</p>
 <p>We can also extract some metadata from the raw data and join it with our single-cell data using some functions from the <code>tidyverse</code>:</p>
@@ -522,12 +548,12 @@
     sample_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span>,
     patient <span class="op">=</span> <span class="fu">str_extract</span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"patient[:digit:]"</span><span class="op">)</span>, 
     stimulation <span class="op">=</span> <span class="fu">str_extract</span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"(BCR-XL)|Reference"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">mutate</span><span class="op">(</span>
     stimulation <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">stimulation</span> <span class="op">==</span> <span class="st">"Reference"</span>, <span class="st">"Basal"</span>, <span class="va">stimulation</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">citrus_metadata</span> <span class="op">%&gt;%</span>
+<span class="va">citrus_metadata</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 4</span>
 <span class="co">#&gt;   file_name                          sample_id patient  stimulation</span>
@@ -542,13 +568,13 @@
 <p>Finally, we can join this metadata with our single-cell <code>tof_tbl</code> to obtain the cleaned dataset.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+  <span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">left_join</span><span class="op">(</span><span class="va">citrus_metadata</span>, by <span class="op">=</span> <span class="st">"sample_id"</span><span class="op">)</span></code></pre></div>
 <p>After these data cleaning steps, we now have <code>citrus_data</code>, a <code>tof_tbl</code> containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells’ B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In <code>citrus_data</code>, each cell’s patient of origin is stored in the <code>patient</code> column, and each cell’s stimulation condition is stored in the <code>stimulation</code> column. In addition, the <code>population_id</code> column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run <code><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">?HDCytoData::Bodenmiller_BCR_XL</a></code> in the R console).</p>
 <p>We might wonder if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question that requires differential abundance analysis (DAA). <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s <code>tof_daa</code> verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">daa_result</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+  <span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_daa.html">tof_daa</a></span><span class="op">(</span>
     daa_method <span class="op">=</span> <span class="st">"ttest"</span>, 
     cluster_col <span class="op">=</span> <span class="va">population_id</span>, 
@@ -572,20 +598,20 @@
 <p>Based on this output, we can see that 6 of our 8 clusters have statistically different abundance in our two stimulation conditions. Using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> easy integration with <a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a> packages, we can use this result to visualize the fold-changes of each cluster (within each patient) in the BCR-XL condition compared to the Basal condition using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">mutate</span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu">left_join</span><span class="op">(</span>
     <span class="fu">select</span><span class="op">(</span><span class="va">daa_result</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span><span class="op">)</span>, 
     by <span class="op">=</span> <span class="st">"population_id"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span>, name <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">group_by</span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span>, name <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">group_by</span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">pivot_wider</span><span class="op">(</span>
     names_from <span class="op">=</span> <span class="va">stimulation</span>, 
     values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prop</span>, <span class="va">n</span><span class="op">)</span>, 
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">mutate</span><span class="op">(</span>
     diff <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">-</span> <span class="va">prop_Basal</span>, 
     fc <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">/</span> <span class="va">prop_Basal</span>,
@@ -599,12 +625,12 @@
   <span class="op">)</span> 
 
 <span class="va">significance_data</span> <span class="op">&lt;-</span> 
-  <span class="va">plot_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu">group_by</span><span class="op">(</span><span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">direction</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">summarize</span><span class="op">(</span>diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span>, fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="va">plot_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">group_by</span><span class="op">(</span><span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">direction</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">summarize</span><span class="op">(</span>diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span>, fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">plot_data</span> <span class="op">%&gt;%</span> 
+<span class="va">plot_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">population_id</span>, y <span class="op">=</span> <span class="va">fc</span>, fill <span class="op">=</span> <span class="va">direction</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_violin</span><span class="op">(</span>trim <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"red"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
@@ -643,8 +669,8 @@
   <span class="op">)</span>
 
 <span class="va">dea_result</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>channel_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>channel_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_dea.html">tof_dea</a></span><span class="op">(</span>
     dea_method <span class="op">=</span> <span class="st">"ttest"</span>, 
     cluster_col <span class="op">=</span> <span class="va">population_id</span>, 
@@ -654,7 +680,7 @@
     test_type <span class="op">=</span> <span class="st">"paired"</span>
   <span class="op">)</span>
 
-<span class="va">dea_result</span> <span class="op">%&gt;%</span> 
+<span class="va">dea_result</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 9</span>
 <span class="co">#&gt;   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc</span>
@@ -669,7 +695,7 @@
 <p>This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">volcano_data</span> <span class="op">&lt;-</span> 
-  <span class="va">dea_result</span> <span class="op">%&gt;%</span> 
+  <span class="va">dea_result</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">mutate</span><span class="op">(</span>
     log2_fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean_fc</span>, base <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, 
     log_p <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">p_adj</span><span class="op">)</span>, 
@@ -680,12 +706,12 @@
         <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span>
       <span class="op">)</span>, 
     marker <span class="op">=</span> 
-      <span class="fu">str_extract</span><span class="op">(</span><span class="va">marker</span>, <span class="st">".+_"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+      <span class="fu">str_extract</span><span class="op">(</span><span class="va">marker</span>, <span class="st">".+_"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
       <span class="fu">str_remove</span><span class="op">(</span><span class="st">"_"</span><span class="op">)</span>, 
     pair <span class="op">=</span> <span class="fu">str_c</span><span class="op">(</span><span class="va">marker</span>, <span class="fu">str_c</span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">population_id</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"@"</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">volcano_data</span> <span class="op">%&gt;%</span> 
+<span class="va">volcano_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">log2_fc</span>, y <span class="op">=</span> <span class="va">log_p</span>, fill <span class="op">=</span> <span class="va">significance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"gray50"</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
@@ -711,6 +737,7 @@
 <div class="section level3">
 <h3 id="analyzing-data-at-the-patient--and-sample-level">Analyzing data at the patient- and sample-level<a class="anchor" aria-label="anchor" href="#analyzing-data-at-the-patient--and-sample-level"></a>
 </h3>
+<p>[some kind of preamble]</p>
 <div class="section level4">
 <h4 id="feature-extraction-with-tof_extract_features">Feature extraction with <code>tof_extract_features</code>
 <a class="anchor" aria-label="anchor" href="#feature-extraction-with-tof_extract_features"></a>
@@ -721,15 +748,15 @@
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># preprocess the numeric columns in the citrus dataset</span>
 <span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu">str_c</span><span class="op">(</span><span class="st">"cluster"</span>, <span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">mutate</span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu">str_c</span><span class="op">(</span><span class="st">"cluster"</span>, <span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 10</span>
 <span class="co">#&gt;   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`</span>
@@ -744,12 +771,12 @@
 <span class="co">#&gt; #   prop@cluster6 &lt;dbl&gt;, prop@cluster7 &lt;dbl&gt;, prop@cluster8 &lt;dbl&gt;</span></code></pre></div>
 <p>Like all members of the <code>tof_extract_*</code> function family, <code>tof_extract_proportion</code> returns one row for each sample (defined as a unique combination of values of the <code>group_cols</code>) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in <code>citrus_data</code>). These values can also be returned in “long” format by changing the <code>format</code> argument:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
     format <span class="op">=</span> <span class="st">"long"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 4</span>
 <span class="co">#&gt;   patient  stimulation cluster     prop</span>
@@ -762,13 +789,13 @@
 <span class="co">#&gt; 6 patient1 Basal       cluster6 0.0759</span></code></pre></div>
 <p>Another member of the same function family, <code>tof_extract_central_tendency</code>, computes the central tendency (e.g. mean or median) of user-specified markers in each cluster.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_central_tendency.html">tof_extract_central_tendency</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
     marker_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
     central_tendency_function <span class="op">=</span> <span class="va">mean</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 26</span>
 <span class="co">#&gt;   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…</span>
@@ -788,13 +815,13 @@
 <span class="co">#&gt; #   CD20_Sm147@cluster5_ct &lt;dbl&gt;, CD45_In115@cluster6_ct &lt;dbl&gt;, …</span></code></pre></div>
 <p><code>tof_extract_threshold</code> is similar to <code>tof_extract_central_tendency</code>, but calculates the proportion of cells above a user-specified expression value for each marker instead of a measure of central tendency:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_threshold.html">tof_extract_threshold</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
     marker_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
     threshold <span class="op">=</span> <span class="fl">5</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 26</span>
 <span class="co">#&gt;   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…</span>
@@ -815,14 +842,14 @@
 <p>The two final members of the <code>tof_extract_*</code> function family – <code>tof_extract_emd</code> and <code>tof_extract_jsd</code> are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a <code>stimulation_col</code> that identifies which stimulation condition each cell is in, and a <code>basal_level</code> that specifies the reference (i.e. unstimulated) condition within the <code>stimulation_col</code>. With these additional arguments, <code>tof_extract_emd</code> computes the Earth-mover’s distance between each marker’s distribution in the stimulation conditions (within each cluster) and the basal condition; similarly, <code>tof_extract_jsd</code> computes the Jensen-Shannon divergence index between the same distributions. Both of these values are ways to compare how different 2 distributions are to one another and are more computationally expensive (but also higher-resolution) than simply comparing measures of central tendency.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Earth-mover's distance</span>
-<span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_emd.html">tof_extract_emd</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>, 
     marker_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
     stimulation_col <span class="op">=</span> <span class="va">stimulation</span>, 
     basal_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 25</span>
 <span class="co">#&gt;   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…</span>
@@ -842,14 +869,14 @@
 <span class="co">#&gt; #   BCR-XL_CD45_In115@cluster8_emd &lt;dbl&gt;, …</span></code></pre></div>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Jensen-Shannon Divergence</span>
-<span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_jsd.html">tof_extract_jsd</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>,  
     marker_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
     stimulation_col <span class="op">=</span> <span class="va">stimulation</span>, 
     basal_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 25</span>
 <span class="co">#&gt;   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…</span>
@@ -869,7 +896,7 @@
 <span class="co">#&gt; #   BCR-XL_CD45_In115@cluster8_jsd &lt;dbl&gt;, …</span></code></pre></div>
 <p>Finally, the <code>tof_extract_features</code> verb provides a wrapper to each of the members of its function family, allowing users to extract multiple features types at once. For example, the following code extracts the proportion of each cluster, median of several markers in each cluster, and EMD between the basal condition and stimulated condition in each cluster for all patients in <code>citrus_data</code>.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_features.html">tof_extract_features</a></span><span class="op">(</span>
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>, 
@@ -878,7 +905,7 @@
     signaling_cols <span class="op">=</span> <span class="fu">any_of</span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>, 
     signaling_method <span class="op">=</span> <span class="st">"emd"</span>, 
     basal_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level4">
@@ -895,13 +922,13 @@
 
 <span class="co"># downloading the data and combining it with clinical annotations</span>
 <span class="va">ddpr_patients</span> <span class="op">&lt;-</span> 
-  <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="va">data_link</span>, skip <span class="op">=</span> <span class="fl">2L</span>, n_max <span class="op">=</span> <span class="fl">78L</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>patient_id <span class="op">=</span> <span class="va">Patient_ID</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">left_join</span><span class="op">(</span><span class="va">ddpr_metadata</span>, by <span class="op">=</span> <span class="st">"patient_id"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="va">data_link</span>, skip <span class="op">=</span> <span class="fl">2L</span>, n_max <span class="op">=</span> <span class="fl">78L</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>patient_id <span class="op">=</span> <span class="va">Patient_ID</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">left_join</span><span class="op">(</span><span class="va">ddpr_metadata</span>, by <span class="op">=</span> <span class="st">"patient_id"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">patient_id</span>, <span class="st">"Healthy"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">ddpr_patients</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 × 8</span>
 <span class="co">#&gt;   patient_id gender mrd_risk nci_rome_risk relapse_status type_of_relapse cohort</span>
@@ -914,112 +941,356 @@
 <span class="co">#&gt; 6 UPN5       Female Standard High          No             &lt;NA&gt;            Valid…</span>
 <span class="co">#&gt; # … with 1 more variable: ddpr_risk &lt;chr&gt;</span></code></pre></div>
 <p>The data processing steps above result in the <code>ddpr_patients</code> tibble. The numeric columns in <code>ddpr_patients</code> represent aggregated cell population features for each sample (see <a href="https://www.nature.com/articles/nm.4505#MOESM3" class="external-link">Supplementary Table 5 in this paper</a> for details). The non-numeric columns represent clinical metadata about each sample (run <code><a href="reference/ddpr_metadata.html">?ddpr_metadata</a></code> for more information).</p>
+<p>There are also a few preprocessing steps that we might want to perform now to save us some headaches when we’re fitting models later.</p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ddpr_patients</span> <span class="op">&lt;-</span> 
+  <span class="va">ddpr_patients</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="co"># convert the relapse_status variable to a factor first, </span>
+  <span class="co"># which is something we'll want for fitting the model later</span>
+  <span class="co"># and create the time_to_event and event columns for survival modeling</span>
+  <span class="fu">mutate</span><span class="op">(</span>
+    relapse_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span>, 
+    time_to_event <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="va">time_to_relapse</span>, <span class="va">ccr</span><span class="op">)</span>,
+    event <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>
+  <span class="op">)</span></code></pre></div>
+<div class="section level5">
+<h5 id="separating-the-training-and-validation-cohorts">Separating the training and validation cohorts<a class="anchor" aria-label="anchor" href="#separating-the-training-and-validation-cohorts"></a>
+</h5>
+<p>In the original DDPR paper, some patients were used to fit the model and the rest were used to assess the model after it was tuned. We can separate our training and validation cohorts using the <code>cohort</code> variable in <code>ddpr_patients</code></p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ddpr_training</span> <span class="op">&lt;-</span> 
+  <span class="va">ddpr_patients</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort</span> <span class="op">==</span> <span class="st">"Training"</span><span class="op">)</span> 
+
+<span class="va">ddpr_validation</span> <span class="op">&lt;-</span> 
+  <span class="va">ddpr_patients</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort</span> <span class="op">==</span> <span class="st">"Validation"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ddpr_training</span><span class="op">)</span>
+<span class="co">#&gt; [1] 49</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ddpr_validation</span><span class="op">)</span>
+<span class="co">#&gt; [1] 12</span></code></pre></div>
+</div>
 <div class="section level5">
 <h5 id="building-a-classifier-using-logistic-regression">Building a classifier using logistic regression<a class="anchor" aria-label="anchor" href="#building-a-classifier-using-logistic-regression"></a>
 </h5>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># k-fold</span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<p>First, we can build an elastic net classifier to predict which patients will relapse and which patients won’t (ignoring time-to-event data for now). For this, we can use the <code>relapse_status</code> variable in <code>ddpr_training</code>:</p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ddpr_training</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 × 2</span>
+<span class="co">#&gt;   relapse_status     n</span>
+<span class="co">#&gt;   &lt;fct&gt;          &lt;int&gt;</span>
+<span class="co">#&gt; 1 No                31</span>
+<span class="co">#&gt; 2 Yes               18</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># train classifier</span>
+<span class="va">training_split</span> <span class="op">&lt;-</span> 
+  <span class="va">ddpr_training</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span>
     split_method <span class="op">=</span> <span class="st">"k-fold"</span>, 
-    num_cv_folds <span class="op">=</span> <span class="fl">3</span>, 
+    num_cv_folds <span class="op">=</span> <span class="fl">5</span>, 
     strata <span class="op">=</span> <span class="va">relapse_status</span>
   <span class="op">)</span>
 
-<span class="co"># bootstrapping</span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span>
-    split_method <span class="op">=</span> <span class="st">"bootstrap"</span>, 
-    num_bootstraps <span class="op">=</span> <span class="fl">3</span>, 
-    strata <span class="op">=</span> <span class="va">relapse_status</span>
-  <span class="op">)</span>
-
-<span class="co"># simple with prop</span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span>
-    split_method <span class="op">=</span> <span class="st">"simple"</span>, 
-    simple_prop <span class="op">=</span> <span class="fl">0.75</span>, 
-    strata <span class="op">=</span> <span class="va">relapse_status</span>
-  <span class="op">)</span>
-
-<span class="co"># simple with specification</span>
-<span class="va">splits</span> <span class="op">&lt;-</span> 
-  <span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>splits <span class="op">=</span> <span class="op">(</span><span class="va">cohort</span> <span class="op">==</span> <span class="st">"Training"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">pull</span><span class="op">(</span><span class="va">splits</span><span class="op">)</span>
-
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span>
-    split_method <span class="op">=</span> <span class="va">splits</span>, 
-    num_cv_folds <span class="op">=</span> <span class="fl">3</span>, 
-    strata <span class="op">=</span> <span class="va">relapse_status</span>
-  <span class="op">)</span>
-
-<span class="co"># using split_col </span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span><span class="op">)</span>, <span class="va">patient_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">drop_na</span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>splits <span class="op">=</span> <span class="op">(</span><span class="va">cohort</span> <span class="op">==</span> <span class="st">"Training"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span>
-    split_method <span class="op">=</span> <span class="st">"simple"</span>, 
-    split_col <span class="op">=</span> <span class="va">splits</span>, 
-    simple_prop <span class="op">=</span> <span class="fl">0.75</span>, 
-    strata <span class="op">=</span> <span class="va">relapse_status</span>
-  <span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># hyperparameter grid </span>
-<span class="fu"><a href="reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 25 × 2</span>
-<span class="co">#&gt;         penalty mixture</span>
-<span class="co">#&gt;           &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 0.0000000001    0   </span>
-<span class="co">#&gt;  2 0.0000000001    0.25</span>
-<span class="co">#&gt;  3 0.0000000001    0.5 </span>
-<span class="co">#&gt;  4 0.0000000001    0.75</span>
-<span class="co">#&gt;  5 0.0000000001    1   </span>
-<span class="co">#&gt;  6 0.0000000316    0   </span>
-<span class="co">#&gt;  7 0.0000000316    0.25</span>
-<span class="co">#&gt;  8 0.0000000316    0.5 </span>
-<span class="co">#&gt;  9 0.0000000316    0.75</span>
-<span class="co">#&gt; 10 0.0000000316    1   </span>
-<span class="co">#&gt; # … with 15 more rows</span></code></pre></div>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># create recipe </span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/tof_create_recipe.html">tof_create_recipe</a></span><span class="op">(</span>predictor_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Recipe</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Inputs:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;       role #variables</span>
-<span class="co">#&gt;  predictor        115</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Operations:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Terms selected  ~dplyr::any_of(outcome_colnames), ~dplyr::any_of(predictor_colnames)</span>
-<span class="co">#&gt; Dummy variables from recipes::all_nominal_predictors()</span>
-<span class="co">#&gt; K-nearest neighbor imputation for recipes::all_numeric_predictors()</span>
-<span class="co">#&gt; Centering and scaling for recipes::all_numeric_predictors()</span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># train classifier</span>
-<span class="va">ddpr_patients</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>relapse_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>event <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">training_split</span>
+<span class="co">#&gt; #  5-fold cross-validation using stratification </span>
+<span class="co">#&gt; # A tibble: 5 × 2</span>
+<span class="co">#&gt;   splits          id   </span>
+<span class="co">#&gt;   &lt;list&gt;          &lt;chr&gt;</span>
+<span class="co">#&gt; 1 &lt;split [38/11]&gt; Fold1</span>
+<span class="co">#&gt; 2 &lt;split [39/10]&gt; Fold2</span>
+<span class="co">#&gt; 3 &lt;split [39/10]&gt; Fold3</span>
+<span class="co">#&gt; 4 &lt;split [40/9]&gt;  Fold4</span>
+<span class="co">#&gt; 5 &lt;split [40/9]&gt;  Fold5</span></code></pre></div>
+<p>And we can inspect each of our splits to see what they contain:</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># workspace to inspect the training_split object</span>
+<span class="va">training_split</span><span class="op">$</span><span class="va">splits</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
+<span class="co">#&gt; &lt;Analysis/Assess/Total&gt;</span>
+<span class="co">#&gt; &lt;38/11/49&gt;</span></code></pre></div>
+<p>From here, we can feed our <code>training_split</code> object into the <code>tof_train_model</code> function to tune a logistic regression classifier</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">class_mod</span> <span class="op">&lt;-</span> 
+  <span class="va">training_split</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span>
     predictor_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span>, 
-    <span class="co">#response_col = relapse_status,</span>
-    time_col <span class="op">=</span> <span class="va">age_at_diagnosis</span>,
-    event_col <span class="op">=</span> <span class="va">event</span>,
+    response_col <span class="op">=</span> <span class="va">relapse_status</span>,
     model_type <span class="op">=</span> <span class="st">"two-class"</span>, 
-    split_method <span class="op">=</span> <span class="st">"simple"</span>
-  <span class="op">)</span></code></pre></div>
+    hyperparameter_grid <span class="op">=</span> <span class="fu"><a href="reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span>mixture_values <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, 
+    impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>, 
+    remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span>
+  <span class="op">)</span>
+<span class="va">end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 </span>
+<span class="co">#&gt; # A tibble: 25 × 2</span>
+<span class="co">#&gt;    feature             coefficient</span>
+<span class="co">#&gt;    &lt;chr&gt;                     &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 p4EBP1_dP_IL7_Pop2        -2.59</span>
+<span class="co">#&gt;  2 CD58_Pop2                  2.23</span>
+<span class="co">#&gt;  3 (Intercept)               -1.83</span>
+<span class="co">#&gt;  4 pSTAT5_dP_TSLP_Pop2        1.69</span>
+<span class="co">#&gt;  5 p4EBP1_FC_IL7_Pop2         1.46</span>
+<span class="co">#&gt;  6 CD43_Pop2                  1.37</span>
+<span class="co">#&gt;  7 HLADR_Pop2                -1.32</span>
+<span class="co">#&gt;  8 pSyk_dP_TSLP_Pop2          1.08</span>
+<span class="co">#&gt;  9 pErk_dP_IL7_Pop2          -1.05</span>
+<span class="co">#&gt; 10 Ki67_Pop2                 -1.05</span>
+<span class="co">#&gt; # … with 15 more rows</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># we can also print out how long it took to fit the model</span>
+<span class="va">end</span> <span class="op">-</span> <span class="va">start</span>
+<span class="co">#&gt; Time difference of 5.740162 secs</span></code></pre></div>
+<p>We can then use the trained model to make predictions on the validation data</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">class_predictions</span> <span class="op">&lt;-</span> 
+  <span class="va">class_mod</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_predict.html">tof_predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span>, prediction_type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span>
+
+<span class="va">ddpr_validation</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">class_predictions</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">relapse_status</span>, <span class="va">.pred</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 4 × 3</span>
+<span class="co">#&gt;   relapse_status .pred     n</span>
+<span class="co">#&gt;   &lt;fct&gt;          &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1 No             No        5</span>
+<span class="co">#&gt; 2 No             Yes       1</span>
+<span class="co">#&gt; 3 Yes            No        4</span>
+<span class="co">#&gt; 4 Yes            Yes       2</span></code></pre></div>
+<p>We can also assess the model using <code>tof_assess_model</code></p>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># calling the function with no new_data gives us the assessment on </span>
+<span class="co"># the training data</span>
+<span class="va">training_assessment</span> <span class="op">&lt;-</span> 
+  <span class="va">class_mod</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">training_assessment</span>
+<span class="co">#&gt; $model_metrics</span>
+<span class="co">#&gt; # A tibble: 5 × 2</span>
+<span class="co">#&gt;   metric                    value</span>
+<span class="co">#&gt;   &lt;chr&gt;                     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 binomial_deviance       0.0291 </span>
+<span class="co">#&gt; 2 misclassification_error 0      </span>
+<span class="co">#&gt; 3 roc_auc                 1      </span>
+<span class="co">#&gt; 4 mse                     0.00119</span>
+<span class="co">#&gt; 5 mae                     0.0285 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $roc_curve</span>
+<span class="co">#&gt; # A tibble: 49 × 2</span>
+<span class="co">#&gt;      FPR    TPR</span>
+<span class="co">#&gt;    &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt;  1     0 0.0556</span>
+<span class="co">#&gt;  2     0 0.111 </span>
+<span class="co">#&gt;  3     0 0.167 </span>
+<span class="co">#&gt;  4     0 0.222 </span>
+<span class="co">#&gt;  5     0 0.278 </span>
+<span class="co">#&gt;  6     0 0.333 </span>
+<span class="co">#&gt;  7     0 0.389 </span>
+<span class="co">#&gt;  8     0 0.444 </span>
+<span class="co">#&gt;  9     0 0.5   </span>
+<span class="co">#&gt; 10     0 0.556 </span>
+<span class="co">#&gt; # … with 39 more rows</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $confusion_matrix</span>
+<span class="co">#&gt; # A tibble: 4 × 3</span>
+<span class="co">#&gt;   true_outcome predicted_outcome num_observations</span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                        &lt;int&gt;</span>
+<span class="co">#&gt; 1 No           No                              31</span>
+<span class="co">#&gt; 2 No           Yes                              0</span>
+<span class="co">#&gt; 3 Yes          No                               0</span>
+<span class="co">#&gt; 4 Yes          Yes                             18</span></code></pre></div>
+<p>And we can make an ROC curve using our metrics:</p>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">auc</span> <span class="op">&lt;-</span> 
+  <span class="va">training_assessment</span><span class="op">$</span><span class="va">model_metrics</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"roc_auc"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>
+
+<span class="va">training_assessment</span><span class="op">$</span><span class="va">roc_curve</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">FPR</span>, y <span class="op">=</span> <span class="va">TPR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_abline</span><span class="op">(</span>
+    slope <span class="op">=</span> <span class="fl">1</span>, 
+    intercept <span class="op">=</span> <span class="fl">0</span>, 
+    linetype <span class="op">=</span> <span class="st">"dotted"</span>, 
+    color <span class="op">=</span> <span class="st">"gray60"</span>
+  <span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">labs</span><span class="op">(</span>
+    subtitle <span class="op">=</span> <span class="st">"Training performance"</span>, 
+    caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="va">auc</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-51-1.png" width="100%"></p>
+<p>We can then assess the model on the validation data</p>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">validation_assessment</span> <span class="op">&lt;-</span> 
+  <span class="va">class_mod</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">)</span>
+
+<span class="va">validation_assessment</span>
+<span class="co">#&gt; $model_metrics</span>
+<span class="co">#&gt; # A tibble: 5 × 2</span>
+<span class="co">#&gt;   metric                  value</span>
+<span class="co">#&gt;   &lt;chr&gt;                   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 binomial_deviance       4.75 </span>
+<span class="co">#&gt; 2 misclassification_error 0.417</span>
+<span class="co">#&gt; 3 roc_auc                 0.639</span>
+<span class="co">#&gt; 4 mse                     0.759</span>
+<span class="co">#&gt; 5 mae                     0.879</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $roc_curve</span>
+<span class="co">#&gt; # A tibble: 12 × 2</span>
+<span class="co">#&gt;      FPR   TPR</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 0.167 0    </span>
+<span class="co">#&gt;  2 0.167 0.167</span>
+<span class="co">#&gt;  3 0.167 0.333</span>
+<span class="co">#&gt;  4 0.333 0.333</span>
+<span class="co">#&gt;  5 0.333 0.5  </span>
+<span class="co">#&gt;  6 0.333 0.667</span>
+<span class="co">#&gt;  7 0.333 0.833</span>
+<span class="co">#&gt;  8 0.5   0.833</span>
+<span class="co">#&gt;  9 0.667 0.833</span>
+<span class="co">#&gt; 10 0.833 0.833</span>
+<span class="co">#&gt; 11 0.833 1    </span>
+<span class="co">#&gt; 12 1     1    </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $confusion_matrix</span>
+<span class="co">#&gt; # A tibble: 4 × 3</span>
+<span class="co">#&gt;   true_outcome predicted_outcome num_observations</span>
+<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                        &lt;int&gt;</span>
+<span class="co">#&gt; 1 No           No                               5</span>
+<span class="co">#&gt; 2 No           Yes                              1</span>
+<span class="co">#&gt; 3 Yes          No                               4</span>
+<span class="co">#&gt; 4 Yes          Yes                              2</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">auc</span> <span class="op">&lt;-</span> 
+  <span class="va">validation_assessment</span><span class="op">$</span><span class="va">model_metrics</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"roc_auc"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>
+
+<span class="va">validation_assessment</span><span class="op">$</span><span class="va">roc_curve</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">FPR</span>, y <span class="op">=</span> <span class="va">TPR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_abline</span><span class="op">(</span>
+    slope <span class="op">=</span> <span class="fl">1</span>, 
+    intercept <span class="op">=</span> <span class="fl">0</span>, 
+    linetype <span class="op">=</span> <span class="st">"dotted"</span>, 
+    color <span class="op">=</span> <span class="st">"gray60"</span>
+  <span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">labs</span><span class="op">(</span>
+    subtitle <span class="op">=</span> <span class="st">"Validation performance"</span>, 
+    caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">auc</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-53-1.png" width="100%"></p>
+<p>We can also fit a survival model</p>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">survival_mod</span> <span class="op">&lt;-</span> 
+  <span class="va">training_split</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span>
+    predictor_cols <span class="op">=</span> <span class="fu">contains</span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span>, 
+    time_col <span class="op">=</span> <span class="va">time_to_event</span>, 
+    event_col <span class="op">=</span> <span class="va">event</span>, 
+    model_type <span class="op">=</span> <span class="st">"survival"</span>, 
+    hyperparameter_grid <span class="op">=</span> <span class="fu"><a href="reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span>mixture_values <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, 
+    impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>, 
+    remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span>
+  <span class="op">)</span>
+<span class="va">end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survival_mod</span><span class="op">)</span>
+<span class="co">#&gt; A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span>
+<span class="co">#&gt; # A tibble: 29 × 2</span>
+<span class="co">#&gt;    feature              coefficient</span>
+<span class="co">#&gt;    &lt;chr&gt;                      &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 pErk_dP_TSLP_Pop2          -8.14</span>
+<span class="co">#&gt;  2 TdT_Pop2                    3.77</span>
+<span class="co">#&gt;  3 pPLCg1_2_dP_IL7_Pop2        3.36</span>
+<span class="co">#&gt;  4 CD38_Pop2                   3.30</span>
+<span class="co">#&gt;  5 CD43_Pop2                   3.22</span>
+<span class="co">#&gt;  6 p4EBP1_dP_IL7_Pop2         -2.60</span>
+<span class="co">#&gt;  7 Ki67_Pop2                  -2.57</span>
+<span class="co">#&gt;  8 p4EBP1_FC_IL7_Pop2          2.49</span>
+<span class="co">#&gt;  9 pCreb_dP_TSLP_Pop2         -2.46</span>
+<span class="co">#&gt; 10 pCreb_dP_PVO4_Pop2         -2.05</span>
+<span class="co">#&gt; # … with 19 more rows</span></code></pre></div>
+<p>Making predictions using the survival model</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">survival_mod</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_predict.html">tof_predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span>, prediction_type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 12 × 1</span>
+<span class="co">#&gt;       .pred</span>
+<span class="co">#&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 2.17e+47</span>
+<span class="co">#&gt;  2 9.12e+ 6</span>
+<span class="co">#&gt;  3 1.86e- 3</span>
+<span class="co">#&gt;  4 1.95e- 6</span>
+<span class="co">#&gt;  5 6.29e+ 0</span>
+<span class="co">#&gt;  6 5.30e- 1</span>
+<span class="co">#&gt;  7 1.81e+ 3</span>
+<span class="co">#&gt;  8 3.36e- 3</span>
+<span class="co">#&gt;  9 6.14e- 2</span>
+<span class="co">#&gt; 10 5.34e- 1</span>
+<span class="co">#&gt; 11 1.91e- 4</span>
+<span class="co">#&gt; 12 1.94e+ 2</span></code></pre></div>
+<p>Assessing the survival model</p>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">survival_assessment</span> <span class="op">&lt;-</span> 
+  <span class="va">survival_mod</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">)</span>
+
+<span class="va">survival_assessment</span>
+<span class="co">#&gt; $model_metrics</span>
+<span class="co">#&gt; # A tibble: 2 × 2</span>
+<span class="co">#&gt;   metric                        value</span>
+<span class="co">#&gt;   &lt;chr&gt;                         &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 neg_log_partial_likelihood 1309.   </span>
+<span class="co">#&gt; 2 concordance_index             0.548</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $survival_curves</span>
+<span class="co">#&gt; # A tibble: 12 × 2</span>
+<span class="co">#&gt;    row_index survival_curve   </span>
+<span class="co">#&gt;    &lt;chr&gt;     &lt;list&gt;           </span>
+<span class="co">#&gt;  1 1         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  2 2         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  3 3         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  4 4         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  5 5         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  6 6         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  7 7         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  8 8         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt;  9 9         &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt; 10 10        &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt; 11 11        &lt;tibble [44 × 2]&gt;</span>
+<span class="co">#&gt; 12 12        &lt;tibble [44 × 2]&gt;</span></code></pre></div>
+<p>And we can use some of these values to make a survival curve for each patient</p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">survival_assessment</span><span class="op">$</span><span class="va">survival_curves</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">survival_curve</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">left_join</span><span class="op">(</span>
+    y <span class="op">=</span> 
+      <span class="fu">tibble</span><span class="op">(</span>
+        ddpr_risk <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">$</span><span class="va">ddpr_risk</span>, 
+        row_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ddpr_validation</span><span class="op">)</span><span class="op">)</span>
+      <span class="op">)</span>, 
+    by <span class="op">=</span> <span class="st">"row_index"</span>
+  <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="co"># something is weird about the first patient</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">row_index</span> <span class="op">!=</span> <span class="st">"1"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">ddpr_risk</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>probability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">probability</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">probability</span>, color <span class="op">=</span> <span class="va">ddpr_risk</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-57-1.png" width="100%"></p>
 </div>
 </div>
 </div>
@@ -1028,30 +1299,30 @@
 <h2 id="tidytofs-design-principles-and-some-tips">
 <code>{tidytof}</code>’s Design Principles (and some tips)<a class="anchor" aria-label="anchor" href="#tidytofs-design-principles-and-some-tips"></a>
 </h2>
-<p>{tidytof} was been designed by a multidisciplinary team of wet-lab biologists, bioinformaticians, and physician-scientists who analyze CyTOF and other kinds of single-cell data to solve a variety of problems. As a result, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s high-level API was designed with great care to mirror that of the <a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a> itself - that is, to be <a href="https://design.tidyverse.org/unifying-principles.html" class="external-link">human-centered, consistent, composable, and inclusive</a> for a wide userbase.</p>
+<p>{tidytof} was designed by a multidisciplinary team of wet-lab biologists, bioinformaticians, and physician-scientists who analyze CyTOF and other kinds of single-cell data to solve a variety of problems. As a result, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s high-level API was designed with great care to mirror that of the <a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a> itself - that is, to be <a href="https://design.tidyverse.org/unifying-principles.html" class="external-link">human-centered, consistent, composable, and inclusive</a> for a wide userbase.</p>
 <p>In this section, we describe some miscellaneous design decisions and tips for using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> that may help the enthusiastic user.</p>
 <div class="section level3">
 <h3 id="1-use-the-tof_-prefix-to-your-advantage">1. Use the <code>tof_</code> prefix to your advantage.<a class="anchor" aria-label="anchor" href="#1-use-the-tof_-prefix-to-your-advantage"></a>
 </h3>
 <p>You may notice that most <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions begin with the prefix <code>tof_</code>. This is intentional, as it will allow you to use your development environment’s code-completing software to search for functions easily (even if you don’t remember the function name). For this reason, we recommend using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> within the RStudio development environment; however, many code editors have predictive text functionality that serves a similar function.</p>
-<p>In general, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs are organized in such a way that your IDE’s code-completion tools should allow you to search for (and compare) related functions with relative ease. (For instance, the <code>tof_cluster_</code> prefix is used for all clustering functions, and the <code>tof_downsample_</code> is used for all downsampling functions).</p>
+<p>In general, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs are organized in such a way that your IDE’s code-completion tools should also allow you to search for (and compare) related functions with relative ease. (For instance, the <code>tof_cluster_</code> prefix is used for all clustering functions, and the <code>tof_downsample_</code> prefix is used for all downsampling functions).</p>
 </div>
 <div class="section level3">
 <h3 id="2-tidytof-functions-use-2-kinds-of-arguments">2. <code>{tidytof}</code> functions use 2 kinds of arguments<a class="anchor" aria-label="anchor" href="#2-tidytof-functions-use-2-kinds-of-arguments"></a>
 </h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions are optimized for working with “tidy” data in the form of <code>tibbles</code> or <code>data.frames</code>. This means that most <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions share some basic design principles in terms of how their arguments work. The most important of these principles is illustrated by the following picture:</p>
 <p>[some picture]</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="kw">tof_extract_features</span>(</span>
-<span id="cb45-2"><a href="#cb45-2"></a>  <span class="dt">tof_tibble =</span> ___, </span>
-<span id="cb45-3"><a href="#cb45-3"></a>  <span class="dt">cluster_col =</span> ___, </span>
-<span id="cb45-4"><a href="#cb45-4"></a>  <span class="dt">group_cols =</span> ___,</span>
-<span id="cb45-5"><a href="#cb45-5"></a>  <span class="dt">stimulation_col =</span> ___,</span>
-<span id="cb45-6"><a href="#cb45-6"></a>  <span class="dt">lineage_cols =</span> ___,</span>
-<span id="cb45-7"><a href="#cb45-7"></a>  <span class="dt">signaling_cols =</span> ___,</span>
-<span id="cb45-8"><a href="#cb45-8"></a>  <span class="dt">central_tendency_function =</span> ___,</span>
-<span id="cb45-9"><a href="#cb45-9"></a>  <span class="dt">signaling_method =</span> ___,</span>
-<span id="cb45-10"><a href="#cb45-10"></a>  <span class="dt">basal_level =</span> ___,</span>
-<span id="cb45-11"><a href="#cb45-11"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">tof_extract_features</span>(</span>
+<span id="cb58-2"><a href="#cb58-2"></a>  <span class="dt">tof_tibble =</span> ___, </span>
+<span id="cb58-3"><a href="#cb58-3"></a>  <span class="dt">cluster_col =</span> ___, </span>
+<span id="cb58-4"><a href="#cb58-4"></a>  <span class="dt">group_cols =</span> ___,</span>
+<span id="cb58-5"><a href="#cb58-5"></a>  <span class="dt">stimulation_col =</span> ___,</span>
+<span id="cb58-6"><a href="#cb58-6"></a>  <span class="dt">lineage_cols =</span> ___,</span>
+<span id="cb58-7"><a href="#cb58-7"></a>  <span class="dt">signaling_cols =</span> ___,</span>
+<span id="cb58-8"><a href="#cb58-8"></a>  <span class="dt">central_tendency_function =</span> ___,</span>
+<span id="cb58-9"><a href="#cb58-9"></a>  <span class="dt">signaling_method =</span> ___,</span>
+<span id="cb58-10"><a href="#cb58-10"></a>  <span class="dt">basal_level =</span> ___,</span>
+<span id="cb58-11"><a href="#cb58-11"></a>)</span></code></pre></div>
 <p>[Under construction]</p>
 </div>
 <div class="section level3">
@@ -1059,7 +1330,7 @@
 </h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is built on top of the <code>tidyverse</code> family of R packages. As a result, most users of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> will benefit substantially from spending a few hours with the <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a>, <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, and <a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a> package vignettes to learn about some of the many useful functions these packages provide.</p>
 <p>To access our recommended list of package vignettes, run the following lines of R code in the console:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># dplyr</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>topic <span class="op">=</span> <span class="st">"dplyr"</span>, package <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>topic <span class="op">=</span> <span class="st">"grouping"</span>, package <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span>
