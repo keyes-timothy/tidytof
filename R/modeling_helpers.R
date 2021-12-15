@@ -871,7 +871,6 @@ tof_all_data <- function(split_data) {
 #' @param outcome_colnames TO DO
 #'
 #' @param training_data TO DO
-
 #'
 #' @return A `tof_model`, an S3 class that includes a trained glmnet model and
 #' the recipe used to perform its associated preprocessing.

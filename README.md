@@ -1,6 +1,9 @@
 
 -   [tidytof: An ecosystem for tidy and highly-reproducible CyTOF data
     analysis](#tidytof-an-ecosystem-for-tidy-and-highly-reproducible-cytof-data-analysis)
+    -   [Getting started](#getting-started)
+        -   [Prerequisites](#prerequisites)
+        -   [Package structure](#package-structure)
     -   [Installation](#installation)
     -   [Usage](#usage)
         -   [Analyzing data at the single-cell
@@ -47,12 +50,51 @@ coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.sv
 
 <!-- badges: end -->
 
-The goal of `{tidytof}` is to provide an integrated suite of R functions
-for CyTOF data analysis with an intuitive and internally consistent set
-of design principles. As an extension of the `tidyverse` ecosystem of
-data manipulation tools in R, `{tidytof}` is both performant and
-easy-to-use for scientists with a wide range of coding experience
-(including beginners).
+`{tidytof}` is an R package that implements an open-source, integrated
+“grammar” of single-cell data analysis for [mass cytometry
+(CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/) data.
+Specifically, `{tidytof}` provides an easy-to-use pipeline for handling
+CyTOF data at multiple levels of observation - the single-cell level,
+the cell subpopulation (or cluster) level, and the whole-sample level -
+by automating many common data-processing tasks under a common [“tidy
+data”](https://r4ds.had.co.nz/tidy-data.html) interface.
+
+As an extension of the `tidyverse` ecosystem of data manipulation tools
+in R, all of `{tidytof}`’s functions have been developed with an
+internally consistent, human-centered set of design principles. This
+means that using `{tidytof}` should be equally intuitive among
+scientists with a wide range of coding experience (including beginners).
+
+## Getting started
+
+### Prerequisites
+
+`{tidytof}` makes heavy use of two concepts that R beginners may be
+unfamiliar with. The first is the `{magrittr}` pipe (`%>%`), which you
+can read about [here](https://r4ds.had.co.nz/pipes.html). The second is
+“grouping” data in a `data.frame` or `tibble` using `dplyr::group_by`,
+which you can read about
+[here](https://dplyr.tidyverse.org/articles/grouping.html).
+
+Everything else should be self-explanatory for beginner and advanced R
+users, though if you have *zero* background in running R code, you
+should read [this chapter](https://r4ds.had.co.nz/workflow-basics.html)
+of [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley
+Wickham.
+
+### Package structure
+
+Broadly speaking, `{tidytof}`’s functionality is organized to support 3
+levels of analysis inherent in single-cell data:
+
+1.  Reading, writing, preprocessing, and visualizing data at the level
+    of **single cells**
+2.  Identifying and describing cell **subpopulations** or **clusters**
+3.  Building models (for inference or prediction) at the level of
+    **patients** or **samples**
+
+How to use `{tidytof}` at each of these levels of CyTOF data analysis is
+detailed in the “Usage” section below.
 
 ## Installation
 
@@ -71,25 +113,18 @@ session using the following code:
 library(tidytof)
 ```
 
-In addition, we can load the other packages we need for this vignette:
+In addition, we can install and load the other packages we need for this
+vignette:
 
 ``` r
+if(!require(FlowSOM)) BiocManager::install("FlowSOM")
+library(FlowSOM)
+
+if(!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 ```
 
 ## Usage
-
-Broadly speaking, `{tidytof}`’s functionality is organized to support 3
-levels of analysis inherent in single-cell data:
-
-1.  Reading, writing, preprocessing, and visualizing data at the level
-    of **single cells**
-2.  Identifying and describing cell **subpopulations** or **clusters**
-3.  Building models (for inference or prediction) at the level of
-    **patients** or **samples**
-
-How to use `{tidytof}` for each of these levels of CyTOF data analysis
-is detailed below.
 
 ### Analyzing data at the single-cell level
 
@@ -440,10 +475,10 @@ have the following names (derived from the values in the
 
 However, suppose we wanted to write multiple files for each cluster by
 breaking cells into two groups: those that express high levels of
-`pstat5`. We can use `dplyr::mutate` to create a new column in
-`phenograph_data` that breaks cells into high- and low-`pstat5`
-expression groups, then add this column to our `group_cols`
-specification:
+`pstat5` and those that express low levels of `pstat5`. We can use
+`dplyr::mutate` to create a new column in `phenograph_data` that breaks
+cells into high- and low-`pstat5` expression groups, then add this
+column to our `group_cols` specification:
 
 ``` r
 phenograph_data %>% 
@@ -504,12 +539,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 27
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569
-#> 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 
-#> 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    
-#> 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 
-#> 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733
-#> 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733
+#> 1 H1_PhenoGrap… 3                 cluster1         0.199  2.19 0      4.56 0.569
+#> 2 H1_PhenoGrap… 3                 cluster1         0      2.92 0      5.33 1.61 
+#> 3 H1_PhenoGrap… 3                 cluster1         0      1.99 0.390  4.62 0    
+#> 4 H1_PhenoGrap… 3                 cluster1         0.881  1.53 0.199  4.61 1.02 
+#> 5 H1_PhenoGrap… 3                 cluster1         0.881  2.05 0.199  4.80 0.733
+#> 6 H1_PhenoGrap… 3                 cluster1         0      1.25 0.733  5.01 0.733
 #> # … with 19 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd15 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -533,12 +568,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           3                     1993
+#> 1 cluster2           1                     1996
 #> 2 cluster3           2                     1993
-#> 3 cluster1           1                     1981
+#> 3 cluster1           3                     1981
 #> 4 cluster1           2                       19
-#> 5 cluster2           2                        7
-#> 6 cluster3           1                        7
+#> 5 cluster3           3                        7
+#> 6 cluster2           2                        4
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -560,12 +595,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 2                   
-#> 2 2                   
-#> 3 2                   
-#> 4 2                   
-#> 5 2                   
-#> 6 2
+#> 1 3                   
+#> 2 3                   
+#> 3 3                   
+#> 4 3                   
+#> 5 3                   
+#> 6 3
 ```
 
 #### Dimensionality reduction with `tof_reduce`
@@ -594,12 +629,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1  -14.9     6.17
-#> 2  -13.0    13.4 
-#> 3  -21.4    -5.21
-#> 4   -9.81    5.05
-#> 5  -16.4     2.55
-#> 6  -16.1     3.25
+#> 1  -14.7    -2.70
+#> 2   -9.46   -1.67
+#> 3  -20.4   -15.4 
+#> 4   -8.67   -4.77
+#> 5  -15.2    -7.24
+#> 6  -15.0    -6.31
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -945,6 +980,8 @@ volcano_data %>%
 
 ### Analyzing data at the patient- and sample-level
 
+\[some kind of preamble\]
+
 #### Feature extraction with `tof_extract_features`
 
 In addition to its functions for analyzing and visualizing CyTOF data at
@@ -1219,122 +1256,416 @@ paper](https://www.nature.com/articles/nm.4505#MOESM3) for details). The
 non-numeric columns represent clinical metadata about each sample (run
 `?ddpr_metadata` for more information).
 
+There are also a few preprocessing steps that we might want to perform
+now to save us some headaches when we’re fitting models later.
+
+``` r
+ddpr_patients <- 
+  ddpr_patients %>% 
+  # convert the relapse_status variable to a factor first, 
+  # which is something we'll want for fitting the model later
+  # and create the time_to_event and event columns for survival modeling
+  mutate(
+    relapse_status = as.factor(relapse_status), 
+    time_to_event = if_else(relapse_status == "Yes", time_to_relapse, ccr),
+    event = if_else(relapse_status == "Yes", 1, 0)
+  )
+```
+
+##### Separating the training and validation cohorts
+
+In the original DDPR paper, some patients were used to fit the model and
+the rest were used to assess the model after it was tuned. We can
+separate our training and validation cohorts using the `cohort` variable
+in `ddpr_patients`
+
+``` r
+ddpr_training <- 
+  ddpr_patients %>% 
+  dplyr::filter(cohort == "Training") 
+
+ddpr_validation <- 
+  ddpr_patients %>% 
+  dplyr::filter(cohort == "Validation")
+```
+
+``` r
+nrow(ddpr_training)
+#> [1] 49
+
+nrow(ddpr_validation)
+#> [1] 12
+```
+
 ##### Building a classifier using logistic regression
 
-``` r
-# k-fold
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "k-fold", 
-    num_cv_folds = 3, 
-    strata = relapse_status
-  )
-
-# bootstrapping
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "bootstrap", 
-    num_bootstraps = 3, 
-    strata = relapse_status
-  )
-
-# simple with prop
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "simple", 
-    simple_prop = 0.75, 
-    strata = relapse_status
-  )
-
-# simple with specification
-splits <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  filter(!is.na(cohort)) %>% 
-  mutate(splits = (cohort == "Training")) %>% 
-  pull(splits)
-
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  filter(!is.na(cohort)) %>% 
-  tof_split_data(
-    split_method = splits, 
-    num_cv_folds = 3, 
-    strata = relapse_status
-  )
-
-# using split_col 
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  drop_na(cohort) %>% 
-  mutate(splits = (cohort == "Training")) %>%
-  tof_split_data(
-    split_method = "simple", 
-    split_col = splits, 
-    simple_prop = 0.75, 
-    strata = relapse_status
-  )
-```
+First, we can build an elastic net classifier to predict which patients
+will relapse and which patients won’t (ignoring time-to-event data for
+now). For this, we can use the `relapse_status` variable in
+`ddpr_training`:
 
 ``` r
-# hyperparameter grid 
-tof_create_grid()
-#> # A tibble: 25 × 2
-#>         penalty mixture
-#>           <dbl>   <dbl>
-#>  1 0.0000000001    0   
-#>  2 0.0000000001    0.25
-#>  3 0.0000000001    0.5 
-#>  4 0.0000000001    0.75
-#>  5 0.0000000001    1   
-#>  6 0.0000000316    0   
-#>  7 0.0000000316    0.25
-#>  8 0.0000000316    0.5 
-#>  9 0.0000000316    0.75
-#> 10 0.0000000316    1   
-#> # … with 15 more rows
-```
-
-``` r
-# create recipe 
-ddpr_patients %>% 
-  tof_create_recipe(predictor_cols = contains("Pop2"))
-#> Recipe
-#> 
-#> Inputs:
-#> 
-#>       role #variables
-#>  predictor        115
-#> 
-#> Operations:
-#> 
-#> Terms selected  ~dplyr::any_of(outcome_colnames), ~dplyr::any_of(predictor_colnames)
-#> Dummy variables from recipes::all_nominal_predictors()
-#> K-nearest neighbor imputation for recipes::all_numeric_predictors()
-#> Centering and scaling for recipes::all_numeric_predictors()
+ddpr_training %>% 
+  dplyr::count(relapse_status)
+#> # A tibble: 2 × 2
+#>   relapse_status     n
+#>   <fct>          <int>
+#> 1 No                31
+#> 2 Yes               18
 ```
 
 ``` r
 # train classifier
-ddpr_patients %>% 
-  mutate(relapse_status = as.factor(relapse_status)) %>%
-  mutate(event = 1) %>% 
+training_split <- 
+  ddpr_training %>% 
+  tof_split_data(
+    split_method = "k-fold", 
+    num_cv_folds = 5, 
+    strata = relapse_status
+  )
+
+training_split
+#> #  5-fold cross-validation using stratification 
+#> # A tibble: 5 × 2
+#>   splits          id   
+#>   <list>          <chr>
+#> 1 <split [38/11]> Fold1
+#> 2 <split [39/10]> Fold2
+#> 3 <split [39/10]> Fold3
+#> 4 <split [40/9]>  Fold4
+#> 5 <split [40/9]>  Fold5
+```
+
+And we can inspect each of our splits to see what they contain:
+
+``` r
+# workspace to inspect the training_split object
+training_split$splits[[1]]
+#> <Analysis/Assess/Total>
+#> <38/11/49>
+```
+
+From here, we can feed our `training_split` object into the
+`tof_train_model` function to tune a logistic regression classifier
+
+``` r
+start <- Sys.time()
+class_mod <- 
+  training_split %>% 
   tof_train_model(
     predictor_cols = contains("Pop2"), 
-    #response_col = relapse_status,
-    time_col = age_at_diagnosis,
-    event_col = event,
+    response_col = relapse_status,
     model_type = "two-class", 
-    split_method = "simple"
+    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
+    impute_missing_predictors = TRUE, 
+    remove_zv_predictors = TRUE # often a smart decision
   )
+end <- Sys.time()
+
+print(class_mod)
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
+#> # A tibble: 25 × 2
+#>    feature             coefficient
+#>    <chr>                     <dbl>
+#>  1 p4EBP1_dP_IL7_Pop2        -2.59
+#>  2 CD58_Pop2                  2.23
+#>  3 (Intercept)               -1.83
+#>  4 pSTAT5_dP_TSLP_Pop2        1.69
+#>  5 p4EBP1_FC_IL7_Pop2         1.46
+#>  6 CD43_Pop2                  1.37
+#>  7 HLADR_Pop2                -1.32
+#>  8 pSyk_dP_TSLP_Pop2          1.08
+#>  9 pErk_dP_IL7_Pop2          -1.05
+#> 10 Ki67_Pop2                 -1.05
+#> # … with 15 more rows
 ```
+
+``` r
+# we can also print out how long it took to fit the model
+end - start
+#> Time difference of 5.740162 secs
+```
+
+We can then use the trained model to make predictions on the validation
+data
+
+``` r
+class_predictions <- 
+  class_mod %>% 
+  tof_predict(new_data = ddpr_validation, prediction_type = "class")
+
+ddpr_validation %>% 
+  dplyr::select(relapse_status) %>% 
+  bind_cols(class_predictions) %>% 
+  dplyr::count(relapse_status, .pred)
+#> # A tibble: 4 × 3
+#>   relapse_status .pred     n
+#>   <fct>          <chr> <int>
+#> 1 No             No        5
+#> 2 No             Yes       1
+#> 3 Yes            No        4
+#> 4 Yes            Yes       2
+```
+
+We can also assess the model using `tof_assess_model`
+
+``` r
+# calling the function with no new_data gives us the assessment on 
+# the training data
+training_assessment <- 
+  class_mod %>% 
+  tof_assess_model()
+
+training_assessment
+#> $model_metrics
+#> # A tibble: 5 × 2
+#>   metric                    value
+#>   <chr>                     <dbl>
+#> 1 binomial_deviance       0.0291 
+#> 2 misclassification_error 0      
+#> 3 roc_auc                 1      
+#> 4 mse                     0.00119
+#> 5 mae                     0.0285 
+#> 
+#> $roc_curve
+#> # A tibble: 49 × 2
+#>      FPR    TPR
+#>    <dbl>  <dbl>
+#>  1     0 0.0556
+#>  2     0 0.111 
+#>  3     0 0.167 
+#>  4     0 0.222 
+#>  5     0 0.278 
+#>  6     0 0.333 
+#>  7     0 0.389 
+#>  8     0 0.444 
+#>  9     0 0.5   
+#> 10     0 0.556 
+#> # … with 39 more rows
+#> 
+#> $confusion_matrix
+#> # A tibble: 4 × 3
+#>   true_outcome predicted_outcome num_observations
+#>   <chr>        <chr>                        <int>
+#> 1 No           No                              31
+#> 2 No           Yes                              0
+#> 3 Yes          No                               0
+#> 4 Yes          Yes                             18
+```
+
+And we can make an ROC curve using our metrics:
+
+``` r
+auc <- 
+  training_assessment$model_metrics %>% 
+  dplyr::filter(metric == "roc_auc") %>% 
+  dplyr::pull(value)
+
+training_assessment$roc_curve %>% 
+  ggplot(aes(x = FPR, y = TPR)) + 
+  geom_line() + 
+  geom_abline(
+    slope = 1, 
+    intercept = 0, 
+    linetype = "dotted", 
+    color = "gray60"
+  ) + 
+  labs(
+    subtitle = "Training performance", 
+    caption = str_glue("AUC = {auc}", auc = auc)
+  ) + 
+  theme_bw()
+```
+
+<img src="man/figures/README-unnamed-chunk-51-1.png" width="100%" />
+
+We can then assess the model on the validation data
+
+``` r
+validation_assessment <- 
+  class_mod %>% 
+  tof_assess_model(new_data = ddpr_validation)
+
+validation_assessment
+#> $model_metrics
+#> # A tibble: 5 × 2
+#>   metric                  value
+#>   <chr>                   <dbl>
+#> 1 binomial_deviance       4.75 
+#> 2 misclassification_error 0.417
+#> 3 roc_auc                 0.639
+#> 4 mse                     0.759
+#> 5 mae                     0.879
+#> 
+#> $roc_curve
+#> # A tibble: 12 × 2
+#>      FPR   TPR
+#>    <dbl> <dbl>
+#>  1 0.167 0    
+#>  2 0.167 0.167
+#>  3 0.167 0.333
+#>  4 0.333 0.333
+#>  5 0.333 0.5  
+#>  6 0.333 0.667
+#>  7 0.333 0.833
+#>  8 0.5   0.833
+#>  9 0.667 0.833
+#> 10 0.833 0.833
+#> 11 0.833 1    
+#> 12 1     1    
+#> 
+#> $confusion_matrix
+#> # A tibble: 4 × 3
+#>   true_outcome predicted_outcome num_observations
+#>   <chr>        <chr>                        <int>
+#> 1 No           No                               5
+#> 2 No           Yes                              1
+#> 3 Yes          No                               4
+#> 4 Yes          Yes                              2
+```
+
+``` r
+auc <- 
+  validation_assessment$model_metrics %>% 
+  dplyr::filter(metric == "roc_auc") %>% 
+  dplyr::pull(value)
+
+validation_assessment$roc_curve %>% 
+  ggplot(aes(x = FPR, y = TPR)) + 
+  geom_line() + 
+  geom_abline(
+    slope = 1, 
+    intercept = 0, 
+    linetype = "dotted", 
+    color = "gray60"
+  ) + 
+  labs(
+    subtitle = "Validation performance", 
+    caption = str_glue("AUC = {auc}", auc = round(auc, 3))
+  ) + 
+  theme_bw()
+```
+
+<img src="man/figures/README-unnamed-chunk-53-1.png" width="100%" />
+
+We can also fit a survival model
+
+``` r
+start <- Sys.time()
+survival_mod <- 
+  training_split %>% 
+  tof_train_model(
+    predictor_cols = contains("Pop2"), 
+    time_col = time_to_event, 
+    event_col = event, 
+    model_type = "survival", 
+    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
+    impute_missing_predictors = TRUE, 
+    remove_zv_predictors = TRUE # often a smart decision
+  )
+end <- Sys.time()
+
+print(survival_mod)
+#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 
+#> # A tibble: 29 × 2
+#>    feature              coefficient
+#>    <chr>                      <dbl>
+#>  1 pErk_dP_TSLP_Pop2          -8.14
+#>  2 TdT_Pop2                    3.77
+#>  3 pPLCg1_2_dP_IL7_Pop2        3.36
+#>  4 CD38_Pop2                   3.30
+#>  5 CD43_Pop2                   3.22
+#>  6 p4EBP1_dP_IL7_Pop2         -2.60
+#>  7 Ki67_Pop2                  -2.57
+#>  8 p4EBP1_FC_IL7_Pop2          2.49
+#>  9 pCreb_dP_TSLP_Pop2         -2.46
+#> 10 pCreb_dP_PVO4_Pop2         -2.05
+#> # … with 19 more rows
+```
+
+Making predictions using the survival model
+
+``` r
+survival_mod %>% 
+  tof_predict(new_data = ddpr_validation, prediction_type = "response")
+#> # A tibble: 12 × 1
+#>       .pred
+#>       <dbl>
+#>  1 2.17e+47
+#>  2 9.12e+ 6
+#>  3 1.86e- 3
+#>  4 1.95e- 6
+#>  5 6.29e+ 0
+#>  6 5.30e- 1
+#>  7 1.81e+ 3
+#>  8 3.36e- 3
+#>  9 6.14e- 2
+#> 10 5.34e- 1
+#> 11 1.91e- 4
+#> 12 1.94e+ 2
+```
+
+Assessing the survival model
+
+``` r
+survival_assessment <- 
+  survival_mod %>% 
+  tof_assess_model(new_data = ddpr_validation)
+
+survival_assessment
+#> $model_metrics
+#> # A tibble: 2 × 2
+#>   metric                        value
+#>   <chr>                         <dbl>
+#> 1 neg_log_partial_likelihood 1309.   
+#> 2 concordance_index             0.548
+#> 
+#> $survival_curves
+#> # A tibble: 12 × 2
+#>    row_index survival_curve   
+#>    <chr>     <list>           
+#>  1 1         <tibble [44 × 2]>
+#>  2 2         <tibble [44 × 2]>
+#>  3 3         <tibble [44 × 2]>
+#>  4 4         <tibble [44 × 2]>
+#>  5 5         <tibble [44 × 2]>
+#>  6 6         <tibble [44 × 2]>
+#>  7 7         <tibble [44 × 2]>
+#>  8 8         <tibble [44 × 2]>
+#>  9 9         <tibble [44 × 2]>
+#> 10 10        <tibble [44 × 2]>
+#> 11 11        <tibble [44 × 2]>
+#> 12 12        <tibble [44 × 2]>
+```
+
+And we can use some of these values to make a survival curve for each
+patient
+
+``` r
+survival_assessment$survival_curves %>% 
+  tidyr::unnest(cols = survival_curve) %>% 
+  left_join(
+    y = 
+      tibble(
+        ddpr_risk = ddpr_validation$ddpr_risk, 
+        row_index = as.character(1:nrow(ddpr_validation))
+      ), 
+    by = "row_index"
+  ) %>% 
+  # something is weird about the first patient
+  dplyr::filter(row_index != "1") %>% 
+  dplyr::group_by(time, ddpr_risk) %>% 
+  dplyr::summarize(probability = mean(probability)) %>% 
+  ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
+  geom_path() + 
+  theme_bw()
+```
+
+<img src="man/figures/README-unnamed-chunk-57-1.png" width="100%" />
 
 ## `{tidytof}`’s Design Principles (and some tips)
 
-{tidytof} was been designed by a multidisciplinary team of wet-lab
+{tidytof} was designed by a multidisciplinary team of wet-lab
 biologists, bioinformaticians, and physician-scientists who analyze
 CyTOF and other kinds of single-cell data to solve a variety of
 problems. As a result, `{tidytof}`’s high-level API was designed with
@@ -1357,10 +1688,10 @@ development environment; however, many code editors have predictive text
 functionality that serves a similar function.
 
 In general, `{tidytof}` verbs are organized in such a way that your
-IDE’s code-completion tools should allow you to search for (and compare)
-related functions with relative ease. (For instance, the `tof_cluster_`
-prefix is used for all clustering functions, and the `tof_downsample_`
-is used for all downsampling functions).
+IDE’s code-completion tools should also allow you to search for (and
+compare) related functions with relative ease. (For instance, the
+`tof_cluster_` prefix is used for all clustering functions, and the
+`tof_downsample_` prefix is used for all downsampling functions).
 
 ### 2. `{tidytof}` functions use 2 kinds of arguments
 

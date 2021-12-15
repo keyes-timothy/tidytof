@@ -3,7 +3,6 @@ output:
   github_document:
     toc: true
     toc_depth: 4
-  pdf_document: 
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -28,11 +27,27 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-The goal of `{tidytof}` is to provide an integrated suite of R functions for CyTOF data analysis with an intuitive and internally consistent set of design principles. As an extension of the `tidyverse` ecosystem of data manipulation tools in R, `{tidytof}` is both performant and easy-to-use for scientists with a wide range of coding experience (including beginners).
+`{tidytof}` is an R package that implements an open-source, integrated "grammar" of single-cell data analysis for [mass cytometry (CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/) data. Specifically, `{tidytof}` provides an easy-to-use pipeline for handling CyTOF data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. 
+
+As an extension of the `tidyverse` ecosystem of data manipulation tools in R, all of `{tidytof}`'s functions have been developed with an internally consistent, human-centered set of design principles. This means that using `{tidytof}` should be equally intuitive among scientists with a wide range of coding experience (including beginners).
 
 ## Getting started
 
-[Under construction]
+### Prerequisites
+
+`{tidytof}` makes heavy use of two concepts that R beginners may be unfamiliar with. The first is the `{magrittr}` pipe (`%>%`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). 
+
+Everything else should be self-explanatory for beginner and advanced R users, though if you have *zero* background in running R code, you should read [this chapter](https://r4ds.had.co.nz/workflow-basics.html) of [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham.
+
+### Package structure 
+
+Broadly speaking, `{tidytof}`'s functionality is organized to support 3 levels of analysis inherent in single-cell data:
+
+1.  Reading, writing, preprocessing, and visualizing data at the level of **single cells**
+2.  Identifying and describing cell **subpopulations** or **clusters**
+3.  Building models (for inference or prediction) at the level of **patients** or **samples**
+
+How to use `{tidytof}` at each of these levels of CyTOF data analysis is detailed in the "Usage" section below.
 
 ## Installation
 
@@ -49,21 +64,17 @@ Once `{tidytof}` is installed, you can attach it to your current R session using
 library(tidytof)
 ```
 
-In addition, we can load the other packages we need for this vignette:
+In addition, we can install and load the other packages we need for this vignette:
 
-```{r, message = FALSE, warning = FALSE}
+```{r}
+if(!require(FlowSOM)) BiocManager::install("FlowSOM")
+library(FlowSOM)
+
+if(!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 ```
 
 ## Usage
-
-Broadly speaking, `{tidytof}`'s functionality is organized to support 3 levels of analysis inherent in single-cell data:
-
-1.  Reading, writing, preprocessing, and visualizing data at the level of **single cells**
-2.  Identifying and describing cell **subpopulations** or **clusters**
-3.  Building models (for inference or prediction) at the level of **patients** or **samples**
-
-How to use `{tidytof}` for each of these levels of CyTOF data analysis is detailed below.
 
 ### Analyzing data at the single-cell level
 
@@ -293,7 +304,7 @@ To do so, we can use the `tof_cluster` verb. Several clustering methods are impl
 
 To demonstrate, we can apply the FlowSOM clustering algorithm to our `phenograph_data` from above. Note that `phenograph_data` contains 6000 total cells (2000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)).
 
-```{r, message = FALSE}
+```{r}
 phenograph_clusters <- 
   phenograph_data %>% 
   tof_preprocess() %>% 
@@ -712,321 +723,242 @@ ddpr_patients %>%
 
 The data processing steps above result in the `ddpr_patients` tibble. The numeric columns in `ddpr_patients` represent aggregated cell population features for each sample (see [Supplementary Table 5 in this paper](https://www.nature.com/articles/nm.4505#MOESM3) for details). The non-numeric columns represent clinical metadata about each sample (run `?ddpr_metadata` for more information).
 
-##### Building a classifier using logistic regression
-
-```{r, eval = FALSE}
-# k-fold
-k_fold <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "k-fold", 
-    num_cv_folds = 3, 
-    strata = relapse_status
-  )
-
-# bootstrapping
-bootstraps <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "bootstrap", 
-    num_bootstraps = 3, 
-    strata = relapse_status
-  )
-
-# simple with prop
-simple_prop <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  tof_split_data(
-    split_method = "simple", 
-    simple_prop = 0.75, 
-    strata = relapse_status
-  )
-
-# simple with specification
-splits <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  dplyr::filter(!is.na(cohort)) %>% 
-  mutate(splits = (cohort == "Training")) %>% 
-  pull(splits)
-
-ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  filter(!is.na(cohort)) %>% 
-  tof_split_data(
-    split_method = splits, 
-    num_cv_folds = 3, 
-    strata = relapse_status
-  )
-
-# using split_col 
-simple_prop_2 <- 
-  ddpr_patients %>% 
-  select(any_of(colnames(ddpr_metadata)), patient_id, contains("Pop2")) %>%
-  drop_na(cohort) %>% 
-  mutate(splits = (cohort == "Training")) %>%
-  tof_split_data(
-    split_method = "simple", 
-    split_col = splits, 
-    simple_prop = 0.75, 
-    strata = relapse_status
-  )
-```
+There are also a few preprocessing steps that we might want to perform now to save us some headaches when we're fitting models later. 
 
 ```{r}
-# hyperparameter grid 
-hyperparameter_grid <- 
-  tof_create_grid()
-```
-
-```{r}
-# create recipe 
-unprepped_recipe <- 
+ddpr_patients <- 
   ddpr_patients %>% 
-  mutate(relapse_status = as.factor(relapse_status), event = 1) %>% 
-  tof_create_recipe(
-    predictor_cols = contains("Pop2"), 
-    outcome_cols = relapse_status, 
-    standardize_predictors = TRUE, 
-    impute_missing_predictors = TRUE
-  )
-
-unprepped_recipe %>% 
-  tidy()
-
-prepped_recipe <- 
-  unprepped_recipe %>% 
-  recipes::prep()
-
-prepped_recipe
-```
-
-
-```{r}
-start <- Sys.time()
-
-# train classifier
-class_mod <- 
-  ddpr_patients %>% 
-  mutate(relapse_status = as.factor(relapse_status)) %>%
-  filter(!is.na(relapse_status)) %>% 
-  tof_split_data(split_method = "simple", strata = relapse_status) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = relapse_status,
-    model_type = "two-class", 
-    impute_missing_predictors = TRUE, 
-    num_cores = 1
-  )
-
-end <- Sys.time()
-
-time_cost <- end - start
-
-class_mod %>% 
-  tof_assess_model()
-
-
-
-
-
-```
-
-
-```{r}
-start <- Sys.time()
-# train classifier
-class_mod <- 
-  ddpr_patients %>% 
-  dplyr::mutate(relapse_status = as.factor(relapse_status)) %>%
-  filter(!is.na(relapse_status)) %>% 
-  tof_split_data(
-    split_method = "k-fold", 
-    strata = relapse_status, 
-    num_cv_folds = 5
-  ) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = relapse_status,
-    model_type = "two-class", 
-    hyperparameter_grid = tof_create_grid(mixture_values = 1),
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE,
-    num_cores = 1
-  )
-
-end <- Sys.time()
-
-time_cost <- end - start
-
-time_cost
-
-
-
-class_mod
-
-
-```
-
-
-
-```{r}
-start <- Sys.time()
-# train classifier
-class_mod <- 
-  ddpr_patients %>% 
-  mutate(relapse_status = as.factor(relapse_status)) %>%
-  filter(!is.na(relapse_status)) %>% 
-  tof_split_data(
-    split_method = "bootstrap", 
-    strata = relapse_status, 
-    num_bootstraps = 10
-  ) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = relapse_status, 
-    model_type = "two-class", 
-    hyperparameter_grid = tof_create_grid(grid_size = 200),
-    impute_missing_predictors = TRUE, 
-    num_cores = 10
-  )
-
-end <- Sys.time()
-
-time_cost <- end - start
-
-time_cost
-
-
-class_mod
-```
-
-
-
-```{r}
-# train multiclass classifier
-multiclass_mod <- 
-  ddpr_patients %>% 
-  mutate(mrd_risk = as.factor(mrd_risk)) %>%
-  filter(!is.na(mrd_risk)) %>%
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 5, strata = mrd_risk) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = mrd_risk,
-    model_type = "multiclass", 
-    impute_missing_predictors = TRUE
-  )
-
-multiclass_mod
-
-multiclass_mod %>%
-  group_by(mixture) %>% 
-  summarize(correlation = cor(multinomial_deviance__tidytof__mean, roc_auc__tidytof__mean), 
-            correlation_2 = cor(multinomial_deviance__tidytof__mean, misclassification_error__tidytof__mean))
-
-```
-
-
-```{r}
-# train linear model
-linear_mod <- 
-  ddpr_patients %>% 
-  filter(!is.na(age_at_diagnosis)) %>% 
-  tof_split_data(split_method = "simple", strata = relapse_status) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = age_at_diagnosis,
-    model_type = "linear", 
-    hyperparameter_grid = 
-      tof_create_grid(
-        penalty_values = seq(0, 1, 0.02), 
-        mixture_values = c(0, 0.5, 1)
-      ), 
-    impute_missing_predictors = TRUE
-  )
-
-linear_mod
-
-```
-
-```{r}
-# train linear model
-linear_mod <- 
-  ddpr_patients %>% 
-  filter(!is.na(age_at_diagnosis)) %>% 
-  tof_split_data(split_method = "k-fold", strata = relapse_status) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = age_at_diagnosis,
-    model_type = "linear", 
-    hyperparameter_grid = 
-      tof_create_grid(
-        penalty_values = seq(0, 1, 0.02), 
-        mixture_values = c(0, 0.5, 1)
-      ), 
-    impute_missing_predictors = TRUE
-  )
-
-linear_mod
-
-cor(linear_mod$mse__tidytof__mean, linear_mod$mae__tidytof__mean)
-```
-
-
-
-```{r}
-# train survival
-surv_mod <-
-  ddpr_patients %>% 
+  # convert the relapse_status variable to a factor first, 
+  # which is something we'll want for fitting the model later
+  # and create the time_to_event and event columns for survival modeling
   mutate(
     relapse_status = as.factor(relapse_status), 
     time_to_event = if_else(relapse_status == "Yes", time_to_relapse, ccr),
     event = if_else(relapse_status == "Yes", 1, 0)
-  ) %>%
-  filter(!is.na(event)) %>% 
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 10, strata = relapse_status) %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    time_col = time_to_event,
-    event_col = event,
-    model_type = "survival",
-     hyperparameter_grid =
-      tof_create_grid(
-        penalty_values = c(0.1, 0.5, 1),
-        mixture_values = c(0.1, 0.5, 1)
-      ),
-    impute_missing_predictors = TRUE
+  )
+```
+
+##### Separating the training and validation cohorts
+
+In the original DDPR paper, some patients were used to fit the model and the rest were used to assess the model after it was tuned. We can separate our training and validation cohorts using the `cohort` variable in `ddpr_patients`
+
+```{r}
+ddpr_training <- 
+  ddpr_patients %>% 
+  dplyr::filter(cohort == "Training") 
+
+ddpr_validation <- 
+  ddpr_patients %>% 
+  dplyr::filter(cohort == "Validation")
+```
+
+
+```{r}
+nrow(ddpr_training)
+
+nrow(ddpr_validation)
+```
+
+
+
+##### Building a classifier using logistic regression
+
+First, we can build an elastic net classifier to predict which patients will relapse and which patients won't (ignoring time-to-event data for now). For this, we can use the `relapse_status` variable in `ddpr_training`: 
+
+```{r}
+ddpr_training %>% 
+  dplyr::count(relapse_status)
+```
+
+
+
+```{r}
+# train classifier
+training_split <- 
+  ddpr_training %>% 
+  tof_split_data(
+    split_method = "k-fold", 
+    num_cv_folds = 5, 
+    strata = relapse_status
   )
 
-surv_mod
+training_split
+```
 
+And we can inspect each of our splits to see what they contain: 
+
+```{r}
+# workspace to inspect the training_split object
+training_split$splits[[1]]
+```
+
+From here, we can feed our `training_split` object into the `tof_train_model` function to tune a logistic regression classifier
+
+```{r, warning = FALSE}
+start <- Sys.time()
+class_mod <- 
+  training_split %>% 
+  tof_train_model(
+    predictor_cols = contains("Pop2"), 
+    response_col = relapse_status,
+    model_type = "two-class", 
+    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
+    impute_missing_predictors = TRUE, 
+    remove_zv_predictors = TRUE # often a smart decision
+  )
+end <- Sys.time()
+
+print(class_mod)
 ```
 
 ```{r}
-k_fold %>% 
-  tof_prep_recipe(unprepped_recipe = unprepped_recipe) %>% 
-  pluck(1) %>% 
-  recipes::bake(new_data = k_fold$splits[[1]])
+# we can also print out how long it took to fit the model
+end - start
+```
 
-bootstraps %>% 
-  tof_prep_recipe(unprepped_recipe = unprepped_recipe) %>% 
-  pluck(1) %>% 
-  juice()
+We can then use the trained model to make predictions on the validation data
 
-simple_prop %>% 
-  tof_prep_recipe(
-    unprepped_recipe = unprepped_recipe
-  )
+```{r}
+class_predictions <- 
+  class_mod %>% 
+  tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-simple_prop_2 %>% 
-  tof_prep_recipe(unprepped_recipe) %>% 
-  juice()
+ddpr_validation %>% 
+  dplyr::select(relapse_status) %>% 
+  bind_cols(class_predictions) %>% 
+  dplyr::count(relapse_status, .pred)
+```
+
+We can also assess the model using `tof_assess_model`
+
+```{r}
+# calling the function with no new_data gives us the assessment on 
+# the training data
+training_assessment <- 
+  class_mod %>% 
+  tof_assess_model()
+
+training_assessment
+```
+
+And we can make an ROC curve using our metrics: 
+
+```{r}
+auc <- 
+  training_assessment$model_metrics %>% 
+  dplyr::filter(metric == "roc_auc") %>% 
+  dplyr::pull(value)
+
+training_assessment$roc_curve %>% 
+  ggplot(aes(x = FPR, y = TPR)) + 
+  geom_line() + 
+  geom_abline(
+    slope = 1, 
+    intercept = 0, 
+    linetype = "dotted", 
+    color = "gray60"
+  ) + 
+  labs(
+    subtitle = "Training performance", 
+    caption = str_glue("AUC = {auc}", auc = auc)
+  ) + 
+  theme_bw()
+
+```
+
+We can then assess the model on the validation data 
+
+```{r}
+validation_assessment <- 
+  class_mod %>% 
+  tof_assess_model(new_data = ddpr_validation)
+
+validation_assessment
 ```
 
 
+```{r}
+auc <- 
+  validation_assessment$model_metrics %>% 
+  dplyr::filter(metric == "roc_auc") %>% 
+  dplyr::pull(value)
+
+validation_assessment$roc_curve %>% 
+  ggplot(aes(x = FPR, y = TPR)) + 
+  geom_line() + 
+  geom_abline(
+    slope = 1, 
+    intercept = 0, 
+    linetype = "dotted", 
+    color = "gray60"
+  ) + 
+  labs(
+    subtitle = "Validation performance", 
+    caption = str_glue("AUC = {auc}", auc = round(auc, 3))
+  ) + 
+  theme_bw()
+
+```
+
+
+We can also fit a survival model 
+
+```{r, warning = FALSE}
+start <- Sys.time()
+survival_mod <- 
+  training_split %>% 
+  tof_train_model(
+    predictor_cols = contains("Pop2"), 
+    time_col = time_to_event, 
+    event_col = event, 
+    model_type = "survival", 
+    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
+    impute_missing_predictors = TRUE, 
+    remove_zv_predictors = TRUE # often a smart decision
+  )
+end <- Sys.time()
+
+print(survival_mod)
+```
+
+Making predictions using the survival model
+
+```{r}
+survival_mod %>% 
+  tof_predict(new_data = ddpr_validation, prediction_type = "response")
+```
+
+Assessing the survival model 
+
+```{r}
+survival_assessment <- 
+  survival_mod %>% 
+  tof_assess_model(new_data = ddpr_validation)
+
+survival_assessment
+```
+
+And we can use some of these values to make a survival curve for each patient 
+
+```{r}
+survival_assessment$survival_curves %>% 
+  tidyr::unnest(cols = survival_curve) %>% 
+  left_join(
+    y = 
+      tibble(
+        ddpr_risk = ddpr_validation$ddpr_risk, 
+        row_index = as.character(1:nrow(ddpr_validation))
+      ), 
+    by = "row_index"
+  ) %>% 
+  # something is weird about the first patient
+  dplyr::filter(row_index != "1") %>% 
+  dplyr::group_by(time, ddpr_risk) %>% 
+  dplyr::summarize(probability = mean(probability)) %>% 
+  ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
+  geom_path() + 
+  theme_bw()
+```
 
 
 ## `{tidytof}`'s Design Principles (and some tips)
