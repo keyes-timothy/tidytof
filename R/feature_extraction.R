@@ -41,6 +41,7 @@
 #' @export
 #'
 #' @importFrom tidyr pivot_wider
+#' @importFrom rlang arg_match
 #'
 #'
 tof_extract_proportion <-
@@ -137,8 +138,11 @@ tof_extract_proportion <-
 #' @export
 #'
 #' @importFrom rlang arg_match
+#' @importFrom stringr str_c
+#' @importFrom stringr str_remove
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
+#'
 #'
 tof_extract_central_tendency <-
   function(
@@ -181,7 +185,6 @@ tof_extract_central_tendency <-
           values_from = values
         )
     }
-
 
     return(dplyr::ungroup(central_tendencies))
   }
@@ -363,6 +366,9 @@ tof_extract_threshold <-
 #' @importFrom purrr map2_dbl
 #' @importFrom tidyselect all_of
 #' @importFrom stringr str_c
+#' @importFrom rlang arg_match
+#' @importFrom rlang enquo
+#'
 #'
 tof_extract_emd <-
   function(

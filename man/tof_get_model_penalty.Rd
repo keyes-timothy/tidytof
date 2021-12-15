@@ -2,16 +2,16 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_get_model_penalty}
 \alias{tof_get_model_penalty}
-\title{TO DO}
+\title{Get a `tof_model`'s optimal penalty (lambda) value}
 \usage{
 tof_get_model_penalty(tof_model)
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A tof_model}
 }
 \value{
-TO DO
+A numeric value
 }
 \description{
-TO DO
+Get a `tof_model`'s optimal penalty (lambda) value
 }

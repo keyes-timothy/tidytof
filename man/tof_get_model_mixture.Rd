@@ -2,16 +2,16 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_get_model_mixture}
 \alias{tof_get_model_mixture}
-\title{TO DO}
+\title{Get a `tof_model`'s optimal mixture (alpha) value}
 \usage{
 tof_get_model_mixture(tof_model)
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A tof_model}
 }
 \value{
-TO DO
+A numeric value
 }
 \description{
-TO DO
+Get a `tof_model`'s optimal mixture (alpha) value
 }

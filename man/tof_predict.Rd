@@ -2,27 +2,40 @@
 % Please edit documentation in R/patient-level_modeling.R
 \name{tof_predict}
 \alias{tof_predict}
-\title{TO DO}
+\title{Use a trained elastic net model to predict fitted values from new data}
 \usage{
 tof_predict(
   tof_model,
   new_data,
-  prediction_type = c("response", "class", "link"),
-  ...
+  prediction_type = c("response", "class", "link")
 )
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A `tof_model` trained using \code{\link{tof_train_model}}}
 
-\item{new_data}{TO DO}
+\item{new_data}{A tibble of new observations for which predictions should be made.
+If new_data isn't provided, predictions will be made for the training data used to
+fit the model.}
 
-\item{prediction_type}{TO DO}
+\item{prediction_type}{A string indicating which type of prediction should be
+provided by the model:
 
-\item{...}{TO DO}
+\describe{
+\item{"response" (the default)}{For "linear" models, the predicted response
+for each observation. For "two-class" and "multiclass" models, the fitted
+probabilities of each class for each observation. For "survival" models, the fitted relative-risk
+for each observation.}
+\item{"class}{Only applies to "two-class" and "multiclass" models. For both,
+the class label corresponding to the class with the maximum fitted probability.}
+\item{"link"}{The linear predictions of the model
+(the output of the link function for each model family.)}
+}}
 }
 \value{
-TO DO
+A \code{link[tibble]{tibble}} with a single column (`.pred`) containing
+the predictions. Each row in the output corresponds to a row in `new_data` (
+or, if `new_data` is not provided, to a row in the `tof_model`'s training data.
 }
 \description{
-TO DO
+This function uses a trained `tof_model` to make predictions on new data.
 }

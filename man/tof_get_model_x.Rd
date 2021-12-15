@@ -2,16 +2,16 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_get_model_x}
 \alias{tof_get_model_x}
-\title{TO DO}
+\title{Get a `tof_model`'s processed predictor matrix (for glmnet)}
 \usage{
 tof_get_model_x(tof_model)
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A tof_model}
 }
 \value{
-TO DO
+An x value formatted for glmnet
 }
 \description{
-TO DO
+Get a `tof_model`'s processed predictor matrix (for glmnet)
 }

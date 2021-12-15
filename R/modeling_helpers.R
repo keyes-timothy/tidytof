@@ -156,7 +156,11 @@ tof_prep_recipe <-
 #'
 #' @return TO DO
 #'
-#'
+#' @importFrom rsample training
+#' @importFrom parallel makeCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom parallel stopCluster
+#' @importFrom foreach %dopar%
 #'
 tof_tune_glmnet <-
   function(
@@ -291,6 +295,14 @@ tof_tune_glmnet <-
 #' }
 #'
 #' @references Harrel Jr, F. E. and Lee, K. L. and Mark, D. B. (1996) Tutorial in biostatistics: multivariable prognostic models: issues in developing models, evaluating assumptions and adequacy, and measuring and reducing error, Statistics in Medicine, 15, pages 361–387.
+#'
+#' @importFrom recipes bake
+#' @importFrom rsample training
+#' @importFrom rsample testing
+#' @importFrom survival Surv
+#' @importFrom glmnet glmnet
+#' @importFrom glmnet assess.glmnet
+#' @importFrom yardstick roc_auc
 #'
 #'
 tof_fit_split <-
@@ -545,6 +557,16 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
 
 
 
+#' Find the optimal hyperparameters for an elastic net model from candidate performance metrics
+#'
+#' @param performance_metrics TO DO
+#' @param model_type TO DO
+#' @param optimization_metric TO DO
+#'
+#' @return TO DO
+#'
+#' @importFrom rlang arg_match0
+#'
 tof_find_best <- function(performance_metrics, model_type, optimization_metric) {
 
   # of optimization metric is default, give it tidytof's automatic preference
@@ -636,14 +658,28 @@ tof_find_glmnet_family <- function(model_type) {
 
 tof_finalize_model <-
   function(
+    feature_tibble,
     best_model_parameters,
     recipe,
-    glmnet_x,
-    glmnet_y,
+    #glmnet_x = NULL,
+    #glmnet_y = NULL,
     model_type,
     outcome_colnames
   ) {
+    # find glmnet family
     glmnet_family <- tof_find_glmnet_family(model_type)
+
+    # convert data into the format glmnet uses
+    features_glmnet <-
+      feature_tibble %>%
+      tof_setup_glmnet_xy(
+        outcome_cols = dplyr::any_of(outcome_colnames),
+        recipe = recipe,
+        model_type = model_type
+      )
+
+    glmnet_x <- features_glmnet$x
+    glmnet_y <- features_glmnet$y
 
     # if there is more than 1 optimal set of hyperparamters, choose the sparsest
     # model and then the one that is closest to the lasso (alpha = 1).
@@ -665,8 +701,6 @@ tof_finalize_model <-
         standardize = FALSE
       )
 
-    # assess model on the full dataset
-
     # hack glmnet a bit to fix a bug in the predict.glmnet function
     new_call <- best_model$call
     new_call$family <- tof_find_glmnet_family(model_type)
@@ -683,40 +717,52 @@ tof_finalize_model <-
         mixture = best_alpha,
         model_type = model_type,
         outcome_colnames = outcome_colnames,
-        train_x = glmnet_x,
-        train_y = glmnet_y
+        training_data = feature_tibble
       )
 
     return(tof_model)
   }
 
-tof_setup_glmnet_xy <- function(feature_tibble, outcome_cols, model_type) {
+# accepts a feature tibble (i.e. produced by an extract function) and a
+# recipe for preprocessing and converts the raw data into a preprocessed x
+# matrix and y vector (or survival object for model_type == "survival")
+# per glmnet's preferences
+tof_setup_glmnet_xy <-
+  function(feature_tibble, recipe, outcome_cols, model_type) {
 
-  y <-
-    feature_tibble %>%
-    dplyr::select({{outcome_cols}})
+    # preprocess the input features using the recipe ---------------------------
+    preprocessed_features <-
+      recipe %>%
+      recipes::bake(new_data = feature_tibble)
 
-  predictor_colnames <-
-    setdiff(colnames(feature_tibble), colnames(y))
+    # separate the predictors (x) and outcomes (y) from one another ------------
 
-  x <-
-    feature_tibble %>%
-    dplyr::select(dplyr::any_of(predictor_colnames)) %>%
-    as.matrix()
-
-  if (model_type == "survival") {
     y <-
-      survival::Surv(
-        time = y[[1]],
-        event = y[[2]]
-      )
+      preprocessed_features %>%
+      dplyr::select({{outcome_cols}})
 
-  } else {
-    y <- y[[colnames(y)]]
+    predictor_colnames <-
+      setdiff(colnames(preprocessed_features), colnames(y))
+
+    x <-
+      preprocessed_features %>%
+      dplyr::select(dplyr::any_of(predictor_colnames)) %>%
+      as.matrix()
+
+    if (model_type == "survival") {
+      # create a survival object for the outcome in a cox model
+      y <-
+        survival::Surv(
+          time = y[[1]],
+          event = y[[2]]
+        )
+
+    } else {
+      y <- y[[colnames(y)]]
+    }
+
+    return(list(x = x, y = y))
   }
-
-  return(list(x = x, y = y))
-}
 
 tof_check_model_args <-
   function(
@@ -771,7 +817,7 @@ tof_check_model_args <-
 
       if (!is.numeric(time)) {
         stop("All values in time_col must be numeric - they represent the time
-           to event outcome for each patient (i.e. each row of feature_tibble.")
+           to event outcome for each patient (i.e. each row of of the input data.")
       }
 
       if (!all(event %in% c(0, 1))) {
@@ -821,9 +867,11 @@ tof_all_data <- function(split_data) {
 #' @param mixture A double indicating which alpha value was used to fit the glmnet model.
 #'
 #' @param model_type A string indicating which type of glmnet model is being fit.
+#'
 #' @param outcome_colnames TO DO
-#' @param train_x TO DO
-#' @param train_y TO DO
+#'
+#' @param training_data TO DO
+
 #'
 #' @return A `tof_model`, an S3 class that includes a trained glmnet model and
 #' the recipe used to perform its associated preprocessing.
@@ -836,8 +884,7 @@ new_tof_model <-
     mixture,
     model_type = c("linear", "two-class", "multiclass", "survival"),
     outcome_colnames,
-    train_x = NULL,
-    train_y = NULL
+    training_data
   ) {
 
     # check arguments
@@ -845,39 +892,63 @@ new_tof_model <-
     stopifnot(inherits(model, "glmnet"))
     stopifnot(is.numeric(penalty))
     stopifnot(is.numeric(mixture))
+    stopifnot(is.data.frame(training_data))
     model_type <- rlang::arg_match(model_type)
 
     # assemble tof_model
-    tof_model <- list(model = model, recipe = recipe)
+    tof_model <-
+      list(
+        model = model,
+        recipe = recipe,
+        mixture = mixture,
+        penalty = penalty,
+        model_type = model_type,
+        outcome_colnames = outcome_colnames,
+        training_data = training_data
+      )
 
-    # add attributes
-    attr(tof_model, which = "mixture") <- mixture
-    attr(tof_model, which = "penalty") <- penalty
-    attr(tof_model, which = "model_type") <- model_type
-    attr(tof_model, which = "outcome_colnames") <- outcome_colnames
-    attr(tof_model, which = "train_x") <- train_x
-    attr(tof_model, which = "train_y") <- train_y
-
+    # add class attribute and return
     class(tof_model) <- "tof_model"
-
     return(tof_model)
   }
 
 #' @exportS3Method
 print.tof_model <- function(x, ...) {
-  model_type <- attr(x, which = "model_type")
-  mixture <- attr(x, which = "mixture")
-  penalty <- attr(x, which = "penalty")
+  model_type <- x$model_type
+  mixture <- x$mixture
+  penalty <- x$penalty
 
-  coefficients <-
-    x$model %>%
-    glmnet::coef.glmnet(s = penalty) %>%
-    as.matrix() %>%
-    tibble::as_tibble(rownames = "feature")
+  if (model_type != "multiclass") {
+    coefficients <-
+      x$model %>%
+      glmnet::coef.glmnet(s = penalty) %>%
+      as.matrix() %>%
+      tibble::as_tibble(rownames = "feature")
 
-  colnames(coefficients) <- c("feature", "coefficient")
+    colnames(coefficients) <- c("feature", "coefficient")
 
-  coefficients <- dplyr::filter(coefficients, coefficient != 0)
+    coefficients <- dplyr::filter(coefficients, coefficient != 0)
+
+  } else {
+    coefficients <-
+      x$model %>%
+      glmnet::coef.glmnet(s = penalty) %>%
+      purrr::map(
+        .f = function(x) {
+          result <- x %>%
+            as.matrix() %>%
+            tibble::as_tibble(rownames = "feature")
+
+          colnames(result) <- c("feature", "coefficient")
+
+          result <- dplyr::filter(result, coefficient != 0)
+
+          return(result)
+        }
+      )
+
+    names(coefficients) <- levels(x$training_data[[tof_get_model_outcomes(x)]])
+  }
 
   cat("A", model_type, "`tof_model` with a mixture parameter (alpha) of",
       round(mixture, 3),
@@ -887,109 +958,113 @@ print.tof_model <- function(x, ...) {
   print(coefficients)
 }
 
-#' TO DO
+#' Get a `tof_model`'s training data
 #'
-#' TO DO
 #'
-#' @param tof_model TO DO
+#' @param tof_model A tof_model
 #'
-#' @return TO DO
-#'
-#' @export
-#'
-tof_get_model_x <-
-  function(tof_model) {
-    model_x <-
-      attr(tof_model, "train_x")
-
-    return(model_x)
-  }
-
-#' TO DO
-#'
-#' TO DO
-#'
-#' @param tof_model TO DO
-#'
-#' @return TO DO
+#' @return A tibble of (non-preprocessed) training data used to fit the model
 #'
 #' @export
 #'
-tof_get_model_y <-
+tof_get_model_training_data <-
   function(tof_model) {
-    model_y <-
-      attr(tof_model, "train_y")
-
-    return(model_y)
+    return(tof_model$training_data)
   }
 
-#' TO DO
+#' Get a `tof_model`'s optimal penalty (lambda) value
 #'
-#' TO DO
+#' @param tof_model A tof_model
 #'
-#' @param tof_model TO DO
-#'
-#' @return TO DO
+#' @return A numeric value
 #'
 #' @export
 #'
 tof_get_model_penalty <-
   function(tof_model) {
-    model_penalty <-
-      attr(tof_model, "penalty")
-
-    return(model_penalty)
+    return(tof_model$penalty)
   }
 
-#' TO DO
+#' Get a `tof_model`'s optimal mixture (alpha) value
 #'
-#' TO DO
+#' @param tof_model A tof_model
 #'
-#' @param tof_model TO DO
-#'
-#' @return TO DO
+#' @return A numeric value
 #'
 #' @export
 #'
 tof_get_model_mixture <-
   function(tof_model) {
-    model_mixture <-
-      attr(tof_model, "mixture")
-
-    return(model_mixture)
+    return(tof_model$mixture)
   }
 
-#' TO DO
+#' Get a `tof_model`'s model type
 #'
-#' TO DO
+#' @param tof_model A tof_model
 #'
-#' @param tof_model TO DO
-#'
-#' @return TO DO
+#' @return A string
 #'
 #' @export
 #'
 tof_get_model_type <-
   function(tof_model) {
-    model_type <-
-      attr(tof_model, "model_type")
-
-    return(model_type)
+    return(tof_model$model_type)
   }
 
-#' TO DO
+#' Get a `tof_model`'s outcome variable name(s)
 #'
-#' @param tof_model TO DO
+#' @param tof_model A tof_model
 #'
-#' @return TO DO
+#' @return A character vector
 #'
 #' @export
 #'
 tof_get_model_outcomes <-
   function(tof_model) {
-    model_colnames <-
-      attr(tof_model, "outcome_colnames")
+    return(tof_model$outcome_colnames)
+  }
 
-    return(model_colnames)
+#' Get a `tof_model`'s processed predictor matrix (for glmnet)
+#'
+#' @param tof_model A tof_model
+#'
+#' @return An x value formatted for glmnet
+#'
+#' @export
+#'
+tof_get_model_x <-
+  function(tof_model) {
+    xy <-
+      tof_model %>%
+      tof_get_model_training_data() %>%
+      tof_setup_glmnet_xy(
+        recipe = tof_model$recipe,
+        outcome_cols = tof_get_model_outcomes(tof_model),
+        model_type = tof_get_model_type(tof_model)
+      )
+
+    return(xy$x)
+  }
+
+#' Get a `tof_model`'s processed outcome variable matrix (for glmnet)
+#'
+#' @param tof_model A tof_model
+#'
+#' @return A y value formatted for glmnet
+#'
+#' @export
+#'
+tof_get_model_y <-
+  function(tof_model) {
+    xy <-
+      tof_model %>%
+      tof_get_model_training_data() %>%
+      tof_setup_glmnet_xy(
+        recipe = tof_model$recipe,
+        outcome_cols = tof_get_model_outcomes(tof_model),
+        model_type = tof_get_model_type(tof_model)
+      )
+
+    return(xy$y)
   }
 

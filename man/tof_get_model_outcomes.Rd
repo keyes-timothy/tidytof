@@ -2,16 +2,16 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_get_model_outcomes}
 \alias{tof_get_model_outcomes}
-\title{TO DO}
+\title{Get a `tof_model`'s outcome variable name(s)}
 \usage{
 tof_get_model_outcomes(tof_model)
 }
 \arguments{
-\item{tof_model}{TO DO}
+\item{tof_model}{A tof_model}
 }
 \value{
-TO DO
+A character vector
 }
 \description{
-TO DO
+Get a `tof_model`'s outcome variable name(s)
 }

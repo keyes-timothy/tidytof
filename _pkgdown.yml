@@ -46,6 +46,7 @@ reference:
   - starts_with("tof_get_model")
   - tof_fit_split
   - tof_tune_glmnet
+  - tof_find_best
 - title: "Visualization"
   desc: "Functions for visualizing CyTOF data"
   contents:
