@@ -5,16 +5,30 @@
 
 
 
-#' Title
+#' Create a recipe for preprocessing sample-level CyTOF data for an elastic net model
 #'
-#' TO DO
+#' @param feature_tibble A tibble in which each row represents a sample- or patient-
+#' level observation, such as those produced by \code{tof_extract_features}.
 #'
-#' @param feature_tibble TO DO
-#' @param predictor_cols TO DO
-#' @param outcome_cols TO DO
-#' @param standardize_predictors TO DO
-#' @param remove_zv_predictors TO DO
-#' @param impute_missing_predictors TO DO
+#' @param predictor_cols Unquoted column names indicating which columns in the
+#' data contained in `feature_tibble` should be used as predictors in the elastic net model.
+#' Supports tidyselect helpers.
+#'
+#' @param outcome_cols Unquoted column names indicating which columns in
+#' `feature_tibble` should be used as outcome variables in the elastic net model.
+#' Supports tidyselect helpers.
+#'
+#' @param standardize_predictors A logical value indicating if numeric predictor columns
+#' should be standardized (centered and scaled) before model fitting. Defaults to TRUE.
+#'
+#' @param remove_zv_predictors A logical value indicating if predictor columns
+#' with near-zero variance should be removed before model fitting using
+#' \code{\link[recipes]{step_nzv}}. Defaults to FALSE.
+#'
+#' @param impute_missing_predictors A logical value indicating if predictor columns
+#' should have missing values imputed using k-nearest neighbors before model fitting (see
+#' \code{\link[recipes]{step_impute_knn}}). Imputation is performed using an observation's
+#' 5 nearest-neighbors. Defaults to FALSE.
 #'
 #' @importFrom rlang arg_match
 #' @importFrom rlang enquo
@@ -142,17 +156,34 @@ tof_prep_recipe <-
 
   }
 
-#' Title
+#' Tune an elastic net model's hyperparameters over multiple resamples of a training dataset
 #'
-#' TO DO
+#' @param split_data An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
+#' package. The easiest way to generate this is to use \code{\link{tof_split_data}}
 #'
-#' @param split_data TO DO
 #' @param prepped_recipe TO DO
-#' @param hyperparameter_grid TO DO
-#' @param model_type TO DO
+#'
+#' @param hyperparameter_grid A hyperparameter grid indicating which values of
+#' the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamters
+#' should be used during model tuning. Generate this grid using \code{\link{tof_create_grid}}.
+#'
+#' @param model_type A string indicating which kind of elastic net model to build.
+#' If a continuous response is being predicted, use "linear" for linear regression;
+#' if a categorical response with only 2 classes is being predicted, use
+#' "two-class" for logistic regression; if a categorical response with more than 2
+#' levels is being predicted, use "multiclass" for multinomial regression; and if
+#' a time-to-event outcome is being predicted, use "survival" for Cox regression.
+#'
 #' @param outcome_cols TO DO
-#' @param optimization_metric TO DO
-#' @param num_cores TO DO
+#'
+#' @param optimization_metric A string indicating which optimization metric
+#' should be used for hyperparameter selection during model tuning. Valid values
+#' depend on the model_type.
+#'
+#' @param num_cores Integer indicating how many cores should be used for parallel
+#' processing when fitting multiple models. Defaults to 1. Overhead to separate
+#' models across multiple cores can be high, so significant speedup is unlikely
+#' to be observed unless many large models are being fit.
 #'
 #' @return TO DO
 #'
@@ -764,6 +795,41 @@ tof_setup_glmnet_xy <-
     return(list(x = x, y = y))
   }
 
+#' TO DO
+#'
+#' @param split_data An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
+#' package. The easiest way to generate this is to use \code{\link{tof_split_data}}
+#'
+#' @param model_type A string indicating which kind of elastic net model to build.
+#' If a continuous response is being predicted, use "linear" for linear regression;
+#' if a categorical response with only 2 classes is being predicted, use
+#' "two-class" for logistic regression; if a categorical response with more than 2
+#' levels is being predicted, use "multiclass" for multinomial regression; and if
+#' a time-to-event outcome is being predicted, use "survival" for Cox regression.
+#'
+#' @param best_model_type Currently unused.
+#'
+#' @param response_col Unquoted column name indicating which column in the data
+#' contained in `split_data` should be used as the outcome in a "two-class", "multiclass",
+#' or "linear" elastic net model. Must be a factor for "two-class" and "multiclass"
+#' models and must be a numeric for "linear" models. Ignored if `model_type` is "survival".
+#'
+#' @param time_col Unquoted column name indicating which column in the data
+#' contained in `split_data` represents the time-to-event outcome in a "survival"
+#' elastic net model. Must be numeric. Ignored if `model_type` is "two-class", "multiclass",
+#' or "linear".
+#'
+#' @param event_col Unquoted column name indicating which column in the data
+#' contained in `split_data` represents the time-to-event outcome in a "survival"
+#' elastic net model. Must be a binary column - all values should be either 0 or 1
+#' (with 1 indicating the adverse event) or FALSE and TRUE (with TRUE indicating the
+#' adverse event). Ignored if `model_type` is "two-class", "multiclass",
+#' or "linear".
+#'
+#' @return TO DO
+#'
+#' @export
+#'
 tof_check_model_args <-
   function(
     split_data,

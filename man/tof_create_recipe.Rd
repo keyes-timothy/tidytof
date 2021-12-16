@@ -2,7 +2,7 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_create_recipe}
 \alias{tof_create_recipe}
-\title{Title}
+\title{Create a recipe for preprocessing sample-level CyTOF data for an elastic net model}
 \usage{
 tof_create_recipe(
   feature_tibble,
@@ -14,18 +14,29 @@ tof_create_recipe(
 )
 }
 \arguments{
-\item{feature_tibble}{TO DO}
+\item{feature_tibble}{A tibble in which each row represents a sample- or patient-
+level observation, such as those produced by \code{tof_extract_features}.}
 
-\item{predictor_cols}{TO DO}
+\item{predictor_cols}{Unquoted column names indicating which columns in the
+data contained in `feature_tibble` should be used as predictors in the elastic net model.
+Supports tidyselect helpers.}
 
-\item{outcome_cols}{TO DO}
+\item{outcome_cols}{Unquoted column names indicating which columns in
+`feature_tibble` should be used as outcome variables in the elastic net model.
+Supports tidyselect helpers.}
 
-\item{standardize_predictors}{TO DO}
+\item{standardize_predictors}{A logical value indicating if numeric predictor columns
+should be standardized (centered and scaled) before model fitting. Defaults to TRUE.}
 
-\item{remove_zv_predictors}{TO DO}
+\item{remove_zv_predictors}{A logical value indicating if predictor columns
+with near-zero variance should be removed before model fitting using
+\code{\link[recipes]{step_nzv}}. Defaults to FALSE.}
 
-\item{impute_missing_predictors}{TO DO}
+\item{impute_missing_predictors}{A logical value indicating if predictor columns
+should have missing values imputed using k-nearest neighbors before model fitting (see
+\code{\link[recipes]{step_impute_knn}}). Imputation is performed using an observation's
+5 nearest-neighbors. Defaults to FALSE.}
 }
 \description{
-TO DO
+Create a recipe for preprocessing sample-level CyTOF data for an elastic net model
 }

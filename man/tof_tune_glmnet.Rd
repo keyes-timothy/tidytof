@@ -2,7 +2,7 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_tune_glmnet}
 \alias{tof_tune_glmnet}
-\title{Title}
+\title{Tune an elastic net model's hyperparameters over multiple resamples of a training dataset}
 \usage{
 tof_tune_glmnet(
   split_data,
@@ -15,23 +15,36 @@ tof_tune_glmnet(
 )
 }
 \arguments{
-\item{split_data}{TO DO}
+\item{split_data}{An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
+package. The easiest way to generate this is to use \code{\link{tof_split_data}}}
 
 \item{prepped_recipe}{TO DO}
 
-\item{hyperparameter_grid}{TO DO}
+\item{hyperparameter_grid}{A hyperparameter grid indicating which values of
+the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamters
+should be used during model tuning. Generate this grid using \code{\link{tof_create_grid}}.}
 
-\item{model_type}{TO DO}
+\item{model_type}{A string indicating which kind of elastic net model to build.
+If a continuous response is being predicted, use "linear" for linear regression;
+if a categorical response with only 2 classes is being predicted, use
+"two-class" for logistic regression; if a categorical response with more than 2
+levels is being predicted, use "multiclass" for multinomial regression; and if
+a time-to-event outcome is being predicted, use "survival" for Cox regression.}
 
 \item{outcome_cols}{TO DO}
 
-\item{optimization_metric}{TO DO}
+\item{optimization_metric}{A string indicating which optimization metric
+should be used for hyperparameter selection during model tuning. Valid values
+depend on the model_type.}
 
-\item{num_cores}{TO DO}
+\item{num_cores}{Integer indicating how many cores should be used for parallel
+processing when fitting multiple models. Defaults to 1. Overhead to separate
+models across multiple cores can be high, so significant speedup is unlikely
+to be observed unless many large models are being fit.}
 }
 \value{
 TO DO
 }
 \description{
-TO DO
+Tune an elastic net model's hyperparameters over multiple resamples of a training dataset
 }
