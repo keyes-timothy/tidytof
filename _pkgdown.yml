@@ -38,6 +38,7 @@ reference:
   contents:
   - tof_split_data
   - tof_train_model
+  - tof_check_model_args
   - tof_predict
   - tof_assess_model
   - tof_clean_metric_names
