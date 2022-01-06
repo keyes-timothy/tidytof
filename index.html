@@ -106,7 +106,7 @@
 <ul>
 <li><a href="#1-use-the-tof_-prefix-to-your-advantage">1. Use the <code>tof_</code> prefix to your advantage.</a></li>
 <li><a href="#2-tidytof-functions-use-2-kinds-of-arguments">2. <code>{tidytof}</code> functions use 2 kinds of arguments</a></li>
-<li><a href="#3-use-tidytof-pipelines-to-write-human-readable-pipelines">3. Use <code>{tidytof}</code> pipelines to write human-readable pipelines</a></li>
+<li><a href="#3-use-tidytof-to-write-human-readable-pipelines">3. Use <code>{tidytof}</code> to write human-readable pipelines</a></li>
 <li><a href="#4-additional-resources">4. Additional resources</a></li>
 </ul>
 </li>
@@ -433,12 +433,12 @@
 <span class="co">#&gt; # A tibble: 6 × 27</span>
 <span class="co">#&gt;   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
 <span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569</span>
-<span class="co">#&gt; 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 </span>
-<span class="co">#&gt; 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    </span>
-<span class="co">#&gt; 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 </span>
-<span class="co">#&gt; 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733</span>
-<span class="co">#&gt; 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733</span>
+<span class="co">#&gt; 1 H1_PhenoGrap… 2                 cluster1         0.199  2.19 0      4.56 0.569</span>
+<span class="co">#&gt; 2 H1_PhenoGrap… 2                 cluster1         0      2.92 0      5.33 1.61 </span>
+<span class="co">#&gt; 3 H1_PhenoGrap… 2                 cluster1         0      1.99 0.390  4.62 0    </span>
+<span class="co">#&gt; 4 H1_PhenoGrap… 2                 cluster1         0.881  1.53 0.199  4.61 1.02 </span>
+<span class="co">#&gt; 5 H1_PhenoGrap… 2                 cluster1         0.881  2.05 0.199  4.80 0.733</span>
+<span class="co">#&gt; 6 H1_PhenoGrap… 2                 cluster1         0      1.25 0.733  5.01 0.733</span>
 <span class="co">#&gt; # … with 19 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd15 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;,</span>
@@ -451,11 +451,11 @@
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;                &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster3           2                     1999</span>
-<span class="co">#&gt; 2 cluster2           3                     1998</span>
-<span class="co">#&gt; 3 cluster1           1                     1974</span>
-<span class="co">#&gt; 4 cluster1           2                       26</span>
-<span class="co">#&gt; 5 cluster2           2                        2</span>
+<span class="co">#&gt; 1 cluster2           1                     2000</span>
+<span class="co">#&gt; 2 cluster3           3                     1992</span>
+<span class="co">#&gt; 3 cluster1           2                     1983</span>
+<span class="co">#&gt; 4 cluster1           3                       17</span>
+<span class="co">#&gt; 5 cluster3           2                        7</span>
 <span class="co">#&gt; 6 cluster3           1                        1</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag; to change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a <code>tibble</code> that only includes the cluster labels (not the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>add_col</code> to <code>FALSE</code>.</p>
@@ -468,12 +468,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1</span>
 <span class="co">#&gt;   .flowsom_metacluster</span>
 <span class="co">#&gt;   &lt;chr&gt;               </span>
-<span class="co">#&gt; 1 2                   </span>
-<span class="co">#&gt; 2 2                   </span>
-<span class="co">#&gt; 3 2                   </span>
-<span class="co">#&gt; 4 2                   </span>
-<span class="co">#&gt; 5 2                   </span>
-<span class="co">#&gt; 6 2</span></code></pre></div>
+<span class="co">#&gt; 1 3                   </span>
+<span class="co">#&gt; 2 3                   </span>
+<span class="co">#&gt; 3 3                   </span>
+<span class="co">#&gt; 4 3                   </span>
+<span class="co">#&gt; 5 3                   </span>
+<span class="co">#&gt; 6 3</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="dimensionality-reduction-with-tof_reduce">Dimensionality reduction with <code>tof_reduce</code>
@@ -494,12 +494,12 @@
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   .tsne_1 .tsne_2</span>
 <span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   -16.4  -17.1 </span>
-<span class="co">#&gt; 2   -16.8  -22.2 </span>
-<span class="co">#&gt; 3   -13.6   -4.75</span>
-<span class="co">#&gt; 4   -12.5  -20.3 </span>
-<span class="co">#&gt; 5   -15.1  -13.6 </span>
-<span class="co">#&gt; 6   -15.8  -14.3</span></code></pre></div>
+<span class="co">#&gt; 1   15.9     17.2</span>
+<span class="co">#&gt; 2   21.9     17.9</span>
+<span class="co">#&gt; 3    2.69    14.9</span>
+<span class="co">#&gt; 4   19.8     14.5</span>
+<span class="co">#&gt; 5   12.2     16.1</span>
+<span class="co">#&gt; 6   13.0     16.3</span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add reduced-dimension feature embeddings to the input <code>tof_tbl</code> and return the augmented <code>tof_tbl</code> (that is, a <code>tof_tbl</code> with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set <code>add_cols</code> to <code>FALSE</code> (as in <code>tof_cluster</code>).</p>
 <p>Regardless of the method used, reduced-dimension feature embeddings can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics package):</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -1030,12 +1030,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
-<span class="co">#&gt; 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944</span>
-<span class="co">#&gt; 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
-<span class="co">#&gt; 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226</span>
-<span class="co">#&gt; 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
-<span class="co">#&gt; 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; 1 UPN1-Rx       0.0395     0.618   0.0634      0.572       2.93     0.944</span>
+<span class="co">#&gt; 2 UPN3          0.633      0.0234  0.0165      0.0327      2.25     0.226</span>
+<span class="co">#&gt; 3 UPN7          0.474      0.966   0.124       1.24        2.59     0.243</span>
+<span class="co">#&gt; 4 UPN9         15.6        0.446   0.0445      0.163       2.86     0.434</span>
+<span class="co">#&gt; 5 UPN10         0.00374    0.761   0.000696    0.829       3.19     0.886</span>
+<span class="co">#&gt; 6 UPN10-Rx      0.00240    0.167   0.203       0.802       2.57     0.822</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1050,12 +1050,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN10         0.00374     0.761  0.000696    0.829       3.19     0.886</span>
-<span class="co">#&gt; 2 UPN10-Rx      0.00240     0.167  0.203       0.802       2.57     0.822</span>
-<span class="co">#&gt; 3 UPN24         0.0989      0.196  0.0198      0.210       2.36     0.382</span>
-<span class="co">#&gt; 4 UPN26         0.390       0.650  0.00157     0.622       2.81     0.684</span>
-<span class="co">#&gt; 5 UPN35         0.0948      0.138  0.155       0.839       3.46     0.970</span>
-<span class="co">#&gt; 6 UPN52         0.0623      0.254  0.0438      0.0240      2.16     0.382</span>
+<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
+<span class="co">#&gt; 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
+<span class="co">#&gt; 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
+<span class="co">#&gt; 4 UPN8           0.951     0.958    0.161      0.556       3.18     0.556</span>
+<span class="co">#&gt; 5 UPN13          0.0634    0.0300   0.0219     0.109       2.34     0.314</span>
+<span class="co">#&gt; 6 UPN19          2.05      0.780    0.00233    0.298       2.36     0.481</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1382,7 +1382,7 @@
 <p>[Under construction]</p>
 </div>
 <div class="section level3">
-<h3 id="3-use-tidytof-pipelines-to-write-human-readable-pipelines">3. Use <code>{tidytof}</code> pipelines to write human-readable pipelines<a class="anchor" aria-label="anchor" href="#3-use-tidytof-pipelines-to-write-human-readable-pipelines"></a>
+<h3 id="3-use-tidytof-to-write-human-readable-pipelines">3. Use <code>{tidytof}</code> to write human-readable pipelines<a class="anchor" aria-label="anchor" href="#3-use-tidytof-to-write-human-readable-pipelines"></a>
 </h3>
 <p>The real “magic” of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> derives from its ability to simplify multistep data-processing tasks into a simple and readable chunk of code. For example, suppose we just acquired some .fcs files from a mass cytometer and want to perform the following analysis:</p>
 <ol style="list-style-type: decimal">
