@@ -36,8 +36,8 @@
             advantage.](#1-use-the-tof_-prefix-to-your-advantage)
         -   [2. `{tidytof}` functions use 2 kinds of
             arguments](#2-tidytof-functions-use-2-kinds-of-arguments)
-        -   [3. Use `{tidytof}` pipelines to write human-readable
-            pipelines](#3-use-tidytof-pipelines-to-write-human-readable-pipelines)
+        -   [3. Use `{tidytof}` to write human-readable
+            pipelines](#3-use-tidytof-to-write-human-readable-pipelines)
         -   [4. Additional resources](#4-additional-resources)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -541,12 +541,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 27
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569
-#> 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 
-#> 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    
-#> 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 
-#> 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733
-#> 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733
+#> 1 H1_PhenoGrap… 2                 cluster1         0.199  2.19 0      4.56 0.569
+#> 2 H1_PhenoGrap… 2                 cluster1         0      2.92 0      5.33 1.61 
+#> 3 H1_PhenoGrap… 2                 cluster1         0      1.99 0.390  4.62 0    
+#> 4 H1_PhenoGrap… 2                 cluster1         0.881  1.53 0.199  4.61 1.02 
+#> 5 H1_PhenoGrap… 2                 cluster1         0.881  2.05 0.199  4.80 0.733
+#> 6 H1_PhenoGrap… 2                 cluster1         0      1.25 0.733  5.01 0.733
 #> # … with 19 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd15 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -570,11 +570,11 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster3           2                     1999
-#> 2 cluster2           3                     1998
-#> 3 cluster1           1                     1974
-#> 4 cluster1           2                       26
-#> 5 cluster2           2                        2
+#> 1 cluster2           1                     2000
+#> 2 cluster3           3                     1992
+#> 3 cluster1           2                     1983
+#> 4 cluster1           3                       17
+#> 5 cluster3           2                        7
 #> 6 cluster3           1                        1
 ```
 
@@ -597,12 +597,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 2                   
-#> 2 2                   
-#> 3 2                   
-#> 4 2                   
-#> 5 2                   
-#> 6 2
+#> 1 3                   
+#> 2 3                   
+#> 3 3                   
+#> 4 3                   
+#> 5 3                   
+#> 6 3
 ```
 
 #### Dimensionality reduction with `tof_reduce`
@@ -631,12 +631,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1   -16.4  -17.1 
-#> 2   -16.8  -22.2 
-#> 3   -13.6   -4.75
-#> 4   -12.5  -20.3 
-#> 5   -15.1  -13.6 
-#> 6   -15.8  -14.3
+#> 1   15.9     17.2
+#> 2   21.9     17.9
+#> 3    2.69    14.9
+#> 4   19.8     14.5
+#> 5   12.2     16.1
+#> 6   13.0     16.3
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1376,12 +1376,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
-#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 1 UPN1-Rx       0.0395     0.618   0.0634      0.572       2.93     0.944
+#> 2 UPN3          0.633      0.0234  0.0165      0.0327      2.25     0.226
+#> 3 UPN7          0.474      0.966   0.124       1.24        2.59     0.243
+#> 4 UPN9         15.6        0.446   0.0445      0.163       2.86     0.434
+#> 5 UPN10         0.00374    0.761   0.000696    0.829       3.19     0.886
+#> 6 UPN10-Rx      0.00240    0.167   0.203       0.802       2.57     0.822
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1396,12 +1396,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN10         0.00374     0.761  0.000696    0.829       3.19     0.886
-#> 2 UPN10-Rx      0.00240     0.167  0.203       0.802       2.57     0.822
-#> 3 UPN24         0.0989      0.196  0.0198      0.210       2.36     0.382
-#> 4 UPN26         0.390       0.650  0.00157     0.622       2.81     0.684
-#> 5 UPN35         0.0948      0.138  0.155       0.839       3.46     0.970
-#> 6 UPN52         0.0623      0.254  0.0438      0.0240      2.16     0.382
+#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 4 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 5 UPN13          0.0634    0.0300   0.0219     0.109       2.34     0.314
+#> 6 UPN19          2.05      0.780    0.00233    0.298       2.36     0.481
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1799,7 +1799,7 @@ tof_extract_features(
 
 \[Under construction\]
 
-### 3. Use `{tidytof}` pipelines to write human-readable pipelines
+### 3. Use `{tidytof}` to write human-readable pipelines
 
 The real “magic” of `{tidytof}` derives from its ability to simplify
 multistep data-processing tasks into a simple and readable chunk of

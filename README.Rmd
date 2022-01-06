@@ -1019,7 +1019,7 @@ tof_extract_features(
 
 [Under construction]
 
-### 3. Use `{tidytof}` pipelines to write human-readable pipelines
+### 3. Use `{tidytof}` to write human-readable pipelines
 
 The real "magic" of `{tidytof}` derives from its ability to simplify multistep data-processing tasks into a simple and readable chunk of code. For example, suppose we just acquired some .fcs files from a mass cytometer and want to perform the following analysis: 
 
