@@ -30,3 +30,11 @@ This function is a wrapper around {tidytof}'s tof_cluster_* function family.
 It performs clustering on CyTOF data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters
 }
+\seealso{
+Other clustering functions: 
+\code{\link{tof_cluster_ddpr}()},
+\code{\link{tof_cluster_flowsom}()},
+\code{\link{tof_cluster_kmeans}()},
+\code{\link{tof_cluster_phenograph}()}
+}
+\concept{clustering functions}

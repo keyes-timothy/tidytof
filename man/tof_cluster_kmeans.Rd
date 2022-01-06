@@ -39,3 +39,11 @@ This function performs k-means clustering on CyTOF data using a user-specified
 selection of input variables/CyTOF measurements. It is mostly a convenient
 wrapper around \code{\link[stats]{kmeans}}.
 }
+\seealso{
+Other clustering functions: 
+\code{\link{tof_cluster_ddpr}()},
+\code{\link{tof_cluster_flowsom}()},
+\code{\link{tof_cluster_phenograph}()},
+\code{\link{tof_cluster}()}
+}
+\concept{clustering functions}

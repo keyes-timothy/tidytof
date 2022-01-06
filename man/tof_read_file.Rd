@@ -30,7 +30,3 @@ manually by the user.
 \description{
 Read CyTOF data from a single .fcs or .csv file into a tidy tibble.
 }
-\examples{
-NULL
-
-}

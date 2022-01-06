@@ -36,3 +36,10 @@ randomly sampling a proportion of cells, or performing density-dependent
 downsampling per the algorithm in
 \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}).
 }
+\seealso{
+Other downsampling functions: 
+\code{\link{tof_downsample_constant}()},
+\code{\link{tof_downsample_density}()},
+\code{\link{tof_downsample_prop}()}
+}
+\concept{downsampling functions}

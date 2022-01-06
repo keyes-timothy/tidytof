@@ -41,3 +41,10 @@ in the calculated principal component space.
 \description{
 This function calculates principal components using single-cell data from a `tof_tibble`.
 }
+\seealso{
+Other dimensionality reduction functions: 
+\code{\link{tof_reduce_dimensions}()},
+\code{\link{tof_reduce_tsne}()},
+\code{\link{tof_reduce_umap}()}
+}
+\concept{dimensionality reduction functions}

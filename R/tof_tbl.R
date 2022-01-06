@@ -12,6 +12,8 @@
 #' @return A `tof_tbl`, an tibble extension that tracks a few other attributes
 #' that are useful for CyTOF data analysis.
 #'
+#' @family tof_tbl utilities
+#'
 new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
 
   stopifnot(tibble::is_tibble(x))
@@ -43,6 +45,8 @@ new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
 #'
 #' @export
 #'
+#' @family tof_tbl utilities
+#'
 #'
 tof_get_panel <- function(tof_tibble) {
   panel <-
@@ -66,6 +70,8 @@ tof_get_panel <- function(tof_tibble) {
 #' that was used during data acquisition for the data contained
 #' in the input `tof_tibble`. Two columns are required: "metals" and "antigens".
 #'
+#' @family tof_tbl utilities
+#'
 #' @export
 #'
 #'
@@ -79,28 +85,31 @@ tof_set_panel <- function(tof_tibble, panel) {
 
 # tidyr methods
 
-
+#' @export
 nest.tof_tbl <- function(.data, ..., .names_sep = NULL) {#, .key = deprecated()) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+#' @export
 unnest.tof_tbl <- function(data, ...) {
   start_panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = start_panel))
 }
 
-
+#' @export
 pivot_longer.tof_tbl <- function(data, ...) {
   panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+#' @export
 pivot_wider.tof_tbl <- function(data, ...) {
   panel <- tof_get_panel(data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+#' @export
 group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
@@ -109,11 +118,13 @@ group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_def
 
 # dplyr methods
 
+#' @export
 mutate.tof_tbl <- function(.data, ...) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
 
+#' @export
 slice_sample.tof_tbl <- function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))

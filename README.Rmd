@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%", 
+  out.width = "100%",
   dpi = 150,
   warning = FALSE,
   message = FALSE
@@ -697,9 +697,7 @@ citrus_data %>%
 
 #### Outcomes modeling with `tof_model`
 
-[Under construction]
-
-[intro to building predictive models and why we might be motivated to do so.]
+[brief intro to building predictive models and why we might be motivated to do so.]
 
 `{tidytof}` implements several functions for building predictive models using sample- or patient-level data. To illustrate how they work, first we download some patient-level data from [this paper](https://pubmed.ncbi.nlm.nih.gov/29505032/) and combining it with sample-level clinical annotations in one of `{tidytof}`'s built-in data objects (`ddpr_metadata`).
 
@@ -760,20 +758,19 @@ nrow(ddpr_validation)
 ```
 
 
-
 ##### Building a classifier using logistic regression
 
-First, we can build an elastic net classifier to predict which patients will relapse and which patients won't (ignoring time-to-event data for now). For this, we can use the `relapse_status` variable in `ddpr_training`: 
+First, we can build an elastic net classifier to predict which patients will relapse and which patients won't (ignoring time-to-event data for now). For this, we can use the `relapse_status` column in `ddpr_training` as the outcome variable: 
 
 ```{r}
+# find how many of each outcome we have in our cohort
 ddpr_training %>% 
   dplyr::count(relapse_status)
 ```
 
-
+Specifically, we can use the `tof_split_data` function to split our cohort into a training and test set either once (a "simple" split) or multiple times (using either k-fold cross-validation or bootstrapping). In this case, we use 5-fold cross-validation, but reading the documentation of `tof_split_data` demonstrates how to use other methods. 
 
 ```{r}
-# train classifier
 training_split <- 
   ddpr_training %>% 
   tof_split_data(
@@ -785,17 +782,36 @@ training_split <-
 training_split
 ```
 
-And we can inspect each of our splits to see what they contain: 
+The output of `tof_split_data` varies depending on which `split_method` is used. For cross-validation, the result is a `rset` object from the [rsample](https://rsample.tidymodels.org/) package. `rset` objects are a type of tibble with two columns: 
+
+* `splits` - a column in which each entry is an `rsplit` object (which contains a single resample of the full dataset)
+* `id` - a character column in which each entry represents the name of the fold that each entry in `splits` belongs to.
+
+We can inspect one of the resamples in the `splits` column to see what they contain:
 
 ```{r}
-# workspace to inspect the training_split object
-training_split$splits[[1]]
+my_resample <- training_split$splits[[1]]
+
+print(my_resample)
+
+class(my_resample)
 ```
 
-From here, we can feed our `training_split` object into the `tof_train_model` function to tune a logistic regression classifier
+Note that you can use `rsample::training` and `rsample::testing` to return the training and test obeservations from each resampling: 
+
+```{r}
+my_resample %>% 
+  training() %>% 
+  head()
+
+my_resample %>% 
+  testing() %>% 
+  head()
+```
+
+From here, we can feed  `training_split` into the `tof_train_model` function to [tune](https://www.tmwr.org/tuning.html) a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the `tof_create_grid` documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model).
 
 ```{r, warning = FALSE}
-start <- Sys.time()
 class_mod <- 
   training_split %>% 
   tof_train_model(
@@ -806,17 +822,16 @@ class_mod <-
     impute_missing_predictors = TRUE, 
     remove_zv_predictors = TRUE # often a smart decision
   )
-end <- Sys.time()
+```
 
+The output of `tof_train_model` is a `tof_model`, an object containing information about the trained model (and that can be passed to the `tof_predict` and `tof_assess_model` verbs). When a `tof_model` is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model. 
+
+```{r}
 print(class_mod)
 ```
 
-```{r}
-# we can also print out how long it took to fit the model
-end - start
-```
 
-We can then use the trained model to make predictions on the validation data
+We can then use the trained model to make predictions on the validation data that we set aside earlier: 
 
 ```{r}
 class_predictions <- 
@@ -827,9 +842,20 @@ ddpr_validation %>%
   dplyr::select(relapse_status) %>% 
   bind_cols(class_predictions) %>% 
   dplyr::count(relapse_status, .pred)
+
+accuracy <- 
+  ddpr_validation %>% 
+  dplyr::select(relapse_status) %>% 
+  bind_cols(class_predictions) %>% 
+  mutate(.pred = factor(.pred, levels = levels(relapse_status))) %>% 
+  yardstick::accuracy(truth = relapse_status, estimate = .pred) %>% 
+  pull(.estimate) %>% 
+  round(3)
 ```
 
-We can also assess the model using `tof_assess_model`
+So we can see that our accuracy is about `r accuracy`.
+
+We can also assess the model directly using `tof_assess_model`
 
 ```{r}
 # calling the function with no new_data gives us the assessment on 
@@ -904,7 +930,6 @@ validation_assessment$roc_curve %>%
 We can also fit a survival model 
 
 ```{r, warning = FALSE}
-start <- Sys.time()
 survival_mod <- 
   training_split %>% 
   tof_train_model(
@@ -916,7 +941,6 @@ survival_mod <-
     impute_missing_predictors = TRUE, 
     remove_zv_predictors = TRUE # often a smart decision
   )
-end <- Sys.time()
 
 print(survival_mod)
 ```
@@ -956,8 +980,8 @@ survival_assessment$survival_curves %>%
   dplyr::group_by(time, ddpr_risk) %>% 
   dplyr::summarize(probability = mean(probability)) %>% 
   ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
-  geom_path() + 
-  theme_bw()
+  geom_path() +
+  theme_bw() 
 ```
 
 
@@ -995,7 +1019,44 @@ tof_extract_features(
 
 [Under construction]
 
-### 3. Additional resources
+### 3. Use `{tidytof}` pipelines to write human-readable pipelines
+
+The real "magic" of `{tidytof}` derives from its ability to simplify multistep data-processing tasks into a simple and readable chunk of code. For example, suppose we just acquired some .fcs files from a mass cytometer and want to perform the following analysis: 
+
+1. Read the .fcs files into our R session
+2. Arcsinh-transform each column of protein measurements 
+3. Cluster our cells based on the surface markers in our panel
+4. Downsample the dataset such that 100 random cells are picked from each cluster
+5. Perform dimensionality reduction on the downsampled dataset using tSNE
+6. Visualize the clusters using the low-dimensional tSNE embedding
+
+By using the appropriate `{tidytof}` verbs for each step of our analysis, we can easily write code in which each function call corresponds to exactly one step of our pipeline: 
+
+```{r}
+input_path <- tidytof_example_data("phenograph")
+
+input_path %>% 
+  # step 1
+  tof_read_data() %>% 
+  # step 2
+  tof_preprocess() %>% 
+  # step 3
+  tof_cluster(method = "flowsom") %>% 
+  # step 4
+  tof_downsample(group_cols = .flowsom_metacluster, method = "constant", num_cells = 50) %>% 
+  # step 5
+  tof_reduce_dimensions(method = "tsne") %>% 
+  # step 6
+  tof_plot_cells_dr(
+    dr_cols = contains("tsne"),
+    color_col = .flowsom_metacluster, 
+    dr_method = "tsne"
+  )
+```
+
+As shown above, stringing together `{tidytof}` verbs creates a pipeline that can be read easily from left-to-right and top-to-bottom -- this means that it will be relatively easy for you to return to this code later (to modify it, or to write a methods section for your next high-impact manuscript!) or, perhaps more importantly, for one of your colleagues to return to it later when they want to recreate your analysis. 
+
+### 4. Additional resources
 
 `{tidytof}` is built on top of the `tidyverse` family of R packages. As a result, most users of `{tidytof}` will benefit substantially from spending a few hours with the `{dplyr}`, `{ggplot2}`, and `{tidyr}` package vignettes to learn about some of the many useful functions these packages provide.
 

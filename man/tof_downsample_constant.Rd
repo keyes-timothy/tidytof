@@ -26,3 +26,10 @@ has fewer than `num_cells` number of cells, an error will be thrown.
 This function downsamples the number of cells in a `tof_tbl` by randomly selecting
 `num_cells` cells from each unique combination of values in `group_cols`.
 }
+\seealso{
+Other downsampling functions: 
+\code{\link{tof_downsample_density}()},
+\code{\link{tof_downsample_prop}()},
+\code{\link{tof_downsample}()}
+}
+\concept{downsampling functions}

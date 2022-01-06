@@ -50,6 +50,7 @@
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
+#' @family clustering functions
 #'
 #' @export
 #'
@@ -196,7 +197,11 @@ tof_cluster_flowsom <-
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the PhenoGraph cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
+#' @family clustering functions
+#'
 #' @export
+#'
+#'
 #'
 #'
 tof_cluster_phenograph <-
@@ -255,6 +260,8 @@ tof_cluster_phenograph <-
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
+#'
+#' @family clustering functions
 #'
 #' @export
 #'
@@ -351,6 +358,8 @@ tof_cluster_kmeans <-
 #' If `return_distances = FALSE`, a tibble with one column named `.{distance_function}_cluster`.
 #' This column will contain an integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the developmental cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
+#'
+#' @family clustering functions
 #'
 #' @export
 #'
@@ -450,6 +459,8 @@ tof_cluster_ddpr <-
 #' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
+#'
+#' @family clustering functions
 #'
 #' @export
 #'

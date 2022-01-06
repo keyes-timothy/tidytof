@@ -117,3 +117,10 @@ as random effects predictors. Once all models (one per each cluster/marker pair)
 p-values for each coefficient in each model are multiple-comparisons adjusted using the
 \code{\link[stats]{p.adjust}} function.
 }
+\seealso{
+Other differential expression analysis functions: 
+\code{\link{tof_dea_diffcyt}()},
+\code{\link{tof_dea_ttest}()},
+\code{\link{tof_dea}()}
+}
+\concept{differential expression analysis functions}

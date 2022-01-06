@@ -29,3 +29,10 @@ of the .fcs file from which each cell was read.
 \description{
 Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 }
+\seealso{
+Other input/output functions: 
+\code{\link{tof_write_csv}()},
+\code{\link{tof_write_data}()},
+\code{\link{tof_write_fcs}()}
+}
+\concept{input/output functions}

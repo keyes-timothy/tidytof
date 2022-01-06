@@ -49,3 +49,11 @@ wrapper around \code{\link[Rphenograph]{Rphenograph}}.
 For additional details about the Phenograph algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/26095251/}{this paper}.
 }
+\seealso{
+Other clustering functions: 
+\code{\link{tof_cluster_ddpr}()},
+\code{\link{tof_cluster_flowsom}()},
+\code{\link{tof_cluster_kmeans}()},
+\code{\link{tof_cluster}()}
+}
+\concept{clustering functions}

@@ -128,3 +128,10 @@ The two methods are based on linear mixed models ("lmm") and
 Both the "lmm" and "limma" methods can model both fixed effects and random
 effects.
 }
+\seealso{
+Other differential expression analysis functions: 
+\code{\link{tof_dea_lmm}()},
+\code{\link{tof_dea_ttest}()},
+\code{\link{tof_dea}()}
+}
+\concept{differential expression analysis functions}

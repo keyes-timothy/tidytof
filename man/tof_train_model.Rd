@@ -120,3 +120,11 @@ elastic net model using a variety of user-specified details. Tuning can be
 performed using either a simple training vs. test set split, k-fold cross-validation,
 or bootstrapping, and multiple preprocessing options are available.
 }
+\seealso{
+Other modeling functions: 
+\code{\link{tof_assess_model}()},
+\code{\link{tof_create_grid}()},
+\code{\link{tof_predict}()},
+\code{\link{tof_split_data}()}
+}
+\concept{modeling functions}

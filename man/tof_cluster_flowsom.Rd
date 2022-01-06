@@ -64,3 +64,11 @@ wrapper around \code{\link[FlowSOM]{BuildSOM}} and \code{\link[FlowSOM]{MetaClus
 For additional details about the FlowSOM algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
 }
+\seealso{
+Other clustering functions: 
+\code{\link{tof_cluster_ddpr}()},
+\code{\link{tof_cluster_kmeans}()},
+\code{\link{tof_cluster_phenograph}()},
+\code{\link{tof_cluster}()}
+}
+\concept{clustering functions}

@@ -38,6 +38,8 @@
 #' each grouping variable, one column for the cluster ids, and one column (`prop`) containing the
 #' cluster proportions.
 #'
+#' @family feature extraction functions
+#'
 #' @export
 #'
 #' @importFrom tidyr pivot_wider
@@ -134,6 +136,8 @@ tof_extract_proportion <-
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
 #' It will have one column for each grouping variable, one column for the cluster ids, one
 #' column for the CyTOF channel names, and one column (`value`) containing the features.
+#'
+#' @family feature extraction functions
 #'
 #' @export
 #'
@@ -243,6 +247,8 @@ tof_extract_central_tendency <-
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
 #' It will have one column for each grouping variable, one column for the cluster ids, one
 #' column for the CyTOF channel names, and one column (`value`) containing the features.
+#'
+#' @family feature extraction functions
 #'
 #' @export
 #'
@@ -355,6 +361,8 @@ tof_extract_threshold <-
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
 #' It will have one column for each grouping variable, one column for the cluster ids, one
 #' column for the CyTOF channel names, and one column (`value`) containing the features.
+#'
+#' @family feature extraction functions
 #'
 #' @export
 #'
@@ -535,6 +543,8 @@ tof_extract_emd <-
 #' in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
 #' It will have one column for each grouping variable, one column for the cluster ids, one
 #' column for the CyTOF channel names, and one column (`value`) containing the features.
+#'
+#' @family feature extraction functions
 #'
 #' @export
 #'
@@ -735,6 +745,8 @@ tof_extract_jsd <-
 #' what is considered a single "sample" based on the grouping provided).
 #' It will have one column for each grouping variable and one column for each
 #' extracted feature ("wide" format).
+#'
+#' @family feature extraction functions
 #'
 #' @export
 #'

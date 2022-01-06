@@ -17,3 +17,9 @@ in `tof_tibble`.
 \description{
 Get panel information from a tof_tibble
 }
+\seealso{
+Other tof_tbl utilities: 
+\code{\link{new_tof_tibble}()},
+\code{\link{tof_set_panel}()}
+}
+\concept{tof_tbl utilities}

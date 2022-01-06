@@ -58,3 +58,11 @@ hyperparameter values can be created.
 tof_create_grid()
 
 }
+\seealso{
+Other modeling functions: 
+\code{\link{tof_assess_model}()},
+\code{\link{tof_predict}()},
+\code{\link{tof_split_data}()},
+\code{\link{tof_train_model}()}
+}
+\concept{modeling functions}

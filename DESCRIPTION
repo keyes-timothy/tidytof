@@ -3,10 +3,19 @@ Package: tidytof
 Title: Analyze Mass Cytometry Data Using Tidy Data Principles
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Timothy",
-           family = "Keyes",
-           role = c("aut", "cre"),
-           email = "tkeyes@stanford.edu")
+    c(person(given = "Timothy",
+             family = "Keyes",
+             role = c("aut", "cre"),
+             email = "tkeyes@stanford.edu", 
+             comment = ORCID = "0000-0003-0423-9679"), 
+      person(given = "Kara", 
+             family = "Davis", 
+             role = c("rth", "own"),
+             email = "kldavis@stanford.edu"), 
+      person(given = "Garry", 
+             family = "Nolan", 
+             role = c("rth", "own"), 
+             email = "gnolan@stanford.edu"))    
 Maintainer: Timothy Keyes <tkeyes@stanford.edu>
 Description: An interactive scientific data analysis pipeline for mass
     cytometry (CyTOF) data built using tidy data principles.  It is

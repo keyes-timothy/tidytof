@@ -111,6 +111,8 @@
 #' \code{\link[edgeR]{glmFit}}, \code{\link[limma]{voom}}, \code{\link[limma]{topTable}},
 #' and \code{\link[diffcyt]{testDA_GLMM}}.
 #'
+#' @family differential abundance analysis functions
+#'
 #' @export
 #'
 #' @importFrom rlang arg_match
@@ -452,6 +454,8 @@ tof_daa_diffcyt <-
 #' will also have two columns representing the cluster and marker corresponding to the
 #' p-value in each row.
 #'
+#' @family differential expression analysis functions
+#'
 #' @export
 #'
 #' @importFrom purrr pluck
@@ -735,6 +739,8 @@ tof_dea_diffcyt <-
 #' differential abundance analysis (such as the log-fold change of cluster
 #' abundance between the levels being compared).
 #'
+#' @family differential abundance analysis functions
+#'
 #' @export
 #'
 #' @importFrom rlang enquo
@@ -1002,6 +1008,8 @@ tof_daa_glmm <-
 #' @importFrom purrr map
 #' @importFrom broomExtra tidy
 #'
+#' @family differential expression analysis functions
+#'
 #'
 tof_dea_lmm <-
   function(
@@ -1246,6 +1254,8 @@ tof_dea_lmm <-
 #' row of the output is computed by subtracting the second level from the first level,
 #' and the `mean_fc` value for each row is computed by dividing the first level
 #' by the second level.
+#'
+#' @family differential abundance analysis functions
 #'
 #' @export
 #'
@@ -1511,6 +1521,8 @@ tof_daa_ttest <-
 #' and the `mean_fc` value for each row is computed by dividing the first level
 #' by the second level.
 #'
+#' @family differential expression analysis functions
+#'
 #' @export
 #'
 #' @importFrom rlang arg_match
@@ -1723,6 +1735,8 @@ tof_dea_ttest <-
 #' from the chosen method. See \code{\link{tof_daa_diffcyt}},
 #' \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}} for details.
 #'
+#' @family differential abundance analysis functions
+#'
 #' @export
 #'
 #' @importFrom rlang arg_match
@@ -1775,6 +1789,8 @@ tof_daa <-
 #' @return A tibble or nested tibble containing the differential abundance results
 #' from the chosen method. See \code{\link{tof_dea_diffcyt}},
 #' \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}} for details.
+#'
+#' @family differential expression analysis functions
 #'
 #' @export
 #'

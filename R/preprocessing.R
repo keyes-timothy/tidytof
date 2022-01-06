@@ -31,6 +31,8 @@
 #' columns specified in channel_cols transformed using `transform_fun` (with noise
 #' removed or not removed depending on `undo_noise`).
 #'
+#' @seealso [tof_postprocess()]
+#'
 #' @export
 #'
 #'
@@ -84,6 +86,8 @@ tof_preprocess <-
 #' @return A `tof_tbl` with identical dimensions to the input `tof_tibble`, with all
 #' columns specified in channel_cols transformed using `transform_fun` (with noise
 #' added or not removed depending on `redo_noise`).
+#'
+#' @seealso [tof_preprocess()]
 #'
 #' @export
 #'

@@ -37,3 +37,6 @@ This function transforms a `tof_tbl` of raw ion counts directly measured on
 a mass cytometer using a user-provided function. It can be used to perform
 standard pre-processing steps before CyTOF data analysis.
 }
+\seealso{
+[tof_postprocess()]
+}

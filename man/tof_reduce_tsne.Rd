@@ -50,3 +50,10 @@ in the calculated tSNE space.
 \description{
 This function calculates a tSNE embedding using single-cell data from a `tof_tibble`.
 }
+\seealso{
+Other dimensionality reduction functions: 
+\code{\link{tof_reduce_dimensions}()},
+\code{\link{tof_reduce_pca}()},
+\code{\link{tof_reduce_umap}()}
+}
+\concept{dimensionality reduction functions}

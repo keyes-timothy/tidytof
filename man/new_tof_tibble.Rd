@@ -20,3 +20,9 @@ that are useful for CyTOF data analysis.
 \description{
 Constructor for a tof_tibble.
 }
+\seealso{
+Other tof_tbl utilities: 
+\code{\link{tof_get_panel}()},
+\code{\link{tof_set_panel}()}
+}
+\concept{tof_tbl utilities}

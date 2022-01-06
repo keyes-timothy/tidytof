@@ -20,3 +20,11 @@ A list of performance metrics that depends on the model type.
 This function assesses a trained `tof_model`'s performance on new data by
 computing model type-specific performance measurements.
 }
+\seealso{
+Other modeling functions: 
+\code{\link{tof_create_grid}()},
+\code{\link{tof_predict}()},
+\code{\link{tof_split_data}()},
+\code{\link{tof_train_model}()}
+}
+\concept{modeling functions}

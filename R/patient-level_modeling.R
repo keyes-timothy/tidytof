@@ -46,6 +46,9 @@
 #' for simple splitting, an "rsplit" object. For details, see
 #' \code{\link[rsample]{rsample}}.
 #'
+#' @family modeling functions
+#'
+#'
 #' @export
 #'
 #' @importFrom dplyr pull
@@ -164,6 +167,8 @@ tof_split_data <-
 #' if `grid_type` is not set to "entropy".
 #'
 #' @return A tibble with two numeric columns: `penalty` and `mixture`.
+#'
+#' @family modeling functions
 #'
 #' @export
 #'
@@ -329,6 +334,8 @@ tof_create_grid <-
 #' \item{training_data}{A tibble containing the (not preprocessed) data used to train the model}
 #' }
 #'
+#' @family modeling functions
+#'
 #' @export
 #'
 #' @importFrom rlang as_name
@@ -478,6 +485,8 @@ tof_train_model <-
 #' the predictions. Each row in the output corresponds to a row in `new_data` (
 #' or, if `new_data` is not provided, to a row in the `tof_model`'s training data.
 #'
+#' @family modeling functions
+#'
 #' @export
 #'
 #' @importFrom dplyr any_of
@@ -549,6 +558,8 @@ tof_predict <-
 #' training data used to fit the model.
 #'
 #' @return A list of performance metrics that depends on the model type.
+#'
+#' @family modeling functions
 #'
 #' @export
 #'

@@ -126,3 +126,10 @@ The three methods are based on generalized linear mixed models ("glmm"),
 While both the "glmm" and "voom" methods can model both fixed effects and random
 effects, the "edgeR" method can only model fixed effects.
 }
+\seealso{
+Other differential abundance analysis functions: 
+\code{\link{tof_daa_glmm}()},
+\code{\link{tof_daa_ttest}()},
+\code{\link{tof_daa}()}
+}
+\concept{differential abundance analysis functions}

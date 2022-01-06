@@ -53,3 +53,10 @@ in the calculated UMAP space.
 \description{
 This function calculates a UMAP embedding from single-cell data in a `tof_tibble`.
 }
+\seealso{
+Other dimensionality reduction functions: 
+\code{\link{tof_reduce_dimensions}()},
+\code{\link{tof_reduce_pca}()},
+\code{\link{tof_reduce_tsne}()}
+}
+\concept{dimensionality reduction functions}

@@ -37,3 +37,10 @@ it writes .csv and/or .fcs files to the specified `out_path`.
 \description{
 Write data (in the form of a `tof_tbl`) into either a .csv or an .fcs file for storage.
 }
+\seealso{
+Other input/output functions: 
+\code{\link{tof_read_data}()},
+\code{\link{tof_write_csv}()},
+\code{\link{tof_write_fcs}()}
+}
+\concept{input/output functions}

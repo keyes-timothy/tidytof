@@ -77,3 +77,11 @@ their most phenotypically similar healthy cell subpopulation (passed into the
 function using `healthy_tibble`). For details about
 the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
 }
+\seealso{
+Other clustering functions: 
+\code{\link{tof_cluster_flowsom}()},
+\code{\link{tof_cluster_kmeans}()},
+\code{\link{tof_cluster_phenograph}()},
+\code{\link{tof_cluster}()}
+}
+\concept{clustering functions}

@@ -36,3 +36,6 @@ This function transforms a `tof_tibble` of transformed ion counts from a mass
 cytometer back into something that looks more like an .fcs file that Fluidigm
 software generates.
 }
+\seealso{
+[tof_preprocess()]
+}

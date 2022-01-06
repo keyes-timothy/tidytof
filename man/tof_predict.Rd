@@ -39,3 +39,11 @@ or, if `new_data` is not provided, to a row in the `tof_model`'s training data.
 \description{
 This function uses a trained `tof_model` to make predictions on new data.
 }
+\seealso{
+Other modeling functions: 
+\code{\link{tof_assess_model}()},
+\code{\link{tof_create_grid}()},
+\code{\link{tof_split_data}()},
+\code{\link{tof_train_model}()}
+}
+\concept{modeling functions}

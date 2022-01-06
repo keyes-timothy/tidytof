@@ -26,3 +26,10 @@ This function downsamples the number of cells in a `tof_tbl` by randomly selecti
 a `prop_cells` proportion of the total number of cells with each unique combination
 of values in `group_cols`.
 }
+\seealso{
+Other downsampling functions: 
+\code{\link{tof_downsample_constant}()},
+\code{\link{tof_downsample_density}()},
+\code{\link{tof_downsample}()}
+}
+\concept{downsampling functions}

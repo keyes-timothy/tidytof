@@ -68,3 +68,12 @@ user-specified selection of CyTOF markers. These calculations can be done either
 overall (across all cells in the dataset) or after breaking down the cells into
 subgroups using `group_cols`.
 }
+\seealso{
+Other feature extraction functions: 
+\code{\link{tof_extract_emd}()},
+\code{\link{tof_extract_features}()},
+\code{\link{tof_extract_jsd}()},
+\code{\link{tof_extract_proportion}()},
+\code{\link{tof_extract_threshold}()}
+}
+\concept{feature extraction functions}

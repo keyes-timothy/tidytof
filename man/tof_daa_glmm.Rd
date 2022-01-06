@@ -99,3 +99,10 @@ specify which columns represent sample, cluster, fixed effect, and random effect
 information, and a (mixed) binomial regression model is fit using either
 \code{\link[lme4]{glmer}} or \code{\link[stats]{glm}}.
 }
+\seealso{
+Other differential abundance analysis functions: 
+\code{\link{tof_daa_diffcyt}()},
+\code{\link{tof_daa_ttest}()},
+\code{\link{tof_daa}()}
+}
+\concept{differential abundance analysis functions}

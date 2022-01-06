@@ -56,3 +56,10 @@ This function downsamples the number of cells in a `tof_tbl` using the
 density-dependent downsampling algorithm described in
 \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}.
 }
+\seealso{
+Other downsampling functions: 
+\code{\link{tof_downsample_constant}()},
+\code{\link{tof_downsample_prop}()},
+\code{\link{tof_downsample}()}
+}
+\concept{downsampling functions}

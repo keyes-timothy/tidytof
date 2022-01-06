@@ -36,6 +36,8 @@ tof_plot_cells_histograms <-
 #'
 #' @return TO DO
 #'
+#' @family visualization functions
+#'
 #' @export
 #'
 #'
@@ -62,7 +64,7 @@ tof_plot_cells_dr <-
       dr_method <- rlang::arg_match(dr_method)
       dr_tibble <-
         tof_tibble %>%
-        tof_dr(method = dr_method, ...)
+        tof_reduce_dimensions(method = dr_method, ...)
 
     # if there are dr_cols specified, just use those
     } else {
@@ -276,25 +278,14 @@ tof_plot_cells_layout <-
 
 # community-level visualizations ----------------------------
 
-tof_plot_community_layout <-
+tof_plot_cluster_layout <-
   function(
     ...
   ) {
     stop("This function is not yet implemented!")
   }
 
-tof_plot_community_volcano <-
-  function(
-    ...
-  ) {
-    stop("This function is not yet implemented!")
-
-  }
-
-
-# patient-level visualizations --------------------------
-
-tof_plot_patient_features <-
+tof_plot_cluster_volcano <-
   function(
     ...
   ) {
@@ -302,7 +293,18 @@ tof_plot_patient_features <-
 
   }
 
-tof_plot_patient_model <-
+
+# sample-level visualizations --------------------------
+
+tof_plot_sample_features <-
+  function(
+    ...
+  ) {
+    stop("This function is not yet implemented!")
+
+  }
+
+tof_plot_sample_model <-
   function(
     model_fit,
     new_data,

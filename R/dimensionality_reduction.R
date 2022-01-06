@@ -31,6 +31,8 @@
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
 #' in the calculated principal component space.
 #'
+#' @family dimensionality reduction functions
+#'
 #' @export
 #'
 #'
@@ -69,7 +71,7 @@ tof_reduce_pca <-
 
 
 
-# tof_reduce_tsne ----------------------------
+# tof_reduce_tsne --------------------------------------------------------------
 
 #' Perform t-distributed stochastic neighborhood embedding on CyTOF data
 #'
@@ -104,6 +106,8 @@ tof_reduce_pca <-
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
 #' in the calculated tSNE space.
+#'
+#' @family dimensionality reduction functions
 #'
 #' @export
 #'
@@ -192,6 +196,8 @@ tof_reduce_tsne <-
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
 #' in the calculated UMAP space.
 #'
+#' @family dimensionality reduction functions
+#'
 #' @export
 #'
 #'
@@ -258,6 +264,8 @@ tof_reduce_umap <-
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
 #' in the calculated embedding space.
+#'
+#' @family dimensionality reduction functions
 #'
 #' @export
 #'

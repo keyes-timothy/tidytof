@@ -199,7 +199,6 @@ tof_read_fcs <-
 #' obvious from data read as a .csv file, this information must be provided
 #' manually from the user (unlike in `tof_read_fcs`).
 #'
-#' @export
 #'
 #' @importFrom readr read_csv
 #' @importFrom readr cols
@@ -265,8 +264,6 @@ tof_read_csv <-
 #' obvious from data read as a .csv file, this information must be provided
 #' manually by the user.
 #'
-#' @examples
-#' NULL
 #'
 tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibble()) {
   if (get_extension(file_path) == "fcs") {
@@ -302,6 +299,8 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #' (of m total in the dataset). If more than one .fcs is read at once,
 #' the last column of the tibble (`file_name`) will represent the file name
 #' of the .fcs file from which each cell was read.
+#'
+#' @family input/output functions
 #'
 #' @export
 #'
@@ -415,6 +414,8 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 #' @return This function does not return anything. Instead, it has the side-effect
 #' of saving .csv files to `out_path`.
 #'
+#' @family input/output functions
+#'
 #' @export
 #'
 #' @importFrom tidyr nest
@@ -505,6 +506,8 @@ tof_write_csv <-
 #'
 #' @return This function does not return anything. Instead, it has the side-effect
 #' of saving .fcs files to `out_path`.
+#'
+#' @family input/output functions
 #'
 #' @export
 #'
@@ -729,6 +732,8 @@ tof_write_fcs <-
 #'
 #' @return This function does not explicitly return any values. Instead,
 #' it writes .csv and/or .fcs files to the specified `out_path`.
+#'
+#' @family input/output functions
 #'
 #' @export
 #'

@@ -104,3 +104,10 @@ within each cluster using a user-specified summary function (i.e. mean or median
 One t-test is conducted per cluster/marker pair and significant differences
 between sample types are detected after multiple-hypothesis correction.
 }
+\seealso{
+Other differential expression analysis functions: 
+\code{\link{tof_dea_diffcyt}()},
+\code{\link{tof_dea_lmm}()},
+\code{\link{tof_dea}()}
+}
+\concept{differential expression analysis functions}

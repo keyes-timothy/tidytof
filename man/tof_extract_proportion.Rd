@@ -46,3 +46,12 @@ This feature extraction function allows you to calculate the proportion of
 cells in each cluster in a `tof_tibble` - either overall or when broken down
 into subgroups using `group_cols`.
 }
+\seealso{
+Other feature extraction functions: 
+\code{\link{tof_extract_central_tendency}()},
+\code{\link{tof_extract_emd}()},
+\code{\link{tof_extract_features}()},
+\code{\link{tof_extract_jsd}()},
+\code{\link{tof_extract_threshold}()}
+}
+\concept{feature extraction functions}

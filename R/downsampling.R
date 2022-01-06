@@ -23,6 +23,8 @@
 #' by the number of unique combinations of the values in `group_cols`. If any group
 #' has fewer than `num_cells` number of cells, an error will be thrown.
 #'
+#' @family downsampling functions
+#'
 #' @export
 #'
 tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
@@ -57,6 +59,8 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 #' @return A `tof_tbl` with the same number of columns as the input `tof_tibble`,
 #' but fewer rows. Specifically, the number of rows should be `prop_cells` times the
 #' number of rows in the input `tof_tibble`.
+#'
+#' @family downsampling functions
 #'
 #' @export
 #'
@@ -113,6 +117,8 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
 #' @return A `tof_tbl` with the same number of columns as the input `tof_tibble`,
 #' but fewer rows. The number of rows will depend on the chosen value of `target_percentile`,
 #' with fewer cells selected with lower values of `target_percentile`.
+#'
+#' @family downsampling functions
 #'
 #' @export
 #'
@@ -227,7 +233,7 @@ tof_downsample_density <-
     return(result)
   }
 
-# tof_downsample_constant ------------------------------------------------------
+# tof_downsample ---------------------------------------------------------------
 
 #' Downsample CyTOF data.
 #'
@@ -252,6 +258,8 @@ tof_downsample_density <-
 #' @return A downsampled `tof_tbl` with the same number of columns as the input
 #' `tof_tibble`, but fewer rows. The number of rows in the result will depend
 #' on the chosen downsampling method.
+#'
+#' @family downsampling functions
 #'
 #' @export
 #'

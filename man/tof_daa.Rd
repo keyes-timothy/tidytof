@@ -27,3 +27,10 @@ contained within a `tof_tbl` using one of three methods
 function family: \code{\link{tof_daa_diffcyt}},
 \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}}.
 }
+\seealso{
+Other differential abundance analysis functions: 
+\code{\link{tof_daa_diffcyt}()},
+\code{\link{tof_daa_glmm}()},
+\code{\link{tof_daa_ttest}()}
+}
+\concept{differential abundance analysis functions}

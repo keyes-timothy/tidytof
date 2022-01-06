@@ -61,3 +61,11 @@ for simple splitting, an "rsplit" object. For details, see
 \description{
 Split CyTOF data into a training and test set
 }
+\seealso{
+Other modeling functions: 
+\code{\link{tof_assess_model}()},
+\code{\link{tof_create_grid}()},
+\code{\link{tof_predict}()},
+\code{\link{tof_train_model}()}
+}
+\concept{modeling functions}

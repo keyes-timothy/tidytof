@@ -27,3 +27,10 @@ contained within a `tof_tbl` using one of three methods
 function family: \code{\link{tof_dea_diffcyt}},
 \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}}.
 }
+\seealso{
+Other differential expression analysis functions: 
+\code{\link{tof_dea_diffcyt}()},
+\code{\link{tof_dea_lmm}()},
+\code{\link{tof_dea_ttest}()}
+}
+\concept{differential expression analysis functions}
