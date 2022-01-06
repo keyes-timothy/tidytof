@@ -36,7 +36,9 @@
             advantage.](#1-use-the-tof_-prefix-to-your-advantage)
         -   [2. `{tidytof}` functions use 2 kinds of
             arguments](#2-tidytof-functions-use-2-kinds-of-arguments)
-        -   [3. Additional resources](#3-additional-resources)
+        -   [3. Use `{tidytof}` pipelines to write human-readable
+            pipelines](#3-use-tidytof-pipelines-to-write-human-readable-pipelines)
+        -   [4. Additional resources](#4-additional-resources)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -539,12 +541,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 27
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 3                 cluster1         0.199  2.19 0      4.56 0.569
-#> 2 H1_PhenoGrap… 3                 cluster1         0      2.92 0      5.33 1.61 
-#> 3 H1_PhenoGrap… 3                 cluster1         0      1.99 0.390  4.62 0    
-#> 4 H1_PhenoGrap… 3                 cluster1         0.881  1.53 0.199  4.61 1.02 
-#> 5 H1_PhenoGrap… 3                 cluster1         0.881  2.05 0.199  4.80 0.733
-#> 6 H1_PhenoGrap… 3                 cluster1         0      1.25 0.733  5.01 0.733
+#> 1 H1_PhenoGrap… 1                 cluster1         0.199  2.19 0      4.56 0.569
+#> 2 H1_PhenoGrap… 1                 cluster1         0      2.92 0      5.33 1.61 
+#> 3 H1_PhenoGrap… 1                 cluster1         0      1.99 0.390  4.62 0    
+#> 4 H1_PhenoGrap… 1                 cluster1         0.881  1.53 0.199  4.61 1.02 
+#> 5 H1_PhenoGrap… 1                 cluster1         0.881  2.05 0.199  4.80 0.733
+#> 6 H1_PhenoGrap… 1                 cluster1         0      1.25 0.733  5.01 0.733
 #> # … with 19 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd15 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -568,12 +570,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           1                     1996
-#> 2 cluster3           2                     1993
-#> 3 cluster1           3                     1981
-#> 4 cluster1           2                       19
-#> 5 cluster3           3                        7
-#> 6 cluster2           2                        4
+#> 1 cluster3           2                     1999
+#> 2 cluster2           3                     1998
+#> 3 cluster1           1                     1974
+#> 4 cluster1           2                       26
+#> 5 cluster2           2                        2
+#> 6 cluster3           1                        1
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -595,12 +597,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 3                   
-#> 2 3                   
-#> 3 3                   
-#> 4 3                   
-#> 5 3                   
-#> 6 3
+#> 1 2                   
+#> 2 2                   
+#> 3 2                   
+#> 4 2                   
+#> 5 2                   
+#> 6 2
 ```
 
 #### Dimensionality reduction with `tof_reduce`
@@ -629,12 +631,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1  -14.7    -2.70
-#> 2   -9.46   -1.67
-#> 3  -20.4   -15.4 
-#> 4   -8.67   -4.77
-#> 5  -15.2    -7.24
-#> 6  -15.0    -6.31
+#> 1   -16.4  -17.1 
+#> 2   -16.8  -22.2 
+#> 3   -13.6   -4.75
+#> 4   -12.5  -20.3 
+#> 5   -15.1  -13.6 
+#> 6   -15.8  -14.3
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1210,10 +1212,8 @@ citrus_data %>%
 
 #### Outcomes modeling with `tof_model`
 
-\[Under construction\]
-
-\[intro to building predictive models and why we might be motivated to
-do so.\]
+\[brief intro to building predictive models and why we might be
+motivated to do so.\]
 
 `{tidytof}` implements several functions for building predictive models
 using sample- or patient-level data. To illustrate how they work, first
@@ -1301,10 +1301,11 @@ nrow(ddpr_validation)
 
 First, we can build an elastic net classifier to predict which patients
 will relapse and which patients won’t (ignoring time-to-event data for
-now). For this, we can use the `relapse_status` variable in
-`ddpr_training`:
+now). For this, we can use the `relapse_status` column in
+`ddpr_training` as the outcome variable:
 
 ``` r
+# find how many of each outcome we have in our cohort
 ddpr_training %>% 
   dplyr::count(relapse_status)
 #> # A tibble: 2 × 2
@@ -1314,8 +1315,13 @@ ddpr_training %>%
 #> 2 Yes               18
 ```
 
+Specifically, we can use the `tof_split_data` function to split our
+cohort into a training and test set either once (a “simple” split) or
+multiple times (using either k-fold cross-validation or bootstrapping).
+In this case, we use 5-fold cross-validation, but reading the
+documentation of `tof_split_data` demonstrates how to use other methods.
+
 ``` r
-# train classifier
 training_split <- 
   ddpr_training %>% 
   tof_split_data(
@@ -1336,20 +1342,84 @@ training_split
 #> 5 <split [40/9]>  Fold5
 ```
 
-And we can inspect each of our splits to see what they contain:
+The output of `tof_split_data` varies depending on which `split_method`
+is used. For cross-validation, the result is a `rset` object from the
+[rsample](https://rsample.tidymodels.org/) package. `rset` objects are a
+type of tibble with two columns:
+
+-   `splits` - a column in which each entry is an `rsplit` object (which
+    contains a single resample of the full dataset)
+-   `id` - a character column in which each entry represents the name of
+    the fold that each entry in `splits` belongs to.
+
+We can inspect one of the resamples in the `splits` column to see what
+they contain:
 
 ``` r
-# workspace to inspect the training_split object
-training_split$splits[[1]]
+my_resample <- training_split$splits[[1]]
+
+print(my_resample)
 #> <Analysis/Assess/Total>
 #> <38/11/49>
+
+class(my_resample)
+#> [1] "vfold_split" "rsplit"
 ```
 
-From here, we can feed our `training_split` object into the
-`tof_train_model` function to tune a logistic regression classifier
+Note that you can use `rsample::training` and `rsample::testing` to
+return the training and test obeservations from each resampling:
 
 ``` r
-start <- Sys.time()
+my_resample %>% 
+  rsample::training() %>% 
+  head()
+#> # A tibble: 6 × 1,854
+#>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
+#>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
+#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
+#> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
+#> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
+#> #   TSLPr_Pop1 <dbl>, RAG1_Pop1 <dbl>, CD123_Pop1 <dbl>, CD45_Pop1 <dbl>,
+#> #   CD10_Pop1 <dbl>, Pax5_Pop1 <dbl>, CD43_Pop1 <dbl>, CD58_Pop1 <dbl>,
+#> #   HLADR_Pop1 <dbl>, p4EBP1_FC_Basal_Pop1 <dbl>, pSTAT5_FC_Basal_Pop1 <dbl>,
+#> #   pPLCg1_2_FC_Basal_Pop1 <dbl>, pAkt_FC_Basal_Pop1 <dbl>, …
+
+my_resample %>% 
+  rsample::testing() %>% 
+  head()
+#> # A tibble: 6 × 1,854
+#>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
+#>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 UPN10         0.00374     0.761  0.000696    0.829       3.19     0.886
+#> 2 UPN10-Rx      0.00240     0.167  0.203       0.802       2.57     0.822
+#> 3 UPN24         0.0989      0.196  0.0198      0.210       2.36     0.382
+#> 4 UPN26         0.390       0.650  0.00157     0.622       2.81     0.684
+#> 5 UPN35         0.0948      0.138  0.155       0.839       3.46     0.970
+#> 6 UPN52         0.0623      0.254  0.0438      0.0240      2.16     0.382
+#> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
+#> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
+#> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
+#> #   TSLPr_Pop1 <dbl>, RAG1_Pop1 <dbl>, CD123_Pop1 <dbl>, CD45_Pop1 <dbl>,
+#> #   CD10_Pop1 <dbl>, Pax5_Pop1 <dbl>, CD43_Pop1 <dbl>, CD58_Pop1 <dbl>,
+#> #   HLADR_Pop1 <dbl>, p4EBP1_FC_Basal_Pop1 <dbl>, pSTAT5_FC_Basal_Pop1 <dbl>,
+#> #   pPLCg1_2_FC_Basal_Pop1 <dbl>, pAkt_FC_Basal_Pop1 <dbl>, …
+```
+
+From here, we can feed `training_split` into the `tof_train_model`
+function to [tune](https://www.tmwr.org/tuning.html) a logistic
+regression model that predicts the relapse\_status of a leukemia
+patient. Be sure to check out the `tof_create_grid` documentation to
+learn how to make a hyperparameter search grid for model tuning (in this
+case, we limit the mixture parameter to a value of 1, which fits a
+sparse lasso model).
+
+``` r
 class_mod <- 
   training_split %>% 
   tof_train_model(
@@ -1360,8 +1430,15 @@ class_mod <-
     impute_missing_predictors = TRUE, 
     remove_zv_predictors = TRUE # often a smart decision
   )
-end <- Sys.time()
+```
 
+The output of `tof_train_model` is a `tof_model`, an object containing
+information about the trained model (and that can be passed to the
+`tof_predict` and `tof_assess_model` verbs). When a `tof_model` is
+printed, some information about the optimal hyperparamters is printed,
+and so is a table of the nonzero model coefficients in the model.
+
+``` r
 print(class_mod)
 #> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
 #> # A tibble: 25 × 2
@@ -1380,14 +1457,8 @@ print(class_mod)
 #> # … with 15 more rows
 ```
 
-``` r
-# we can also print out how long it took to fit the model
-end - start
-#> Time difference of 5.740162 secs
-```
-
 We can then use the trained model to make predictions on the validation
-data
+data that we set aside earlier:
 
 ``` r
 class_predictions <- 
@@ -1405,9 +1476,20 @@ ddpr_validation %>%
 #> 2 No             Yes       1
 #> 3 Yes            No        4
 #> 4 Yes            Yes       2
+
+accuracy <- 
+  ddpr_validation %>% 
+  dplyr::select(relapse_status) %>% 
+  bind_cols(class_predictions) %>% 
+  mutate(.pred = factor(.pred, levels = levels(relapse_status))) %>% 
+  yardstick::accuracy(truth = relapse_status, estimate = .pred) %>% 
+  pull(.estimate) %>% 
+  round(3)
 ```
 
-We can also assess the model using `tof_assess_model`
+So we can see that our accuracy is about 0.583.
+
+We can also assess the model directly using `tof_assess_model`
 
 ``` r
 # calling the function with no new_data gives us the assessment on 
@@ -1477,7 +1559,7 @@ training_assessment$roc_curve %>%
   theme_bw()
 ```
 
-<img src="man/figures/README-unnamed-chunk-51-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-52-1.png" width="100%" />
 
 We can then assess the model on the validation data
 
@@ -1546,12 +1628,11 @@ validation_assessment$roc_curve %>%
   theme_bw()
 ```
 
-<img src="man/figures/README-unnamed-chunk-53-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-54-1.png" width="100%" />
 
 We can also fit a survival model
 
 ``` r
-start <- Sys.time()
 survival_mod <- 
   training_split %>% 
   tof_train_model(
@@ -1563,7 +1644,6 @@ survival_mod <-
     impute_missing_predictors = TRUE, 
     remove_zv_predictors = TRUE # often a smart decision
   )
-end <- Sys.time()
 
 print(survival_mod)
 #> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 
@@ -1657,11 +1737,11 @@ survival_assessment$survival_curves %>%
   dplyr::group_by(time, ddpr_risk) %>% 
   dplyr::summarize(probability = mean(probability)) %>% 
   ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
-  geom_path() + 
-  theme_bw()
+  geom_path() +
+  theme_bw() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-57-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-58-1.png" width="100%" />
 
 ## `{tidytof}`’s Design Principles (and some tips)
 
@@ -1719,7 +1799,59 @@ tof_extract_features(
 
 \[Under construction\]
 
-### 3. Additional resources
+### 3. Use `{tidytof}` pipelines to write human-readable pipelines
+
+The real “magic” of `{tidytof}` derives from its ability to simplify
+multistep data-processing tasks into a simple and readable chunk of
+code. For example, suppose we just acquired some .fcs files from a mass
+cytometer and want to perform the following analysis:
+
+1.  Read the .fcs files into our R session
+2.  Arcsinh-transform each column of protein measurements
+3.  Cluster our cells based on the surface markers in our panel
+4.  Downsample the dataset such that 100 random cells are picked from
+    each cluster
+5.  Perform dimensionality reduction on the downsampled dataset using
+    tSNE
+6.  Visualize the clusters using the low-dimensional tSNE embedding
+
+By using the appropriate `{tidytof}` verbs for each step of our
+analysis, we can easily write code in which each function call
+corresponds to exactly one step of our pipeline:
+
+``` r
+input_path <- tidytof_example_data("phenograph")
+
+input_path %>% 
+  # step 1
+  tof_read_data() %>% 
+  # step 2
+  tof_preprocess() %>% 
+  # step 3
+  tof_cluster(method = "flowsom") %>% 
+  # step 4
+  tof_downsample(group_cols = .flowsom_metacluster, method = "constant", num_cells = 50) %>% 
+  # step 5
+  tof_reduce_dimensions(method = "tsne") %>% 
+  # step 6
+  tof_plot_cells_dr(
+    dr_cols = contains("tsne"),
+    color_col = .flowsom_metacluster, 
+    dr_method = "tsne"
+  )
+```
+
+<img src="man/figures/README-unnamed-chunk-60-1.png" width="100%" />
+
+As shown above, stringing together `{tidytof}` verbs creates a pipeline
+that can be read easily from left-to-right and top-to-bottom – this
+means that it will be relatively easy for you to return to this code
+later (to modify it, or to write a methods section for your next
+high-impact manuscript!) or, perhaps more importantly, for one of your
+colleagues to return to it later when they want to recreate your
+analysis.
+
+### 4. Additional resources
 
 `{tidytof}` is built on top of the `tidyverse` family of R packages. As
 a result, most users of `{tidytof}` will benefit substantially from

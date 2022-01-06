@@ -801,11 +801,11 @@ Note that you can use `rsample::training` and `rsample::testing` to return the t
 
 ```{r}
 my_resample %>% 
-  training() %>% 
+  rsample::training() %>% 
   head()
 
 my_resample %>% 
-  testing() %>% 
+  rsample::testing() %>% 
   head()
 ```
 
