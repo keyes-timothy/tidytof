@@ -43,10 +43,20 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="navbar" class="collapse navbar-collapse ms-2">
+    <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/tidytof.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/preprocessing.html">Preprocessing</a>
+    <a class="dropdown-item" href="articles/reading-and-writing-data.html">Reading and writing data using {tidytof}</a>
+  </div>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -75,30 +85,9 @@
 <li>
 <a href="#usage">Usage</a>
 <ul>
-<li>
-<a href="#analyzing-data-at-the-single-cell-level">Analyzing data at the single-cell level</a>
-<ul>
-<li><a href="#reading-data-with-tof_read_data">Reading data with <code>tof_read_data</code></a></li>
-<li><a href="#pre-processing-with-tof_preprocess">Pre-processing with <code>tof_preprocess</code></a></li>
-<li><a href="#downsampling-with-tof_downsample">Downsampling with <code>tof_downsample</code></a></li>
-<li><a href="#writing-data-with-tof_write_data">Writing data with <code>tof_write_data</code></a></li>
-</ul>
-</li>
-<li>
-<a href="#analyzing-data-at-the-cluster-level">Analyzing data at the cluster-level</a>
-<ul>
-<li><a href="#identifying-clusters-with-tof_cluster">Identifying clusters with <code>tof_cluster</code></a></li>
-<li><a href="#dimensionality-reduction-with-tof_reduce">Dimensionality reduction with <code>tof_reduce</code></a></li>
-<li><a href="#differential-discovery-analysis-with-tof_daa-and-tof_dea">Differential discovery analysis with <code>tof_daa</code> and <code>tof_dea</code></a></li>
-</ul>
-</li>
-<li>
-<a href="#analyzing-data-at-the-patient--and-sample-level">Analyzing data at the patient- and sample-level</a>
-<ul>
-<li><a href="#feature-extraction-with-tof_extract_features">Feature extraction with <code>tof_extract_features</code></a></li>
-<li><a href="#outcomes-modeling-with-tof_model">Outcomes modeling with <code>tof_model</code></a></li>
-</ul>
-</li>
+<li><a href="#analyzing-data-at-the-single-cell-level">Analyzing data at the single-cell level</a></li>
+<li><a href="#analyzing-data-at-the-cluster-level">Analyzing data at the cluster-level</a></li>
+<li><a href="#analyzing-data-at-the-patient--and-sample-level">Analyzing data at the patient- and sample-level</a></li>
 </ul>
 </li>
 <li>
@@ -301,9 +290,9 @@
 <span class="co">#&gt; # A tibble: 3 × 2</span>
 <span class="co">#&gt;   phenograph_cluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster1            2000</span>
-<span class="co">#&gt; 2 cluster2            2000</span>
-<span class="co">#&gt; 3 cluster3            2000</span></code></pre></div>
+<span class="co">#&gt; 1 cluster1            1000</span>
+<span class="co">#&gt; 2 cluster2            1000</span>
+<span class="co">#&gt; 3 cluster3            1000</span></code></pre></div>
 <p>To randomly sample 200 cells per cluster, we can use <code>tof_downsample</code> using the “constant” <code>method</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -335,9 +324,9 @@
 <span class="co">#&gt; # A tibble: 3 × 2</span>
 <span class="co">#&gt;   phenograph_cluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster1            1000</span>
-<span class="co">#&gt; 2 cluster2            1000</span>
-<span class="co">#&gt; 3 cluster3            1000</span></code></pre></div>
+<span class="co">#&gt; 1 cluster1             500</span>
+<span class="co">#&gt; 2 cluster2             500</span>
+<span class="co">#&gt; 3 cluster3             500</span></code></pre></div>
 <p>And finally, you might also be interested in taking a slightly different approach to downsampling that downsamples the number of cells not to a fixed constant or proportion, but to a fixed <em>density</em> in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density in <code>phenograph_data</code> that contain more cells than others along the <code>cd34</code>/<code>cd38</code> axes:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -348,7 +337,7 @@
   <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_x_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_y_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
 <p>To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the “density” <code>method</code> of <code>tof_downsample</code>:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -358,7 +347,7 @@
   <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_x_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_y_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-18-1.png" width="100%"></p>
 <p>For more details, check out the documentation for the 3 underlying members of the <code>tof_downsample_*</code> function family (which are wrapped by <code>tof_downsample</code>):</p>
 <ul>
 <li><code>tof_downsample_constant</code></li>
@@ -430,19 +419,19 @@
 <span class="va">phenograph_clusters</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.flowsom_metacluster</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 × 27</span>
+<span class="co">#&gt; # A tibble: 6 × 26</span>
 <span class="co">#&gt;   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
 <span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 H1_PhenoGrap… 2                 cluster1         0.199  2.19 0      4.56 0.569</span>
-<span class="co">#&gt; 2 H1_PhenoGrap… 2                 cluster1         0      2.92 0      5.33 1.61 </span>
-<span class="co">#&gt; 3 H1_PhenoGrap… 2                 cluster1         0      1.99 0.390  4.62 0    </span>
-<span class="co">#&gt; 4 H1_PhenoGrap… 2                 cluster1         0.881  1.53 0.199  4.61 1.02 </span>
-<span class="co">#&gt; 5 H1_PhenoGrap… 2                 cluster1         0.881  2.05 0.199  4.80 0.733</span>
-<span class="co">#&gt; 6 H1_PhenoGrap… 2                 cluster1         0      1.25 0.733  5.01 0.733</span>
-<span class="co">#&gt; # … with 19 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd15 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   pcreb &lt;dbl&gt;, pzap70-syk &lt;dbl&gt;, prb &lt;dbl&gt;, perk1-2 &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt; 1 H1_PhenoGrap… 3                 cluster1         0     2.46  0.733  3.96 0    </span>
+<span class="co">#&gt; 2 H1_PhenoGrap… 2                 cluster1         0.390 0.881 0      4.52 0.569</span>
+<span class="co">#&gt; 3 H1_PhenoGrap… 3                 cluster1         0.569 2.70  1.02   4.77 0    </span>
+<span class="co">#&gt; 4 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  5.15 0.569</span>
+<span class="co">#&gt; 5 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  4.53 0    </span>
+<span class="co">#&gt; 6 H1_PhenoGrap… 3                 cluster1         0.881 3.42  0.390  5.71 0    </span>
+<span class="co">#&gt; # … with 18 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd44 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   pzap70-syk &lt;dbl&gt;, prb &lt;dbl&gt;, perk1-2 &lt;dbl&gt;</span></code></pre></div>
 <p>The output of <code>tof_cluster</code> is a <code>tof_tbl</code> identical to the input tibble, now with the addition of an additional column (“.flowsom_metacluster”) that encodes the cluster id for each cell in the input <code>tof_tbl</code>. Note that all output columns added to a tibble or <code>tof_tbl</code> by <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> begin with a full-stop (“.”) to reduce the likelihood of collisions with existing column names.</p>
 <p>Because the output of <code>tof_cluster</code> is a <code>tof_tbl</code>, we can use <code>dplyr</code>’s <code>count</code> method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -451,12 +440,12 @@
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;                &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster2           1                     2000</span>
-<span class="co">#&gt; 2 cluster3           3                     1992</span>
-<span class="co">#&gt; 3 cluster1           2                     1983</span>
-<span class="co">#&gt; 4 cluster1           3                       17</span>
-<span class="co">#&gt; 5 cluster3           2                        7</span>
-<span class="co">#&gt; 6 cluster3           1                        1</span></code></pre></div>
+<span class="co">#&gt; 1 cluster2           1                     1000</span>
+<span class="co">#&gt; 2 cluster3           2                      997</span>
+<span class="co">#&gt; 3 cluster1           3                      986</span>
+<span class="co">#&gt; 4 cluster1           2                       14</span>
+<span class="co">#&gt; 5 cluster3           1                        2</span>
+<span class="co">#&gt; 6 cluster3           3                        1</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag; to change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a <code>tibble</code> that only includes the cluster labels (not the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>add_col</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -494,12 +483,12 @@
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   .tsne_1 .tsne_2</span>
 <span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   15.9     17.2</span>
-<span class="co">#&gt; 2   21.9     17.9</span>
-<span class="co">#&gt; 3    2.69    14.9</span>
-<span class="co">#&gt; 4   19.8     14.5</span>
-<span class="co">#&gt; 5   12.2     16.1</span>
-<span class="co">#&gt; 6   13.0     16.3</span></code></pre></div>
+<span class="co">#&gt; 1    3.05   -7.93</span>
+<span class="co">#&gt; 2    7.23  -12.0 </span>
+<span class="co">#&gt; 3   26.9   -25.5 </span>
+<span class="co">#&gt; 4   11.4   -19.7 </span>
+<span class="co">#&gt; 5    5.49   -9.48</span>
+<span class="co">#&gt; 6   17.8   -15.6</span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add reduced-dimension feature embeddings to the input <code>tof_tbl</code> and return the augmented <code>tof_tbl</code> (that is, a <code>tof_tbl</code> with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set <code>add_cols</code> to <code>FALSE</code> (as in <code>tof_cluster</code>).</p>
 <p>Regardless of the method used, reduced-dimension feature embeddings can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics package):</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -509,7 +498,7 @@
   <span class="fu">geom_point</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">labs</span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-24-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-25-1.png" width="100%"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the tsne embeddings using color to represent CD11b expression</span>
 <span class="va">phenograph_tsne</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -518,7 +507,7 @@
   <span class="fu">scale_fill_viridis_c</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">labs</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"CD11b expression"</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-24-2.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-25-2.png" width="100%"></p>
 <p>Such visualizations can be helpful in qualitatively describing the phenotypic differences between the clusters in a dataset. For example, in the example above, we can see that one of the clusters has high CD11b expression, whereas the others have lower CD11b expression.</p>
 </div>
 <div class="section level4">
@@ -654,7 +643,7 @@
     fill <span class="op">=</span> <span class="st">"Effect"</span>, 
     caption <span class="op">=</span> <span class="st">"Asterisks indicate significance at an adjusted p-value of 0.05"</span>
   <span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-30-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-31-1.png" width="100%"></p>
 <p>Importantly, the output of <code>tof_daa</code> depends slightly on the underlying statistical method being used, and details can be found in the documentation for each <code>tof_daa_*</code> function family member:</p>
 <ul>
 <li><code>tof_daa_diffcyt</code></li>
@@ -732,7 +721,7 @@
     fill <span class="op">=</span> <span class="cn">NULL</span>, 
     caption <span class="op">=</span> <span class="st">"Labels indicate the 10 most significant marker-cluster pairs"</span>
   <span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-32-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-33-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1030,12 +1019,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1-Rx       0.0395     0.618   0.0634      0.572       2.93     0.944</span>
-<span class="co">#&gt; 2 UPN3          0.633      0.0234  0.0165      0.0327      2.25     0.226</span>
-<span class="co">#&gt; 3 UPN7          0.474      0.966   0.124       1.24        2.59     0.243</span>
-<span class="co">#&gt; 4 UPN9         15.6        0.446   0.0445      0.163       2.86     0.434</span>
-<span class="co">#&gt; 5 UPN10         0.00374    0.761   0.000696    0.829       3.19     0.886</span>
-<span class="co">#&gt; 6 UPN10-Rx      0.00240    0.167   0.203       0.802       2.57     0.822</span>
+<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
+<span class="co">#&gt; 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944</span>
+<span class="co">#&gt; 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
+<span class="co">#&gt; 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226</span>
+<span class="co">#&gt; 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
+<span class="co">#&gt; 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1050,12 +1039,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
-<span class="co">#&gt; 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
-<span class="co">#&gt; 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
-<span class="co">#&gt; 4 UPN8           0.951     0.958    0.161      0.556       3.18     0.556</span>
-<span class="co">#&gt; 5 UPN13          0.0634    0.0300   0.0219     0.109       2.34     0.314</span>
-<span class="co">#&gt; 6 UPN19          2.05      0.780    0.00233    0.298       2.36     0.481</span>
+<span class="co">#&gt; 1 UPN10         0.00374    0.761   0.000696     0.829      3.19     0.886</span>
+<span class="co">#&gt; 2 UPN16         0.156      0.193   0.00407      0.951      2.87     0.254</span>
+<span class="co">#&gt; 3 UPN19         2.05       0.780   0.00233      0.298      2.36     0.481</span>
+<span class="co">#&gt; 4 UPN22-Rx      0.0643     1.68    0.0804       1.56       3.06     0.529</span>
+<span class="co">#&gt; 5 UPN25         0.0181     0.0266  0.00152      0.108      2.73     0.386</span>
+<span class="co">#&gt; 6 UPN27         0.563      1.07    0.00276      0.712      2.40     0.411</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1078,7 +1067,7 @@
 <p>The output of <code>tof_train_model</code> is a <code>tof_model</code>, an object containing information about the trained model (and that can be passed to the <code>tof_predict</code> and <code>tof_assess_model</code> verbs). When a <code>tof_model</code> is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
-<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 </span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 </span>
 <span class="co">#&gt; # A tibble: 25 × 2</span>
 <span class="co">#&gt;    feature             coefficient</span>
 <span class="co">#&gt;    &lt;chr&gt;                     &lt;dbl&gt;</span>
@@ -1184,7 +1173,7 @@
     caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="va">auc</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">+</span> 
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-52-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-53-1.png" width="100%"></p>
 <p>We can then assess the model on the validation data</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">validation_assessment</span> <span class="op">&lt;-</span> 
@@ -1247,7 +1236,7 @@
     caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">auc</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">+</span> 
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-54-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-55-1.png" width="100%"></p>
 <p>We can also fit a survival model</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">survival_mod</span> <span class="op">&lt;-</span> 
@@ -1346,7 +1335,7 @@
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">probability</span>, color <span class="op">=</span> <span class="va">ddpr_risk</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> </code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-58-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-59-1.png" width="100%"></p>
 </div>
 </div>
 </div>
@@ -1414,7 +1403,7 @@
     color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, 
     dr_method <span class="op">=</span> <span class="st">"tsne"</span>
   <span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-60-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-61-1.png" width="100%"></p>
 <p>As shown above, stringing together <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs creates a pipeline that can be read easily from left-to-right and top-to-bottom – this means that it will be relatively easy for you to return to this code later (to modify it, or to write a methods section for your next high-impact manuscript!) or, perhaps more importantly, for one of your colleagues to return to it later when they want to recreate your analysis.</p>
 </div>
 <div class="section level3">
@@ -1481,7 +1470,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
     </footer>
