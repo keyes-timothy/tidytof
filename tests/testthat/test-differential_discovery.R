@@ -17,11 +17,12 @@ dd_data <-
     replicate = as.character(round(cell_id, digits = -3)),
     sample_name = str_c(stim, condition, replicate, sep = "_"),
     sample_name_2 = str_c(stim_2, condition, replicate, sep = "_"),
-    pairs = str_c(condition, replicate, sep = "_")
+    pairs = str_c(condition, replicate, sep = "_"),
+    .flowsom_metacluster =
+      sample(x= c("1", "2", "3"), size = nrow(ddpr_data), replace = TRUE)
   ) %>%
   select(-cell_id) %>%
-  tof_preprocess() %>%
-  tof_cluster(method = "flowsom")
+  tof_preprocess()
 
 num_clusters <-
   dd_data$.flowsom_metacluster %>%
@@ -625,7 +626,7 @@ test_that("changing the summary function works", {
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = cd45,
-        effect_col = condition,
+        effect_col = stim,
         group_cols = replicate,
         test_type = "unpaired",
         summary_function = median,

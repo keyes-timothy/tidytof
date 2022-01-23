@@ -2,7 +2,7 @@
 output:
   github_document:
     toc: true
-    toc_depth: 4
+    toc_depth: 3
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  dpi = 150,
+  dpi = 100,
   warning = FALSE,
   message = FALSE
 )
@@ -73,6 +73,11 @@ library(FlowSOM)
 if(!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 ```
+
+```{r, echo = FALSE}
+`%>%` <- dplyr::`%>%`
+```
+
 
 ## Usage
 

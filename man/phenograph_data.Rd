@@ -17,7 +17,6 @@ A data frame with 6000 rows and 26 variables:
   \item{cd33}{A CyTOF measurement in raw ion counts}
   \item{cd47}{A CyTOF measurement in raw ion counts}
   \item{cd7}{A CyTOF measurement in raw ion counts}
-  \item{cd15}{A CyTOF measurement in raw ion counts}
   \item{cd44}{A CyTOF measurement in raw ion counts}
   \item{cd38}{A CyTOF measurement in raw ion counts}
   \item{cd3}{A CyTOF measurement in raw ion counts}

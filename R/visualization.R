@@ -91,9 +91,11 @@ tof_plot_cells_dr <-
     # create plot
     result <-
       tof_tibble %>%
-      ggplot2::ggplot(aes(x = dr_tibble[[1]], y = dr_tibble[[2]], fill = {{color_col}})) +
+      ggplot2::ggplot(
+        ggplot2::aes(x = dr_tibble[[1]], y = dr_tibble[[2]], fill = {{color_col}})
+      ) +
       ggplot2::geom_point(shape = shape, alpha = point_alpha) +
-      labs(
+      ggplot2::labs(
         x = colnames(dr_tibble)[[1]],
         y = colnames(dr_tibble)[[2]]
       )
@@ -104,7 +106,7 @@ tof_plot_cells_dr <-
         ggplot2::facet_wrap(facets = vars({{facet_cols}}))
     }
 
-    return(result)
+    return(result + theme)
 
   }
 
@@ -260,7 +262,7 @@ tof_plot_cells_layout <-
       knn_plot +
       ggraph::geom_edge_link(alpha = edge_alpha) +
       ggraph::geom_node_point(
-        aes(fill = {{color_col}}),
+        ggplot2::aes(fill = {{color_col}}),
         shape = 21,
         size = node_size
       )
@@ -294,7 +296,7 @@ tof_plot_cluster_volcano <-
   }
 
 
-# sample-level visualizations --------------------------
+# sample-level visualizations --------------------------------------------------
 
 tof_plot_sample_features <-
   function(

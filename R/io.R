@@ -379,8 +379,8 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 
       panel <-
         panels %>%
-        unique() %>%
-        purrr::pluck(1)
+        unique()
+      panel <- panel[[1]]
 
       tof_tibble <-
         new_tof_tibble(x = tof_tibble, panel = panel)

@@ -21,16 +21,13 @@
 #'   \item{cd79b}{A CyTOF measurement in raw ion counts}
 #'   \item{cd20}{A CyTOF measurement in raw ion counts}
 #'   \item{cd34}{A CyTOF measurement in raw ion counts}
-#'   \item{cd179a}{A CyTOF measurement in raw ion counts}
 #'   \item{cd123}{A CyTOF measurement in raw ion counts}
 #'   \item{cd10}{A CyTOF measurement in raw ion counts}
-#'   \item{cd179b}{A CyTOF measurement in raw ion counts}
 #'   \item{cd24}{A CyTOF measurement in raw ion counts}
 #'   \item{cd127}{A CyTOF measurement in raw ion counts}
 #'   \item{cd43}{A CyTOF measurement in raw ion counts}
 #'   \item{cd38}{A CyTOF measurement in raw ion counts}
 #'   \item{cd58}{A CyTOF measurement in raw ion counts}
-#'   \item{cd3}{A CyTOF measurement in raw ion counts}
 #'   \item{psyk}{A CyTOF measurement in raw ion counts}
 #'   \item{p4ebp1}{A CyTOF measurement in raw ion counts}
 #'   \item{pstat5}{A CyTOF measurement in raw ion counts}
@@ -106,7 +103,6 @@
 #'   \item{cd33}{A CyTOF measurement in raw ion counts}
 #'   \item{cd47}{A CyTOF measurement in raw ion counts}
 #'   \item{cd7}{A CyTOF measurement in raw ion counts}
-#'   \item{cd15}{A CyTOF measurement in raw ion counts}
 #'   \item{cd44}{A CyTOF measurement in raw ion counts}
 #'   \item{cd38}{A CyTOF measurement in raw ion counts}
 #'   \item{cd3}{A CyTOF measurement in raw ion counts}
