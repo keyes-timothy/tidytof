@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  dpi = 100,
+  dpi = 150,
   warning = FALSE,
   message = FALSE
 )
@@ -185,7 +185,7 @@ Finally, note that the built-in function `tof_postprocess` works nearly identica
 
 Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. To do this, `{tidytof}` implements the `tof_downsample` verb, which allows downsampling using 3 methods.
 
-Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 2000 cells per cluster, or 6000 cells in total:
+Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 1000 cells per cluster, or 3000 cells in total:
 
 ```{r}
 phenograph_data %>% 
@@ -341,7 +341,7 @@ phenograph_data %>%
   head()
 ```
 
-#### Dimensionality reduction with `tof_reduce`
+#### Dimensionality reduction with `tof_reduce_dimensions()`
 
 After clusters are identified, a useful tool for visualizing them is dimensionality reduction, a form of unsupervised machine learning used to represent high-dimensional datasets in a smaller, easier-to-visualize number of dimensions.
 

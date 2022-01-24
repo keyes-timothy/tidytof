@@ -16,7 +16,7 @@ vignette: >
 ```{=html}
 <style>
 p.caption {
-  font-size: 0.8em;
+  font-size: 0.9em;
   text-align: justify;
 }
 </style>
@@ -40,7 +40,7 @@ Analyzing single-cell data can be surprisingly complicated. One one hand, this i
 ```{r, out.width = "100%", fig.cap = caption, echo = FALSE}
 
 caption <- 
-  "Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the <b>single-cell level</b>, you may be interested in individual cells' marker expression profiles. At the <b>cluster level</b>, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the <b>whole-sample level</b>, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables."
+  "Figure 1: Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the <b>single-cell level</b>, you may be interested in individual cells' marker expression profiles. At the <b>cluster level</b>, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the <b>whole-sample level</b>, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables."
 
 knitr::include_graphics(
   path = file.path("..", "man", "figures", "tidytof_figure_1a.jpg")
@@ -139,7 +139,7 @@ ddpr_data %>%
 
 4.  Perform dimensionality reduction on the downsampled dataset using tSNE
 
-5.  Visualize the clusters using the low-dimensional tSNE embedding
+5.  Visualize the clusters using a low-dimensional tSNE embedding
 
 ```{r}
 ddpr_data %>% 

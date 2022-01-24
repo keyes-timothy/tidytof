@@ -1,0 +1,214 @@
+---
+title: "Feature extraction"
+author: "Timothy Keyes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+description: > 
+  Read this vignette to learn how to compute summary statistics like cluster 
+  abundance and cluster marker expression using {tidytof} 
+vignette: >
+  %\VignetteIndexEntry{Feature extraction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidytof)
+library(tidyverse)
+```
+
+
+In addition to its functions for analyzing and visualizing CyTOF data at the single-cell and cluster levels, `{tidytof}`'s `tof_extract_features()` verb allows users to aggregate single-cell and cluster-level information in order to summarize whole samples (or whole patients) from which cells were collected. These features can be useful for visualizing the differences between patients and samples in different experimental conditions or for building machine learning models.
+
+To understand how the `tof_extract_features()` verb works, it's easiest to look at each of its subroutines (the members of the `tof_extract_*` function family) independently.
+
+## Accessing the data for this vignette
+
+To demonstrate how to use these verbs, we'll first download a dataset originally collected for the development of the [CITRUS](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/) algorithm. These data are available in the `{HDCytoData}` package, which is available on Bioconductor and can be downloaded with the following command:
+
+```{r, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install("HDCytoData")
+```
+
+To load the CITRUS data into our current R session, we can call a function from the `{HDCytoData}`, which will provide it to us in a format from the `{flowCore}` package (called a "flowSet"). To convert this into a tidy tibble, we can use `{tidytof}` built-in method for converting flowCore objects into `tof_tbl`'s .
+
+```{r, message = FALSE, warning = FALSE}
+citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
+
+citrus_data <- 
+  citrus_raw %>% 
+  as_tof_tbl(sep = "_")
+```
+
+Thus, we can see that `citrus_data` is a `tof_tbl` with `r nrow(citrus_data)` cells (one in each row) and `r ncol(citrus_data)` pieces of information about each cell (one in each column).
+
+We can also extract some metadata from the raw data and join it with our single-cell data using some functions from the `tidyverse`:
+
+```{r}
+citrus_metadata <- 
+  tibble(
+    file_name = as.character(flowCore::pData(citrus_raw)[[1]]), 
+    sample_id = 1:length(file_name),
+    patient = stringr::str_extract(file_name, "patient[:digit:]"), 
+    stimulation = stringr::str_extract(file_name, "(BCR-XL)|Reference")
+  ) %>% 
+  mutate(
+    stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
+  )
+
+citrus_metadata %>%
+  head()
+```
+
+Thus, we now have sample-level information about which patient each sample was collected from and which stimulation condition ("Basal" or "BCR-XL") each sample was exposed to before data acquisition.
+
+Finally, we can join this metadata with our single-cell `tof_tbl` to obtain the cleaned dataset.
+
+```{r}
+citrus_data <- 
+  citrus_data %>% 
+  left_join(citrus_metadata, by = "sample_id")
+```
+
+After these data cleaning steps, we now have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
+
+## Calculating cluster proportions using `tof_extract_proportion()`
+
+First, we have `tof_extract_proportion()`, which extracts the proportion of cells in each cluster within each sample (with samples defined using the `group_cols` argument):
+
+```{r}
+# preprocess the numeric columns in the citrus dataset
+citrus_data <- 
+  citrus_data %>% 
+  mutate(cluster = str_c("cluster", population_id)) %>% 
+  tof_preprocess()
+
+citrus_data %>% 
+  tof_extract_proportion(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation)
+  ) %>% 
+  head()
+```
+
+Like all members of the `tof_extract_*` function family, `tof_extract_proportion()` returns one row for each sample (defined as a unique combination of values of the columns specified in `group_cols`) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in `citrus_data`). These values can also be returned in "long" format by changing the `format` argument:
+
+```{r}
+citrus_data %>% 
+  tof_extract_proportion(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    format = "long"
+  ) %>% 
+  head()
+```
+
+## Calculating cluster marker expression measures using `tof_extract_central_tendency()`
+
+Another member of the `tof_extract_*()` function family, `tof_extract_central_tendency()`, computes the central tendency (e.g. mean or median) of user-specified markers in each cluster.
+
+```{r}
+citrus_data %>% 
+  tof_extract_central_tendency(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    central_tendency_function = mean
+  ) %>% 
+  head()
+```
+
+The argument `central_tendency_function` can be used to compute any summary statistic. For example, the following choice for `central_tendency_function` will compute the 75th percentile for each marker-cluster pair in `citrus_data`: 
+
+```{r}
+citrus_data %>% 
+  tof_extract_central_tendency(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    central_tendency_function = function(x) quantile(x = x, probs = 0.75)
+  ) %>% 
+  head()
+```
+
+## Calculating the proportion of cells with marker expression above a threshold using `tof_extract_proportion()`
+
+`tof_extract_threshold()` is similar to `tof_extract_central_tendency()`, but calculates the proportion of cells above a user-specified expression value for each marker instead of a measure of central tendency:
+
+```{r}
+citrus_data %>% 
+  tof_extract_threshold(
+    cluster_col = cluster, 
+    group_cols = c(patient, stimulation), 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    threshold = 5
+  ) %>% 
+  head()
+```
+
+## Calculating differences in marker distributions using `tof_extract_emd()` and `tof_extract_jsd()`
+
+The two final members of the `tof_extract_*` function family -- `tof_extract_emd` and `tof_extract_jsd` -- are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a `stimulation_col` that identifies which stimulation condition each cell is in, and a `basal_level` that specifies the reference (i.e. unstimulated) condition within the `stimulation_col`. 
+
+With these additional arguments, `tof_extract_emd` computes the Earth-mover's distance between each marker's distribution in the stimulation conditions (within each cluster) and the basal condition; similarly, `tof_extract_jsd` computes the Jensen-Shannon divergence index between the same distributions. Both of these values are ways to compare how different 2 distributions are to one another and are more computationally expensive (but also higher-resolution) than simply comparing measures of central tendency.
+
+```{r}
+# Earth-mover's distance
+citrus_data %>% 
+  tof_extract_emd(
+    cluster_col = cluster, 
+    group_cols = patient, 
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    stimulation_col = stimulation, 
+    basal_level = "Basal"
+  ) %>% 
+  head()
+```
+
+```{r}
+# Jensen-Shannon Divergence
+citrus_data %>% 
+  tof_extract_jsd(
+    cluster_col = cluster, 
+    group_cols = patient,  
+    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
+    stimulation_col = stimulation, 
+    basal_level = "Basal"
+  ) %>% 
+  head()
+```
+
+## Putting it all together with `tof_extract_features()`
+
+Finally, the `tof_extract_features()` verb provides a wrapper to each of the members of its function family, allowing users to extract multiple features types at once. For example, the following code extracts the proportion of each cluster, median of several markers in each cluster, and EMD between the basal condition and stimulated condition in each cluster for all patients in `citrus_data`.
+
+```{r}
+signaling_markers <- 
+  c(
+    "pNFkB_Nd142", "pStat5_Nd150", "pAkt_Sm152", "pStat1_Eu153", "pStat3_Gd158", 
+    "pSlp76_Dy164", "pBtk_Er166", "pErk_Er168", "pS6_Yb172", "pZap70_Gd156"
+  )
+
+citrus_data %>% 
+  tof_extract_features(
+    cluster_col = cluster, 
+    group_cols = patient, 
+    stimulation_col = stimulation,
+    lineage_cols = any_of(c("CD45_In115", "CD20_Sm147", "CD33_Nd148")), 
+    signaling_cols = any_of(signaling_markers), 
+    signaling_method = "emd", 
+    basal_level = "Basal"
+  ) %>% 
+  head()
+```

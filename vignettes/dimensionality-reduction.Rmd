@@ -1,0 +1,106 @@
+---
+title: "Dimensionality reduction"
+author: "Timothy Keyes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+description: > 
+  Read this vignette to learn how visualize single-cell phenotypes in 
+  low-dimensional space using dimensionality reduction algorithms (PCA, UMAP, tSNE)
+vignette: >
+  %\VignetteIndexEntry{Dimensionality reduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(tidytof)
+library(dplyr)
+```
+
+A useful tool for visualizing the phenotypic relationships between single cells and clusters of cells is dimensionality reduction, a form of unsupervised machine learning used to represent high-dimensional datasets in a smaller number of dimensions.
+
+`{tidytof}` includes several dimensionality reduction algorithms commonly used by biologists: Principal component analysis (PCA), t-distributed stochastic neighbor embedding (tSNE), and uniform manifold approximation and projection (UMAP). To apply these to a dataset, use `tof_reduce_dimensions()`. 
+
+## Dimensionality reduction with `tof_reduce_dimensions()`. 
+
+Here is an example call to `tof_reduce_dimensions()` in which we use tSNE to visualize data in `{tidytof}`'s built-in `phenograph_data` dataset.
+
+```{r}
+# perform the dimensionality reduction
+phenograph_tsne <- 
+  phenograph_data %>% 
+  tof_preprocess() %>% 
+  tof_reduce_dimensions(method = "tsne")
+
+# select only the tsne embedding columns
+phenograph_tsne %>% 
+  select(contains("tsne")) %>% 
+  head()
+```
+
+By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `add_cols` to `FALSE` (as in `tof_cluster`).
+
+```{r}
+phenograph_data %>% 
+  tof_preprocess() %>% 
+  tof_reduce_dimensions(method = "tsne", add_cols = FALSE)
+```
+
+Changing the `method` argument results in different low-dimensional embeddings: 
+
+```{r}
+phenograph_data %>% 
+  tof_reduce_dimensions(method = "umap", add_cols = FALSE)
+
+phenograph_data %>% 
+  tof_reduce_dimensions(method = "pca", add_cols = FALSE)
+```
+
+
+## Method specifications for `tof_reduce_*()` functions
+
+`tof_reduce_dimensions()` provides a high-level API for three lower-level functions: `tof_reduce_pca()`, `tof_reduce_umap()`, and `tof_reduce_tsne()`. The help files for each of these functions provide details about the algorithm-specific method specifications associated with each of these dimensionality reduction approaches. For example, `tof_reduce_pca` takes the `num_comp` argument to determine how many principal components should be returned: 
+
+```{r}
+# 2 principal components
+phenograph_data %>% 
+  tof_reduce_pca(num_comp = 2)
+```
+
+```{r}
+# 3 principal components
+phenograph_data %>% 
+  tof_reduce_pca(num_comp = 3)
+```
+
+see `?tof_reduce_pca`, `?tof_reduce_umap`, and `?tof_reduce_tsne` for additional details.
+
+## Visualization using tof_plot_cells_dr()
+
+Regardless of the method used, reduced-dimension feature embeddings can be visualized using `{ggplot2}` (or any graphics package). `{tidytof}` also provides some helper functions for easily generating dimensionality reduction plots from a `tof_tbl` or tibble with columns representing embedding dimensions:
+
+```{r}
+# plot the tsne embeddings using color to distinguish between clusters
+phenograph_tsne %>% 
+  tof_plot_cells_dr(
+    dr_cols = contains(".tsne"), 
+    color_col = phenograph_cluster
+  )
+
+# plot the tsne embeddings using color to represent CD11b expression
+phenograph_tsne %>% 
+  tof_plot_cells_dr(
+    dr_cols = contains(".tsne"), 
+    color_col = cd11b
+  ) + 
+  ggplot2::scale_fill_viridis_c()
+```
+
+Such visualizations can be helpful in qualitatively describing the phenotypic differences between the clusters in a dataset. For example, in the example above, we can see that one of the clusters has high CD11b expression, whereas the others have lower CD11b expression.

@@ -1,13 +1,13 @@
 ---
-title: "Reading and writing data using {tidytof}"
+title: "Reading and writing data"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 description: > 
-  Read this vignette to learn how to read data from FCS and CSV files 
+  Read this vignette to learn how to read data from FCS and CSV files
   on disk and how to write data to FCS and CSV files on disk. 
 vignette: >
-  %\VignetteIndexEntry{Reading and writing data using tidytof}
+  %\VignetteIndexEntry{Reading and writing data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-```{r setup}
+```{r setup, message = FALSE}
 library(tidytof)
 library(dplyr)
 ```
@@ -161,6 +161,13 @@ phenograph_data %>%
 -   cluster2.fcs
 -   cluster3.fcs
 
+Note that these file names match the distinct values in our `group_cols` column (`phenograph_cluster`): 
+
+```{r}
+phenograph_data %>% 
+  distinct(phenograph_cluster)
+```
+
 However, suppose we wanted to write multiple files for each cluster by breaking cells into two groups: those that express high levels of `pstat5` and those that express low levels of `pstat5`. We can use `dplyr::mutate` to create a new column in `phenograph_data` that breaks cells into high- and low-`pstat5` expression groups, then add this column to our `group_cols` specification:
 
 ```{r, eval = FALSE}
@@ -185,6 +192,16 @@ This will write 6 files with the following names (derived from the values in `ph
 -   cluster2_high.fcs
 -   cluster3_low.fcs
 -   cluster3_high.fcs
+
+As above, note that these file names match the distinct values in our `group_cols` columns (`phenograph_cluster` and `expression_group`):
+
+```{r}
+phenograph_data %>% 
+  mutate(
+    expression_group = if_else(pstat5 > median(pstat5), "high", "low")
+  ) %>% 
+  distinct(phenograph_cluster, expression_group)
+```
 
 A useful feature of `tof_write_data` is that it will automatically concatenate cells into single FCS or CSV files based on the specified `group_cols` *regardless of how many unique files those cells came from*. This allows for easy concatenation of FCS or CSV files containing data from a single sample acquired over multiple CyTOF runs, for example.
 
