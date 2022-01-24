@@ -46,8 +46,14 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
+    <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
     <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data using {tidytof}</a>
+    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
   </div>
 </li>
       </ul>
@@ -69,7 +75,7 @@
       <img src="" class="logo" alt=""><h1>Getting started with {tidytof}</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-23</h4>
+            <h4 data-toc-skip class="date">2022-01-24</h4>
       
       
       <div class="d-none name"><code>tidytof.Rmd</code></div>
@@ -79,7 +85,7 @@
     
 <style>
 p.caption {
-  font-size: 0.8em;
+  font-size: 0.9em;
   text-align: justify;
 }
 </style>
@@ -93,8 +99,8 @@ p.caption {
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span></code></pre>
 <p>Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.</p>
 <div class="figure">
-<img src="../reference/figures/tidytof_figure_1a.jpg" alt="Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the &lt;b&gt;single-cell level&lt;/b&gt;, you may be interested in individual cells' marker expression profiles. At the &lt;b&gt;cluster level&lt;/b&gt;, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the &lt;b&gt;whole-sample level&lt;/b&gt;, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables." width="100%"><p class="caption">
-Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the <b>single-cell level</b>, you may be interested in individual cells’ marker expression profiles. At the <b>cluster level</b>, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the <b>whole-sample level</b>, you may be interested in how individual cells’ and clusters’ characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.
+<img src="../reference/figures/tidytof_figure_1a.jpg" alt="Figure 1: Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the &lt;b&gt;single-cell level&lt;/b&gt;, you may be interested in individual cells' marker expression profiles. At the &lt;b&gt;cluster level&lt;/b&gt;, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the &lt;b&gt;whole-sample level&lt;/b&gt;, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables." width="100%"><p class="caption">
+Figure 1: Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the <b>single-cell level</b>, you may be interested in individual cells’ marker expression profiles. At the <b>cluster level</b>, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the <b>whole-sample level</b>, you may be interested in how individual cells’ and clusters’ characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.
 </p>
 </div>
 <p><br><br></p>
@@ -211,7 +217,7 @@ Researchers are often interested in biological questions that manifest at multip
 <li><p>Cluster our cells based on the surface markers in our panel</p></li>
 <li><p>Downsample the dataset such that 100 random cells are picked from each cluster</p></li>
 <li><p>Perform dimensionality reduction on the downsampled dataset using tSNE</p></li>
-<li><p>Visualize the clusters using the low-dimensional tSNE embedding</p></li>
+<li><p>Visualize the clusters using a low-dimensional tSNE embedding</p></li>
 </ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ddpr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 

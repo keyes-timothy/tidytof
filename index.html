@@ -54,8 +54,14 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <a class="dropdown-item" href="articles/downsampling.html">Downsampling</a>
+    <a class="dropdown-item" href="articles/feature-extraction.html">Feature extraction</a>
+    <a class="dropdown-item" href="articles/modeling.html">Modeling</a>
     <a class="dropdown-item" href="articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="articles/reading-and-writing-data.html">Reading and writing data using {tidytof}</a>
+    <a class="dropdown-item" href="articles/reading-and-writing-data.html">Reading and writing data</a>
   </div>
 </li>
       </ul>
@@ -105,6 +111,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file --><div class="section level1">
 <div class="page-header"><h1 id="tidytof-an-ecosystem-for-tidy-and-highly-reproducible-cytof-data-analysis">tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis<a class="anchor" aria-label="anchor" href="#tidytof-an-ecosystem-for-tidy-and-highly-reproducible-cytof-data-analysis"></a>
 </h1></div>
+<p><a href="https://keyes-timothy.github.io/tidytof/index.html"><img src="reference/figures/tidytof_logo.png" align="right" height="139"></a></p>
 <!-- badges: start -->
 
 <!-- badges: end -->
@@ -283,7 +290,7 @@
 <a class="anchor" aria-label="anchor" href="#downsampling-with-tof_downsample"></a>
 </h4>
 <p>Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. To do this, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements the <code>tof_downsample</code> verb, which allows downsampling using 3 methods.</p>
-<p>Using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in dataset <code>phenograph_data</code> (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 2000 cells per cluster, or 6000 cells in total:</p>
+<p>Using <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in dataset <code>phenograph_data</code> (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 1000 cells per cluster, or 3000 cells in total:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_data</span> <span class="op"><a href="https://rdrr.io/pkg/FlowSOM/man/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span>
@@ -423,7 +430,7 @@
 <span class="co">#&gt;   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
 <span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 H1_PhenoGrap… 3                 cluster1         0     2.46  0.733  3.96 0    </span>
-<span class="co">#&gt; 2 H1_PhenoGrap… 2                 cluster1         0.390 0.881 0      4.52 0.569</span>
+<span class="co">#&gt; 2 H1_PhenoGrap… 3                 cluster1         0.390 0.881 0      4.52 0.569</span>
 <span class="co">#&gt; 3 H1_PhenoGrap… 3                 cluster1         0.569 2.70  1.02   4.77 0    </span>
 <span class="co">#&gt; 4 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  5.15 0.569</span>
 <span class="co">#&gt; 5 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  4.53 0    </span>
@@ -440,12 +447,12 @@
 <span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;                &lt;int&gt;</span>
-<span class="co">#&gt; 1 cluster2           1                     1000</span>
-<span class="co">#&gt; 2 cluster3           2                      997</span>
-<span class="co">#&gt; 3 cluster1           3                      986</span>
-<span class="co">#&gt; 4 cluster1           2                       14</span>
-<span class="co">#&gt; 5 cluster3           1                        2</span>
-<span class="co">#&gt; 6 cluster3           3                        1</span></code></pre></div>
+<span class="co">#&gt; 1 cluster2           2                      999</span>
+<span class="co">#&gt; 2 cluster3           1                      998</span>
+<span class="co">#&gt; 3 cluster1           3                      996</span>
+<span class="co">#&gt; 4 cluster1           1                        4</span>
+<span class="co">#&gt; 5 cluster3           3                        2</span>
+<span class="co">#&gt; 6 cluster2           1                        1</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag; to change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a <code>tibble</code> that only includes the cluster labels (not the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>add_col</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -457,16 +464,16 @@
 <span class="co">#&gt; # A tibble: 6 × 1</span>
 <span class="co">#&gt;   .flowsom_metacluster</span>
 <span class="co">#&gt;   &lt;chr&gt;               </span>
-<span class="co">#&gt; 1 3                   </span>
-<span class="co">#&gt; 2 3                   </span>
-<span class="co">#&gt; 3 3                   </span>
-<span class="co">#&gt; 4 3                   </span>
-<span class="co">#&gt; 5 3                   </span>
-<span class="co">#&gt; 6 3</span></code></pre></div>
+<span class="co">#&gt; 1 1                   </span>
+<span class="co">#&gt; 2 2                   </span>
+<span class="co">#&gt; 3 1                   </span>
+<span class="co">#&gt; 4 1                   </span>
+<span class="co">#&gt; 5 1                   </span>
+<span class="co">#&gt; 6 1</span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="dimensionality-reduction-with-tof_reduce">Dimensionality reduction with <code>tof_reduce</code>
-<a class="anchor" aria-label="anchor" href="#dimensionality-reduction-with-tof_reduce"></a>
+<h4 id="dimensionality-reduction-with-tof_reduce_dimensions">Dimensionality reduction with <code>tof_reduce_dimensions()</code>
+<a class="anchor" aria-label="anchor" href="#dimensionality-reduction-with-tof_reduce_dimensions"></a>
 </h4>
 <p>After clusters are identified, a useful tool for visualizing them is dimensionality reduction, a form of unsupervised machine learning used to represent high-dimensional datasets in a smaller, easier-to-visualize number of dimensions.</p>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> includes several algorithms commonly used by biologists for dimensionality reduction: Principal component analysis (PCA), t-distributed stochastic neighbor embedding (tSNE), and uniform manifold approximation and projection (UMAP). To apply these to a dataset, use <code>tof_reduce_dimensions</code>:</p>
@@ -483,12 +490,12 @@
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   .tsne_1 .tsne_2</span>
 <span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1    3.05   -7.93</span>
-<span class="co">#&gt; 2    7.23  -12.0 </span>
-<span class="co">#&gt; 3   26.9   -25.5 </span>
-<span class="co">#&gt; 4   11.4   -19.7 </span>
-<span class="co">#&gt; 5    5.49   -9.48</span>
-<span class="co">#&gt; 6   17.8   -15.6</span></code></pre></div>
+<span class="co">#&gt; 1   -2.60   -6.91</span>
+<span class="co">#&gt; 2   -7.02  -12.1 </span>
+<span class="co">#&gt; 3  -26.0   -19.9 </span>
+<span class="co">#&gt; 4   -9.37  -17.5 </span>
+<span class="co">#&gt; 5   -6.03   -7.61</span>
+<span class="co">#&gt; 6  -15.5   -17.4</span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add reduced-dimension feature embeddings to the input <code>tof_tbl</code> and return the augmented <code>tof_tbl</code> (that is, a <code>tof_tbl</code> with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set <code>add_cols</code> to <code>FALSE</code> (as in <code>tof_cluster</code>).</p>
 <p>Regardless of the method used, reduced-dimension feature embeddings can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics package):</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -1019,12 +1026,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
-<span class="co">#&gt; 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944</span>
-<span class="co">#&gt; 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
-<span class="co">#&gt; 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226</span>
-<span class="co">#&gt; 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
-<span class="co">#&gt; 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; 1 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944</span>
+<span class="co">#&gt; 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
+<span class="co">#&gt; 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
+<span class="co">#&gt; 4 UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; 5 UPN8           0.951     0.958    0.161      0.556       3.18     0.556</span>
+<span class="co">#&gt; 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1039,12 +1046,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN10         0.00374    0.761   0.000696     0.829      3.19     0.886</span>
-<span class="co">#&gt; 2 UPN16         0.156      0.193   0.00407      0.951      2.87     0.254</span>
-<span class="co">#&gt; 3 UPN19         2.05       0.780   0.00233      0.298      2.36     0.481</span>
-<span class="co">#&gt; 4 UPN22-Rx      0.0643     1.68    0.0804       1.56       3.06     0.529</span>
-<span class="co">#&gt; 5 UPN25         0.0181     0.0266  0.00152      0.108      2.73     0.386</span>
-<span class="co">#&gt; 6 UPN27         0.563      1.07    0.00276      0.712      2.40     0.411</span>
+<span class="co">#&gt; 1 UPN1          3.06       0.583    0.00449    0.164       1.94     0.416</span>
+<span class="co">#&gt; 2 UPN3          0.633      0.0234   0.0165     0.0327      2.25     0.226</span>
+<span class="co">#&gt; 3 UPN10-Rx      0.00240    0.167    0.203      0.802       2.57     0.822</span>
+<span class="co">#&gt; 4 UPN15         0.0516     1.37     0.00610    0.915       2.55     0.236</span>
+<span class="co">#&gt; 5 UPN21         0.477      0.202    0.0920     0.641       2.47     0.267</span>
+<span class="co">#&gt; 6 UPN48         0.0641     0.131    0.0118     0.428       2.02     0.386</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1067,7 +1074,7 @@
 <p>The output of <code>tof_train_model</code> is a <code>tof_model</code>, an object containing information about the trained model (and that can be passed to the <code>tof_predict</code> and <code>tof_assess_model</code> verbs). When a <code>tof_model</code> is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
-<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 </span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 </span>
 <span class="co">#&gt; # A tibble: 25 × 2</span>
 <span class="co">#&gt;    feature             coefficient</span>
 <span class="co">#&gt;    &lt;chr&gt;                     &lt;dbl&gt;</span>
@@ -1252,20 +1259,20 @@
   <span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survival_mod</span><span class="op">)</span>
-<span class="co">#&gt; A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span>
+<span class="co">#&gt; A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 </span>
 <span class="co">#&gt; # A tibble: 29 × 2</span>
 <span class="co">#&gt;    feature              coefficient</span>
 <span class="co">#&gt;    &lt;chr&gt;                      &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 pErk_dP_TSLP_Pop2          -8.14</span>
-<span class="co">#&gt;  2 TdT_Pop2                    3.77</span>
-<span class="co">#&gt;  3 pPLCg1_2_dP_IL7_Pop2        3.36</span>
-<span class="co">#&gt;  4 CD38_Pop2                   3.30</span>
-<span class="co">#&gt;  5 CD43_Pop2                   3.22</span>
-<span class="co">#&gt;  6 p4EBP1_dP_IL7_Pop2         -2.60</span>
-<span class="co">#&gt;  7 Ki67_Pop2                  -2.57</span>
-<span class="co">#&gt;  8 p4EBP1_FC_IL7_Pop2          2.49</span>
-<span class="co">#&gt;  9 pCreb_dP_TSLP_Pop2         -2.46</span>
-<span class="co">#&gt; 10 pCreb_dP_PVO4_Pop2         -2.05</span>
+<span class="co">#&gt;  1 pErk_dP_TSLP_Pop2          -8.33</span>
+<span class="co">#&gt;  2 TdT_Pop2                    3.86</span>
+<span class="co">#&gt;  3 pPLCg1_2_dP_IL7_Pop2        3.44</span>
+<span class="co">#&gt;  4 CD38_Pop2                   3.37</span>
+<span class="co">#&gt;  5 CD43_Pop2                   3.28</span>
+<span class="co">#&gt;  6 p4EBP1_dP_IL7_Pop2         -2.65</span>
+<span class="co">#&gt;  7 Ki67_Pop2                  -2.63</span>
+<span class="co">#&gt;  8 p4EBP1_FC_IL7_Pop2          2.54</span>
+<span class="co">#&gt;  9 pCreb_dP_TSLP_Pop2         -2.48</span>
+<span class="co">#&gt; 10 pCreb_dP_PVO4_Pop2         -2.10</span>
 <span class="co">#&gt; # … with 19 more rows</span></code></pre></div>
 <p>Making predictions using the survival model</p>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
@@ -1274,18 +1281,18 @@
 <span class="co">#&gt; # A tibble: 12 × 1</span>
 <span class="co">#&gt;       .pred</span>
 <span class="co">#&gt;       &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 2.17e+47</span>
-<span class="co">#&gt;  2 9.12e+ 6</span>
-<span class="co">#&gt;  3 1.86e- 3</span>
-<span class="co">#&gt;  4 1.95e- 6</span>
-<span class="co">#&gt;  5 6.29e+ 0</span>
-<span class="co">#&gt;  6 5.30e- 1</span>
-<span class="co">#&gt;  7 1.81e+ 3</span>
-<span class="co">#&gt;  8 3.36e- 3</span>
-<span class="co">#&gt;  9 6.14e- 2</span>
-<span class="co">#&gt; 10 5.34e- 1</span>
-<span class="co">#&gt; 11 1.91e- 4</span>
-<span class="co">#&gt; 12 1.94e+ 2</span></code></pre></div>
+<span class="co">#&gt;  1 5.33e+48</span>
+<span class="co">#&gt;  2 1.30e+ 7</span>
+<span class="co">#&gt;  3 1.64e- 3</span>
+<span class="co">#&gt;  4 1.41e- 6</span>
+<span class="co">#&gt;  5 6.66e+ 0</span>
+<span class="co">#&gt;  6 5.17e- 1</span>
+<span class="co">#&gt;  7 2.07e+ 3</span>
+<span class="co">#&gt;  8 3.04e- 3</span>
+<span class="co">#&gt;  9 5.74e- 2</span>
+<span class="co">#&gt; 10 5.11e- 1</span>
+<span class="co">#&gt; 11 1.61e- 4</span>
+<span class="co">#&gt; 12 2.18e+ 2</span></code></pre></div>
 <p>Assessing the survival model</p>
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">survival_assessment</span> <span class="op">&lt;-</span> 
@@ -1297,8 +1304,8 @@
 <span class="co">#&gt; # A tibble: 2 × 2</span>
 <span class="co">#&gt;   metric                        value</span>
 <span class="co">#&gt;   &lt;chr&gt;                         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 neg_log_partial_likelihood 1309.   </span>
-<span class="co">#&gt; 2 concordance_index             0.548</span>
+<span class="co">#&gt; 1 neg_log_partial_likelihood 1348.   </span>
+<span class="co">#&gt; 2 concordance_index             0.571</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $survival_curves</span>
 <span class="co">#&gt; # A tibble: 12 × 2</span>

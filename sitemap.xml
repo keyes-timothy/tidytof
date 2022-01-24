@@ -10,7 +10,25 @@
     <loc>https://keyes-timothy.github.io/tidytof/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/clustering.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/differential-discovery-analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/dimensionality-reduction.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/downsampling.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/feature-extraction.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/modeling.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/articles/preprocessing.html</loc>
