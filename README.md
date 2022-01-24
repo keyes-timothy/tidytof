@@ -26,6 +26,8 @@
 
 # tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis
 
+<a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
@@ -321,7 +323,7 @@ or while developing code. To do this, `{tidytof}` implements the
 
 Using `{tidytof}`’s built-in dataset `phenograph_data` (which is a
 smaller version of the dataset we read in ourselves above), we can see
-that the original size of the dataset is 2000 cells per cluster, or 6000
+that the original size of the dataset is 1000 cells per cluster, or 3000
 cells in total:
 
 ``` r
@@ -524,7 +526,7 @@ phenograph_clusters %>%
 #>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
 #>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1 H1_PhenoGrap… 3                 cluster1         0     2.46  0.733  3.96 0    
-#> 2 H1_PhenoGrap… 2                 cluster1         0.390 0.881 0      4.52 0.569
+#> 2 H1_PhenoGrap… 3                 cluster1         0.390 0.881 0      4.52 0.569
 #> 3 H1_PhenoGrap… 3                 cluster1         0.569 2.70  1.02   4.77 0    
 #> 4 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  5.15 0.569
 #> 5 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  4.53 0    
@@ -552,12 +554,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           1                     1000
-#> 2 cluster3           2                      997
-#> 3 cluster1           3                      986
-#> 4 cluster1           2                       14
-#> 5 cluster3           1                        2
-#> 6 cluster3           3                        1
+#> 1 cluster2           2                      999
+#> 2 cluster3           1                      998
+#> 3 cluster1           3                      996
+#> 4 cluster1           1                        4
+#> 5 cluster3           3                        2
+#> 6 cluster2           1                        1
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -579,15 +581,15 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 3                   
-#> 2 3                   
-#> 3 3                   
-#> 4 3                   
-#> 5 3                   
-#> 6 3
+#> 1 1                   
+#> 2 2                   
+#> 3 1                   
+#> 4 1                   
+#> 5 1                   
+#> 6 1
 ```
 
-#### Dimensionality reduction with `tof_reduce`
+#### Dimensionality reduction with `tof_reduce_dimensions()`
 
 After clusters are identified, a useful tool for visualizing them is
 dimensionality reduction, a form of unsupervised machine learning used
@@ -613,12 +615,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    3.05   -7.93
-#> 2    7.23  -12.0 
-#> 3   26.9   -25.5 
-#> 4   11.4   -19.7 
-#> 5    5.49   -9.48
-#> 6   17.8   -15.6
+#> 1   -2.60   -6.91
+#> 2   -7.02  -12.1 
+#> 3  -26.0   -19.9 
+#> 4   -9.37  -17.5 
+#> 5   -6.03   -7.61
+#> 6  -15.5   -17.4
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1358,12 +1360,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
-#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 1 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
+#> 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 4 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 5 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1378,12 +1380,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN10         0.00374    0.761   0.000696     0.829      3.19     0.886
-#> 2 UPN16         0.156      0.193   0.00407      0.951      2.87     0.254
-#> 3 UPN19         2.05       0.780   0.00233      0.298      2.36     0.481
-#> 4 UPN22-Rx      0.0643     1.68    0.0804       1.56       3.06     0.529
-#> 5 UPN25         0.0181     0.0266  0.00152      0.108      2.73     0.386
-#> 6 UPN27         0.563      1.07    0.00276      0.712      2.40     0.411
+#> 1 UPN1          3.06       0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN3          0.633      0.0234   0.0165     0.0327      2.25     0.226
+#> 3 UPN10-Rx      0.00240    0.167    0.203      0.802       2.57     0.822
+#> 4 UPN15         0.0516     1.37     0.00610    0.915       2.55     0.236
+#> 5 UPN21         0.477      0.202    0.0920     0.641       2.47     0.267
+#> 6 UPN48         0.0641     0.131    0.0118     0.428       2.02     0.386
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1422,7 +1424,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1628,20 +1630,20 @@ survival_mod <-
   )
 
 print(survival_mod)
-#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 
+#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
 #> # A tibble: 29 × 2
 #>    feature              coefficient
 #>    <chr>                      <dbl>
-#>  1 pErk_dP_TSLP_Pop2          -8.14
-#>  2 TdT_Pop2                    3.77
-#>  3 pPLCg1_2_dP_IL7_Pop2        3.36
-#>  4 CD38_Pop2                   3.30
-#>  5 CD43_Pop2                   3.22
-#>  6 p4EBP1_dP_IL7_Pop2         -2.60
-#>  7 Ki67_Pop2                  -2.57
-#>  8 p4EBP1_FC_IL7_Pop2          2.49
-#>  9 pCreb_dP_TSLP_Pop2         -2.46
-#> 10 pCreb_dP_PVO4_Pop2         -2.05
+#>  1 pErk_dP_TSLP_Pop2          -8.33
+#>  2 TdT_Pop2                    3.86
+#>  3 pPLCg1_2_dP_IL7_Pop2        3.44
+#>  4 CD38_Pop2                   3.37
+#>  5 CD43_Pop2                   3.28
+#>  6 p4EBP1_dP_IL7_Pop2         -2.65
+#>  7 Ki67_Pop2                  -2.63
+#>  8 p4EBP1_FC_IL7_Pop2          2.54
+#>  9 pCreb_dP_TSLP_Pop2         -2.48
+#> 10 pCreb_dP_PVO4_Pop2         -2.10
 #> # … with 19 more rows
 ```
 
@@ -1653,18 +1655,18 @@ survival_mod %>%
 #> # A tibble: 12 × 1
 #>       .pred
 #>       <dbl>
-#>  1 2.17e+47
-#>  2 9.12e+ 6
-#>  3 1.86e- 3
-#>  4 1.95e- 6
-#>  5 6.29e+ 0
-#>  6 5.30e- 1
-#>  7 1.81e+ 3
-#>  8 3.36e- 3
-#>  9 6.14e- 2
-#> 10 5.34e- 1
-#> 11 1.91e- 4
-#> 12 1.94e+ 2
+#>  1 5.33e+48
+#>  2 1.30e+ 7
+#>  3 1.64e- 3
+#>  4 1.41e- 6
+#>  5 6.66e+ 0
+#>  6 5.17e- 1
+#>  7 2.07e+ 3
+#>  8 3.04e- 3
+#>  9 5.74e- 2
+#> 10 5.11e- 1
+#> 11 1.61e- 4
+#> 12 2.18e+ 2
 ```
 
 Assessing the survival model
@@ -1679,8 +1681,8 @@ survival_assessment
 #> # A tibble: 2 × 2
 #>   metric                        value
 #>   <chr>                         <dbl>
-#> 1 neg_log_partial_likelihood 1309.   
-#> 2 concordance_index             0.548
+#> 1 neg_log_partial_likelihood 1348.   
+#> 2 concordance_index             0.571
 #> 
 #> $survival_curves
 #> # A tibble: 12 × 2

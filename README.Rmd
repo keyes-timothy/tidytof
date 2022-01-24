@@ -19,7 +19,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis
+# tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis 
+
+<a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+
 
 <!-- badges: start -->
 

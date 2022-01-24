@@ -21,7 +21,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(tidytof)
-library(tidyverse)
+library(dplyr)
+library(stringr)
 ```
 
 

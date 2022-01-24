@@ -22,7 +22,11 @@ knitr::opts_chunk$set(
 
 ```{r setup, message = FALSE}
 library(tidytof)
-library(tidyverse)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+library(forcats)
 ```
 
 After clusters are identified, many CyTOF users want to use statistical tools to rigorously quantify which clusters(s) in their dataset associate with a particular experimental or clinical variable.
