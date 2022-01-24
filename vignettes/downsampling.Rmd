@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to downsample a CyTOF dataset to a smaller 
   number of cells using {tidytof}.
 vignette: >
-  %\VignetteIndexEntry{Dowsampling}
+  %\VignetteIndexEntry{Downsampling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,5 +1,5 @@
 ---
-title: "Getting started with {tidytof}"
+title: "Getting started with tidytof"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
