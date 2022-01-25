@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidytof  <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and highly reproducible mass cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 
 <!-- badges: start -->

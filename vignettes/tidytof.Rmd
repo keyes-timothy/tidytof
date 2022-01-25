@@ -106,13 +106,14 @@ With very few exceptions, `{tidytof}` functions follow a specific, shared syntax
 The following code demonstrates how `{tidytof}` verb syntax looks in practice, with column and method specifications explicitly pointed out:
 
 ```{r}
-set.seed(2020L)
+set.seed(777L)
 
 ddpr_data %>% 
   tof_preprocess() %>%
   tof_cluster(
     cluster_cols = starts_with("cd"), # column specification
-    method = "flowsom" # method specification
+    method = "flowsom", # method specification, 
+    num_metaclusters = 5 # method specification
   ) %>% 
   tof_downsample(
     group_cols = .flowsom_metacluster, # column specification
