@@ -165,8 +165,7 @@ tof_cluster_flowsom <-
 #' Perform PhenoGraph clustering on CyTOF data.
 #'
 #' This function performs PhenoGraph clustering on CyTOF data using a user-specified
-#' selection of input variables/CyTOF measurements. It is mostly a convenient
-#' wrapper around \code{\link[Rphenograph]{Rphenograph}}.
+#' selection of input variables/CyTOF measurements.
 #'
 #' For additional details about the Phenograph algorithm,
 #' see \href{https://pubmed.ncbi.nlm.nih.gov/26095251/}{this paper}.

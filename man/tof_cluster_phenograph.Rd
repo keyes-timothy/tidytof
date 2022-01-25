@@ -42,8 +42,7 @@ the PhenoGraph cluster to which each cell (i.e. each row) in `tof_tibble` was as
 }
 \description{
 This function performs PhenoGraph clustering on CyTOF data using a user-specified
-selection of input variables/CyTOF measurements. It is mostly a convenient
-wrapper around \code{\link[Rphenograph]{Rphenograph}}.
+selection of input variables/CyTOF measurements.
 }
 \details{
 For additional details about the Phenograph algorithm,
