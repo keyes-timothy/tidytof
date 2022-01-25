@@ -9,7 +9,7 @@ description: >
   and where to find more information. 
 vignette: >
   %\VignetteIndexEntry{Getting started with tidytof}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

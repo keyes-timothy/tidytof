@@ -74,3 +74,22 @@ reference:
   - ddpr_metadata
   - phenograph_data
   - metal_masterlist
+articles:
+- title: "Single-cell"
+  navbar: "Cell-level operations"
+  contents:
+  - reading-and-writing-data
+  - preprocessing
+  - downsampling
+  - dimensionality-reduction
+- title: "Cluster"
+  navbar: "Cluster-level operations"
+  contents:
+  - clustering
+  - differential-discovery-analysis
+  - feature-extraction
+- title: "Sample"
+  navbar: "Sample-level operations"
+  contents:
+  - modeling
+

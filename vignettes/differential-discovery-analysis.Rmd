@@ -9,7 +9,7 @@ description: >
   tools.
 vignette: >
   %\VignetteIndexEntry{Differential discovery analysis}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

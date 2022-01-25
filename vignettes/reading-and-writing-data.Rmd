@@ -8,7 +8,7 @@ description: >
   on disk and how to write data to FCS and CSV files on disk. 
 vignette: >
   %\VignetteIndexEntry{Reading and writing data}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

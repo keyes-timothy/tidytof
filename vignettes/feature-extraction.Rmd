@@ -8,7 +8,7 @@ description: >
   abundance and cluster marker expression using {tidytof} 
 vignette: >
   %\VignetteIndexEntry{Feature extraction}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

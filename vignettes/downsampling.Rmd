@@ -8,14 +8,16 @@ description: >
   number of cells using {tidytof}.
 vignette: >
   %\VignetteIndexEntry{Downsampling}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>", 
+  fig.height = 4, 
+  fig.width = 4
 )
 ```
 
@@ -23,6 +25,8 @@ knitr::opts_chunk$set(
 library(tidytof)
 library(dplyr)
 library(ggplot2)
+
+count <- dplyr::count
 ```
 
 Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. 
@@ -35,7 +39,7 @@ Using `{tidytof}`'s built-in dataset `phenograph_data`, we can see that the orig
 
 ```{r}
 phenograph_data %>% 
-  count(phenograph_cluster)
+  dplyr::count(phenograph_cluster)
 ```
 
 To randomly sample 200 cells per cluster, we can use `tof_downsample()` using the "constant" `method`:
@@ -70,14 +74,26 @@ And finally, we might also be interested in taking a slightly different approach
 
 
 ```{r, warning = FALSE, message = FALSE}
+rescale_max <- 
+  function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) { 
+    x/from[2] * to[2]
+  }
+
 phenograph_data %>% 
   # preprocess all numeric columns in the dataset
   tof_preprocess(undo_noise = FALSE) %>% 
-  # make a scatterplot
+  # plot
   ggplot(aes(x = cd34, y = cd38)) + 
-  geom_point(alpha = 0.5) + 
+  geom_hex() + 
+  coord_fixed(ratio = 0.4) + 
   scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4))
+  scale_y_continuous(limits = c(NA, 4)) +
+  scale_fill_viridis_c(
+    labels = function(x) round(rescale_max(x), 2)
+  ) + 
+  labs(
+    fill = "relative density"
+  )
 ```
 
 To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the "density" `method` of `tof_downsample`:
@@ -88,12 +104,19 @@ phenograph_data %>%
   tof_downsample(method = "density", density_cols = c(cd34, cd38)) %>% 
   # plot
   ggplot(aes(x = cd34, y = cd38)) + 
-  geom_point(alpha = 0.5) + 
+  geom_hex() + 
+  coord_fixed(ratio = 0.4) + 
   scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4))
+  scale_y_continuous(limits = c(NA, 4)) + 
+  scale_fill_viridis_c(
+    labels = function(x) round(rescale_max(x), 2)
+    ) + 
+  labs(
+    fill = "relative density"
+  )
 ```
 
-Thus, we can see that the density after downsampling is approximately uniform across the range of `cd34`/`cd38` values in `phenograph_data`.
+Thus, we can see that the density after downsampling is more uniform (though not exactly uniform) across the range of `cd34`/`cd38` values in `phenograph_data`.
 
 ## Additional documentation
 

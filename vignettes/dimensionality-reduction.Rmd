@@ -8,7 +8,7 @@ description: >
   low-dimensional space using dimensionality reduction algorithms (PCA, UMAP, tSNE)
 vignette: >
   %\VignetteIndexEntry{Dimensionality reduction}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

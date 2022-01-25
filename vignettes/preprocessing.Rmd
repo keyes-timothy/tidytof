@@ -8,7 +8,7 @@ description: >
   {tidytof}.
 vignette: >
   %\VignetteIndexEntry{Preprocessing}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
