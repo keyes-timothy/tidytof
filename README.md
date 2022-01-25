@@ -1,32 +1,7 @@
 
--   [tidytof: An ecosystem for tidy and highly-reproducible CyTOF data
-    analysis](#tidytof-an-ecosystem-for-tidy-and-highly-reproducible-cytof-data-analysis)
-    -   [Getting started](#getting-started)
-        -   [Prerequisites](#prerequisites)
-        -   [Package structure](#package-structure)
-    -   [Installation](#installation)
-    -   [Usage](#usage)
-        -   [Analyzing data at the single-cell
-            level](#analyzing-data-at-the-single-cell-level)
-        -   [Analyzing data at the
-            cluster-level](#analyzing-data-at-the-cluster-level)
-        -   [Analyzing data at the patient- and
-            sample-level](#analyzing-data-at-the-patient--and-sample-level)
-    -   [`{tidytof}`’s Design Principles (and some
-        tips)](#tidytofs-design-principles-and-some-tips)
-        -   [1. Use the `tof_` prefix to your
-            advantage.](#1-use-the-tof_-prefix-to-your-advantage)
-        -   [2. `{tidytof}` functions use 2 kinds of
-            arguments](#2-tidytof-functions-use-2-kinds-of-arguments)
-        -   [3. Use `{tidytof}` to write human-readable
-            pipelines](#3-use-tidytof-to-write-human-readable-pipelines)
-        -   [4. Additional resources](#4-additional-resources)
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tidytof: An ecosystem for tidy and highly-reproducible CyTOF data analysis
-
-<a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -124,10 +99,9 @@ datasets contained in `{tidytof}`:
 
 ``` r
 tidytof_example_data()
-#>  [1] "aml"                  "ddpr"                 "ddpr_metadata.csv"   
-#>  [4] "mix"                  "mix2"                 "phenograph"          
-#>  [7] "phenograph_csv"       "scaffold"             "statistical_scaffold"
-#> [10] "surgery"
+#> [1] "aml"               "ddpr"              "ddpr_metadata.csv"
+#> [4] "mix"               "mix2"              "phenograph"       
+#> [7] "phenograph_csv"    "surgery"
 ```
 
 To obtain the file path for the directory containing each dataset, call
@@ -551,15 +525,14 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 6 × 3
+#> # A tibble: 5 × 3
 #>   phenograph_cluster .flowsom_metacluster     n
 #>   <chr>              <chr>                <int>
-#> 1 cluster2           2                      999
-#> 2 cluster3           1                      998
+#> 1 cluster2           1                     1000
+#> 2 cluster3           2                      999
 #> 3 cluster1           3                      996
-#> 4 cluster1           1                        4
-#> 5 cluster3           3                        2
-#> 6 cluster2           1                        1
+#> 4 cluster1           2                        4
+#> 5 cluster3           3                        1
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -581,12 +554,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 1                   
+#> 1 2                   
 #> 2 2                   
-#> 3 1                   
-#> 4 1                   
-#> 5 1                   
-#> 6 1
+#> 3 2                   
+#> 4 2                   
+#> 5 2                   
+#> 6 2
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -615,12 +588,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1   -2.60   -6.91
-#> 2   -7.02  -12.1 
-#> 3  -26.0   -19.9 
-#> 4   -9.37  -17.5 
-#> 5   -6.03   -7.61
-#> 6  -15.5   -17.4
+#> 1    14.5 -13.1  
+#> 2    14.8  -6.96 
+#> 3    36.4   5.10 
+#> 4    18.9   0.741
+#> 5    18.1 -13.4  
+#> 6    25.6  -3.50
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1360,11 +1333,11 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 4 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
-#> 5 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
+#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
 #> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
@@ -1380,12 +1353,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1          3.06       0.583    0.00449    0.164       1.94     0.416
-#> 2 UPN3          0.633      0.0234   0.0165     0.0327      2.25     0.226
-#> 3 UPN10-Rx      0.00240    0.167    0.203      0.802       2.57     0.822
-#> 4 UPN15         0.0516     1.37     0.00610    0.915       2.55     0.236
-#> 5 UPN21         0.477      0.202    0.0920     0.641       2.47     0.267
-#> 6 UPN48         0.0641     0.131    0.0118     0.428       2.02     0.386
+#> 1 UPN6          5.62       0.550    0.00374     0.622      2.86     0.342
+#> 2 UPN8          0.951      0.958    0.161       0.556      3.18     0.556
+#> 3 UPN10-Rx      0.00240    0.167    0.203       0.802      2.57     0.822
+#> 4 UPN11         0.332      0.488    0.0146      0.598      2.16     0.320
+#> 5 UPN22-Rx      0.0643     1.68     0.0804      1.56       3.06     0.529
+#> 6 UPN28         0.0208     0.0675   0.00544     0.106      2.18     0.533
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1630,21 +1603,9 @@ survival_mod <-
   )
 
 print(survival_mod)
-#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
-#> # A tibble: 29 × 2
-#>    feature              coefficient
-#>    <chr>                      <dbl>
-#>  1 pErk_dP_TSLP_Pop2          -8.33
-#>  2 TdT_Pop2                    3.86
-#>  3 pPLCg1_2_dP_IL7_Pop2        3.44
-#>  4 CD38_Pop2                   3.37
-#>  5 CD43_Pop2                   3.28
-#>  6 p4EBP1_dP_IL7_Pop2         -2.65
-#>  7 Ki67_Pop2                  -2.63
-#>  8 p4EBP1_FC_IL7_Pop2          2.54
-#>  9 pCreb_dP_TSLP_Pop2         -2.48
-#> 10 pCreb_dP_PVO4_Pop2         -2.10
-#> # … with 19 more rows
+#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e+00 
+#> # A tibble: 0 × 2
+#> # … with 2 variables: feature <chr>, coefficient <dbl>
 ```
 
 Making predictions using the survival model
@@ -1653,20 +1614,20 @@ Making predictions using the survival model
 survival_mod %>% 
   tof_predict(new_data = ddpr_validation, prediction_type = "response")
 #> # A tibble: 12 × 1
-#>       .pred
-#>       <dbl>
-#>  1 5.33e+48
-#>  2 1.30e+ 7
-#>  3 1.64e- 3
-#>  4 1.41e- 6
-#>  5 6.66e+ 0
-#>  6 5.17e- 1
-#>  7 2.07e+ 3
-#>  8 3.04e- 3
-#>  9 5.74e- 2
-#> 10 5.11e- 1
-#> 11 1.61e- 4
-#> 12 2.18e+ 2
+#>    .pred
+#>    <dbl>
+#>  1     1
+#>  2     1
+#>  3     1
+#>  4     1
+#>  5     1
+#>  6     1
+#>  7     1
+#>  8     1
+#>  9     1
+#> 10     1
+#> 11     1
+#> 12     1
 ```
 
 Assessing the survival model
@@ -1679,10 +1640,10 @@ survival_assessment <-
 survival_assessment
 #> $model_metrics
 #> # A tibble: 2 × 2
-#>   metric                        value
-#>   <chr>                         <dbl>
-#> 1 neg_log_partial_likelihood 1348.   
-#> 2 concordance_index             0.571
+#>   metric                     value
+#>   <chr>                      <dbl>
+#> 1 neg_log_partial_likelihood  19.6
+#> 2 concordance_index            0.5
 #> 
 #> $survival_curves
 #> # A tibble: 12 × 2
