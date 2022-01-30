@@ -1,0 +1,87 @@
+---
+title: "Preprocessing"
+output: 
+  officedown::rdocx_document:
+    mapstyles:
+      Normal: ['First Paragraph']
+    reference_docx: reference.docx
+---
+
+```{r setup_3, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  fig.cap = TRUE, 
+  out.width = "100%"
+  )
+library(officedown)
+library(officer)
+
+fp <- fp_par(
+  text.align = "center", 
+  padding.bottom = 20, padding.top = 120, 
+  border.bottom = fp_border())
+
+ft <- fp_text(shading.color='#EFEFEF', bold = TRUE)
+
+library(tidytof)
+library(dplyr)
+```
+
+### Preprocessing with `tof_preprocess()`
+
+Generally speaking, the raw ion counts measured for each analyte on a mass cytometer (the content of raw FCS files obtained directly from a mass cytometer) need to be transformed before CyTOF data analysis. Common preprocessing steps may include variance-stabilizing transformations - such as the hyperbolic arcsine (arcsinh) transformation or a log transformation - scaling/centering, and/or denoising.
+
+To perform standard preprocessing tasks with `{tidytof}`, use `tof_preprocess`. `tof_preprocess`'s default behavior is to apply the arcsinh transformation (with a cofactor of 5) to each numeric column in the input `tof_tibble` as well as to remove the gaussian noise that Fluidigm software adds to each ion count (this noise is added for visualization purposes, but for most analyses, removing it is recommended).
+
+As an example, we can preprocess `{tidytof}`'s built-in `phenograph_data` `tof_tibble` and see how our first few measurements change before and after.
+
+```{r}
+# before preprocessing
+phenograph_data %>% 
+  select(cd45, cd34, cd38) %>% 
+  head()
+```
+
+
+```{r}
+# after preprocessing
+phenograph_data %>% 
+  # perform preprocessing
+  tof_preprocess() %>% 
+  # inspect new values
+  select(cd45, cd34, cd38) %>% 
+  head()
+```
+
+To alter `tof_preprocess`'s default behavior, change the `channel_cols` argument to specify which columns of `tof_tibble` should be transformed. Alter the `transform_fun` argument to specify a vector-valued function that should be used to transform each of the `channel_cols`. For example, suppose we want to center and scale each of our numeric columns instead of arcsinh-transforming them: 
+
+```{r}
+phenograph_data %>% 
+  # preprocess
+  tof_preprocess(transform_fun = scale) %>% 
+  # inspect new values
+  select(cd45, cd34, cd38) %>% 
+  head()
+```
+
+To keep the gaussian noise added by Fluidigm software (or if you are working with a dataset that does not have this noise), set the `undo_noise` argument to `FALSE`.
+
+### Postprocessing with tof_postprocess
+
+As a final note, note that the built-in function `tof_postprocess` works nearly identically `tof_preprocess`, but provides different default behavior (namely, applying the reverse arcsinh transformation with a cofactor of 5 to all numeric columns. See `?tof_postprocess` for details).
+
+```{r}
+phenograph_data %>% 
+  select(cd45, cd34, cd38) %>% 
+  head()
+
+# after preprocessing and post-processing, the data are the same 
+# except that the re-added noise component is different for each value 
+phenograph_data %>% 
+  tof_preprocess() %>% 
+  tof_postprocess(redo_noise = TRUE) %>% 
+  select(cd45, cd34, cd38) %>% 
+  head()
+```

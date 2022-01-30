@@ -1,0 +1,258 @@
+---
+title: "Differential discovery analysis"
+output: 
+  officedown::rdocx_document:
+    mapstyles:
+      Normal: ['First Paragraph']
+    reference_docx: reference.docx
+
+---
+
+```{r setup_7, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  fig.cap = TRUE, 
+  out.width = "100%"
+  )
+library(officedown)
+library(officer)
+
+fp <- fp_par(
+  text.align = "center", 
+  padding.bottom = 20, padding.top = 120, 
+  border.bottom = fp_border())
+
+ft <- fp_text(shading.color='#EFEFEF', bold = TRUE)
+
+library(tidytof)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+library(forcats)
+
+```
+
+After clusters are identified, many CyTOF users want to use statistical tools to rigorously quantify which clusters(s) in their dataset associate with a particular experimental or clinical variable.
+
+Such analyses are often grouped under the umbrella term **differential discovery analysis** and include both comparing the relative *size* of clusters between experimental conditions (**differential abundance analysis; DAA**) as well as comparing marker expression patterns of clusters between experimental conditions (**differential expression analysis; DEA**). `{tidytof}` provides the `tof_daa()` and `tof_dea()` verbs for differential abundance and differential expression analyses, respectively.
+
+### Accessing the data for this vignette
+
+To demonstrate how to use these verbs, we'll first download a dataset originally collected for the development of the [CITRUS](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/) algorithm. These data are available in the `{HDCytoData}` package, which is available on Bioconductor and can be downloaded with the following command:
+
+```{r, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install("HDCytoData")
+```
+
+To load the CITRUS data into our current R session, we can call a function from the `{HDCytoData}`, which will provide it to us in a format from the `{flowCore}` package (called a "flowSet"). To convert this into a tidy tibble, we can use `{tidytof}` built-in method for converting flowCore objects into `tof_tbl`'s .
+
+```{r, message = FALSE, warning = FALSE}
+citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
+
+citrus_data <- 
+  citrus_raw %>% 
+  as_tof_tbl(sep = "_")
+```
+
+Thus, we can see that `citrus_data` is a `tof_tbl` with `r nrow(citrus_data)` cells (one in each row) and `r ncol(citrus_data)` pieces of information about each cell (one in each column).
+
+We can also extract some metadata from the raw data and join it with our single-cell data using some functions from the `tidyverse`:
+
+```{r}
+citrus_metadata <- 
+  tibble(
+    file_name = as.character(flowCore::pData(citrus_raw)[[1]]), 
+    sample_id = 1:length(file_name),
+    patient = stringr::str_extract(file_name, "patient[:digit:]"), 
+    stimulation = stringr::str_extract(file_name, "(BCR-XL)|Reference")
+  ) %>% 
+  mutate(
+    stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
+  )
+
+citrus_metadata %>%
+  head()
+```
+
+Thus, we now have sample-level information about which patient each sample was collected from and which stimulation condition ("Basal" or "BCR-XL") each sample was exposed to before data acquisition.
+
+Finally, we can join this metadata with our single-cell `tof_tbl` to obtain the cleaned dataset.
+
+```{r}
+citrus_data <- 
+  citrus_data %>% 
+  left_join(citrus_metadata, by = "sample_id")
+```
+
+After these data cleaning steps, we now have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
+
+### Differential abundance analysis using `tof_daa()`
+
+We might wonder if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question that requires differential abundance analysis (DAA). `{tidytof}`'s `tof_daa()` verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:
+
+```{r}
+daa_result <- 
+  citrus_data %>% 
+  tof_daa(
+    cluster_col = population_id, 
+    effect_col = stimulation, 
+    group_cols = patient, 
+    test_type = "paired", 
+    daa_method = "ttest"
+  )
+
+daa_result %>% 
+  head()
+```
+
+Based on this output, we can see that 6 of our 8 clusters have statistically different abundance in our two stimulation conditions. Using `{tidytof}` easy integration with `{tidyverse}` packages, we can use this result to visualize the fold-changes of each cluster (within each patient) in the BCR-XL condition compared to the Basal condition using `{ggplot2}`:
+
+```{r, message = FALSE}
+plot_data <- 
+  citrus_data %>% 
+  mutate(population_id = as.character(population_id)) %>%
+  left_join(
+    select(daa_result, population_id, significant, mean_fc), 
+    by = "population_id"
+  ) %>% 
+  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") %>% 
+  group_by(patient, stimulation) %>% 
+  mutate(prop = n / sum(n)) %>% 
+  ungroup() %>% 
+  pivot_wider(
+    names_from = stimulation, 
+    values_from = c(prop, n), 
+  ) %>% 
+  mutate(
+    diff = `prop_BCR-XL` - prop_Basal, 
+    fc = `prop_BCR-XL` / prop_Basal,
+    population_id = fct_reorder(population_id, diff),
+    direction = 
+      case_when(
+        mean_fc > 1 & significant == "*" ~ "increase",
+        mean_fc < 1 & significant == "*" ~ "decrease", 
+        TRUE ~ NA_character_
+      )
+  ) 
+
+significance_data <- 
+  plot_data %>% 
+  group_by(population_id, significant, direction) %>% 
+  summarize(diff = max(diff), fc = max(fc)) %>% 
+  ungroup()
+
+plot_data %>% 
+  ggplot(aes(x = population_id, y = fc, fill = direction)) + 
+  geom_violin(trim = FALSE) +
+  geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) + 
+  geom_point() + 
+  geom_text(
+    aes(x = population_id, y = fc, label = significant), 
+    data = significance_data, 
+    size = 8, 
+    nudge_x = 0.2,
+    nudge_y = 0.06
+  ) +
+  scale_x_discrete(labels = function(x) str_c("cluster ", x)) + 
+  scale_fill_manual(
+    values = c("decrease" = "#cd5241", "increase" = "#207394"),
+    na.translate = FALSE
+  ) +
+  labs(
+    x = NULL, 
+    y = "Abundance fold-change (stimulated / basal)", 
+    fill = "Effect", 
+    caption = "Asterisks indicate significance at an adjusted p-value of 0.05"
+  )
+```
+
+Importantly, the output of `tof_daa` depends slightly on the underlying statistical method being used, and details can be found in the documentation for each `tof_daa_*` function family member:
+
+-   `tof_daa_diffcyt`
+-   `tof_daa_glmm`
+-   `tof_daa_ttest`
+
+### Differential expression analysis with `tof_dea()`
+
+Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_dea` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each cluster's expression of our signaling markers between stimulation conditions.
+
+```{r}
+signaling_markers <- 
+  c(
+    "pNFkB_Nd142", "pStat5_Nd150", "pAkt_Sm152", "pStat1_Eu153", "pStat3_Gd158", 
+    "pSlp76_Dy164", "pBtk_Er166", "pErk_Er168", "pS6_Yb172", "pZap70_Gd156"
+  )
+
+dea_result <- 
+  citrus_data %>% 
+  tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
+  tof_dea(
+    dea_method = "ttest", 
+    cluster_col = population_id, 
+    marker_cols = any_of(signaling_markers), 
+    effect_col = stimulation,
+    group_cols = patient, 
+    test_type = "paired"
+  )
+
+dea_result %>% 
+  head()
+```
+
+While the output of `tof_dea()` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa()`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.
+
+This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs:
+
+```{r}
+volcano_data <- 
+  dea_result %>% 
+  mutate(
+    log2_fc = log(mean_fc, base = 2), 
+    log_p = -log(p_adj), 
+    significance = 
+      case_when(
+        p_adj < 0.05 & mean_fc > 1 ~ "increased", 
+        p_adj < 0.05 & mean_fc < 1 ~ "decreased",
+        TRUE ~ NA_character_
+      ), 
+    marker = 
+      str_extract(marker, ".+_") %>% 
+      str_remove("_"), 
+    pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
+  )
+
+volcano_data %>% 
+  ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
+  geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
+  geom_point(shape = 21, size = 2) + 
+  ggrepel::geom_text_repel(
+    aes(label = pair), 
+    data = slice_head(volcano_data, n = 10L), 
+    size = 2
+  ) + 
+  scale_fill_manual(
+    values = c("decreased" = "#cd5241", "increased" = "#207394"), 
+    na.value = "#cdcdcd"
+  ) + 
+  labs(
+    x = "log2(Fold-change)", 
+    y = "-log10(p-value)", 
+    fill = NULL, 
+    caption = "Labels indicate the 10 most significant marker-cluster pairs"
+  )
+```
+
+As above, details can be found in the documentation for each `tof_dea_*` function family member:
+
+-   `tof_dea_diffcyt`
+-   `tof_dea_lmm`
+-   `tof_dea_ttest`
+

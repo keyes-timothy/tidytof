@@ -1,0 +1,343 @@
+---
+title: "{tidytof}: A reproducible pipeline for analyzing mass cytometry data using tidy data principles"
+subtitle: "Supplementary information"
+author: "Keyes et al."
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document: 
+    reference_docx: reference.docx
+    tables:
+      width: 1.0
+---
+
+```{r setup_master, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  warning = FALSE, 
+  message = FALSE 
+)
+
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+
+library(tidyverse)
+library(tidytof)
+library(kableExtra)
+library(flextable)
+library(officer)
+```
+
+# Table of contents
+
+<!---BLOCK_TOC--->
+
+\newpage
+
+# Supplementary Tables
+
+## Supplementary Table 1
+
+```{r}
+sup_table_data <- 
+  ddpr_data %>% 
+  tof_preprocess(undo_noise = FALSE) %>% 
+  tof_cluster(method = "kmeans", cluster_cols = c(cd19, cd45), num_clusters = 4) %>% 
+  rename(cluster = .kmeans_cluster) %>% 
+  tof_downsample_constant(
+    group_cols = cluster,
+    num_cells = 100
+  ) %>% 
+  tof_reduce_dimensions(
+    method = "tsne", 
+    tsne_cols = starts_with("cd", ignore.case = FALSE)
+    ) %>% 
+  tof_preprocess(
+    transform_fun = function(x) round(x, digits = 2), 
+    undo_noise = FALSE
+  ) %>% 
+  mutate(
+    patient = sample(x = paste0("patient ", 1:3), replace = TRUE, size = nrow(.))
+  ) %>% 
+  dplyr::select(cd45, cd19, cd20, starts_with(".tsne"), patient, cluster) %>% 
+  rename(
+    protein_1 = cd45, 
+    protein_2 = cd19,
+    protein_3 = cd20,
+    tsne_1 = .tsne_1, 
+    tsne_2 = .tsne_2
+  )
+
+patient_1 <-
+  sup_table_data %>% 
+  filter(patient == "patient 1")
+
+patient_2 <-
+  sup_table_data %>% 
+  filter(patient == "patient 2")
+
+patient_3 <-
+  sup_table_data %>% 
+  filter(patient == "patient 3")
+
+patient_1 <- 
+  bind_rows(
+    filter(patient_1, cluster == "1") %>% 
+      slice_head(n = 1), 
+    filter(patient_1, cluster == "2") %>% 
+      slice_head(n = 1), 
+    filter(patient_1, cluster == "4") %>% 
+      slice_head(n = 1)
+  )
+
+patient_2 <- 
+  bind_rows(
+    filter(patient_2, cluster == "1") %>% 
+      slice_head(n = 1), 
+    filter(patient_2, cluster == "4") %>% 
+      slice_head(n = 2)
+  )
+
+patient_3 <- 
+  bind_rows(
+    filter(patient_3, cluster == "3") %>% 
+      slice_head(n = 1), 
+    filter(patient_3, cluster == "2") %>% 
+      slice_head(n = 1), 
+    filter(patient_3, cluster == "3") %>% 
+      slice_tail(n = 1)
+  )
+
+sup_table_data <- 
+  bind_rows(patient_1, patient_2, patient_3) %>% 
+  arrange(patient) %>% 
+  relocate(contains("protein"), contains("tsne"), cluster, everything())
+
+patient_colors <- 
+  tibble(
+    patient = c("patient 1", "patient 2", "patient 3"), 
+    color = c("#fdf7b6", "#a1dcee", "#b2d9a4")
+  )
+
+sup_table_data <- 
+  sup_table_data %>% 
+  left_join(patient_colors) %>% 
+  mutate(sample_type = c(rep("healthy", 6), rep("cancer", 3))) %>% 
+  relocate(patient, .after = last_col()) %>% 
+  as.data.frame()
+
+row.names(sup_table_data) <- paste0("Cell ", 1:9)
+
+```
+
+```{r, echo = FALSE, tab.topcaption	= FALSE, tab.id="supplemental_table_1"}
+stable_1 <- 
+  sup_table_data %>% 
+  select(-color) %>% 
+  #rename_with(.fn = str_remove, .cols = c(contains("protein"), contains("tsne")), pattern = "_") %>% 
+  as_tibble(rownames = "cell_id") %>% 
+  flextable::regulartable() %>% 
+  flextable::add_header_row(
+    values = c("", "Proteomic data", "{tidytof} calculations", "Metadata"), 
+    colwidths = c(1, 3, 3, 2)
+  ) %>% 
+  flextable::theme_alafoli() %>% 
+  flextable::align(i = 1, align = "center", part = "header") %>% 
+  flextable::align(i = 2, j = "cluster", align = "right", part = "header") %>% 
+  flextable::align(j = "cluster", align = "right", part = "body") %>% 
+  flextable::vline(
+    j = c("cell_id", "protein_3", "cluster"), 
+    border = officer::fp_border(color = "gray80", width = 0.5),
+    part = "all"
+  ) %>% 
+  flextable::bg(i = 1, bg = "gray97", part = "header") %>% 
+  flextable::bg(i = 2, bg = "gray91", part = "header") %>% 
+  flextable::bold(i = 2, bold = TRUE, part = "header") %>% 
+  flextable::color(color = "black", part = "all") %>% 
+  flextable::set_table_properties(layout = "autofit") #%>% 
+  #flextable::set_caption(caption = "Example of a {tidytof} data frame")
+
+stable_1
+```
+
+**Supplementary Table 1 - Example of a `{tidytof}` data frame.** {tidytof} represents CyTOF data in a "tidy format" using an extended data frame called a "tof_tbl". In this format, data are represented such that each cell is given its own row and each measurement or piece of metadata is given its own column.
+
+```{r, eval = FALSE}
+sup_table_data %>% 
+  as_tibble(rownames = "cell_id") %>% 
+  select(-color) %>% 
+  flextable::as_grouped_data(groups = "patient") %>% 
+  relocate(cell_id, .after = last_col()) %>% 
+  #rename_with(.fn = str_remove, .cols = c(contains("protein"), contains("tsne")), pattern = "_") %>% 
+  flextable::regulartable() %>% 
+  flextable::add_header_row(
+    values = c("", "Proteomic data", "{tidytof} calculations", "Metadata"), 
+    colwidths = c(1, 3, 3, 2)
+  ) %>% 
+  flextable::theme_alafoli() %>% 
+  flextable::align(i = 1, align = "center", part = "header") %>% 
+  flextable::align(i = 2, j = "cluster", align = "right", part = "header") %>% 
+  flextable::align(j = "cluster", align = "right", part = "body") %>% 
+  flextable::vline(
+    j = c("cell_id", "protein_3", "cluster"), 
+    border = officer::fp_border(color = "gray80", width = 0.5),
+    part = "all"
+  ) %>% 
+  flextable::bg(i = 1, bg = "gray97", part = "header") %>% 
+  flextable::bg(i = 2, bg = "gray91", part = "header") %>% 
+  flextable::bold(i = 2, bold = TRUE, part = "header") %>% 
+  flextable::color(color = "black", part = "all") %>% 
+  flextable::set_table_properties(layout = "autofit")
+  
+```
+
+\newpage
+
+## Supplementary Table 2
+
++-------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Verb**                | **Family members**            | **Description**                                                                                                                                                                              |
++=========================+===============================+==============================================================================================================================================================================================+
+| tof_read_data()         | -   tof_read_fcs()            | Read FCS and CSV files on disk into a tidy data frame                                                                                                                                        |
+|                         | -   tof_read_csv()            |                                                                                                                                                                                              |
++-------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_write_data()        | -   tof_write_fcs()           | Write FCS and CSV files to disk from a tidy data frame                                                                                                                                       |
+|                         | -   tof_write_csv()           |                                                                                                                                                                                              |
++-------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_downsample()        | -   tof_downsample_constant() | Subsample cells to a constant number, to a proportion of the the number of cells in the input, or to an estimated density in phenotypic space.                                               |
+|                         | -   tof_downsample_prop()     |                                                                                                                                                                                              |
+|                         | -   tof_downsample_density()  |                                                                                                                                                                                              |
++-------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_reduce_dimensions() | -   tof_reduce_pca()          | Perform dimensionality reduction on a dataset using principal components analysis (PCA), t-stochastic neighborhood embedding (tSNE), or uniform manifold approximation and projection (UMAP) |
+|                         | -   tof_reduce_tsne()         |                                                                                                                                                                                              |
+|                         | -   tof_reduce_umap()         |                                                                                                                                                                                              |
++-------------------------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+**Supplementary Table 2 - Cell-level verbs.** A comprehensive table of `{tidytof}` verbs that operate at the single-cell level.
+
+\newpage
+
+## Supplementary Table 3 - Cluster-level verbs
+
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Verb**               | **Family members**                 | **Description**                                                                                                                                                                                                                                                               |
++========================+====================================+===============================================================================================================================================================================================================================================================================+
+| tof_cluster()          | -   tof_cluster_ddpr()             | Assign cluster labels to each cell in a dataset using one of several clustering algorithms commonly applied to mass cytometry data.                                                                                                                                           |
+|                        | -   tof_cluster_flowsom()          |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_cluster_kmeans()           |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_cluster_phenograph()       |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_cluster_xshift()           |                                                                                                                                                                                                                                                                               |
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_metacluster()      | -   tof_metacluster_consensus()    | Agglomerate clusters into a smaller, user-specified number of metaclusters using several common methods.                                                                                                                                                                      |
+|                        | -   tof_metacluster_hierarchical() |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_metacluster_kmeans()       |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_metacluster_phenograph()   |                                                                                                                                                                                                                                                                               |
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_daa()              | -   tof_daa_diffcyt()              | Perform differential abundance analysis (DAA) of clusters across experimental conditions using one of 3 statistical methods.                                                                                                                                                  |
+|                        | -   tof_daa_glmm()                 |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_daa_ttest()                |                                                                                                                                                                                                                                                                               |
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_dea()              | -   tof_dea_diffcyt()              | Perform differential expression analysis (DEA) of clusters across experimental conditions using one of 3 statistical methods.                                                                                                                                                 |
+|                        | -   tof_dea_lmm()                  |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_dea_ttest()                |                                                                                                                                                                                                                                                                               |
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_extract_features() | -   tof_extract_central_tendency() | Aggregate cluster-level information across single cells to compute summary statistics including the proportion of cells in each cluster, marker expression central tendencies (i.e. mean, median), and the proportion of cells with marker expression over a given threshold. |
+|                        | -   tof_extract_proportion()       |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_extract_threshold()        |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_extract_emd()              |                                                                                                                                                                                                                                                                               |
+|                        | -   tof_extract_jsd()              |                                                                                                                                                                                                                                                                               |
++------------------------+------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+**Supplementary Table 3 - Cluster-level verbs.** A comprehensive table of `{tidytof}` verbs that operate at the cluster level.
+
+\newpage
+
+## Supplementary Table 4 - Sample-level verbs
+
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Verb**          | **Description**                                                                                                                                                                                       |
++===================+=======================================================================================================================================================================================================+
+| tof_split_data()  | Split sample-level data into a training and test set for predictive modeling (including k-fold cross-validation and bootstrapped resampling).                                                         |
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_create_grid() | Create a search grid of candidate hyperparameters to test during model tuning.                                                                                                                        |
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_train_model() | Train a sample-level elastic net model to predict continuous (linear regression), categorical (logistic and multinomial regression), or time-to-event (Cox proportional-hazards regression) outcomes. |
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_predict()     | Apply a trained {tidytof} model to a new dataset to predict sample-level outcomes.                                                                                                                    |
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| tof_assess()      | Interrogate a trained {tidytof} model's performance by calculating evaluation metrics                                                                                                                 |
++-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+**Supplementary Table 4 - Sample-level verbs.** A comprehensive table of `{tidytof}` verbs that operate at the whole-sample level.
+
+\newpage
+
+# Supplementary Notes
+
+## Supplementary Note 1 - Getting started with `{tidytof}`
+
+```{r, child = "supplementary_note_1.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 2 - Reading and writing data
+
+```{r, child = "supplementary_note_2.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 3 - Preprocessing
+
+```{r, child = "supplementary_note_3.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 4 - Downsampling
+
+```{r, child = "supplementary_note_4.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 5 - Dimensionality reduction
+
+```{r, child = "supplementary_note_5.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 6 - Clustering and metaclustering
+
+```{r, child = "supplementary_note_6.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 7 - Differential discovery analysis
+
+```{r, child = "supplementary_note_7.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 8 - Feature extraction
+
+```{r, child = "supplementary_note_8.Rmd"}
+
+```
+
+\newpage
+
+## Supplementary Note 9 - Building predictive models
+
+```{r, child = "supplementary_note_9.Rmd"}
+
+```
