@@ -11,7 +11,7 @@ articles:
   preprocessing: preprocessing.html
   reading-and-writing-data: reading-and-writing-data.html
   tidytof: tidytof.html
-last_built: 2022-01-30T23:11Z
+last_built: 2022-01-30T23:25Z
 urls:
   reference: https://keyes-timothy.github.io/tidytof/reference
   article: https://keyes-timothy.github.io/tidytof/articles
