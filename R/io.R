@@ -572,17 +572,17 @@ tof_write_fcs <-
 
     # find max and min values for all non-grouping columns in tof_tibble
     if (!missing(group_cols)) {
-    maxes_and_mins <-
-      tof_tibble %>%
-      dplyr::summarize(
-        dplyr::across(
-          -{{group_cols}},
-          .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
-          # use the many underscores because it's unlikely this will come up
-          # in column names on their own
-          .names = "{.col}_____{.fn}"
+      maxes_and_mins <-
+        tof_tibble %>%
+        dplyr::summarize(
+          dplyr::across(
+            -{{group_cols}},
+            .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+            # use the many underscores because it's unlikely this will come up
+            # in column names on their own
+            .names = "{.col}_____{.fn}"
+          )
         )
-      )
     } else {
       maxes_and_mins <-
         tof_tibble %>%
@@ -759,7 +759,7 @@ tof_write_fcs <-
 tof_write_data <-
   function(
     tof_tibble = NULL,
-    group_cols = NULL,
+    group_cols,
     out_path = NULL,
     format = c("fcs", "csv"),
     sep = "_",
@@ -770,24 +770,42 @@ tof_write_data <-
 
     # if .csv file is requested
     if ("csv" %in% format) {
-      tof_write_csv(
-        tof_tibble = tof_tibble,
-        group_cols = {{group_cols}},
-        out_path = out_path,
-        sep = sep,
-        file_name = file_name
-      )
+      if (!missing(group_cols)) {
+        tof_write_csv(
+          tof_tibble = tof_tibble,
+          group_cols = {{group_cols}},
+          out_path = out_path,
+          sep = sep,
+          file_name = file_name
+        )
+      } else {
+        tof_write_csv(
+          tof_tibble = tof_tibble,
+          out_path = out_path,
+          sep = sep,
+          file_name = file_name
+        )
+      }
     }
 
     # if .fcs file is requested
     if ("fcs" %in% format) {
-      tof_write_fcs(
-        tof_tibble = tof_tibble,
-        group_cols = {{group_cols}},
-        out_path = out_path,
-        sep = sep,
-        file_name = file_name
-      )
+      if (!missing(group_cols)) {
+        tof_write_fcs(
+          tof_tibble = tof_tibble,
+          group_cols = {{group_cols}},
+          out_path = out_path,
+          sep = sep,
+          file_name = file_name
+        )
+      } else {
+        tof_write_fcs(
+          tof_tibble = tof_tibble,
+          out_path = out_path,
+          sep = sep,
+          file_name = file_name
+        )
+      }
     }
   }
 

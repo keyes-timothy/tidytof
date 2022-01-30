@@ -1,39 +1,53 @@
 ---
-title: "{tidytof} performance benchmarking"
-output: 
-  pdf_document: default
+title: '{tidytof} performance benchmarking'
+output:
+  html_document:
+    df_print: paged
   officedown::rdocx_document:
     mapstyles:
-      Normal: ['First Paragraph']
+      Normal: First Paragraph
     reference_docx: reference.docx
+  pdf_document: default
 ---
 
 ```{r setup_bench, include=FALSE}
+# options
 knitr::opts_chunk$set(
-  echo = TRUE,
+  echo = FALSE,
   message = FALSE, 
   warning = FALSE,
   fig.cap = TRUE, 
   out.width = "100%"
   )
+
+# libraries
 library(officedown)
 library(officer)
 library(tidytof)
 library(tidyverse)
 library(microbenchmark)
 library(flowCore)
-
-num_repeats <- 5L
-
 filter <- dplyr::filter
 count <- dplyr::count
 
-charizard <- c("base" = "#207394", "tidytof" = "#cd5241")
-```
+# source benchmarking functions 
+source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 
-## Files 
+# globals
+num_repeats <- 5L
+charizard <- c("base" = "#207394", "tidytof" = "#cd5241", "flowcore" = "#eeb45a")
 
-```{r}
+# which benchmarking sections to run from scratch
+run_io <- FALSE
+run_downsample <- FALSE
+run_preprocess <- FALSE
+run_tsne <- FALSE
+run_pca <- FALSE
+run_cluster <- FALSE
+run_extract <- FALSE
+run_style <- FALSE
+
+# file paths 
 ddpr_path <-
   file.path("~", "Box", "Tim", "Lab", "Data", "DDPR_Data")
 
@@ -70,18 +84,17 @@ ddpr_data_info <-
 
 ddpr_data_info %>% 
   write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "ddpr_data_info.rds")
+    file = here::here("manuscript", "benchmarking", "ddpr_data_info.rds")
   )
 ```
 
 ```{r}
 ddpr_data_info <- 
   read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "ddpr_data_info.rds")
+    file = here::here("manuscript", "benchmarking", "ddpr_data_info.rds")
   )
 
 ddpr_data_info
-  
 ```
 
 ```{r}
@@ -106,6 +119,8 @@ ddpr_100 <- largest_cohort_paths[1:100]
 ```
 
 ```{r}
+# put together a benchmarking dataset that includes a set of 5, 10, 25, 
+# 50, and 100 FCS files from the largest ddpr cohort
 ddpr_datasets <- 
   tibble(
     num_files = c(5, 10, 25, 50, 100)
@@ -120,6 +135,8 @@ ddpr_datasets
 
 
 ```{r}
+# put together a smaller benchmarking dataset that includes a set of 1 to 
+# 20 FCS files from the largest ddpr cohort
 ddpr_datasets_mini <- 
   tibble(
     num_files = 1:20, 
@@ -130,9 +147,10 @@ ddpr_datasets_mini <-
 ddpr_datasets_mini
 ```
 
-### set up csv folders 
 
 ```{r, eval = FALSE}
+# take the largest ddpr cohort and convert all files to CSVs, then save in a 
+# new directory on Box
 ddpr_large <- 
   largest_cohort_paths %>% 
   tof_read_data()
@@ -146,20 +164,56 @@ ddpr_large %>%
   )
 ```
 
-## Reading data
 
-### {tidytof} function
 
 ```{r}
-read_data_tidytof <- function(file_names) { 
-  return(tof_read_data(file_names))
-}
+# set up pre-read data sets for downsampling, _____. 
+
+## every file in the 20-FCS dataset is a row, with single-cell data stored 
+## in the "data" column
+ddpr_mini_tibble <- 
+  tof_read_data(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]) %>% 
+  group_by(file_name) %>% 
+  nest() %>% 
+  ungroup()
+
+## same as above, but in flowSet form (flowSet of 20 experiments)
+ddpr_mini_flowset <- 
+  flowCore::read.flowSet(files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]])
+
+# store each benchmark iteration as a single row in a tibble. 
+# Each row is an iteration. The "tibbles" column contains a single tibble 
+# with all the cells for that fold. The "flowSets" column contains a single 
+# flowSet with all the cells for that fold.
+ddpr_data_mini <- 
+  ddpr_datasets_mini %>% 
+  mutate(
+    tibbles = 
+      map(
+        .x = 1:nrow(ddpr_datasets_mini), 
+        .f = ~ ddpr_mini_tibble %>% 
+          slice_head(n = .x) %>% 
+          unnest(cols = data)
+        ), 
+    flowSets = 
+      map(
+        .x = 1:nrow(ddpr_datasets_mini), 
+        .f = ~ddpr_mini_flowset[1:.x]
+      )
+  )
+
 ```
 
 
-### Base R function
+## Reading data
 
-```{r}
+```{r, eval = FALSE}
+### {tidytof} function
+read_data_tidytof <- function(file_names) { 
+  return(tof_read_data(file_names))
+}
+
+### Base R function
 read_data_base <- function(file_names) { 
   extension_type <- tools::file_ext(file_names[[1]])
   if (extension_type == "csv") { 
@@ -186,9 +240,8 @@ read_data_base <- function(file_names) {
 }
 ```
 
-### Benchmarking function
-
 ```{r}
+### Benchmarking function
 benchmark_io <- 
   function(file_paths) { 
     microbenchmark(
@@ -203,17 +256,21 @@ benchmark_io <-
         time = time / (10^9)
       )
   }
+
+file_name <- 
+  str_glue("io_benchmarking_speed_{num_repeats}.rds")
+
+file_name_csv <- 
+  str_glue("io_benchmarking_speed_csv_{num_repeats}.rds")
 ```
 
-
+```{r, eval = run_io}
 ### Perform benchmarking
-
-```{r, eval = FALSE}
-io_benchmarking_3 <- 
+io_benchmarking <- 
   ddpr_datasets_mini %>% 
   mutate(io_benchmarks = map(.x = file_paths, .f = benchmark_io))
 
-io_benchmarking_3_csv <- 
+io_benchmarking_csv <- 
   ddpr_datasets_mini %>% 
   mutate(
     file_paths = 
@@ -221,31 +278,48 @@ io_benchmarking_3_csv <-
       map(.f = str_replace, pattern = "DDPR_Data", replacement = "DDPR_Data_csv") 
   ) %>% 
   mutate(io_benchmarks = map(.x = file_paths, .f = benchmark_io))
+
+
 ```
+
+
+
 
 
 ### Visualize results
 
-```{r, eval = FALSE}
+```{r, eval = run_io}
 # save benchmarking output as an .rds
-io_benchmarking_3 %>% 
+io_benchmarking %>% 
   write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name)
   )
 ```
 
-```{r}
-
-io_benchmarking_3 <- 
+```{r, message = FALSE}
+io_benchmarking <- 
   read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name) 
   )
+
+engines <- 
+  io_benchmarking %>% 
+  select(io_benchmarks) %>% 
+  unnest(io_benchmarks) %>% 
+  mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
+  pull(engine) %>% 
+  unique()
+
+num_engines <- length(engines)
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 # make a plot to summarize 
 io_speed_plot <- 
-  io_benchmarking_3 %>% 
+  io_benchmarking %>% 
   select(num_files, num_cells, io_benchmarks) %>% 
   unnest(cols = io_benchmarks) %>% 
+  mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
     mean_time = mean(time), 
@@ -266,8 +340,8 @@ io_speed_plot <-
   geom_errorbar() + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) +
+  scale_fill_manual(values = my_palette) + 
+  scale_color_manual(values = my_palette) +
   theme_bw() + 
   labs(
     subtitle = "FCS reader speed benchmarking",
@@ -282,7 +356,7 @@ io_speed_plot
 io_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed.pdf"), 
+      here::here("manuscript", "benchmarking", str_glue("io_benchmarking_speed_{num_repeats}.pdf")), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -292,20 +366,28 @@ io_speed_plot %>%
 
 ```{r, eval = FALSE}
 # save benchmarking results as an .rds
-io_benchmarking_3_csv %>% 
+io_benchmarking_csv %>% 
   write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed_csv.rds")
+    file = here::here("manuscript", "benchmarking", file_name_csv)
   )
 ```
 
-```{r}
+```{r, message = FALSE}
 
-io_benchmarking_3_csv <- 
-  read_rds(file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed_csv.rds"))
+io_benchmarking_csv <- 
+  read_rds(file = here::here("manuscript", "benchmarking", file_name_csv))
+
+num_engines <- 
+  io_benchmarking_csv %>% 
+  select(io_benchmarks) %>% 
+  unnest(io_benchmarks) %>% 
+  pull(engine) %>% 
+  unique() %>% 
+  length()
 
 # visualize speed benchmarking results
 io_speed_plot_csv <- 
-  io_benchmarking_3_csv %>% 
+  io_benchmarking_csv %>% 
   select(num_files, num_cells, io_benchmarks) %>% 
   unnest(cols = io_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
@@ -328,8 +410,8 @@ io_speed_plot_csv <-
   geom_errorbar() + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) +
+  scale_fill_manual(values = charizard[1:num_engines]) + 
+  scale_color_manual(values = charizard[1:num_engines]) +
   theme_bw() + 
   labs(
     subtitle = "CSV reader speed benchmarking",
@@ -344,7 +426,7 @@ io_speed_plot_csv
 io_speed_plot_csv %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "io_benchmarking_speed_csv.pdf"), 
+      here::here("manuscript", "benchmarking", str_glue("io_benchmarking_speed_csv_{num_repeats}.pdf")), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -353,72 +435,10 @@ io_speed_plot_csv %>%
 
 ## Downsampling
 
-### setup 
-
-```{r}
-ddpr_mini_tibble <- 
-  tof_read_data(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]) %>% 
-  group_by(file_name) %>% 
-  nest() %>% 
-  ungroup()
-
-ddpr_mini_flowset <- 
-  flowCore::read.flowSet(files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]])
-
-ddpr_large_tibble <- 
-  tof_read_data(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets)]]) %>% 
-  group_by(file_name) %>% 
-  nest() %>% 
-  ungroup()
-
-ddpr_large_flowset <- 
-  flowCore::read.flowSet(files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets)]])
-
-ddpr_data_mini <- 
-  ddpr_datasets_mini %>% 
-  mutate(
-    tibbles = 
-      map(
-        .x = 1:nrow(ddpr_datasets_mini), 
-        .f = ~ ddpr_mini_tibble %>% 
-          slice_head(n = .x) %>% 
-          unnest(cols = data)
-        ), 
-    flowSets = 
-      map(
-        .x = 1:nrow(ddpr_datasets_mini), 
-        .f = ~ddpr_mini_flowset[1:.x]
-      )
-  )
-
-ddpr_data_mini$tibbles[[1]]
-
-ddpr_data_large <- 
-  ddpr_datasets %>% 
-  mutate(
-    tibbles = 
-      map(
-        .x = 1:nrow(ddpr_datasets), 
-        .f = ~ ddpr_large_tibble %>% 
-          slice_head(n = .x) %>% 
-          unnest(cols = data)
-        ), 
-    flowSets = 
-      map(
-        .x = 1:nrow(ddpr_datasets), 
-        .f = ~ddpr_large_flowset[1:.x]
-      )
-  )
-
-ddpr_data_large$tibbles[[1]]
-
-
-```
-
-
 ### {tidytof} function
 
-```{r}
+```{r, eval = FALSE}
+# tidytof
 downsample_tidytof <- 
   function(data_frame) {
     result <- data_frame %>% 
@@ -426,13 +446,7 @@ downsample_tidytof <-
     return(result)
   }
 
-downsample_tidytof(data_frame = ddpr_data_mini$tibbles[[2]])
-```
-
-
-### Base R function
-
-```{r}
+# base R
 downsample_base <- 
   function(data_frame) {
     file_names <- unique(data_frame$file_name)
@@ -448,36 +462,62 @@ downsample_base <-
     result <- data_frame[final_subset, ]
     return(result)
   }
+
+# flowcore
+downsample_flowcore <- 
+  function(flowset) { 
+    subset_flowframe <- function(flowframe) {
+      num_cells <- nrow(flowframe)
+      sample_indices <- sort(sample(x = 1:num_cells, size = 200L))
+      subsampled_flowframe <- flowframe[sample_indices]
+      return(subsampled_flowframe)
+    }
+    subsampled_flowset <- flowCore::fsApply(x = flowset, FUN = subset_flowframe)
+  }
+
+# downsample_base(data_frame = ddpr_data_mini$tibbles[[2]])
+
+# downsample_flowcore(flowset = ddpr_data_mini$flowSets[[2]])
 ```
 
 
 ### Benchmarking function
 
 ```{r}
+old_repeats <- num_repeats
+num_repeats <- 10L
 benchmark_downsample <- 
-  function(data_frame) { 
+  function(data_frame, flowset) { 
     microbenchmark(
       downsample_tidytof(data_frame), 
       downsample_base(data_frame),
+      downsample_flowcore(flowset),
       times = num_repeats, 
       unit = "s" # seconds
     ) %>% 
       as_tibble() %>% 
       transmute(
-        engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"), 
+        engine = 
+          case_when(
+            str_detect(expr, "tidytof")  ~ "tidytof",
+            str_detect(expr, "flowcore") ~ "flowcore", 
+            TRUE                         ~ "base"
+          ), 
         time = time / (10^9)
       )
   }
+
+file_name <- str_glue("downsample_benchmarking_speed_{num_repeats}.rds")
 ```
 
 
 ### Perform benchmarking
 
-```{r, eval = FALSE}
-downsample_benchmarking_3 <- 
+```{r, eval = run_downsample}
+downsample_benchmarking <- 
   ddpr_data_mini %>% 
   #filter(num_files <= 10) %>% 
-  mutate(downsample_benchmarks = map(.x = tibbles, .f = benchmark_downsample)) %>% 
+  mutate(downsample_benchmarks = map2(.x = tibbles, .y = flowSets, .f = benchmark_downsample)) %>% 
   select(-tibbles, -flowSets)
 
 ```
@@ -485,33 +525,38 @@ downsample_benchmarking_3 <-
 
 ### Visualize results
 
-```{r, eval = FALSE}
+```{r, eval = run_dowsample}
 # save benchmarking output as an .rds
-downsample_benchmarking_3 %>% 
+downsample_benchmarking %>% 
   write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "downsample_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name)
   )
 
 ```
 
 ```{r}
-downsample_benchmarking_3 <- 
+downsample_benchmarking <- 
   read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "downsample_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name)
   )
 
 # make a plot to summarize 
 downsample_speed_plot <- 
-  downsample_benchmarking_3 %>% 
+  downsample_benchmarking %>% 
   select(num_files, num_cells, downsample_benchmarks) %>% 
   unnest(cols = downsample_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
-  ) %>% 
-  ungroup() %>% 
+    mean_time = median(time), 
+    max = max(time), 
+    min = min(time),
+    sd_time = sd(time),
+    # max_time = mean_time + sd_time, 
+    # min_time = mean_time - sd_time
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
+  ) %>%
+  ungroup() %>%
   ggplot(
     aes(
       x = num_cells, 
@@ -541,32 +586,33 @@ downsample_speed_plot
 downsample_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "downsample_benchmarking_speed.pdf"), 
+      here::here(
+        "manuscript", 
+        "benchmarking", 
+        str_glue("downsample_benchmarking_speed_{num_repeats}.pdf")
+      ), 
     device = "pdf", 
     width = 5, 
     height = 3
   )
 
+num_repeats <- old_repeats
 ```
-
 
 ## Preprocessing
 
 ### {tidytof} function
 
-```{r}
+```{r, eval = FALSE}
+# tidytof function
 preprocess_tidytof <- 
   function(data_frame) {
     return(tof_preprocess(data_frame, undo_noise = FALSE))
   }
 
-preprocess_tidytof(data_frame = ddpr_data_mini$tibbles[[2]])
-```
+# preprocess_tidytof(data_frame = ddpr_data_mini$tibbles[[2]])
 
-
-### Base R function
-
-```{r}
+# base R function
 preprocess_base <- 
   function(data_frame) {
     num_cols <- ncol(data_frame)
@@ -580,7 +626,19 @@ preprocess_base <-
     return(data_frame)
   }
 
-preprocess_base(data_frame = ddpr_data_mini$tibbles[[2]])
+preprocess_flowcore <- 
+  function(flowset) {
+    numeric_columns <- 
+      as.logical(apply(X = exprs(flowset[[1]]), MARGIN = 2, FUN = is.numeric))
+    asinh_transform <- arcsinhTransform(a = 0, b = 0.2, c = 0)
+    translist <- transformList(colnames(flowset)[numeric_columns],  asinh_transform)
+    preprocessed_flowset <- transform(flowset, translist)
+    return(preprocessed_flowset)
+  }
+
+#preprocess_base(data_frame = ddpr_data_mini$tibbles[[2]])
+
+#preprocess_flowcore(flowset = ddpr_data_mini$flowSets[[2]])
 
 ```
 
@@ -588,60 +646,68 @@ preprocess_base(data_frame = ddpr_data_mini$tibbles[[2]])
 ### Benchmarking function
 
 ```{r}
+old_repeats <- num_repeats
+num_repeats <- 10L
 benchmark_preprocess <- 
-  function(data_frame) { 
+  function(data_frame, flowset) { 
     microbenchmark(
       preprocess_tidytof(data_frame), 
       preprocess_base(data_frame),
+      preprocess_flowcore(flowset),
       times = num_repeats, 
       unit = "s" # seconds
     ) %>% 
       as_tibble() %>% 
       transmute(
-        engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"), 
+        engine = 
+          case_when(
+            str_detect(expr, "tidytof")  ~ "tidytof",
+            str_detect(expr, "flowcore") ~ "flowcore", 
+            TRUE                         ~ "base"
+          ), 
         time = time / (10^9)
       )
   }
+
+file_name <- 
+  str_glue("preprocess_benchmarking_speed_{num_repeats}.rds")
 ```
 
 
 ### Perform benchmarking
 
-```{r, eval = FALSE}
-preprocess_benchmarking_3 <- 
+```{r, eval = run_preprocess}
+preprocess_benchmarking <- 
   ddpr_data_mini %>% 
-  #filter(num_files <= 10) %>% 
-  mutate(preprocess_benchmarks = map(.x = tibbles, .f = benchmark_preprocess)) %>% 
+  mutate(preprocess_benchmarks = map2(.x = tibbles, .y = flowSets, .f = benchmark_preprocess)) %>% 
   select(-tibbles, -flowSets)
 ```
 
 
 ### Visualize results
 
-```{r, eval = FALSE}
+```{r, eval = run_preprocess}
 # save benchmarking output as an .rds
-preprocess_benchmarking_3 %>% 
-  write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "preprocess_benchmarking_speed.rds")
-  )
+preprocess_benchmarking %>% 
+  write_rds(file = here::here("manuscript", "benchmarking", file_name))
 ```
 
 ```{r}
-preprocess_benchmarking_3 <- 
-  read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "preprocess_benchmarking_speed.rds")
-  )
+preprocess_benchmarking <- 
+  read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
 # make a plot to summarize 
 preprocess_speed_plot <- 
-  preprocess_benchmarking_3 %>% 
+  preprocess_benchmarking %>% 
   select(num_files, num_cells, preprocess_benchmarks) %>% 
   unnest(cols = preprocess_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
+    mean_time = median(time), 
     max_time = max(time), 
-    min_time = min(time)
+    min_time = min(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
@@ -673,21 +739,29 @@ preprocess_speed_plot
 preprocess_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "preprocess_benchmarking_speed.pdf"), 
+      here::here(
+        "manuscript", 
+        "benchmarking", 
+        str_glue("preprocess_benchmarking_speed_{num_repeats}.pdf")
+      ), 
     device = "pdf", 
     width = 5, 
     height = 3
   )
 
+num_repeats <- old_repeats
 ```
 
 ## Dimensionality reduction
 
 ```{r}
-# setup
+# setup a nested tibble in which each row is a number of sampled cells 
+# and each entry in the "data_frames" column is a tof_tbl containing 
+# that many cells. 
+# These tibbles are to be used for the dimensionality reduction benchmarking.
 dr_tibbles <- 
   tibble(
-    sample_cells = (seq(1000, 10^5, length.out = 10)), 
+    sample_cells = (seq(1000, 10^6, length.out = 10)), 
     data_frames = 
       map(
         .x = sample_cells, 
@@ -697,33 +771,60 @@ dr_tibbles <-
       )
   )
 
+flowset_path <- file.path("~", "Box", "Tim", "Lab", "Data", "tidytof_dr_fcs_files")
+
 dr_tibbles %>% 
-  head()
+  select(sample_cells, data_frames) %>% 
+  unnest(cols = data_frames) %>% 
+  mutate(file_name = str_remove(file_name, "\\.fcs")) %>% 
+  tof_write_data(
+    group_cols = c(sample_cells, file_name), 
+    out_path = flowset_path, 
+    format = "fcs"
+  )
+
+dr_flowsets <- 
+  tibble(
+    num_cells = dr_tibbles$sample_cells
+  ) %>% 
+  mutate(
+    file_paths = 
+      map(.x = as.character(num_cells), .f = ~ dir(flowset_path, pattern = .x, full.names = TRUE))
+  )
+
+dr_flowsets$file_paths[nrow(dr_flowsets)] <- 
+  list(dir(flowset_path, pattern = "1e+", full.names = TRUE))
+  
+dr_flowsets <- 
+  dr_flowsets %>% 
+  mutate(
+    flowSets = map(.x = file_paths, .f = read.flowSet)
+  )
+
+dr_tibbles$flowSets <- dr_flowsets$flowSets
+
+dr_tibbles %>% 
+  slice_head(n = 1)
 ```
 
 
+```{r, eval = FALSE}
 ### {tidytof} function
-
-```{r}
 tsne_tidytof <- 
   function(data_frame) {
-    return(tof_reduce_tsne(data_frame, tsne_cols = starts_with("CD")))
+    return(tof_reduce_tsne(data_frame, tsne_cols = starts_with("CD"), perplexity = 5))
   }
 
 # tsne_tidytof(data_frame = ddpr_data_mini$tibbles[[2]][1:500,])
 
 pca_tidytof <- 
   function(data_frame) {
-    return(tof_reduce_pca(data_frame, pca_cols = starts_with("CD")))
+    return(tof_reduce_pca(data_frame, pca_cols = starts_with("CD"), num_comp = 2))
   }
 
 # pca_tidytof(data_frame = ddpr_data_mini$tibbles[[2]][1:500,])
-```
 
-
-### Base R function
-
-```{r}
+# base R functions
 tsne_base <- 
   function(data_frame) {
     dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
@@ -736,7 +837,6 @@ tsne_base <-
   }
 
 #tsne_base(data_frame = ddpr_data_mini$tibbles[[2]][1:500,])
-
 pca_base <- 
   function(data_frame) {
     dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
@@ -754,6 +854,59 @@ pca_base <-
 
 #pca_base(data_frame = ddpr_data_mini$tibbles[[2]][1:500,])
 
+tsne_flowcore <- 
+  function(flowset) {
+    channel_names <- flowset[[1]]@parameters@data$desc
+    dr_columns <- grepl(pattern = "^CD", x = channel_names)
+    my_exprs <- fsApply(x = flowset, FUN = exprs)
+    dr_exprs <- my_exprs[, dr_columns]
+    tsne_result <- Rtsne::Rtsne(X = as.matrix(dr_exprs))
+    tsne_embeddings <- tsne_result$Y
+    colnames(tsne_embeddings) <- paste0(".tsne", 1:2)
+    flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+    starting_index <- 1L
+    flowframe_list <- list()
+    for (i in 1:length(flowframe_num_cells)) { 
+      flowframe <- flowset[[i]]
+      num_cells <- flowframe_num_cells[[i]]
+      ending_index <- starting_index + num_cells - 1
+      flowframe_tsne <- tsne_embeddings[starting_index:ending_index , ]
+      new_flowframe <- fr_append_cols(flowframe, flowframe_tsne)
+      flowframe_list[[i]] <- new_flowframe
+      starting_index = ending_index + 1
+    }
+    result <- flowSet(flowframe_list)
+    return(result)
+  }
+
+pca_flowcore <- function(flowset) { 
+  channel_names <- flowset[[1]]@parameters@data$desc
+    dr_columns <- grepl(pattern = "^CD", x = channel_names)
+    my_exprs <- fsApply(x = flowset, FUN = exprs)
+    dr_exprs <- my_exprs[, dr_columns]
+    column_variances <- 
+      apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
+    zv_columns <- as.logical(round(column_variances) == 1)
+    dr_exprs <- dr_exprs[, !zv_columns]
+    pca_result <- prcomp(x = as.matrix(dr_exprs), center = TRUE, scale. = TRUE)
+    pca_embeddings <- pca_result$x[, 1:2]
+    colnames(pca_embeddings) <- paste0("PC", 1:2)
+    flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+    starting_index <- 1L
+    flowframe_list <- list()
+    for (i in 1:length(flowframe_num_cells)) { 
+      flowframe <- flowset[[i]]
+      num_cells <- flowframe_num_cells[[i]]
+      ending_index <- starting_index + num_cells - 1
+      flowframe_pca <- pca_embeddings[starting_index:ending_index , ]
+      new_flowframe <- fr_append_cols(flowframe, flowframe_pca)
+      flowframe_list[[i]] <- new_flowframe
+      starting_index = ending_index + 1
+    }
+    result <- flowSet(flowframe_list)
+    return(result)
+  }
+
 ```
 
 
@@ -761,97 +914,118 @@ pca_base <-
 
 ```{r}
 benchmark_tsne <- 
-  function(data_frame) { 
+  function(data_frame, flowset) { 
     microbenchmark(
       tsne_tidytof(data_frame), 
       tsne_base(data_frame),
-      times = 3L, 
+      tsne_flowcore(flowset),
+      times = num_repeats, 
       unit = "s" # seconds
     ) %>% 
       as_tibble() %>% 
-      transmute(
-        engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"), 
+       transmute(
+        engine = 
+          case_when(
+            str_detect(expr, "tidytof")  ~ "tidytof",
+            str_detect(expr, "flowcore") ~ "flowcore", 
+            TRUE                         ~ "base"
+          ), 
         time = time / (10^9)
       )
   }
 
+file_name_tsne <- str_glue("tsne_benchmarking_speed_{num_repeats}.rds")
+
 
 benchmark_pca <- 
-  function(data_frame) { 
+  function(data_frame, flowset) { 
     microbenchmark(
       pca_tidytof(data_frame), 
       pca_base(data_frame),
+      pca_flowcore(flowset),
       times = num_repeats, 
       unit = "s" # seconds
     ) %>% 
       as_tibble() %>% 
       transmute(
-        engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"), 
+        engine = 
+          case_when(
+            str_detect(expr, "tidytof")  ~ "tidytof",
+            str_detect(expr, "flowcore") ~ "flowcore", 
+            TRUE                         ~ "base"
+          ), 
         time = time / (10^9)
       )
   }
+
+file_name_pca <- str_glue("pca_benchmarking_speed_{num_repeats}.rds")
+
 ```
 
 
-```{r, eval = FALSE}
-time <- 
-  benchmark_tsne(data_frame = dr_tibbles$data_frames[[2]] )
-time 
-
-time %>% 
-  summarize(time = sum(time))
-```
 
 
+```{r, eval = run_tsne}
 ### Perform benchmarking
+sample_factor <- 0.005
 
-```{r, eval = FALSE}
-sample_factor <- 0.5
-
-tsne_benchmark_3 <- 
+tsne_benchmark <- 
   dr_tibbles %>%
+  slice(2:6) %>% 
   mutate(
     data_frames = map(.x = data_frames, .f = tof_downsample_prop, prop_cells = sample_factor), 
     sample_cells = sample_cells * sample_factor,
-    tsne_benchmarks = map(.x = data_frames, .f = benchmark_tsne)
+    tsne_benchmarks = map2(.x = data_frames, .y = flowSets, .f = benchmark_tsne)
   ) %>% 
   select(-data_frames) %>% 
   rename(num_cells = sample_cells)
 
-tsne_benchmark_3
+tsne_benchmark
+
 ```
 
 
-```{r, eval = FALSE}
-pca_benchmark_3 <- 
+```{r, eval = run_pca}
+pca_benchmark <- 
   dr_tibbles %>%
-  mutate(pca_benchmarks = map(.x = data_frames, .f = benchmark_pca)) %>% 
-  select(-data_frames) %>% 
+  mutate(pca_benchmarks = map2(.x = data_frames, .y = flowSets, .f = benchmark_pca)) %>% 
+  select(-data_frames, -flowSets) %>% 
   rename(num_cells = sample_cells)
 
-pca_benchmark_3
+pca_benchmark
 ```
 
 ### Visualize results
 
-```{r, eval = FALSE}
+```{r, eval = run_tsne}
 # save benchmarking output as an .rds
-tsne_benchmark_3 %>% 
+tsne_benchmark %>% 
   write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "tsne_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name_tsne)
   )
 ```
 
 ```{r}
 
-tsne_benchmark_3 <- 
+tsne_benchmark <- 
   read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "tsne_benchmarking_speed.rds")
+    file = here::here("manuscript", "benchmarking", file_name_tsne)
   )
+
+engines <- 
+  tsne_benchmark %>% 
+  select(tsne_benchmarks) %>% 
+  unnest(tsne_benchmarks) %>% 
+  pull(engine) %>% 
+  unique()
+
+num_engines <- length(engines)
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 # make a plot to summarize 
 tsne_speed_plot <- 
-  tsne_benchmark_3 %>%
+  tsne_benchmark %>%
   select(num_cells, tsne_benchmarks) %>% 
   unnest(cols = tsne_benchmarks) %>% 
   group_by(num_cells, engine) %>% 
@@ -871,11 +1045,11 @@ tsne_speed_plot <-
       ymax = max_time
     )
   ) + 
-  geom_errorbar() + 
+  geom_errorbar(width = 1000) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_color_manual(values = charizard) + 
-  scale_fill_manual(values = charizard) +
+  scale_color_manual(values = my_palette) + 
+  scale_fill_manual(values = my_palette) +
   theme_bw() + 
   labs(
     subtitle = "tSNE speed benchmarking",
@@ -890,7 +1064,7 @@ tsne_speed_plot
 tsne_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "tsne_benchmarking_speed.pdf"), 
+      here::here("manuscript", "benchmarking", str_glue("tsne_benchmarking_speed_{num_repeats}.pdf")), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -899,32 +1073,38 @@ tsne_speed_plot %>%
 ```
 
 
-```{r, eval = FALSE}
+```{r, eval = run_pca}
 # save benchmarking output as an .rds
-pca_benchmark_3 %>% 
-  write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "pca_benchmarking_speed.rds")
-  )
+pca_benchmark %>% 
+  write_rds(file = here::here("manuscript", "benchmarking", file_name_pca))
 ```
 
 
 ```{r}
+pca_benchmark <- 
+  read_rds(file = here::here("manuscript", "benchmarking", file_name_pca))
 
-pca_benchmark_3 <- 
-  read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "pca_benchmarking_speed.rds")
-  )
+engines <- 
+  pca_benchmark %>% 
+  select(pca_benchmarks) %>% 
+  unnest(pca_benchmarks) %>% 
+  pull(engine) %>% 
+  unique()
+
+num_engines <- length(engines)
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 # make a plot to summarize 
 pca_speed_plot <- 
-  pca_benchmark_3 %>%
+  pca_benchmark %>%
   select(num_cells, pca_benchmarks) %>% 
   unnest(cols = pca_benchmarks) %>% 
   group_by(num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
+    mean_time = median(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
@@ -940,8 +1120,8 @@ pca_speed_plot <-
   geom_errorbar(width = 20000) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_color_manual(values = charizard) + 
-  scale_fill_manual(values = charizard) +
+  scale_color_manual(values = my_palette) + 
+  scale_fill_manual(values = my_palette) +
   theme_bw() + 
   labs(
     subtitle = "PCA speed benchmarking",
@@ -956,7 +1136,7 @@ pca_speed_plot
 pca_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "pca_benchmarking_speed.pdf"), 
+      here::here("manuscript", "benchmarking", str_glue("pca_benchmarking_speed_{num_repeats}.pdf")), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -967,9 +1147,8 @@ pca_speed_plot %>%
 
 ## Clustering
 
-### {tidytof} function
-
 ```{r}
+### {tidytof} function
 flowsom_tidytof <- 
   function(file_names) { 
     clusters <- 
@@ -982,12 +1161,8 @@ flowsom_tidytof <-
       )
     return(clusters)
   }
-```
-
 
 ### Base R function
-
-```{r}
 flowsom_base <- 
   function(file_names) {
     flowset <- 
@@ -1036,12 +1211,15 @@ benchmark_clustering <-
         time = time / (10^9)
       )
   }
+
+file_name <- str_glue("flowsom_benchmarking_speed_{num_repeats}.rds")
+  
 ```
 
 ### perform benchmarking
 
 ```{r, eval = FALSE}
-cluster_benchmarking_3 <- 
+cluster_benchmarking <- 
   ddpr_datasets_mini %>% 
   #filter(num_files <= 10) %>% 
   mutate(cluster_benchmarks = map(.x = file_paths, .f = benchmark_clustering))
@@ -1051,29 +1229,35 @@ cluster_benchmarking_3 <-
 
 ```{r, eval = FALSE}
 # speed
-cluster_benchmarking_3 %>% 
-  write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "flowsom_benchmarking_speed.rds")
-  )
+cluster_benchmarking %>% 
+  write_rds(file = here::here("manuscript", "benchmarking", file_name)
 ```
 
 
 ```{r}
+cluster_benchmarking <-
+  read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
-cluster_benchmarking_3 <-
-  read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "flowsom_benchmarking_speed.rds")
-  )
+engines <- 
+  cluster_benchmarking %>% 
+  select(cluster_benchmarks) %>% 
+  unnest(cluster_benchmarks) %>% 
+  pull(engine) %>% 
+  unique()
+
+num_engines <- length(engines)
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 flowsom_speed_plot <- 
-  cluster_benchmarking_3 %>% 
+  cluster_benchmarking %>% 
   select(num_files, num_cells, cluster_benchmarks) %>% 
   unnest(cols = cluster_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
+    mean_time = median(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
@@ -1089,8 +1273,8 @@ flowsom_speed_plot <-
   geom_errorbar() + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) +
+  scale_fill_manual(values = my_palette) + 
+  scale_color_manual(values = my_palette) +
   theme_bw() + 
   labs(
     subtitle = "FlowSOM speed benchmarking",
@@ -1105,7 +1289,11 @@ flowsom_speed_plot
 flowsom_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "flowsom_benchmarking_speed.pdf"), 
+      here::here(
+        "manuscript", 
+        "benchmarking", 
+        str_glue("flowsom_benchmarking_speed_{num_repeats}.pdf")
+      ), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -1117,9 +1305,8 @@ flowsom_speed_plot %>%
 ## Feature extraction
 
 
-### {tidytof} function
-
 ```{r}
+### {tidytof} function
 extract_tidytof <- 
   function(data_frame) { 
     data_frame %>% 
@@ -1131,11 +1318,7 @@ extract_tidytof <-
       )
   }
 
-```
-
 ### Base R function
-
-```{r}
 extract_base <- 
   function(data_frame) {
     lineage_cols <- grepl(pattern = "^CD", x = colnames(data_frame))
@@ -1280,12 +1463,14 @@ benchmark_extract <-
         time = time / (10^9)
       )
   }
+
+file_name <- str_glue("extract_benchmarking_speed_{num_repeats}.rds")
 ```
 
 ### perform benchmarking
 
 ```{r}
-extract_benchmarking_3 <- 
+extract_benchmarking <- 
   ddpr_data_mini %>%
   mutate(
     tibbles = 
@@ -1308,30 +1493,36 @@ extract_benchmarking_3 <-
 
 ```{r}
 # speed
-extract_benchmarking_3 %>% 
-  write_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "extract_benchmarking_speed.rds")
-  )
+extract_benchmarking %>% 
+  write_rds(file = here::here("manuscript", "benchmarking", file_name))
 ```
 
 
 
 ```{r}
+extract_benchmarking <- 
+  read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
-extract_benchmarking_3 <- 
-  read_rds(
-    file = here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "extract_benchmarking_speed.rds")
-  )
+engines <- 
+  extract_benchmarking %>% 
+  select(extract_benchmarks) %>% 
+  unnest(extract_benchmarks) %>% 
+  pull(engine) %>% 
+  unique()
+
+num_engines <- length(engines)
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 extract_speed_plot <- 
-  extract_benchmarking_3 %>% 
+  extract_benchmarking %>% 
   select(num_files, num_cells, extract_benchmarks) %>% 
   unnest(cols = extract_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
+    mean_time = median(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
@@ -1347,8 +1538,8 @@ extract_speed_plot <-
   geom_errorbar() + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) + 
+  scale_fill_manual(values = my_palette) + 
+  scale_color_manual(values = my_palette) + 
   theme_bw() + 
   labs(
     subtitle = "Feature extraction speed benchmarking",
@@ -1363,7 +1554,11 @@ extract_speed_plot
 extract_speed_plot %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "extract_benchmarking_speed.pdf"), 
+      here::here(
+        "manuscript", 
+        "benchmarking", 
+        str_glue("extract_benchmarking_speed_{num_repeats}.pdf")
+      ), 
     device = "pdf", 
     width = 5, 
     height = 3
@@ -1377,7 +1572,7 @@ extract_speed_plot %>%
 ## Lines of code
 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 prefixes <- 
   c("read_data", "preprocess", "downsample", "pca", "tsne", "flowsom", "extract")
 
@@ -1390,15 +1585,27 @@ base_functions <-
 tidytof_functions <- 
   mget(x = paste0(prefixes, "_tidytof"))
 
+flowcore_functions <- 
+  mget(x = paste0(prefixes, "_flowcore"), ifnotfound = NA) #%>% 
+  #purrr::discard(.p = is.na)
+
 get_lines <- function(function_object) { 
-  lines <- capture.output(print(function_object))
-  return(length(lines) - 2L)
+  if (is.na(function_object)) {
+    return(NA)
+  } else {
+    lines <- capture.output(print(function_object))
+    return(length(lines) - 2L)
+  }
 }
 
-get_assignments <- function(function_object) { 
-  lines <- capture.output(print(function_object))
-  assignments <- max(sum(str_count(lines, pattern = "<-")), 1L)
-  return(assignments)
+get_assignments <- function(function_object) {
+  if (is.na(function_object)) {
+    return(NA)
+  } else {
+    lines <- capture.output(print(function_object))
+    assignments <- max(sum(str_count(lines, pattern = "<-")), 1L)
+    return(assignments)
+  }
 }
 
 # make tibble
@@ -1406,9 +1613,11 @@ code_tibble <-
   tibble(
     analysis = factor(analyses, levels = analyses), 
     base_lines = map_int(.x = base_functions, .f = get_lines), 
-    tidytof_lines = map_int(.x = tidytof_functions, .f = get_lines), 
+    tidytof_lines = map_int(.x = tidytof_functions, .f = get_lines),
+    flowcore_lines = map_int(.x = flowcore_functions, .f = get_lines),
     base_variables = map_int(.x = base_functions, .f = get_assignments), 
-    tidytof_variables = map_int(.x = tidytof_functions, .f = get_assignments)
+    tidytof_variables = map_int(.x = tidytof_functions, .f = get_assignments), 
+    flowcore_variables = map_int(.x = flowcore_functions, .f = get_assignments)
   ) %>% 
   pivot_longer(
     cols = -analysis, 
@@ -1421,6 +1630,14 @@ code_tibble <-
 
 ```{r}
 # visualize lines of code
+
+engines <- 
+  code_tibble %>% 
+  pull(engine) %>% 
+  unique()
+
+my_palette <- charizard[names(charizard) %in% engines]
+
 lines_plot_1 <- 
   code_tibble %>% 
   filter(measure == "lines") %>% 
@@ -1441,7 +1658,7 @@ lines_plot_1 <-
   scale_x_discrete(
     labels = function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
   ) + 
-  scale_fill_manual(values = charizard) + 
+  scale_fill_manual(values = my_palette) + 
   labs(
     x = NULL, 
     y = "Lines of code", 
@@ -1450,10 +1667,12 @@ lines_plot_1 <-
 
 lines_plot_1
 
+```
+```{r}
 lines_plot_1 %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "lines_plot_1.pdf"), 
+      here::here("manuscript", "benchmarking", "lines_plot_1.pdf"), 
     device = "pdf", 
     width = 5, 
     height = 3.5
@@ -1511,8 +1730,8 @@ lines_plot_2 <-
     labels = function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) +
+  scale_fill_manual(values = my_palette) + 
+  scale_color_manual(values = my_palette) +
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1526,17 +1745,19 @@ lines_plot_2 <-
 
 lines_plot_2
 
+
+```
+
+```{r}
 lines_plot_2 %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "lines_plot_2.pdf"), 
+      here::here("manuscript", "benchmarking", "lines_plot_2.pdf"), 
     device = "pdf", 
     width = 6, 
     height = 4
   )
 ```
-
-
 
 ```{r}
 assignment_plot_1 <- 
@@ -1559,7 +1780,7 @@ assignment_plot_1 <-
   scale_x_discrete(
     labels = function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
   ) + 
-  scale_fill_manual(values = charizard) + 
+  scale_fill_manual(values = my_palette) + 
   labs(
     x = NULL, 
     y = "# of assigned variables", 
@@ -1568,10 +1789,14 @@ assignment_plot_1 <-
 
 assignment_plot_1
 
+```
+
+
+```{r}
 assignment_plot_1 %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "assignment_plot_1.pdf"), 
+      here::here("manuscript", "benchmarking", "assignment_plot_1.pdf"), 
     device = "pdf", 
     width = 4.5, 
     height = 3.5
@@ -1630,8 +1855,8 @@ assignment_plot_2 <-
     labels = function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = charizard) + 
-  scale_color_manual(values = charizard) + 
+  scale_fill_manual(values = my_palette) + 
+  scale_color_manual(values = my_palette) + 
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1644,11 +1869,13 @@ assignment_plot_2 <-
   )
 
 assignment_plot_2
+```
 
+```{r}
 assignment_plot_2 %>% 
   ggsave(
     filename = 
-      here::here("notes", "manuscript", "nature_methods", "supplement", "benchmarking", "assignment_plot_2.pdf"), 
+      here::here("manuscript", "benchmarking", "assignment_plot_2.pdf"), 
     device = "pdf", 
     width = 7, 
     height = 5
