@@ -291,9 +291,7 @@ io_benchmarking_csv <-
 ```{r, eval = run_io}
 # save benchmarking output as an .rds
 io_benchmarking %>% 
-  write_rds(
-    file = here::here("manuscript", "benchmarking", file_name)
-  )
+  write_rds(file = here::here("manuscript", "benchmarking", file_name))
 ```
 
 ```{r, message = FALSE}
@@ -322,9 +320,9 @@ io_speed_plot <-
   mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
+    mean_time = median(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
@@ -367,9 +365,7 @@ io_speed_plot %>%
 ```{r, eval = FALSE}
 # save benchmarking results as an .rds
 io_benchmarking_csv %>% 
-  write_rds(
-    file = here::here("manuscript", "benchmarking", file_name_csv)
-  )
+  write_rds(file = here::here("manuscript", "benchmarking", file_name_csv))
 ```
 
 ```{r, message = FALSE}
