@@ -53,12 +53,12 @@
     <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
-    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul>
@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Feature extraction</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-25</h4>
+            <h4 data-toc-skip class="date">2022-01-30</h4>
       
       
       <div class="d-none name"><code>feature-extraction.Rmd</code></div>
@@ -178,8 +178,8 @@
 <span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL               0.010<span style="text-decoration: underline;">1</span>          0.014<span style="text-decoration: underline;">3</span>           0.358</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                0.032<span style="text-decoration: underline;">6</span>          0.083<span style="text-decoration: underline;">0</span>           0.397</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL               0.020<span style="text-decoration: underline;">0</span>          0.041<span style="text-decoration: underline;">2</span>           0.323</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 5 more variables: prop@cluster4 &lt;dbl&gt;, prop@cluster5 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   prop@cluster6 &lt;dbl&gt;, prop@cluster7 &lt;dbl&gt;, prop@cluster8 &lt;dbl&gt;</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># … with 5 more variables: `prop@cluster4` &lt;dbl&gt;, `prop@cluster5` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster6` &lt;dbl&gt;, `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;</span></span></code></pre></div>
 <p>Like all members of the <code>tof_extract_*</code> function family, <code><a href="../reference/tof_extract_proportion.html">tof_extract_proportion()</a></code> returns one row for each sample (defined as a unique combination of values of the columns specified in <code>group_cols</code>) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in <code>citrus_data</code>). These values can also be returned in “long” format by changing the <code>format</code> argument:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -213,21 +213,21 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                      4.68             0.834                3.72</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                     4.80             0.186                4.11</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                      4.89             0.879                3.55</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                     5.00             0.037<span style="text-decoration: underline;">9</span>               3.91</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                      4.98             0.818                3.60</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                     5.04             0.051<span style="text-decoration: underline;">6</span>               3.92</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: CD45_In115@cluster2_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster2_ct &lt;dbl&gt;, CD20_Sm147@cluster2_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster3_ct &lt;dbl&gt;, CD4_Nd145@cluster3_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster3_ct &lt;dbl&gt;, CD45_In115@cluster4_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster4_ct &lt;dbl&gt;, CD20_Sm147@cluster4_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster5_ct &lt;dbl&gt;, CD4_Nd145@cluster5_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster5_ct &lt;dbl&gt;, CD45_In115@cluster6_ct &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                          4.68           0.834              3.72</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                         4.80           0.186              4.11</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                          4.89           0.879              3.55</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                         5.00           0.037<span style="text-decoration: underline;">9</span>             3.91</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                          4.98           0.818              3.60</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                         5.04           0.051<span style="text-decoration: underline;">6</span>             3.92</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_ct` &lt;dbl&gt;, `CD20_Sm147@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD4_Nd145@cluster3_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster4_ct` &lt;dbl&gt;, `CD20_Sm147@cluster4_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster5_ct` &lt;dbl&gt;, `CD4_Nd145@cluster5_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, `CD45_In115@cluster6_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
 <p>The argument <code>central_tendency_function</code> can be used to compute any summary statistic. For example, the following choice for <code>central_tendency_function</code> will compute the 75th percentile for each marker-cluster pair in <code>citrus_data</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -239,21 +239,21 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                      5.19               1.37               4.33</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                     5.30               0                  4.70</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                      5.28               1.44               4.21</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                     5.41               0                  4.36</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                      5.41               1.35               4.28</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                     5.42               0                  4.46</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: CD45_In115@cluster2_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster2_ct &lt;dbl&gt;, CD20_Sm147@cluster2_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster3_ct &lt;dbl&gt;, CD4_Nd145@cluster3_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster3_ct &lt;dbl&gt;, CD45_In115@cluster4_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster4_ct &lt;dbl&gt;, CD20_Sm147@cluster4_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster5_ct &lt;dbl&gt;, CD4_Nd145@cluster5_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster5_ct &lt;dbl&gt;, CD45_In115@cluster6_ct &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                          5.19             1.37             4.33</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                         5.30             0                4.70</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                          5.28             1.44             4.21</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                         5.41             0                4.36</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                          5.41             1.35             4.28</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                         5.42             0                4.46</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_ct` &lt;dbl&gt;, `CD20_Sm147@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD4_Nd145@cluster3_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster4_ct` &lt;dbl&gt;, `CD20_Sm147@cluster4_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster5_ct` &lt;dbl&gt;, `CD4_Nd145@cluster5_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, `CD45_In115@cluster6_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion">Calculating the proportion of cells with marker expression above a threshold using <code>tof_extract_proportion()</code><a class="anchor" aria-label="anchor" href="#calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion"></a>
@@ -269,21 +269,21 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                     0.365                  0             0.076<span style="text-decoration: underline;">9</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                    0.516                  0             0.096<span style="text-decoration: underline;">8</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                     0.452                  0             0.032<span style="text-decoration: underline;">3</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                    0.554                  0             0.101 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                     0.549                  0             0.055<span style="text-decoration: underline;">2</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                    0.547                  0             0.081<span style="text-decoration: underline;">6</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: CD45_In115@cluster2_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster2_threshold &lt;dbl&gt;, CD20_Sm147@cluster2_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster3_threshold &lt;dbl&gt;, CD4_Nd145@cluster3_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster3_threshold &lt;dbl&gt;, CD45_In115@cluster4_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD4_Nd145@cluster4_threshold &lt;dbl&gt;, CD20_Sm147@cluster4_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster5_threshold &lt;dbl&gt;, CD4_Nd145@cluster5_threshold &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster5_threshold &lt;dbl&gt;, CD45_In115@cluster6_threshold &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                         0.365                0           0.076<span style="text-decoration: underline;">9</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                        0.516                0           0.096<span style="text-decoration: underline;">8</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                         0.452                0           0.032<span style="text-decoration: underline;">3</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                        0.554                0           0.101 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                         0.549                0           0.055<span style="text-decoration: underline;">2</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                        0.547                0           0.081<span style="text-decoration: underline;">6</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster3_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_threshold` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster4_threshold` &lt;dbl&gt;, …</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd">Calculating differences in marker distributions using <code>tof_extract_emd()</code> and <code>tof_extract_jsd()</code><a class="anchor" aria-label="anchor" href="#calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd"></a>
@@ -302,21 +302,21 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>
-<span class="co">#&gt;   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1             0.870              2.48            12.5             1.45 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2             1.11               7.02            10.9             0.730</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3             0.756              6.19            10.5             0.639</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4             2.64               6.78             9.47            3.27 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5             0.593              7.49             7.70            0.781</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6             0.656              4.74             8.72            1.57 </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD20_Sm147@cluster7_emd &lt;dbl&gt;, BCR-XL_CD45_In115@cluster4_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD4_Nd145@cluster4_emd &lt;dbl&gt;, BCR-XL_CD20_Sm147@cluster4_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD45_In115@cluster2_emd &lt;dbl&gt;, BCR-XL_CD4_Nd145@cluster2_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD20_Sm147@cluster2_emd &lt;dbl&gt;, BCR-XL_CD45_In115@cluster6_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD4_Nd145@cluster6_emd &lt;dbl&gt;, BCR-XL_CD20_Sm147@cluster6_emd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD45_In115@cluster8_emd &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt;   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1              0.870             2.48            12.5             1.45 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2              1.11              7.02            10.9             0.730</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3              0.756             6.19            10.5             0.639</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4              2.64              6.78             9.47            3.27 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5              0.593             7.49             7.70            0.781</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6              0.656             4.74             8.72            1.57 </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster4_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster2_emd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster2_emd` &lt;dbl&gt;, …</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Jensen-Shannon Divergence</span>
 <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -329,21 +329,21 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>
-<span class="co">#&gt;   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1           0.033<span style="text-decoration: underline;">1</span>             0.047<span style="text-decoration: underline;">9</span>            0.348           0.058<span style="text-decoration: underline;">0</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2           0.008<span style="text-decoration: underline;">05</span>            0.168             0.402           0.015<span style="text-decoration: underline;">9</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3           0.011<span style="text-decoration: underline;">4</span>             0.113             0.358           0.020<span style="text-decoration: underline;">5</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4           0.030<span style="text-decoration: underline;">3</span>             0.136             0.205           0.039<span style="text-decoration: underline;">0</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5           0.009<span style="text-decoration: underline;">08</span>            0.078<span style="text-decoration: underline;">2</span>            0.283           0.026<span style="text-decoration: underline;">1</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6           0.009<span style="text-decoration: underline;">19</span>            0.034<span style="text-decoration: underline;">1</span>            0.222           0.045<span style="text-decoration: underline;">0</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD20_Sm147@cluster7_jsd &lt;dbl&gt;, BCR-XL_CD45_In115@cluster4_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD4_Nd145@cluster4_jsd &lt;dbl&gt;, BCR-XL_CD20_Sm147@cluster4_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD45_In115@cluster2_jsd &lt;dbl&gt;, BCR-XL_CD4_Nd145@cluster2_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD20_Sm147@cluster2_jsd &lt;dbl&gt;, BCR-XL_CD45_In115@cluster6_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD4_Nd145@cluster6_jsd &lt;dbl&gt;, BCR-XL_CD20_Sm147@cluster6_jsd &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   BCR-XL_CD45_In115@cluster8_jsd &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt;   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1            0.033<span style="text-decoration: underline;">1</span>            0.047<span style="text-decoration: underline;">9</span>            0.348           0.058<span style="text-decoration: underline;">0</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2            0.008<span style="text-decoration: underline;">05</span>           0.168             0.402           0.015<span style="text-decoration: underline;">9</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3            0.011<span style="text-decoration: underline;">4</span>            0.113             0.358           0.020<span style="text-decoration: underline;">5</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4            0.030<span style="text-decoration: underline;">3</span>            0.136             0.205           0.039<span style="text-decoration: underline;">0</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5            0.009<span style="text-decoration: underline;">08</span>           0.078<span style="text-decoration: underline;">2</span>            0.283           0.026<span style="text-decoration: underline;">1</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6            0.009<span style="text-decoration: underline;">19</span>           0.034<span style="text-decoration: underline;">1</span>            0.222           0.045<span style="text-decoration: underline;">0</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster4_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster2_jsd` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster2_jsd` &lt;dbl&gt;, …</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="putting-it-all-together-with-tof_extract_features">Putting it all together with <code>tof_extract_features()</code><a class="anchor" aria-label="anchor" href="#putting-it-all-together-with-tof_extract_features"></a>
@@ -376,13 +376,13 @@
 <span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4          0.012<span style="text-decoration: underline;">7</span>          0.041<span style="text-decoration: underline;">8</span>           0.320           0.223</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5          0.020<span style="text-decoration: underline;">7</span>          0.042<span style="text-decoration: underline;">3</span>           0.377           0.269</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6          0.018<span style="text-decoration: underline;">3</span>          0.049<span style="text-decoration: underline;">3</span>           0.459           0.250</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 188 more variables: prop@cluster5 &lt;dbl&gt;, prop@cluster6 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   prop@cluster7 &lt;dbl&gt;, prop@cluster8 &lt;dbl&gt;, CD45_In115@cluster1_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster1_ct &lt;dbl&gt;, CD33_Nd148@cluster1_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster2_ct &lt;dbl&gt;, CD20_Sm147@cluster2_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD33_Nd148@cluster2_ct &lt;dbl&gt;, CD45_In115@cluster3_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD20_Sm147@cluster3_ct &lt;dbl&gt;, CD33_Nd148@cluster3_ct &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   CD45_In115@cluster4_ct &lt;dbl&gt;, CD20_Sm147@cluster4_ct &lt;dbl&gt;, …</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># … with 188 more variables: `prop@cluster5` &lt;dbl&gt;, `prop@cluster6` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster1_ct` &lt;dbl&gt;, `CD20_Sm147@cluster1_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster1_ct` &lt;dbl&gt;, `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_ct` &lt;dbl&gt;, `CD33_Nd148@cluster2_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD20_Sm147@cluster3_ct` &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

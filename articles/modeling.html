@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="Read this vignette to learn how to compute summary statistics like cluster  abundance and cluster marker expression using {tidytof} 
 ">
-<title>Modeling • tidytof</title>
+<title>Building predictive models • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Modeling">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Building predictive models">
 <meta property="og:description" content="Read this vignette to learn how to compute summary statistics like cluster  abundance and cluster marker expression using {tidytof} 
 ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -53,12 +53,12 @@
     <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
-    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul>
@@ -77,10 +77,10 @@
 
 <script src="modeling_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <main id="main"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Modeling</h1>
+      <img src="" class="logo" alt=""><h1>Building predictive models</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-25</h4>
+            <h4 data-toc-skip class="date">2022-01-30</h4>
       
       
       <div class="d-none name"><code>modeling.Rmd</code></div>
@@ -218,12 +218,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1,854</span></span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN2            0.139    0.066<span style="text-decoration: underline;">2</span>   0.022<span style="text-decoration: underline;">1</span>     0.082<span style="text-decoration: underline;">5</span>      2.25     0.454</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN3            0.633    0.023<span style="text-decoration: underline;">4</span>   0.016<span style="text-decoration: underline;">5</span>     0.032<span style="text-decoration: underline;">7</span>      2.25     0.226</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN6            5.62     0.550    0.003<span style="text-decoration: underline;">74</span>    0.622       2.86     0.342</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN7            0.474    0.966    0.124      1.24        2.59     0.243</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN8            0.951    0.958    0.161      0.556       3.18     0.556</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN9           15.6      0.446    0.044<span style="text-decoration: underline;">5</span>     0.163       2.86     0.434</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN1-Rx        0.039<span style="text-decoration: underline;">5</span>    0.618    0.063<span style="text-decoration: underline;">4</span>     0.572       2.93     0.944</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN2           0.139     0.066<span style="text-decoration: underline;">2</span>   0.022<span style="text-decoration: underline;">1</span>     0.082<span style="text-decoration: underline;">5</span>      2.25     0.454</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN3           0.633     0.023<span style="text-decoration: underline;">4</span>   0.016<span style="text-decoration: underline;">5</span>     0.032<span style="text-decoration: underline;">7</span>      2.25     0.226</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN6           5.62      0.550    0.003<span style="text-decoration: underline;">74</span>    0.622       2.86     0.342</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN9          15.6       0.446    0.044<span style="text-decoration: underline;">5</span>     0.163       2.86     0.434</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span></span>
@@ -238,12 +238,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1,854</span></span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN1           3.06       0.583   0.004<span style="text-decoration: underline;">49</span>     0.164      1.94     0.416</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN1-Rx        0.039<span style="text-decoration: underline;">5</span>     0.618   0.063<span style="text-decoration: underline;">4</span>      0.572      2.93     0.944</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN11          0.332      0.488   0.014<span style="text-decoration: underline;">6</span>      0.598      2.16     0.320</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN19          2.05       0.780   0.002<span style="text-decoration: underline;">33</span>     0.298      2.36     0.481</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN21          0.477      0.202   0.092<span style="text-decoration: underline;">0</span>      0.641      2.47     0.267</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN22          3.29       1.63    0.128       0.525      3.38     0.688</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN1           3.06      0.583    0.004<span style="text-decoration: underline;">49</span>     0.164      1.94     0.416</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN8           0.951     0.958    0.161       0.556      3.18     0.556</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN15          0.051<span style="text-decoration: underline;">6</span>    1.37     0.006<span style="text-decoration: underline;">10</span>     0.915      2.55     0.236</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN16          0.156     0.193    0.004<span style="text-decoration: underline;">07</span>     0.951      2.87     0.254</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN24          0.098<span style="text-decoration: underline;">9</span>    0.196    0.019<span style="text-decoration: underline;">8</span>      0.210      2.36     0.382</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN28          0.020<span style="text-decoration: underline;">8</span>    0.067<span style="text-decoration: underline;">5</span>   0.005<span style="text-decoration: underline;">44</span>     0.106      2.18     0.533</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span></span>
@@ -266,7 +266,7 @@
 <p>The output of <code>tof_train_model</code> is a <code>tof_model</code>, an object containing information about the trained model (and that can be passed to the <code>tof_predict</code> and <code>tof_assess_model</code> verbs). When a <code>tof_model</code> is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
-<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 </span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 </span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 25 × 2</span></span>
 <span class="co">#&gt;    feature             coefficient</span>
 <span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

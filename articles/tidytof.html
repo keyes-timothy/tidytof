@@ -53,12 +53,12 @@
     <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
-    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul>
@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Getting started with tidytof</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-25</h4>
+            <h4 data-toc-skip class="date">2022-01-30</h4>
       
       
       <div class="d-none name"><code>tidytof.Rmd</code></div>
@@ -183,7 +183,7 @@ Figure 1: Researchers are often interested in biological questions that manifest
 <ol style="list-style-type: decimal">
 <li>For almost all <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions, the first argument is a data frame (or tibble). This enables the use of the pipe (<code>%&gt;%</code>) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). This also means that most <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions are so-called <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html" class="external-link">“single-table verbs,”</a> with the exception of <code>tof_cluster_ddpr</code>, which is a “two-table verb” (for details about how to use <code>tof_cluster_ddpr</code>, see the “clustering-and-metaclustering” vignette).</li>
 <li>The second group of arguments are called <em>column specifications</em>, and they end in the suffix <code>_col</code> or <code>_cols</code>. Column specifications are unquoted column names that tell a <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb which columns to compute over for a particular operation. For example, the <code>cluster_cols</code> argument in <code>tof_cluster</code> allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support <a href="https://tidyselect.r-lib.org/reference/language.html" class="external-link">tidyselect helpers</a>.</li>
-<li>Finally, the third group of arguments for each <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb are called <em>method specifications</em>, and they’re comprised of every argument that isn’t an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the <code>tof_cluster_phenograph</code> function requires the method specification <code>num_neighbors</code>, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm’s k-nearest-neighbor graph. In most cases, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> sets reasonable defaults for each verb’s particular method specifications, but your workflows are can also be customized by experimenting with non-default values.</li>
+<li>Finally, the third group of arguments for each <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb are called <em>method specifications</em>, and they’re comprised of every argument that isn’t an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the <code><a href="../reference/tof_cluster_phenograph.html">tof_cluster_phenograph()</a></code> function requires the method specification <code>num_neighbors</code>, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm’s k-nearest-neighbor graph. In most cases, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> sets reasonable defaults for each verb’s particular method specifications, but your workflows are can also be customized by experimenting with non-default values.</li>
 </ol>
 <p>The following code demonstrates how <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb syntax looks in practice, with column and method specifications explicitly pointed out:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -245,9 +245,6 @@ Figure 1: Researchers are often interested in biological questions that manifest
     color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span> 
   <span class="op">)</span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-</div>
-<div class="section level2">
-<h2 id="section"></h2>
 </div>
 <div class="section level2">
 <h2 id="other-tips">Other tips<a class="anchor" aria-label="anchor" href="#other-tips"></a>

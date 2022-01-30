@@ -53,12 +53,12 @@
     <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
-    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul>
@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Reading and writing data</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-25</h4>
+            <h4 data-toc-skip class="date">2022-01-30</h4>
       
       
       <div class="d-none name"><code>reading-and-writing-data.Rmd</code></div>
@@ -186,12 +186,12 @@
   <span class="co"># that the columns have been changed</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span><span class="op">)</span> 
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 3</span></span>
-<span class="co">#&gt;   file_name              PhenoGraph Condition</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph_cluster1 7          7        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph_cluster1 6          6        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph_cluster1 9          9        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph_cluster1 2          2        </span>
+<span class="co">#&gt;   file_name                  PhenoGraph Condition</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph_cluster1.fcs 7          7        </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph_cluster1.fcs 6          6        </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph_cluster1.fcs 9          9        </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph_cluster1.fcs 2          2        </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 296 more rows</span></span></code></pre></div>
 <p>And note that the <code>tof_tbl</code> class is preserved even after these transformations.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -241,7 +241,7 @@
 <span class="co">#&gt; <span style="color: #949494;"># … with 2,996 more rows, and 16 more variables: cd7 &lt;dbl&gt;, cd44 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   pzap70-syk &lt;dbl&gt;, prb &lt;dbl&gt;, perk1-2 &lt;dbl&gt;</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;">#   `pzap70-syk` &lt;dbl&gt;, prb &lt;dbl&gt;, `perk1-2` &lt;dbl&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># when copying and pasting this code, feel free to change this path </span>
 <span class="co"># to wherever you'd like to save your output files</span>

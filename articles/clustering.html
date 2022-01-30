@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="Read this vignette to learn how to identify clusters of cells with shared phenotypic characteristics using {tidytof}.
 ">
-<title>Clustering • tidytof</title>
+<title>Clustering and metaclustering • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Clustering">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Clustering and metaclustering">
 <meta property="og:description" content="Read this vignette to learn how to identify clusters of cells with shared phenotypic characteristics using {tidytof}.
 ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -53,12 +53,12 @@
     <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering</a>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
-    <a class="dropdown-item" href="../articles/modeling.html">Modeling</a>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul>
@@ -77,10 +77,10 @@
 
 <script src="clustering_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <main id="main"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Clustering</h1>
+      <img src="" class="logo" alt=""><h1>Clustering and metaclustering</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-01-25</h4>
+            <h4 data-toc-skip class="date">2022-01-30</h4>
       
       
       <div class="d-none name"><code>clustering.Rmd</code></div>
@@ -116,18 +116,18 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.flowsom_metacluster</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGrap… 1                 cluster1         0     2.46  0.733  3.96 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGrap… 1                 cluster1         0.390 0.881 0      4.52 0.569</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGrap… 1                 cluster1         0.569 2.70  1.02   4.77 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGrap… 1                 cluster1         0.199 2.98  0.199  5.15 0.569</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGrap… 1                 cluster1         0.199 2.98  0.199  4.53 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGrap… 1                 cluster1         0.881 3.42  0.390  5.71 0    </span>
+<span class="co">#&gt;   sample_name    .flowsom_metacl… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph… 2                cluster1         0     2.46  0.733  3.96 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph… 3                cluster1         0.390 0.881 0      4.52 0.569</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph… 2                cluster1         0.569 2.70  1.02   4.77 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph… 2                cluster1         0.199 2.98  0.199  5.15 0.569</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGraph… 2                cluster1         0.199 2.98  0.199  4.53 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGraph… 2                cluster1         0.881 3.42  0.390  5.71 0    </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 18 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd44 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   pzap70-syk &lt;dbl&gt;, prb &lt;dbl&gt;, perk1-2 &lt;dbl&gt;</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;">#   `pzap70-syk` &lt;dbl&gt;, prb &lt;dbl&gt;, `perk1-2` &lt;dbl&gt;</span></span></code></pre></div>
 <p>The output of <code>tof_cluster</code> is a <code>tof_tbl</code> identical to the input tibble, but now with the addition of an additional column (in this case, “.flowsom_metacluster”) that encodes the cluster id for each cell in the input <code>tof_tbl</code>. Note that all output columns added to a tibble or <code>tof_tbl</code> by <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> begin with a full-stop (“.”) to reduce the likelihood of collisions with existing column names.</p>
 <p>Because the output of <code>tof_cluster</code> is a <code>tof_tbl</code>, we can use <code>dplyr</code>’s <code>count</code> method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -136,12 +136,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
 <span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> cluster2           2                     <span style="text-decoration: underline;">1</span>000</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> cluster3           3                      994</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> cluster1           1                      987</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cluster1           3                       13</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> cluster3           2                        4</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> cluster3           1                        2</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> cluster2           1                     <span style="text-decoration: underline;">1</span>000</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> cluster3           3                      997</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> cluster1           2                      976</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cluster1           3                       24</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> cluster3           2                        2</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> cluster3           1                        1</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -164,8 +164,8 @@
 <span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGrap… cluster1         0.881 3.42  0.390  5.71 0     1.25   2.19 0.569</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 16 more variables: cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;, pzap70-syk &lt;dbl&gt;, prb &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   perk1-2 &lt;dbl&gt;, .phenograph_cluster &lt;chr&gt;</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;">#   p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;, `pzap70-syk` &lt;dbl&gt;, prb &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   `perk1-2` &lt;dbl&gt;, .phenograph_cluster &lt;chr&gt;</span></span></code></pre></div>
 <p>To change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a one-column <code>tibble</code> that only includes the cluster labels (as opposed to the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>add_col</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># will result in a tibble with only 1 column (the cluster labels)</span>
@@ -180,12 +180,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1</span></span>
 <span class="co">#&gt;   .kmeans_cluster</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 10             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 10             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 13             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 3              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 3</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 6              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 6              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 6              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 10             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 6              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="metaclustering-with-tof_metacluster">Metaclustering with <code>tof_metacluster()</code><a class="anchor" aria-label="anchor" href="#metaclustering-with-tof_metacluster"></a>
