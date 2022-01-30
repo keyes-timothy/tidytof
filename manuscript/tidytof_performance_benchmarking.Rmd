@@ -388,9 +388,9 @@ io_speed_plot_csv <-
   unnest(cols = io_benchmarks) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
+    mean_time = median(time), 
+    max_time = quantile(time, 0.75), 
+    min_time = quantile(time, 0.25)
   ) %>% 
   ungroup() %>% 
   ggplot(
