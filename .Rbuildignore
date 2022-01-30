@@ -6,6 +6,7 @@
 ^tests-raw$
 ^betas$
 ^notes$
+^manuscript$
 ^\.github$
 ^codecov\.yml$
 ^_pkgdown\.yml$

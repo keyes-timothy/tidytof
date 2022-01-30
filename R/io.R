@@ -313,80 +313,97 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #'
 tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble()) {
 
-  # if the path leads to a single file
-  if (file_test(op = "-f", x = path)) {
-    tof_tibble <- tof_read_file(path, sep = sep, panel_info = panel_info)
-    return(tof_tibble)
+  # if path gives multiple paths to multiple files
+  if (length(path) > 1) {
+    if (all(file_test(op = "-f", x = path))) {
+      file_paths <- path
+      file_names <- basename(file_paths)
+    } else {
+      stop("If length(path) > 1, each entry must point to a single file.")
+    }
 
-    # if the path leads to a directory
-  } else if (file_test(op = "-d", x = path)) {
+    # if path only gives a single path
+  } else if (length(path == 1)) {
 
-    file_names <-
-      list.files(path, full.names = FALSE) %>%
-      stringr::str_remove_all("\\.fcs|\\.csv")
+    # if the path leads to a single file
+    if (file_test(op = "-f", x = path)) {
+      tof_tibble <- tof_read_file(path, sep = sep, panel_info = panel_info)
+      return(tof_tibble)
 
-    # read files into a nested tibble
+      # if the path leads to a directory
+    } else if (file_test(op = "-d", x = path)) {
+      file_paths <-
+        list.files(path, full.names = TRUE)
+      file_names <- basename(file_paths)
+    } else {
+      stop(
+        "path must be a vector of paths to data files or a
+        single path to a data file or directory."
+      )
+    }
+  }
+
+  # read files into a nested tibble
+  tof_tibble <-
+    tibble::tibble(
+      file_name = file_names,
+      data =
+        purrr::map(
+          .x = file_paths,
+          .f = tof_read_file,
+          sep = sep,
+          panel_info = panel_info
+        )
+    )
+
+  # check how many unique panels are present across all files being read
+  panels <-
+    purrr::map(.x = tof_tibble$data, ~attr(x = .x, which = "panel"))
+
+  num_panels <-
+    panels %>%
+    unique() %>%
+    length()
+
+  if (num_panels > 1) {
+    # group by panel
     tof_tibble <-
-      tibble::tibble(
-        file_name = file_names,
+      tof_tibble %>%
+      dplyr::mutate(panel = panels) %>%
+      tidyr::nest(data = -panel) %>%
+      dplyr::mutate(
         data =
-          purrr::map(
-            .x = list.files(path, full.names = TRUE),
-            .f = tof_read_file,
-            sep = sep,
-            panel_info = panel_info
+          purrr::map2(
+            .x = data,
+            .y = panel,
+            .f = ~new_tof_tibble(x = .x, panel = .y)
+          )
+      ) %>%
+      mutate(
+        data =
+          purrr::map2(
+            .x = data,
+            .y = panel,
+            .f = ~
+              new_tof_tibble(x = tidyr::unnest(.x, cols = data), panel = .y)
           )
       )
 
-    # check how many unique panels are present across all files being read
-    panels <-
-      purrr::map(.x = tof_tibble$data, ~attr(x = .x, which = "panel"))
+  } else {
+    # put everything together
+    tof_tibble <-
+      tof_tibble %>%
+      tidyr::unnest(cols = data)
 
-    num_panels <-
+    panel <-
       panels %>%
-      unique() %>%
-      length()
+      unique()
+    panel <- panel[[1]]
 
-    if (num_panels > 1) {
-      # group by panel
-      tof_tibble <-
-        tof_tibble %>%
-        dplyr::mutate(panel = panels) %>%
-        tidyr::nest(data = -panel) %>%
-        dplyr::mutate(
-          data =
-            purrr::map2(
-              .x = data,
-              .y = panel,
-              .f = ~new_tof_tibble(x = .x, panel = .y)
-            )
-        ) %>%
-        mutate(
-          data =
-            purrr::map2(
-              .x = data,
-              .y = panel,
-              .f = ~
-                new_tof_tibble(x = tidyr::unnest(.x, cols = data), panel = .y)
-            )
-        )
-
-    } else {
-      # put everything together
-      tof_tibble <-
-        tof_tibble %>%
-        tidyr::unnest(cols = data)
-
-      panel <-
-        panels %>%
-        unique()
-      panel <- panel[[1]]
-
-      tof_tibble <-
-        new_tof_tibble(x = tof_tibble, panel = panel)
-    }
-
+    tof_tibble <-
+      new_tof_tibble(x = tof_tibble, panel = panel)
   }
+
 
   return(tof_tibble)
 }
@@ -394,9 +411,9 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 # tof_write_csv ----------------------------------------------------------------
 
 #' Write a series of .csv files from a tof_tbl
-#'
-#' This function takes a given `tof_tbl` and writes the single-cell data
-#' it contains into .csv files within the directory located at `out_path`. The
+  #'
+  #' This function takes a given `tof_tbl` and writes the single-cell data
+  #' it contains into .csv files within the directory located at `out_path`. The
 #' `group_cols` argument specifies how the rows of the `tof_tbl` (each cell)
 #' should be broken into separate .csv files
 #'

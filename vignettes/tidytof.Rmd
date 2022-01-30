@@ -2,7 +2,8 @@
 title: "Getting started with tidytof"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette: default
 description: > 
   Read this vignette if this is your first time using tidytof. You'll 
   learn about tidytof's basic design schema, its main capabilities, 
@@ -21,6 +22,7 @@ p.caption {
 }
 </style>
 ```
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -103,7 +105,7 @@ With very few exceptions, `{tidytof}` functions follow a specific, shared syntax
 
 1.  For almost all `{tidytof}` functions, the first argument is a data frame (or tibble). This enables the use of the pipe (`%>%`) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). This also means that most `{tidytof}` functions are so-called ["single-table verbs,"](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html) with the exception of `tof_cluster_ddpr`, which is a "two-table verb" (for details about how to use `tof_cluster_ddpr`, see the "clustering-and-metaclustering" vignette).
 2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html).
-3.  Finally, the third group of arguments for each `{tidytof}` verb are called *method specifications*, and they're comprised of every argument that isn't an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the `tof_cluster_phenograph` function requires the method specification `num_neighbors`, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm's k-nearest-neighbor graph. In most cases, `{tidytof}` sets reasonable defaults for each verb's particular method specifications, but your workflows are can also be customized by experimenting with non-default values.
+3.  Finally, the third group of arguments for each `{tidytof}` verb are called *method specifications*, and they're comprised of every argument that isn't an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the `tof_cluster_phenograph()` function requires the method specification `num_neighbors`, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm's k-nearest-neighbor graph. In most cases, `{tidytof}` sets reasonable defaults for each verb's particular method specifications, but your workflows are can also be customized by experimenting with non-default values.
 
 The following code demonstrates how `{tidytof}` verb syntax looks in practice, with column and method specifications explicitly pointed out:
 
@@ -169,7 +171,6 @@ ddpr_data %>%
   )
 ```
 
-## 
 
 ## Other tips
 

@@ -1,5 +1,5 @@
 ---
-title: "Modeling"
+title: "Building predictive models"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

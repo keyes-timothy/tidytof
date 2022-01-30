@@ -1,5 +1,5 @@
 ---
-title: "Clustering"
+title: "Clustering and metaclustering"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

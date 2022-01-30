@@ -136,22 +136,20 @@ tof_cluster_flowsom <-
 
     # if no metaclustering, return flowSOM cluster labels
     if (!perform_metaclustering) {
-      flowsom_clusters <- som$map$mapping[,1]
+      flowsom_clusters <- som$map$mapping[, 1]
       return(dplyr::tibble(.flowsom_cluster = flowsom_clusters))
 
     # otherwise, perform metaclustering
     } else {
-      mst <- FlowSOM::BuildMST(som, silent = TRUE, tSNE = FALSE)
-
       flowsom_metacluster_object <-
         FlowSOM::MetaClustering(
-          data = mst$map$codes,
+          data = som$map$codes,
           method = "metaClustering_consensus",
           max = num_metaclusters
         )
 
       flowsom_metaclusters <-
-        flowsom_metacluster_object[mst$map$mapping[,1]] %>%
+        flowsom_metacluster_object[som$map$mapping[,1]] %>%
         as.integer() %>%
         as.character()
 
