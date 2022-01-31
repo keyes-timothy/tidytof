@@ -6,7 +6,7 @@
 \usage{
 tof_write_data(
   tof_tibble = NULL,
-  group_cols = NULL,
+  group_cols,
   out_path = NULL,
   format = c("fcs", "csv"),
   sep = "_",
