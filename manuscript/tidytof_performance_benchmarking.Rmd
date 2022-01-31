@@ -1,13 +1,13 @@
 ---
 title: '{tidytof} performance benchmarking'
 output:
-  html_document:
-    df_print: paged
+  pdf_document: default
   officedown::rdocx_document:
     mapstyles:
       Normal: First Paragraph
     reference_docx: reference.docx
-  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup_bench, include=FALSE}
@@ -521,7 +521,7 @@ downsample_benchmarking <-
 
 ### Visualize results
 
-```{r, eval = run_dowsample}
+```{r, eval = run_downsample}
 # save benchmarking output as an .rds
 downsample_benchmarking %>% 
   write_rds(
@@ -1465,7 +1465,7 @@ file_name <- str_glue("extract_benchmarking_speed_{num_repeats}.rds")
 
 ### perform benchmarking
 
-```{r}
+```{r, eval = run_extract}
 extract_benchmarking <- 
   ddpr_data_mini %>%
   mutate(
@@ -1487,7 +1487,7 @@ extract_benchmarking <-
 
 ### visualize results
 
-```{r}
+```{r, eval = run_extract}
 # speed
 extract_benchmarking %>% 
   write_rds(file = here::here("manuscript", "benchmarking", file_name))
@@ -1563,10 +1563,7 @@ extract_speed_plot %>%
 ```
 
 
-
-
 ## Lines of code
-
 
 ```{r, message = FALSE, warning = FALSE}
 prefixes <- 
