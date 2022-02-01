@@ -1,10 +1,12 @@
 # reading data -----------------------------------------------------------------
 
+# tidytof
 read_data_tidytof <-
   function(file_names) {
     return(tof_read_data(file_names))
   }
 
+# base (read FCS or CSV file into a tidy data.frame)
 read_data_base <-
   function(file_names) {
     extension_type <- tools::file_ext(file_names[[1]])
@@ -31,9 +33,36 @@ read_data_base <-
     return(output_data)
   }
 
+# read a flowset with names cleaned up in the same way that tidytof does it
+read_data_flowcore <- function(file_names) {
+  flowset <- read.flowSet(file_names)
+  channel_names <- as.character(flowset[[1]]@parameters[["desc"]])
+  metal_names <- as.character(flowset[[1]]@parameters[["name"]])
+  metals_to_change <- grepl(pattern = "Di", x = metal_names)
+  metal_names[metals_to_change] <-
+    gsub(
+      pattern = "\\(|\\)|(Di)",
+      replacement = "",
+      x = metal_names[metals_to_change]
+    )
+  new_names <- paste(channel_names, metal_names, sep = "_")
+  new_names[!metals_to_change] <- channel_names[!metals_to_change]
+  num_files <- length(flowset)
+  flowframe_list <- list()
+  for (i in 1:num_files) {
+    flowframe <- flowset[[i]]
+    flowframe@parameters[["desc"]] <- new_names
+    flowframe@parameters[["name"]] <- new_names
+    flowframe_list[[i]] <- flowframe
+  }
+  result <- flowSet(flowframe_list)
+  return(result)
+}
+
 
 # downsampling -----------------------------------------------------------------
 
+# tidytof
 downsample_tidytof <-
   function(data_frame) {
     result <-
@@ -42,6 +71,7 @@ downsample_tidytof <-
     return(result)
   }
 
+# base R
 downsample_base <-
   function(data_frame) {
     file_names <- unique(data_frame$file_name)
@@ -58,13 +88,27 @@ downsample_base <-
     return(result)
   }
 
+# flowcore
+downsample_flowcore <-
+  function(flowset) {
+    subset_flowframe <- function(flowframe) {
+      num_cells <- nrow(flowframe)
+      sample_indices <- sort(sample(x = 1:num_cells, size = 200L))
+      subsampled_flowframe <- flowframe[sample_indices]
+      return(subsampled_flowframe)
+    }
+    subsampled_flowset <- flowCore::fsApply(x = flowset, FUN = subset_flowframe)
+  }
+
 # preprocessing ----------------------------------------------------------------
 
+# tidytof
 preprocess_tidytof <-
   function(data_frame) {
     return(tof_preprocess(data_frame, undo_noise = FALSE))
   }
 
+# base R
 preprocess_base <-
   function(data_frame) {
     num_cols <- ncol(data_frame)
@@ -78,18 +122,29 @@ preprocess_base <-
     return(data_frame)
   }
 
+# flowCore
+preprocess_flowcore <-
+  function(flowset) {
+    numeric_columns <-
+      as.logical(apply(X = exprs(flowset[[1]]), MARGIN = 2, FUN = is.numeric))
+    asinh_transform <- arcsinhTransform(a = 0, b = 0.2, c = 0)
+    translist <-
+      transformList(colnames(flowset)[numeric_columns], asinh_transform)
+    preprocessed_flowset <- transform(flowset, translist)
+    return(preprocessed_flowset)
+  }
+
 # dimensionality reduction -----------------------------------------------------
 
+### tsne
+
+# tidytof
 tsne_tidytof <-
   function(data_frame) {
     return(tof_reduce_tsne(data_frame, tsne_cols = starts_with("CD")))
   }
 
-pca_tidytof <-
-  function(data_frame) {
-    return(tof_reduce_pca(data_frame, pca_cols = starts_with("CD")))
-  }
-
+# base R
 tsne_base <-
   function(data_frame) {
     dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
@@ -101,6 +156,41 @@ tsne_base <-
     return(final_result)
   }
 
+# flowcore
+tsne_flowcore <-
+  function(flowset) {
+    channel_names <- flowset[[1]]@parameters@data$desc
+    dr_columns <- grepl(pattern = "^CD", x = channel_names)
+    my_exprs <- fsApply(x = flowset, FUN = exprs)
+    dr_exprs <- my_exprs[, dr_columns]
+    tsne_result <- Rtsne::Rtsne(X = as.matrix(dr_exprs))
+    tsne_embeddings <- tsne_result$Y
+    colnames(tsne_embeddings) <- paste0(".tsne", 1:2)
+    flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+    starting_index <- 1L
+    flowframe_list <- list()
+    for (i in 1:length(flowframe_num_cells)) {
+      flowframe <- flowset[[i]]
+      num_cells <- flowframe_num_cells[[i]]
+      ending_index <- starting_index + num_cells - 1
+      flowframe_tsne <- tsne_embeddings[starting_index:ending_index, ]
+      new_flowframe <- fr_append_cols(flowframe, flowframe_tsne)
+      flowframe_list[[i]] <- new_flowframe
+      starting_index <- ending_index + 1
+    }
+    result <- flowSet(flowframe_list)
+    return(result)
+  }
+
+### pca
+
+# tidytof
+pca_tidytof <-
+  function(data_frame) {
+    return(tof_reduce_pca(data_frame, pca_cols = starts_with("CD")))
+  }
+
+# base R
 pca_base <-
   function(data_frame) {
     dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
@@ -116,9 +206,92 @@ pca_base <-
     return(final_result)
   }
 
+# flowcore
+pca_flowcore <- function(flowset) {
+  channel_names <- flowset[[1]]@parameters@data$desc
+  dr_columns <- grepl(pattern = "^CD", x = channel_names)
+  my_exprs <- fsApply(x = flowset, FUN = exprs)
+  dr_exprs <- my_exprs[, dr_columns]
+  column_variances <-
+    apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
+  zv_columns <- as.logical(round(column_variances) == 1)
+  dr_exprs <- dr_exprs[, !zv_columns]
+  pca_result <- prcomp(x = as.matrix(dr_exprs), center = TRUE, scale. = TRUE)
+  pca_embeddings <- pca_result$x[, 1:2]
+  colnames(pca_embeddings) <- paste0("PC", 1:2)
+  flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+  starting_index <- 1L
+  flowframe_list <- list()
+  for (i in 1:length(flowframe_num_cells)) {
+    flowframe <- flowset[[i]]
+    num_cells <- flowframe_num_cells[[i]]
+    ending_index <- starting_index + num_cells - 1
+    flowframe_pca <- pca_embeddings[starting_index:ending_index, ]
+    new_flowframe <- fr_append_cols(flowframe, flowframe_pca)
+    flowframe_list[[i]] <- new_flowframe
+    starting_index <- ending_index + 1
+  }
+  result <- flowSet(flowframe_list)
+  return(result)
+}
+
+### umap
+
+# tidytof
+umap_tidytof <-
+  function(data_frame) {
+    return(tof_reduce_umap(data_frame, umap_cols = starts_with("CD")))
+  }
+
+# base R
+umap_base <-
+  function(data_frame) {
+    dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
+    umap_df <- data_frame[, dr_colnames]
+    column_variances <-
+      apply(X = umap_df, MARGIN = 2, FUN = function(x) length(unique(x)))
+    zv_columns <- as.logical(round(column_variances) == 1)
+    umap_df <- umap_df[, !zv_columns]
+    umap_result <-
+      uwot::umap(X = umap_df, n_neighbors = 5, scale = TRUE)
+    final_result <-
+      data.frame(UMAP1 = umap_result[, 1], UMAP2 = umap_result[, 2])
+    return(final_result)
+  }
+
+# flowcore
+umap_flowcore <- function(flowset) {
+  channel_names <- flowset[[1]]@parameters@data$desc
+  dr_columns <- grepl(pattern = "^CD", x = channel_names)
+  my_exprs <- fsApply(x = flowset, FUN = exprs)
+  dr_exprs <- my_exprs[, dr_columns]
+  column_variances <-
+    apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
+  zv_columns <- as.logical(round(column_variances) == 1)
+  dr_exprs <- dr_exprs[, !zv_columns]
+  umap_result <-
+    uwot::umap(X = dr_exprs, n_neighbors = 5, scale = TRUE)
+  colnames(umap_result) <- paste0("UMAP", 1:2)
+  flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+  starting_index <- 1L
+  flowframe_list <- list()
+  for (i in 1:length(flowframe_num_cells)) {
+    flowframe <- flowset[[i]]
+    num_cells <- flowframe_num_cells[[i]]
+    ending_index <- starting_index + num_cells - 1
+    flowframe_umap <- umap_result[starting_index:ending_index, ]
+    new_flowframe <- fr_append_cols(flowframe, flowframe_umap)
+    flowframe_list[[i]] <- new_flowframe
+    starting_index <- ending_index + 1
+  }
+  result <- flowSet(flowframe_list)
+  return(result)
+}
+
 
 # clustering -------------------------------------------------------------------
 
+# tidytof
 flowsom_tidytof <-
   function(file_names) {
     clusters <-
@@ -132,6 +305,7 @@ flowsom_tidytof <-
     return(clusters)
   }
 
+# base R (+ flowcore)
 flowsom_base <-
   function(file_names) {
     flowset <-
@@ -164,6 +338,7 @@ flowsom_base <-
 
 # feature extraction -----------------------------------------------------------
 
+# tidytof
 extract_tidytof <-
   function(data_frame) {
     data_frame %>%
@@ -175,6 +350,7 @@ extract_tidytof <-
       )
   }
 
+# base R
 extract_base <-
   function(data_frame) {
     lineage_cols <- grepl(pattern = "^CD", x = colnames(data_frame))
