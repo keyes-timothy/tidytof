@@ -98,6 +98,7 @@ downsample_flowcore <-
       return(subsampled_flowframe)
     }
     subsampled_flowset <- flowCore::fsApply(x = flowset, FUN = subset_flowframe)
+    return(subsampled_flowset)
   }
 
 # preprocessing ----------------------------------------------------------------
@@ -360,13 +361,13 @@ extract_base <-
     grouped_lineage_df <-
       split(
         x = lineage_df,
-        f = list(data_frame$file_name, data_frame$cluster),
+        f = list(data_frame$file_name, data_frame$my_cluster),
         sep = "@"
       )
     grouped_signaling_df <-
       split(
         x = signaling_df,
-        f = list(data_frame$file_name, data_frame$cluster),
+        f = list(data_frame$file_name, data_frame$my_cluster),
         sep = "@"
       )
     lineage_medians <-
@@ -384,7 +385,7 @@ extract_base <-
       )
     lineage_result <- as.data.frame(t(lineage_medians))
     signaling_result <- as.data.frame(t(signaling_thresh))
-    lineage_result$cluster <-
+    lineage_result$my_cluster <-
       substr(
         x = row.names(lineage_result),
         start = nchar(row.names(lineage_result)),
@@ -396,7 +397,7 @@ extract_base <-
         replacement = "",
         x = row.names(lineage_result)
       )
-    signaling_result$cluster <-
+    signaling_result$my_cluster <-
       substr(
         x = row.names(signaling_result),
         start = nchar(row.names(signaling_result)),
@@ -409,11 +410,11 @@ extract_base <-
         x = row.names(signaling_result)
       )
     num_files <- length(unique(signaling_result$file_name))
-    num_clusters <- length(unique(signaling_result$cluster))
+    num_clusters <- length(unique(signaling_result$my_cluster))
     num_signaling_channels <-
-      length(setdiff(colnames(signaling_result), c("file_name", "cluster")))
+      length(setdiff(colnames(signaling_result), c("file_name", "my_cluster")))
     num_lineage_channels <-
-      length(setdiff(colnames(lineage_result), c("file_name", "cluster")))
+      length(setdiff(colnames(lineage_result), c("file_name", "my_cluster")))
 
     lineage_final <-
       matrix(
@@ -424,8 +425,8 @@ extract_base <-
     row.names(lineage_final) <- unique(lineage_result$file_name)
     colname_grid <-
       expand.grid(
-        setdiff(colnames(lineage_result), c("file_name", "cluster")),
-        unique(lineage_result$cluster)
+        setdiff(colnames(lineage_result), c("file_name", "my_cluster")),
+        unique(lineage_result$my_cluster)
       )
     colnames(lineage_final) <-
       paste(colname_grid$Var1, colname_grid$Var2, sep = "@")
@@ -433,12 +434,12 @@ extract_base <-
       for (j in 1:ncol(lineage_final)) {
         file <- row.names(lineage_final)[[i]]
         colname <- colnames(lineage_final)[[j]]
-        cluster <-
+        my_cluster <-
           substr(x = colname, start = nchar(colname), stop = nchar(colname))
         channel <- sub(pattern = "@.$", replacement = "", x = colname)
         current_value <-
           lineage_result[
-            lineage_result$cluster == cluster & lineage_result$file_nam == file,
+            lineage_result$my_cluster == my_cluster & lineage_result$file_nam == file,
             channel
           ]
         lineage_final[i, j] <- current_value
@@ -453,8 +454,8 @@ extract_base <-
     row.names(signaling_final) <- unique(lineage_result$file_name)
     colname_grid <-
       expand.grid(
-        setdiff(colnames(signaling_result), c("file_name", "cluster")),
-        unique(signaling_result$cluster)
+        setdiff(colnames(signaling_result), c("file_name", "my_cluster")),
+        unique(signaling_result$my_cluster)
       )
     colnames(signaling_final) <-
       paste(colname_grid$Var1, colname_grid$Var2, sep = "@")
@@ -462,12 +463,12 @@ extract_base <-
       for (j in 1:ncol(signaling_final)) {
         file <- row.names(signaling_final)[[i]]
         colname <- colnames(signaling_final)[[j]]
-        cluster <-
+        my_cluster <-
           substr(x = colname, start = nchar(colname), stop = nchar(colname))
         channel <- sub(pattern = "@.$", replacement = "", x = colname)
         current_value <-
           signaling_result[
-            signaling_result$cluster == cluster & signaling_result$file_nam == file,
+            signaling_result$my_cluster == my_cluster & signaling_result$file_nam == file,
             channel
           ]
         signaling_final[i, j] <- current_value
