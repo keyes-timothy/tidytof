@@ -483,6 +483,8 @@ extract_base <-
 
 # memory benchmarking ----------------------------------------------------------
 # return the size of a cytof dataset in megabytes as either a tof_tibble
+
+
 # or as a flowSet
 get_memory <- function(file_paths, mode) {
   if (mode == "tidytof") {
@@ -507,6 +509,7 @@ get_memory <- function(file_paths, mode) {
 }
 
 # code style benchmarking ------------------------------------------------------
+
 
 # count the lines of code for a given workflow
 get_lines <- function(function_object) {

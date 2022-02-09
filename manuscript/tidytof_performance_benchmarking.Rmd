@@ -38,8 +38,8 @@ source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
-machine <- "galaxia"
-num_repeats <- 1L
+machine <- "excalibur"
+num_repeats <- 10L
 charizard <- c("base" = "#207394", "tidytof" = "#cd5241", "flowcore" = "#eeb45a")
 
 # which benchmarking sections to run from scratch
@@ -53,7 +53,7 @@ run_umap <- FALSE
 run_cluster <- FALSE
 run_extract <- FALSE
 run_memory <- FALSE
-run_style <- FALSE
+run_style <- TRUE
 
 # should I print the large versions of each plot
 print_large <- FALSE
@@ -78,7 +78,7 @@ ddpr_files <-
 
 ```
 
-```{r}
+```{r run_all_benchmarking}
 # run all benchmarking from scratch 
 benchmark_master(
   set_up_csvs = set_up_csvs,
@@ -90,7 +90,7 @@ benchmark_master(
   run_umap = run_umap,
   run_cluster = run_cluster,
   run_extract = run_extract,
-  run_memory = TRUE,
+  run_memory = run_memory,
   run_style = run_style,
   num_repeats = 1L,
   num_channels = 10,
@@ -1388,22 +1388,30 @@ memory_plot %>%
 ## Methods
 
 ```{r}
+ddpr_data_info <-
+  read_rds(
+    file = here::here("manuscript", "benchmarking", "ddpr_data_info.rds")
+  )
+
+largest_cohort_names <-
+  ddpr_data_info %>%
+  filter(num_files == 288L) %>%
+  pull(file_names) %>%
+  pluck(1)
+
+all_file_names <-
+  largest_cohort_names[1:20]
+
 smallest_num_cells <- 
-  ddpr_datasets_mini %>% 
-  slice_head(n = 1) %>% 
-  pull(num_cells)
+  memory_tibble %>% 
+  pull(num_cells) %>% 
+  min()
 
 total_num_cells <- 
-  ddpr_datasets_mini %>% 
-  slice_tail(n = 1) %>% 
-  pull(num_cells)
+  memory_tibble %>% 
+  pull(num_cells) %>% 
+  max()
 
-all_file_names <- 
-  ddpr_datasets_mini %>% 
-  slice_tail(n = 1) %>% 
-  pull(file_paths) %>% 
-  pluck(1) %>% 
-  basename()
 ```
 
 
@@ -1594,7 +1602,7 @@ lines_patchwork %>%
 ```
 
 
-**Supplementary Figure 2 - {tidytof} coding style reduces the number of lines of code needed for CyTOF data analyis pipelines.** (A) Raw lines of code needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) lines of code needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) lines of code needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
+**Supplementary Figure 2 - {tidytof} coding style reduces the number of lines of code needed for CyTOF data analysis pipelines.** (A) Raw lines of code needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) lines of code needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) lines of code needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
 
 \newpage 
 
@@ -1631,6 +1639,14 @@ variables_patchwork %>%
 
 **Supplementary Figure 3 - {tidytof} coding style reduces the number of intermediate variable assignments needed in equivalent CyTOF data analyis pipelines.** (A) Raw number of variable assignments needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) number of variable assignments needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) number of variables assignments needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
 
+\newpage 
+
+```{r}
+memory_plot
+```
+
+
+**Supplementary Figure 4 - {tidytof}'s tidy data structures require similar system memory to {flowCore} flowSet objects.** Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects),  
 
 \newpage 
 

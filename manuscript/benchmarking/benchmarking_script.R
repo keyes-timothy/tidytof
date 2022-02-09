@@ -49,72 +49,78 @@ benchmark_master <-
     largest_cohort_paths <-
       file.path(ddpr_path, largest_cohort_names)
 
-    # put together a small benchmarking dataset that includes a set of 1 to
-    # 20 FCS files from the largest ddpr cohort
-    ddpr_datasets_mini <-
-      tibble(
-        num_files = 1:20,
-        file_paths = map(.x = num_files, .f = ~ largest_cohort_paths[1:.x])
-      ) %>%
-      mutate(
-        tidytof_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "tidytof"),
-        flowcore_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "flowcore"),
-        num_cells = map_int(.x = file_paths, .f = ~nrow(tof_read_data(.x)))
+    if (
+      any(
+        run_io, run_cluster, run_downsample, run_extract,
+        run_pca, run_tsne, run_umap, run_preprocess, run_memory
       )
+    ) {
 
-    # if needed, create CSV versions of the files in ddpr_datasets_mini
-    if (set_up_csvs) {
-      ddpr_large <-
-        largest_cohort_paths %>%
-        tof_read_data()
+      # put together a small benchmarking dataset that includes a set of 1 to
+      # 20 FCS files from the largest ddpr cohort
+      ddpr_datasets_mini <-
+        tibble(
+          num_files = 1:20,
+          file_paths = map(.x = num_files, .f = ~ largest_cohort_paths[1:.x])
+        ) %>%
+        mutate(
+          tidytof_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "tidytof"),
+          flowcore_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "flowcore"),
+          num_cells = map_int(.x = file_paths, .f = ~nrow(tof_read_data(.x)))
+        )
+      # if needed, create CSV versions of the files in ddpr_datasets_mini
+      if (set_up_csvs) {
+        ddpr_large <-
+          largest_cohort_paths %>%
+          tof_read_data()
 
-      ddpr_large %>%
-        mutate(file_name = str_remove(string = file_name, pattern = "\\.fcs")) %>%
-        tof_write_data(
-          group_cols = file_name,
-          out_path = csv_path,
-          format = "csv"
+        ddpr_large %>%
+          mutate(file_name = str_remove(string = file_name, pattern = "\\.fcs")) %>%
+          tof_write_data(
+            group_cols = file_name,
+            out_path = csv_path,
+            format = "csv"
+          )
+      }
+
+      # set up pre-read data sets for downsampling, dimensionality reduction,
+      # feature extraction, etc.
+
+      ## every file in the 20-FCS dataset is a row, with single-cell data stored
+      ## in the "data" column
+      ddpr_mini_tibble <-
+        tof_read_data(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]) %>%
+        group_by(file_name) %>%
+        nest() %>%
+        ungroup()
+
+      ## same as above, but in flowSet form (flowSet of 20 experiments)
+      ddpr_mini_flowset <-
+        flowCore::read.flowSet(
+          files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]
+        )
+
+      # store each benchmark iteration as a single row in a tibble.
+      # Each row is an iteration. The "tibbles" column contains a single tibble
+      # with all the cells for that iteration. The "flowSets" column contains a single
+      # flowSet with all the cells for that iteration.
+      ddpr_data_mini <-
+        ddpr_datasets_mini %>%
+        mutate(
+          tibbles =
+            map(
+              .x = 1:nrow(ddpr_datasets_mini),
+              .f = ~ ddpr_mini_tibble %>%
+                slice_head(n = .x) %>%
+                unnest(cols = data)
+            ),
+          flowSets =
+            map(
+              .x = 1:nrow(ddpr_datasets_mini),
+              .f = ~ddpr_mini_flowset[1:.x]
+            )
         )
     }
-
-    # set up pre-read data sets for downsampling, dimensionality reduction,
-    # feature extraction, etc.
-
-    ## every file in the 20-FCS dataset is a row, with single-cell data stored
-    ## in the "data" column
-    ddpr_mini_tibble <-
-      tof_read_data(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]) %>%
-      group_by(file_name) %>%
-      nest() %>%
-      ungroup()
-
-    ## same as above, but in flowSet form (flowSet of 20 experiments)
-    ddpr_mini_flowset <-
-      flowCore::read.flowSet(
-        files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]
-      )
-
-    # store each benchmark iteration as a single row in a tibble.
-    # Each row is an iteration. The "tibbles" column contains a single tibble
-    # with all the cells for that iteration. The "flowSets" column contains a single
-    # flowSet with all the cells for that iteration.
-    ddpr_data_mini <-
-      ddpr_datasets_mini %>%
-      mutate(
-        tibbles =
-          map(
-            .x = 1:nrow(ddpr_datasets_mini),
-            .f = ~ ddpr_mini_tibble %>%
-              slice_head(n = .x) %>%
-              unnest(cols = data)
-          ),
-        flowSets =
-          map(
-            .x = 1:nrow(ddpr_datasets_mini),
-            .f = ~ddpr_mini_flowset[1:.x]
-          )
-      )
-
     # handle the file paths for saving/loading benchmarking results
     in_out_paths <-
       tibble(
@@ -167,6 +173,7 @@ benchmark_master <-
 
     # reading files
     if (run_io) {
+      print("benchmark io")
       ### Benchmarking function
       benchmark_io <-
         function(file_paths) {
@@ -239,6 +246,7 @@ benchmark_master <-
 
     # dowsampling
     if (run_downsample) {
+      print("benchmark downsampling")
       ### Benchmarking function
       benchmark_downsample <-
         function(data_frame, flowset) {
@@ -285,6 +293,8 @@ benchmark_master <-
 
     # preprocessing
     if (run_preprocess) {
+      print("benchmark preprocessing")
+
       benchmark_preprocess <-
         function(data_frame, flowset) {
           microbenchmark(
@@ -415,6 +425,8 @@ benchmark_master <-
 
     # tsne
     if (run_tsne) {
+      print("benchmark tsne")
+
       ### Benchmarking function
       benchmark_tsne <-
         function(data_frame, flowset) {
@@ -459,6 +471,8 @@ benchmark_master <-
 
     # pca
     if (run_pca) {
+      print("benchmark pca")
+
       benchmark_pca <-
         function(data_frame, flowset) {
           microbenchmark(
@@ -501,6 +515,8 @@ benchmark_master <-
 
     # umap
     if (run_umap) {
+      print("benchmark umap")
+
       benchmark_umap <-
         function(data_frame, flowset) {
           microbenchmark(
@@ -544,6 +560,8 @@ benchmark_master <-
 
     # clustering
     if (run_cluster) {
+      print("benchmark clustering")
+
       benchmark_clustering <-
         function(file_paths) {
           microbenchmark(
@@ -575,6 +593,8 @@ benchmark_master <-
     }
 
     if (run_extract) {
+      print("benchmark feature extraction")
+
       benchmark_extract <-
         function(data_frame) {
           microbenchmark(
@@ -620,6 +640,8 @@ benchmark_master <-
 
     # memory
     if (run_memory) {
+      print("benchmark memory")
+
       memory_tibble <-
         ddpr_datasets_mini %>%
         select(num_files, num_cells, tidytof_memory, flowcore_memory)
@@ -630,6 +652,8 @@ benchmark_master <-
 
     # style
     if (run_style) {
+      print("benchmark style")
+
       prefixes <-
         c("read_data", "preprocess", "downsample", "pca", "tsne", "umap", "flowsom", "extract")
 
