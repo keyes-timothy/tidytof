@@ -208,33 +208,34 @@ pca_base <-
   }
 
 # flowcore
-pca_flowcore <- function(flowset) {
-  channel_names <- flowset[[1]]@parameters@data$desc
-  dr_columns <- grepl(pattern = "^CD", x = channel_names)
-  my_exprs <- fsApply(x = flowset, FUN = exprs)
-  dr_exprs <- my_exprs[, dr_columns]
-  column_variances <-
-    apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
-  zv_columns <- as.logical(round(column_variances) == 1)
-  dr_exprs <- dr_exprs[, !zv_columns]
-  pca_result <- prcomp(x = as.matrix(dr_exprs), center = TRUE, scale. = TRUE)
-  pca_embeddings <- pca_result$x[, 1:2]
-  colnames(pca_embeddings) <- paste0("PC", 1:2)
-  flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
-  starting_index <- 1L
-  flowframe_list <- list()
-  for (i in 1:length(flowframe_num_cells)) {
-    flowframe <- flowset[[i]]
-    num_cells <- flowframe_num_cells[[i]]
-    ending_index <- starting_index + num_cells - 1
-    flowframe_pca <- pca_embeddings[starting_index:ending_index, ]
-    new_flowframe <- fr_append_cols(flowframe, flowframe_pca)
-    flowframe_list[[i]] <- new_flowframe
-    starting_index <- ending_index + 1
+pca_flowcore <-
+  function(flowset) {
+    channel_names <- flowset[[1]]@parameters@data$desc
+    dr_columns <- grepl(pattern = "^CD", x = channel_names)
+    my_exprs <- fsApply(x = flowset, FUN = exprs)
+    dr_exprs <- my_exprs[, dr_columns]
+    column_variances <-
+      apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
+    zv_columns <- as.logical(round(column_variances) == 1)
+    dr_exprs <- dr_exprs[, !zv_columns]
+    pca_result <- prcomp(x = as.matrix(dr_exprs), center = TRUE, scale. = TRUE)
+    pca_embeddings <- pca_result$x[, 1:2]
+    colnames(pca_embeddings) <- paste0("PC", 1:2)
+    flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+    starting_index <- 1L
+    flowframe_list <- list()
+    for (i in 1:length(flowframe_num_cells)) {
+      flowframe <- flowset[[i]]
+      num_cells <- flowframe_num_cells[[i]]
+      ending_index <- starting_index + num_cells - 1
+      flowframe_pca <- pca_embeddings[starting_index:ending_index, ]
+      new_flowframe <- fr_append_cols(flowframe, flowframe_pca)
+      flowframe_list[[i]] <- new_flowframe
+      starting_index <- ending_index + 1
+    }
+    result <- flowSet(flowframe_list)
+    return(result)
   }
-  result <- flowSet(flowframe_list)
-  return(result)
-}
 
 ### umap
 
@@ -261,33 +262,34 @@ umap_base <-
   }
 
 # flowcore
-umap_flowcore <- function(flowset) {
-  channel_names <- flowset[[1]]@parameters@data$desc
-  dr_columns <- grepl(pattern = "^CD", x = channel_names)
-  my_exprs <- fsApply(x = flowset, FUN = exprs)
-  dr_exprs <- my_exprs[, dr_columns]
-  column_variances <-
-    apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
-  zv_columns <- as.logical(round(column_variances) == 1)
-  dr_exprs <- dr_exprs[, !zv_columns]
-  umap_result <-
-    uwot::umap(X = dr_exprs, n_neighbors = 5, scale = TRUE)
-  colnames(umap_result) <- paste0("UMAP", 1:2)
-  flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
-  starting_index <- 1L
-  flowframe_list <- list()
-  for (i in 1:length(flowframe_num_cells)) {
-    flowframe <- flowset[[i]]
-    num_cells <- flowframe_num_cells[[i]]
-    ending_index <- starting_index + num_cells - 1
-    flowframe_umap <- umap_result[starting_index:ending_index, ]
-    new_flowframe <- fr_append_cols(flowframe, flowframe_umap)
-    flowframe_list[[i]] <- new_flowframe
-    starting_index <- ending_index + 1
+umap_flowcore <-
+  function(flowset) {
+    channel_names <- flowset[[1]]@parameters@data$desc
+    dr_columns <- grepl(pattern = "^CD", x = channel_names)
+    my_exprs <- fsApply(x = flowset, FUN = exprs)
+    dr_exprs <- my_exprs[, dr_columns]
+    column_variances <-
+      apply(X = dr_exprs, MARGIN = 2, FUN = function(x) length(unique(x)))
+    zv_columns <- as.logical(round(column_variances) == 1)
+    dr_exprs <- dr_exprs[, !zv_columns]
+    umap_result <-
+      uwot::umap(X = dr_exprs, n_neighbors = 5, scale = TRUE)
+    colnames(umap_result) <- paste0("UMAP", 1:2)
+    flowframe_num_cells <- as.numeric(fsApply(x = flowset, FUN = nrow))
+    starting_index <- 1L
+    flowframe_list <- list()
+    for (i in 1:length(flowframe_num_cells)) {
+      flowframe <- flowset[[i]]
+      num_cells <- flowframe_num_cells[[i]]
+      ending_index <- starting_index + num_cells - 1
+      flowframe_umap <- umap_result[starting_index:ending_index, ]
+      new_flowframe <- fr_append_cols(flowframe, flowframe_umap)
+      flowframe_list[[i]] <- new_flowframe
+      starting_index <- ending_index + 1
+    }
+    result <- flowSet(flowframe_list)
+    return(result)
   }
-  result <- flowSet(flowframe_list)
-  return(result)
-}
 
 
 # clustering -------------------------------------------------------------------
@@ -344,7 +346,7 @@ extract_tidytof <-
   function(data_frame) {
     data_frame %>%
       tof_extract_features(
-        cluster_col = cluster,
+        cluster_col = my_cluster,
         group_cols = file_name,
         lineage_cols = starts_with("CD"),
         signaling_cols = starts_with("p")
@@ -477,3 +479,52 @@ extract_base <-
     result <- as.data.frame(cbind(lineage_final, signaling_final))
     return(result)
   }
+
+
+# memory benchmarking ----------------------------------------------------------
+# return the size of a cytof dataset in megabytes as either a tof_tibble
+# or as a flowSet
+get_memory <- function(file_paths, mode) {
+  if (mode == "tidytof") {
+    result <-
+      file_paths %>%
+      tof_read_data() %>%
+      lobstr::obj_size() %>%
+      as.numeric()
+
+  } else if (mode == "flowcore") {
+    result <-
+      file_paths %>%
+      flowCore::read.flowSet() %>%
+      lobstr::obj_size() %>%
+      as.numeric()
+
+  } else {
+    stop("mode must be tidytof or flowcore")
+  }
+
+  return(result / 1e6)
+}
+
+# code style benchmarking ------------------------------------------------------
+
+# count the lines of code for a given workflow
+get_lines <- function(function_object) {
+  if (is.na(function_object)) {
+    return(NA)
+  } else {
+    lines <- capture.output(print(function_object))
+    return(length(lines) - 2L)
+  }
+}
+
+# count the number of assigned variables for a given workflow
+get_assignments <- function(function_object) {
+  if (is.na(function_object)) {
+    return(NA)
+  } else {
+    lines <- capture.output(print(function_object))
+    assignments <- max(sum(str_count(lines, pattern = "<-")), 1L)
+    return(assignments)
+  }
+}
