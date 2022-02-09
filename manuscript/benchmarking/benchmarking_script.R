@@ -661,13 +661,13 @@ benchmark_master <-
         c("reading files", "preprocessing", "downsampling", "pca", "tsne", "umap", "clustering", "feature extraction")
 
       base_functions <-
-        mget(x = paste0(prefixes, "_base"))
+        mget(x = paste0(prefixes, "_base"), envir = globalenv())
 
       tidytof_functions <-
-        mget(x = paste0(prefixes, "_tidytof"))
+        mget(x = paste0(prefixes, "_tidytof"), envir = globalenv())
 
       flowcore_functions <-
-        mget(x = paste0(prefixes, "_flowcore"), ifnotfound = NA)
+        mget(x = paste0(prefixes, "_flowcore"), ifnotfound = NA, envir = globalenv())
 
       # make tibble
       code_tibble <-
