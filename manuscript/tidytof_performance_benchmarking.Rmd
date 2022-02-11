@@ -1,11 +1,12 @@
 ---
-title: '{tidytof} performance benchmarking'
 output:
   pdf_document: default
   officedown::rdocx_document:
     mapstyles:
       Normal: First Paragraph
     reference_docx: reference.docx
+    tables: 
+      width: 1.0
   html_document:
     df_print: paged
 bibliography: benchmarking_references.bib
@@ -38,9 +39,12 @@ source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
-machine <- "excalibur"
+machine <- "galaxia"
 num_repeats <- 10L
-charizard <- c("base" = "#207394", "tidytof" = "#cd5241", "flowcore" = "#eeb45a")
+charizard <- 
+  c("base" = "#207394", "tidytof" = "#cd5241", "flowcore" = "#eeb45a")
+engine_labels <- 
+  c("base" = "base", "tidytof" = "tidytof", "flowcore" = "flowCore")
 
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
@@ -53,7 +57,8 @@ run_umap <- FALSE
 run_cluster <- FALSE
 run_extract <- FALSE
 run_memory <- FALSE
-run_style <- TRUE
+run_style <- FALSE
+verbose <- FALSE
 
 # should I print the large versions of each plot
 print_large <- FALSE
@@ -78,7 +83,7 @@ ddpr_files <-
 
 ```
 
-```{r run_all_benchmarking}
+```{r run_all_benchmarking, warning = FALSE, message = FALSE}
 # run all benchmarking from scratch 
 benchmark_master(
   set_up_csvs = set_up_csvs,
@@ -92,9 +97,10 @@ benchmark_master(
   run_extract = run_extract,
   run_memory = run_memory,
   run_style = run_style,
-  num_repeats = 1L,
+  num_repeats = 10L,
   num_channels = 10,
-  base_path = base_path
+  base_path = base_path, 
+  verbose = verbose
 )
 ```
 
@@ -171,7 +177,7 @@ engines <-
   io_benchmarking %>% 
   select(io_benchmarks) %>% 
   unnest(io_benchmarks) %>% 
-  mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
+  #mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
   pull(engine) %>% 
   unique()
 
@@ -180,7 +186,7 @@ num_engines <- length(engines)
 my_palette <- charizard[which(names(charizard) %in% engines)]
 
 max_cells <- max(io_benchmarking$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 
 # make a plot to summarize 
@@ -188,7 +194,7 @@ io_speed_plot <-
   io_benchmarking %>% 
   select(num_files, num_cells, io_benchmarks) %>% 
   unnest(cols = io_benchmarks) %>% 
-  mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
+  #mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
   group_by(num_files, num_cells, engine) %>% 
   summarize(
     mean_time = median(time), 
@@ -245,16 +251,17 @@ io_speed_plot %>%
 io_benchmarking_csv <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_csv))
 
-num_engines <- 
+engines <- 
   io_benchmarking_csv %>% 
   select(io_benchmarks) %>% 
   unnest(io_benchmarks) %>% 
   pull(engine) %>% 
-  unique() %>% 
-  length()
+  unique()
+
+my_palette <- charizard[which(names(charizard) %in% engines)]
 
 max_cells <- max(io_benchmarking_csv$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
 
 # visualize speed benchmarking results
 io_speed_plot_csv <- 
@@ -282,8 +289,8 @@ io_speed_plot_csv <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = charizard[1:num_engines]) + 
-  scale_color_manual(values = charizard[1:num_engines]) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "CSV reader",
@@ -321,7 +328,7 @@ downsample_benchmarking <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
 max_cells <- max(downsample_benchmarking$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
 
 # make a plot to summarize 
 downsample_speed_plot <- 
@@ -352,8 +359,8 @@ downsample_speed_plot <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = charizard) + 
-  scale_fill_manual(values = charizard) +
+  scale_color_manual(values = charizard, labels = engine_labels) + 
+  scale_fill_manual(values = charizard, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "Downsampling",
@@ -395,7 +402,7 @@ preprocess_benchmarking <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
 max_cells <- max(preprocess_benchmarking$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
 
 # make a plot to summarize 
 preprocess_speed_plot <- 
@@ -428,8 +435,8 @@ preprocess_speed_plot <-
     position = position_dodge(width = 15000)
   ) + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = charizard) + 
-  scale_fill_manual(values = charizard) + 
+  scale_color_manual(values = charizard, labels = engine_labels) + 
+  scale_fill_manual(values = charizard, labels = engine_labels) + 
   theme_bw() + 
   labs(
     subtitle = "Preprocessing",
@@ -483,7 +490,7 @@ tsne_benchmark <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name_tsne))
 
 max_cells <- max(tsne_benchmark$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 engines <- 
   tsne_benchmark %>% 
@@ -522,8 +529,8 @@ tsne_speed_plot <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = my_palette) + 
-  scale_fill_manual(values = my_palette) +
+  scale_color_manual(values = my_palette, labels = engine_labels) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "tSNE",
@@ -555,7 +562,7 @@ pca_benchmark <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name_pca))
 
 max_cells <- max(pca_benchmark$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 engines <- 
   pca_benchmark %>% 
@@ -594,8 +601,8 @@ pca_speed_plot <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = my_palette) + 
-  scale_fill_manual(values = my_palette) +
+  scale_color_manual(values = my_palette, labels = engine_labels) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "PCA",
@@ -626,7 +633,7 @@ umap_benchmark <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name_umap))
 
 max_cells <- max(umap_benchmark$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 engines <- 
   umap_benchmark %>% 
@@ -665,8 +672,8 @@ umap_speed_plot <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = my_palette) + 
-  scale_fill_manual(values = my_palette) +
+  scale_color_manual(values = my_palette, labels = engine_labels) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "UMAP",
@@ -705,7 +712,7 @@ cluster_benchmarking <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
 max_cells <- max(cluster_benchmarking$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 
 engines <- 
@@ -744,8 +751,8 @@ flowsom_speed_plot <-
   geom_line() +
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "FlowSOM",
@@ -780,7 +787,6 @@ file_name <-
   in_out_paths %>% 
   filter(process == "extraction") %>% 
   pull(file_name)
-
 ```
 
 
@@ -789,7 +795,7 @@ extract_benchmarking <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
 max_cells <- max(extract_benchmarking$num_cells)
-width <- max_cells * 0.03
+width <- max_cells * 0.05
   
 
 engines <- 
@@ -828,8 +834,8 @@ extract_speed_plot <-
   geom_line(aes(group = engine)) +
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) + 
   theme_bw() + 
   labs(
     subtitle = "Feature extraction",
@@ -893,8 +899,8 @@ lines_plot_raw <-
     labels = 
       function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
   ) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) + 
   labs(
     x = NULL, 
     y = "Lines of code", 
@@ -976,8 +982,8 @@ lines_plot_base <-
       function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1052,8 +1058,8 @@ lines_plot_flowcore <-
       function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1199,8 +1205,8 @@ variables_plot_base <-
       function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1275,8 +1281,8 @@ variables_plot_flowcore <-
       function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
   ) + 
   scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
@@ -1349,8 +1355,8 @@ memory_plot <-
   geom_line() +
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "Dataset memory requirements",
@@ -1415,29 +1421,44 @@ total_num_cells <-
 ```
 
 
-To benchmark {tidytof}'s performance against existing tools for high-dimensional cytometry data analysis, we compared {tidytof} functions to their equivalent workflows using base R @baseR or the flowCore package @flowcore where equivalent workflows existed. Workflows were compared both on the basis of their computational speed and on the basis of their coding burden (i.e. the amount of code needed for each workflow). Specifically, comparisons included one metric for computational speed (total elapsed time for each workflow) and two metrics for coding burden associated with human error when conducting computational analyses (the number of lines of code and the number of variable assignments needed to write the workflow).
+To benchmark {tidytof}'s performance against existing tools for high-dimensional cytometry data analysis, we compared {tidytof} functions to their equivalent workflows (where they existed) using base R @baseR or the {flowCore} package @flowcore. Workflows were compared both on the basis of their computational speed on datasets of various sizes (see below for details) and on the basis of their coding burden (i.e. the amount of code needed for each workflow). Specifically, comparisons included one metric for computational speed (total elapsed time for each workflow) and two metrics for coding burden associated with human error when conducting computational analyses (the number of lines of code and the number of intermediate variable assignments needed for the workflow). In addition, {tidytof}'s memory requirements were benchmarked against those of the {flowCore} package's `flowSet` objects, a commonly-used data structure for the analysis of high-dimensional cytometry data. 
 
-All benchmarking was performed on a Linux machine running Ubuntu 20.04 with an AMD Threadripper Pro 3995WX processor (64 cores; 2.70 GHz; 256 MB cache) and 256 GB of RAM.
+All benchmarking was performed on a Linux machine running Ubuntu 20.04 with an AMD Threadripper Pro 3995WX processor (64 cores; 2.70 GHz; 256 MB cache) and 256 GB of RAM. All functions used to perform speed, coding burden, and memory benchmarking are available [here](https://github.com/keyes-timothy/tidytof/blob/main/manuscript/benchmarking/benchmarking_functions.R).
 
 
 ### Benchmarking datasets
 
-The data used for benchmarking were drawn from a publicly available CyTOF dataset published in 2018 @ddpr. Specifically, 20 files acquired from 2 healthy patients were chosen from the full dataset, totaling `r total_num_cells` cells. The following files were used: 
+The data used for benchmarking were drawn from Good et al.'s publicly available CyTOF dataset published in 2018 @ddpr. Specifically, 20 files acquired from 2 healthy patients were chosen from the full dataset, totaling `r total_num_cells` cells. The following files were used: 
 
-```{r}
+```{r, results = "asis"}
+brdr <- officer::fp_border(color = "black", width = 0.5)
+
 tibble(`File name` = all_file_names) %>% 
-  knitr::kable()
+  flextable::flextable() %>% 
+  flextable::bold(i = 1, part = "header") %>% 
+  flextable::fontsize(part = "all", size = 10) %>% 
+  #flextable::padding(padding = 0, part = "all") %>% 
+  #flextable::line_spacing(part = "all", space = 1) %>% 
+  flextable::hline_top(part = "header", border = brdr) %>% 
+  flextable::hline_bottom(part = "header", border = brdr) %>% 
+  flextable::hline_bottom(part = "body", border = brdr) %>% 
+  flextable::autofit() %>% 
+  flextable::flextable_to_rmd(ft.arraystretch = 1.1)
 ```
 
 ### Speed benchmarking
 
 For speed benchmarking, each workflow was run on 20 nested datasets derived from the files listed above such that each dataset *i* was comprised of the first *i* files in the list. Thus, the smallest dataset included only 1 file (and `r smallest_num_cells` cells) while the largest dataset included all 20 files (and `r total_num_cells` cells). However, due to the computationally intensive nature of t-stochastic neighborhood embedding (tSNE) and uniform manifold approximation and projection (UMAP), speed benchmarking was performed using 10 subsampled versions of the full dataset (all 20 files) with a smaller number of cells drawn at random: 1K, 2K, 3K, 4K, 5K, 6K, 7K, 8K, 9K, and 10K.
 
-Using these datasets, the `microbenchmark` package @microbenchmark was used to time each workflow on each dataset 10 independent times. The median and interquartile range of each workflow's runtime could then be computed for {tidytof}, base R, and flowCore. For dimensionality reduction and clustering analyses, only cluster of differentiation ("CD") markers were used for analysis across all workflows. For downsampling, 200 cells were subsampled from each input FCS or CSV file. Otherwise, {tidytof}'s default behavior was used across all functions used for speed benchmarking.
+Using these datasets, the `microbenchmark` package @microbenchmark was used to time each workflow independently on each dataset 10 times. The median and interquartile range of each workflow's runtime could then be computed for {tidytof}, base R, and {flowCore}. For dimensionality reduction and clustering analyses, only cluster of differentiation ("CD") markers were used for analysis across all workflows. For downsampling, 200 cells were subsampled from each input FCS or CSV file. Otherwise, {tidytof}'s default behavior was used across all functions used for speed benchmarking.
+
+### Memory benchmarking
+
+For memory benchmarking, each nested dataset described above was read into both a `tof_tbl` object using {tidytof}'s `tof_read_data()` function and a `flowSet` object using {flowCore}'s `read.flowSet()` function. The system memory used to store each object was calculated using the {lobstr} package's `obj_size()` function @lobstr. 
 
 ### Coding burden benchmarking
 
-For coding burden benchmarking, the R scripts containing each workflow were themselves subjected to text analysis. To control for differences in code style and practices between workflows, the styler package @styler was used to standardize all benchmarking code to adhere to the [tidyverse R code style guide](https://style.tidyverse.org/). The functions used to count the number of lines of code in each workflow are provided here:
+For coding burden benchmarking, the source code of the functions containing each workflow was subjected to text analysis. To control for differences in code style and practices between workflows, the styler package @styler was used to standardize all benchmarking code to adhere to the [tidyverse R code style guide](https://style.tidyverse.org/). The functions used to count the number of lines of code and the number of variable assignments in each workflow are provided here:
 
 
 ```{r, echo = TRUE, include = TRUE, eval = FALSE}
@@ -1447,6 +1468,8 @@ get_lines <- function(function_object) {
     return(NA)
   } else {
     lines <- capture.output(print(function_object))
+    # substract 2 lines to omit the function definition and closing 
+    # bracket for each workflow
     return(length(lines) - 2L)
   }
 }
@@ -1465,13 +1488,14 @@ get_assignments <- function(function_object) {
 
 For both functions above, the input is a function (`function_object`) used to define a {tidytof}, base R, or {flowCore} analysis workflow, and the output is an integer representing the number of lines of code or the number of variable assignments, respectively, contained in the workflow. The functions used to define each workflow are available on GitHub [here](https://github.com/keyes-timothy/tidytof/blob/main/manuscript/benchmarking/benchmarking_functions.R). 
 
-
 ## Results 
 
-### Speed
+### Speed benchmarking
 
-Across a wide variety of functions including FCS and CSV file reading, single-cell data transformation (preprocessing), downsamping, tSNE, FlowSOM clustering, and sample-level feature extraction, 
-{tidytof}'s time efficiency rivals or improves upon alternative approaches (**Supplementary Figure 1**). In the case of PCA and UMAP, {tidytof} incurs a slight performance decrease relative to alternative tools because it uses the `{embed}` package @embed to store a dataset's PCA or UMAP embedding as a recipe object (from the {recipes} package) @recipes - which, while costing a small amount of computational overhead, allows users to more easily apply the same embedding to new data points. 
+Across a wide variety of workflows including FCS and CSV file reading, single-cell data transformation (preprocessing), downsampling, tSNE embedding, FlowSOM clustering, and sample-level feature extraction, 
+{tidytof}'s time efficiency rivals or improves upon alternative approaches (**Supplementary Figure 1**). In the case of PCA and UMAP, {tidytof} incurs a slight performance decrease relative to alternative tools because it uses the `{embed}` package @embed to store a dataset's PCA or UMAP embedding as a `recipe` object (from the {recipes} package) @recipes - which, while costing a small amount of computational overhead, allows users to more easily apply the same embedding to new data points. 
+
+\newpage
 
 ```{r, message = FALSE}
 make_speed_plots <- 
@@ -1480,8 +1504,12 @@ make_speed_plots <-
       map(
         .x = speed_plot_list, 
         .f = ~ .x + 
-          scale_fill_manual(values = charizard) + 
-          scale_color_manual(values = charizard)
+          scale_fill_manual(values = charizard, labels = engine_labels) + 
+          scale_color_manual(values = charizard, labels = engine_labels) + 
+          scale_x_continuous(
+            breaks = scales::breaks_pretty(n = 4), 
+            labels = scales::label_scientific()
+          )
       )
     result <- 
       speed_plot_list %>% 
@@ -1493,7 +1521,7 @@ make_speed_plots <-
   }
 ```
 
-```{r, fig.width = 10, fig.height = 7, warning = FALSE, message = FALSE}
+```{r, fig.width = 10, fig.height = 8, warning = FALSE, message = FALSE}
 all_speed_names <- 
   ls()[str_detect(string = ls(), pattern = "speed_plot(_csv)?$")] %>% 
   factor(levels = 
@@ -1511,14 +1539,13 @@ all_speed_plots <-
 
 all_speed_plots
 
-
 all_speed_plots %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "all_speed_plots.png"), 
     device = "png", 
     width = 10, 
-    height = 7
+    height = 8
   )
 
 
@@ -1528,18 +1555,47 @@ all_speed_plots %>%
       here::here("manuscript", "benchmarking", "all_speed_plots.pdf"), 
     device = "pdf", 
     width = 10, 
-    height = 7
+    height = 8
   )
-
-
 ```
-**Supplementary Figure 1 - {tidytof}'s computational speed rivals or improves upon equivalent approaches in base R or {flowCore}.** Benchmark plots indicating the elapsed time for (A) reading FCS files, (B) reading CSV files, (C) preprocessing single-cell data, (D) downsampling single-cell data, (E) performing principal component analysis (PCA), (F) performing t-stochastic neighborhood embedding (tSNE), (G) performing uniform manifold approximation and projection (UMAP) embedding), (H) performing FlowSOM clustering, (I) or sample-level feature extraction using {tidytof}, base R, and {flowCore}. 
+**Supplementary Figure 1 - {tidytof}'s computational speed rivals or improves upon equivalent approaches in base R or {flowCore}.** Benchmark plots indicating the elapsed time for (A) reading FCS files, (B) reading CSV files, (C) preprocessing single-cell data, (D) downsampling single-cell data, (E) performing principal component analysis (PCA), (F) performing t-stochastic neighborhood embedding (tSNE), (G) performing uniform manifold approximation and projection (UMAP) embedding), (H) performing FlowSOM clustering, (I) or sample-level feature extraction using {tidytof}, base R, and {flowCore}. Points represent the median runtime for each workflow from 10 independent repetitions; error bars represent the interquartile range of runtimes.
 
 \newpage 
 
-### Coding burden
+### Memory benchmarking
 
-Despite its competitive speed performance relative to equivalent base R and {flowCore} workflows, {tidytof} reduces the coding burden of performing CyTOF data analyses significantly compared to alternative frameworks. Across workflows, {tidytof} reduces the lines of code needed to perform an analysis between 70% and 95% compared to base R and between 56% and 96% compared to {flowCore} (**Supplementary Figure 2**). Similarly, {tidytof} reduces the number of variable assignments needed to perform an analysis between 75% to 97% compared to base R and between 75% and 95% compared to {flowCore} (**Supplementary Figure 3**). Because code bases with both more lines of code and more intermediate variables are more prone to human (e.g copy-and-paste) error and reduced readability, these results support {tidytof}'s marked ability to simplify CyTOF data analysis code and increase reprodubility among data analysis pipelines.
+```{r}
+average_increase <- 
+  ((average_mem_ratio - 1) * 100) %>% 
+  round(2) %>% 
+  str_c("%")
+
+```
+
+
+Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects) compared to {flowCore}'s native data structure (the `flowSet`), both data structures require similar amounts of system memory (**Supplementary Figure 2**). Across all datasets, {tidytof} data structures require slightly more memory on average than their {flowCore} counterparts, with an average increase in `r average_increase`. 
+
+\
+
+
+```{r}
+memory_plot + 
+  scale_x_continuous(breaks = scales::breaks_extended(n = 5), labels = scales::label_scientific())
+```
+
+
+**Supplementary Figure 2 - {tidytof}'s tidy data structures require similar system memory to {flowCore} flowSet objects.** The system memory (in Megabytes; MB) required to store {tidytof} and {flowCore} data structures of varying sizes. 
+
+
+\newpage 
+
+### Coding burden benchmarking
+
+In addition to its competitive computational speed relative to equivalent base R and {flowCore} workflows, {tidytof} reduces the coding burden of performing CyTOF data analyses significantly compared to alternative frameworks. Across workflows, {tidytof} reduces the lines of code needed to perform an analysis between 70% and 95% compared to base R and between 56% and 96% compared to {flowCore} (**Supplementary Figure 3**). Similarly, {tidytof} reduces the number of variable assignments needed to perform an analysis between 75% to 97% compared to base R and between 75% and 95% compared to {flowCore} (**Supplementary Figure 4**). Because code bases with both more lines of code and more intermediate variables are more prone to human (e.g copy-and-paste) error and reduced readability, these results support {tidytof}'s marked ability to simplify CyTOF data analysis code and increase reproducibility among data analysis pipelines.
+
+\ 
+
+\ 
 
 ```{r}
 make_style_plot <- function(raw, base, flowcore) { 
@@ -1548,18 +1604,18 @@ make_style_plot <- function(raw, base, flowcore) {
   
   result <- 
     raw +
-  (base + 
-     flowcore + 
-      plot_layout(nrow = 1, widths = c(5.8, 4.2))
-  ) + 
-  plot_layout(
-    guides = "collect", 
-    heights = c(4, 6),
-    design = "
+    (base + 
+       flowcore + 
+       plot_layout(nrow = 1, widths = c(5.8, 4.2))
+    ) + 
+    plot_layout(
+      guides = "collect", 
+      heights = c(4, 6),
+      design = "
       #1111#
       222222
     "
-  ) + 
+    ) + 
     plot_annotation(tag_levels = "A") + 
     theme(plot.tag = element_text(face = "bold"))
   return(result)
@@ -1567,8 +1623,6 @@ make_style_plot <- function(raw, base, flowcore) {
 
 
 ```
-
-\newpage 
 
 
 ```{r, fig.width = 10, fig.height = 7}
@@ -1578,7 +1632,9 @@ lines_patchwork <-
     base = lines_plot_base, 
     flowcore = lines_plot_flowcore
   )
+
 lines_patchwork
+
 
 lines_patchwork %>% 
   ggsave(
@@ -1602,7 +1658,7 @@ lines_patchwork %>%
 ```
 
 
-**Supplementary Figure 2 - {tidytof} coding style reduces the number of lines of code needed for CyTOF data analysis pipelines.** (A) Raw lines of code needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) lines of code needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) lines of code needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
+**Supplementary Figure 3 - {tidytof} coding style reduces the number of lines of code needed for CyTOF data analysis pipelines.** (A) Raw lines of code needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) lines of code needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) lines of code needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
 
 \newpage 
 
@@ -1614,7 +1670,8 @@ variables_patchwork <-
     base = variables_plot_base, 
     flowcore = variables_plot_flowcore
   )
-variables_patchwork
+
+print(variables_patchwork)
 
 variables_patchwork %>% 
   ggsave(
@@ -1637,18 +1694,6 @@ variables_patchwork %>%
 ```
 
 
-**Supplementary Figure 3 - {tidytof} coding style reduces the number of intermediate variable assignments needed in equivalent CyTOF data analyis pipelines.** (A) Raw number of variable assignments needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) number of variable assignments needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) number of variables assignments needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
+**Supplementary Figure 4 - {tidytof} coding style reduces the number of intermediate variable assignments needed in equivalent CyTOF data analyis pipelines.** (A) Raw number of variable assignments needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) number of variable assignments needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) number of variables assignments needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
 
-\newpage 
-
-```{r}
-memory_plot
-```
-
-
-**Supplementary Figure 4 - {tidytof}'s tidy data structures require similar system memory to {flowCore} flowSet objects.** Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects),  
-
-\newpage 
-
-## References
 

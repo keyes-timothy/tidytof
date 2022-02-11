@@ -20,7 +20,8 @@ benchmark_master <-
     run_style = FALSE,
     num_repeats = 10,
     num_channels = 10,
-    base_path
+    base_path,
+    verbose = FALSE
   ) {
 
     # handle file paths
@@ -173,7 +174,7 @@ benchmark_master <-
 
     # reading files
     if (run_io) {
-      print("benchmark io")
+      if (verbose) {print("benchmark io")}
       ### Benchmarking function
       benchmark_io <-
         function(file_paths) {
@@ -246,7 +247,7 @@ benchmark_master <-
 
     # dowsampling
     if (run_downsample) {
-      print("benchmark downsampling")
+      if (verbose) {print("benchmark downsampling")}
       ### Benchmarking function
       benchmark_downsample <-
         function(data_frame, flowset) {
@@ -293,7 +294,7 @@ benchmark_master <-
 
     # preprocessing
     if (run_preprocess) {
-      print("benchmark preprocessing")
+      if (verbose) {print("benchmark preprocessing")}
 
       benchmark_preprocess <-
         function(data_frame, flowset) {
@@ -425,7 +426,7 @@ benchmark_master <-
 
     # tsne
     if (run_tsne) {
-      print("benchmark tsne")
+      if (verbose) {print("benchmark tsne")}
 
       ### Benchmarking function
       benchmark_tsne <-
@@ -471,7 +472,7 @@ benchmark_master <-
 
     # pca
     if (run_pca) {
-      print("benchmark pca")
+      if (verbose) {print("benchmark pca")}
 
       benchmark_pca <-
         function(data_frame, flowset) {
@@ -515,7 +516,7 @@ benchmark_master <-
 
     # umap
     if (run_umap) {
-      print("benchmark umap")
+      if (verbose) {print("benchmark umap")}
 
       benchmark_umap <-
         function(data_frame, flowset) {
@@ -560,7 +561,7 @@ benchmark_master <-
 
     # clustering
     if (run_cluster) {
-      print("benchmark clustering")
+      if (verbose) {print("benchmark clustering")}
 
       benchmark_clustering <-
         function(file_paths) {
@@ -593,7 +594,7 @@ benchmark_master <-
     }
 
     if (run_extract) {
-      print("benchmark feature extraction")
+      if (verbose) {print("benchmark feature extraction")}
 
       benchmark_extract <-
         function(data_frame) {
@@ -640,7 +641,7 @@ benchmark_master <-
 
     # memory
     if (run_memory) {
-      print("benchmark memory")
+      if (verbose) {print("benchmark memory")}
 
       memory_tibble <-
         ddpr_datasets_mini %>%
@@ -652,7 +653,7 @@ benchmark_master <-
 
     # style
     if (run_style) {
-      print("benchmark style")
+      if (verbose) {print("benchmark style")}
 
       prefixes <-
         c("read_data", "preprocess", "downsample", "pca", "tsne", "umap", "flowsom", "extract")

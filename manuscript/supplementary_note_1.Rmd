@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE, 
   warning = FALSE,
-  fig.cap = TRUE, 
+  #fig.cap = TRUE, 
   out.width = "100%"
   )
 library(officedown)
@@ -30,10 +30,10 @@ library(dplyr)
 ```
 
 
-Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
+Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published at a rapid rate. Accordingly, when new tools are shared with the scientific community, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. Furthermore, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
 
 
-![**Figure legend -** Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the single-cell level, you may be interested in individual cells' marker expression profiles. At the cluster level, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the whole-sample level, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.](../../../man/figures/tidytof_figure_1a.jpg)
+![**Figure legend -** Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the single-cell level, you may be interested in individual cells' marker expression profiles. At the cluster level, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the whole-sample level, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.](../man/figures/tidytof_figure_1a.jpg)
 
 To address both of these challenges for [mass cytometry (CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing CyTOF data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to CyTOF datasets.
 
