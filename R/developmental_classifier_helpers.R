@@ -157,8 +157,10 @@ tof_classify_cells <-
         purrr::pluck("result")
     }
 
-    # Is there a way to set colnames directly in the piped call above?
-    colnames(classifications) <- classifier_fit$population
+    colnames(classifications) <- as.character(classifier_fit$population)
+    if (distance_function == "pearson") {
+      classifications <- tibble::as_tibble(as.matrix(classifications))
+    }
 
     # This has to be optimized
     population_names <-
@@ -265,9 +267,7 @@ tof_apply_classifier <- function(
         cancer_data = select(cancer_tibble, all_of(classifier_markers)),
         distance_function = distance_function
       ) %>%
-      rename_with(function(x) str_c(distance_function, x, sep = "_"), .cols = everything())
-
-    return(classification_data)
+      dplyr::rename_with(function(x) str_c(distance_function, x, sep = "_"), .cols = everything())
 
     # otherwise,
   } else {
@@ -326,10 +326,10 @@ tof_apply_classifier <- function(
       dplyr::arrange(..cell_id) %>%
       dplyr::select(-..cell_id) %>%
       dplyr::rename_with(
-        function(x) stringr::str_c(paste0(".", distance_function), x, sep = "_"),
+        function(x) stringr::str_c(distance_function, x, sep = "_"),
         .cols = tidyselect::everything()
       )
-
-    return(classification_data)
   }
+
+  return(classification_data)
 }

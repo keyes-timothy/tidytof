@@ -1458,7 +1458,7 @@ For memory benchmarking, each nested dataset described above was read into both 
 
 ### Coding burden benchmarking
 
-For coding burden benchmarking, the source code of the functions containing each workflow was subjected to text analysis. To control for differences in code style and practices between workflows, the styler package @styler was used to standardize all benchmarking code to adhere to the [tidyverse R code style guide](https://style.tidyverse.org/). The functions used to count the number of lines of code and the number of variable assignments in each workflow are provided here:
+For coding burden benchmarking, the source code of the functions containing each workflow was subjected to text analysis. To control for differences in code style and practices between workflows, the {styler} package @styler was used to standardize all benchmarking code to adhere to the [tidyverse R code style guide](https://style.tidyverse.org/). The functions used to count the number of lines of code and the number of variable assignments in each workflow are provided here:
 
 
 ```{r, echo = TRUE, include = TRUE, eval = FALSE}
@@ -1573,7 +1573,7 @@ average_increase <-
 ```
 
 
-Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects) compared to {flowCore}'s native data structure (the `flowSet`), both data structures require similar amounts of system memory (**Supplementary Figure 2**). Across all datasets, {tidytof} data structures require slightly more memory on average than their {flowCore} counterparts, with an average increase in `r average_increase`. 
+Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects) compared to {flowCore}'s native data structure (the `flowSet`), both data structures require similar amounts of system memory (**Supplementary Figure 2**). Across all datasets, {tidytof} data structures require slightly more memory on average than their {flowCore} counterparts, with an average increase of `r average_increase` across all datasets. 
 
 \
 

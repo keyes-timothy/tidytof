@@ -12,7 +12,7 @@ tof_cluster(tof_tibble, method, ..., add_col = TRUE)
 \item{method}{A string indicating which clustering methods should be used. Valid
 values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".}
 
-\item{...}{Additional arguments to pass onto the `tof_cluster_*`
+\item{...}{Additional arguments to pass to the `tof_cluster_*`
 function family member corresponding to the chosen method.}
 
 \item{add_col}{A boolean value indicating if the output should column-bind the

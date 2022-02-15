@@ -298,7 +298,7 @@ tof_cluster_kmeans <-
 #' Perform developmental clustering on CyTOF data.
 #'
 #' This function performs distance-based clustering on CyTOF data
-#' by sorting cancer cells (passed into the function as `tof_tibble`) with
+#' by sorting cancer cells (passed into the function as `tof_tibble`) into
 #' their most phenotypically similar healthy cell subpopulation (passed into the
 #' function using `healthy_tibble`). For details about
 #' the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
@@ -341,7 +341,7 @@ tof_cluster_kmeans <-
 #' printed during developmental classification. Default is FALSE.
 #'
 #' @return  If `return_distances = FALSE`, a tibble with one column named
-#' `{distance_function}_cluster`, a character vector of length `nrow(tof_tibble)`
+#' `.{distance_function}_cluster`, a character vector of length `nrow(tof_tibble)`
 #' indicating the id of the developmental cluster to which each cell
 #' (i.e. each row) in `tof_tibble` was assigned.
 #'
@@ -445,7 +445,7 @@ tof_cluster_ddpr <-
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
-#' @param ... Additional arguments to pass onto the `tof_cluster_*`
+#' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
 #'
 #' @param add_col A boolean value indicating if the output should column-bind the
