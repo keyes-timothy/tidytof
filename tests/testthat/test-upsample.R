@@ -1,6 +1,7 @@
 # libraries
 library(tidytof)
 library(dplyr)
+library(testthat)
 
 # set up
 reference_tibble <-
@@ -132,6 +133,7 @@ test_that("tof_upsample and tof_upsample_distance results are the same", {
       reference_cluster_col = my_cluster,
       upsample_cols = c(cd34, cd45, cd19),
       return_distances = TRUE,
+      add_col = FALSE,
       method = "distance"
     )
 
@@ -154,6 +156,7 @@ test_that("tof_upsample and tof_upsample_neighbor results are the same", {
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
       upsample_cols = c(cd34, cd45, cd19),
+      add_col = FALSE,
       method = "neighbor"
     )
 

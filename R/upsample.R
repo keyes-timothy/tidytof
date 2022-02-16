@@ -249,6 +249,8 @@ tof_upsample <-
         tof_upsample_distance(
           tof_tibble = tof_tibble,
           reference_tibble = reference_tibble,
+          reference_cluster_col = {{reference_cluster_col}},
+          upsample_cols = {{upsample_cols}},
           ...
         )
     } else if (method == "neighbor") {
@@ -256,6 +258,8 @@ tof_upsample <-
         tof_upsample_neighbor(
           tof_tibble = tof_tibble,
           reference_tibble = reference_tibble,
+          reference_cluster_col = {{reference_cluster_col}},
+          upsample_cols = {{upsample_cols}},
           ...
         )
     } else {
