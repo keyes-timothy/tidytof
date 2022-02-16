@@ -59,11 +59,11 @@ engine_labels <-
 
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
-run_io <- TRUE
-run_downsample <- TRUE
-run_preprocess <- TRUE
-run_tsne <- TRUE
-run_pca <- TRUE
+run_io <- FALSE
+run_downsample <- FALSE
+run_preprocess <- FALSE
+run_tsne <- FALSE
+run_pca <- FALSE
 run_umap <- FALSE
 run_cluster <- TRUE
 run_extract <- FALSE
