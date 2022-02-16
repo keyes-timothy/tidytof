@@ -59,6 +59,24 @@ read_data_flowcore <- function(file_names) {
   return(result)
 }
 
+# read_data_cytofkit -----------------------------------------------------------
+read_data_cytofkit <-
+  function(file_names) {
+    extension_type <- tools::file_ext(file_names[[1]])
+    if (extension_type == "csv") {
+      data_list <- lapply(X = file_names, read.csv)
+      output_data <- rbind(data_list)
+    } else {
+      output_data <- cytof_exprsMerge(file_names, mergeMethod="all")
+      l <- colnames(output_data)
+      channel_names  <- sub('.*\\<(.*)\\>.*', '\\1', l)
+      metal_names  <- sub('.*\\((.*)\\).*', '\\1', l)
+      new_names <- paste(channel_names, metal_names, sep = "_")
+      colnames(output_data) <- new_names
+    }
+    return(output_data)
+  }
+
 
 # downsampling -----------------------------------------------------------------
 
@@ -101,6 +119,18 @@ downsample_flowcore <-
     return(subsampled_flowset)
   }
 
+# cytofkit (not modular, so must be done by reading in files again)
+downsample_cytofkit <-
+  function(file_names) {
+    output_data <- cytof_exprsMerge(file_names, mergeMethod="ceil", fixedNum = 200)
+    l <- colnames(output_data)
+    channel_names  <- sub('.*\\<(.*)\\>.*', '\\1', l)
+    metal_names  <- sub('.*\\((.*)\\).*', '\\1', l)
+    new_names <- paste(channel_names, metal_names, sep = "_")
+    colnames(output_data) <- new_names
+    return(output_data)
+  }
+
 # preprocessing ----------------------------------------------------------------
 
 # tidytof
@@ -133,6 +163,23 @@ preprocess_flowcore <-
       transformList(colnames(flowset)[numeric_columns], asinh_transform)
     preprocessed_flowset <- transform(flowset, translist)
     return(preprocessed_flowset)
+  }
+
+# cytofkit
+preprocess_cytofkit <-
+  function(file_names) {
+    output_data <-
+      cytof_exprsMerge(
+        file_names,
+        mergeMethod = "all",
+        transformMethod = "cytofAsinh"
+      )
+    l <- colnames(output_data)
+    channel_names  <- sub('.*\\<(.*)\\>.*', '\\1', l)
+    metal_names  <- sub('.*\\((.*)\\).*', '\\1', l)
+    new_names <- paste(channel_names, metal_names, sep = "_")
+    colnames(output_data) <- new_names
+    return(output_data)
   }
 
 # dimensionality reduction -----------------------------------------------------
@@ -181,6 +228,16 @@ tsne_flowcore <-
     }
     result <- flowSet(flowframe_list)
     return(result)
+  }
+
+tsne_cytofkit <-
+  function(data_frame) {
+    dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
+    tsne_df <- data_frame[, dr_colnames]
+    tsne_embeddings <- cytof_dimReduction(data = tsne_df, method = "tsne")
+    final_result <-
+      data.frame(TSNE1 = tsne_embeddings[, 1], TSNE2 = tsne_embeddings[, 2])
+    return(final_result)
   }
 
 ### pca
@@ -235,6 +292,21 @@ pca_flowcore <-
     }
     result <- flowSet(flowframe_list)
     return(result)
+  }
+
+# cytofkit
+pca_cytofkit <-
+  function(data_frame) {
+    dr_colnames <- grepl(pattern = "^CD", x = colnames(data_frame))
+    pca_df <- data_frame[, dr_colnames]
+    column_variances <-
+      apply(X = pca_df, MARGIN = 2, FUN = function(x) length(unique(x)))
+    zv_columns <- as.logical(round(column_variances) == 1)
+    pca_df <- pca_df[, !zv_columns]
+    pca_embeddings <- cytof_dimReduction(data = pca_df, method = "pca")
+    final_result <-
+      data.frame(PC1 = pca_embeddings[, 1], PC2 = pca_embeddings[, 2])
+    return(final_result)
   }
 
 ### umap
@@ -337,6 +409,27 @@ flowsom_base <-
       )
     metacluster_labels <- metaclusters[flowsom_som$map$mapping[, 1]]
     clusters <- data.frame(.flowsom_metacluster = metacluster_labels)
+  }
+
+# cytofkit
+flowsom_cytofkit <-
+  function(file_names) {
+    data_frame <-
+      cytof_exprsMerge(
+        fcsFiles = file_names,
+        transformMethod = "cytofAsinh",
+        mergeMethod = "all"
+      )
+    cluster_colnames <- grepl(pattern = "CD", x = colnames(data_frame))
+    data_frame <- data_frame[, cluster_colnames]
+    cluster_FlowSOM <-
+      cytof_cluster(
+        xdata = data_frame,
+        method = "FlowSOM",
+        FlowSOM_k = 20
+      )
+    result <- data.frame(.flowsom_metacluster = as.character(cluster_FlowSOM))
+    return(result)
   }
 
 # feature extraction -----------------------------------------------------------

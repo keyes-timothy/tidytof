@@ -97,25 +97,8 @@ tof_cluster_flowsom <-
       dplyr::select({{cluster_cols}}) %>%
       colnames()
 
-    # build the flowsom object
-    fsom <-
-      list(
-        data =
-          tof_tibble %>%
-          select(all_of(clustering_markers)) %>%
-          data.matrix(),
-        compensate = FALSE,
-        spillover = NULL,
-        transform = FALSE,
-        scale = NULL,
-        prettyColnames = setNames(clustering_markers, clustering_markers)
-      )
-
-    class(fsom) <- "FlowSOM"
-
-    # build self-organizing map and extract cluster labels
+    # convert character distance function name to a number that SOM understands
     distf <-
-      # convert character distance function name to a number that BuildSOM understands
       switch(
         som_distance_function,
         manhattan = 1,
@@ -125,31 +108,31 @@ tof_cluster_flowsom <-
       )
 
     som <-
-      FlowSOM::BuildSOM(
-        fsom = fsom,
-        silent = TRUE,
-        xdim = som_xdim,
-        ydim = som_ydim,
-        distf = distf,
-        ...
+      suppressMessages(
+        FlowSOM::SOM(
+          data = as.matrix(tof_tibble[, clustering_markers]),
+          xdim = som_xdim,
+          ydim = som_ydim,
+          distf = distf,
+          ...
+        )
       )
 
-    # if no metaclustering, return flowSOM cluster labels
+    # if no metaclustering, return FlowSOM cluster labels
     if (!perform_metaclustering) {
-      flowsom_clusters <- som$map$mapping[, 1]
+      flowsom_clusters <- as.character(som$mapping[, 1])
       return(dplyr::tibble(.flowsom_cluster = flowsom_clusters))
 
     # otherwise, perform metaclustering
     } else {
-      flowsom_metacluster_object <-
-        FlowSOM::MetaClustering(
-          data = som$map$codes,
-          method = "metaClustering_consensus",
-          max = num_metaclusters
+      metacluster_result <-
+        FlowSOM::metaClustering_consensus(
+          data = som$codes,
+          k = num_metaclusters
         )
 
       flowsom_metaclusters <-
-        flowsom_metacluster_object[som$map$mapping[,1]] %>%
+        metacluster_result[som$mapping[, 1]] %>%
         as.integer() %>%
         as.character()
 

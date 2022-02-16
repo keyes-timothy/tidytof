@@ -26,10 +26,11 @@ knitr::opts_chunk$set(
 
 ```{r libraries_globals}
 # libraries
+library(cytofkit)
+library(flowCore)
 library(tidytof)
 library(tidyverse)
 library(microbenchmark)
-library(flowCore)
 library(patchwork)
 filter <- dplyr::filter
 count <- dplyr::count
@@ -39,25 +40,35 @@ source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
-machine <- "galaxia"
+machine <- "excalibur"
 num_repeats <- 10L
 charizard <- 
-  c("base" = "#207394", "tidytof" = "#cd5241", "flowcore" = "#eeb45a")
+  c(
+    "base" = "#207394", 
+    "tidytof" = "#cd5241", 
+    "flowcore" = "#eeb45a", 
+    "cytofkit" = "#833118"
+  )
 engine_labels <- 
-  c("base" = "base", "tidytof" = "tidytof", "flowcore" = "flowCore")
+  c(
+    "base" = "base", 
+    "tidytof" = "tidytof", 
+    "flowcore" = "flowCore", 
+    "cytofkit" = "cytofkit"
+  )
 
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
-run_io <- FALSE
-run_downsample <- FALSE
-run_preprocess <- FALSE
-run_tsne <- FALSE
-run_pca <- FALSE
+run_io <- TRUE
+run_downsample <- TRUE
+run_preprocess <- TRUE
+run_tsne <- TRUE
+run_pca <- TRUE
 run_umap <- FALSE
-run_cluster <- FALSE
+run_cluster <- TRUE
 run_extract <- FALSE
 run_memory <- FALSE
-run_style <- FALSE
+run_style <- TRUE
 verbose <- FALSE
 
 # should I print the large versions of each plot
@@ -97,7 +108,7 @@ benchmark_master(
   run_extract = run_extract,
   run_memory = run_memory,
   run_style = run_style,
-  num_repeats = 10L,
+  num_repeats = num_repeats,
   num_channels = 10,
   base_path = base_path, 
   verbose = verbose
@@ -881,16 +892,6 @@ lines_plot_raw <-
   code_tibble %>% 
   filter(measure == "lines") %>% 
   ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  # geom_line(
-  #   mapping = aes(group = analysis),
-  #   #data = filter(plot_tibble, engine == "tidytof"), 
-  #   size = 1.5, 
-  #   color = "gray60", 
-  #   arrow = arrow(length = unit(0.075, "inches"), type = "closed"), 
-  #   alpha = 0.9, 
-  #   data = filter(code_tibble, measure == "lines") %>% 
-  #     mutate(number = if_else(engine == "base", as.double(number), number + 4.5))
-  # ) +
   geom_line(aes(group = engine, color = engine)) + 
   geom_point(shape = 21, size = 3) + 
   theme_bw() + 
@@ -931,7 +932,7 @@ lines_plot_raw %>%
 # compared to whatever engine it's being compared to)
 plot_tibble_base <- 
   code_tibble %>% 
-  filter(engine != "flowcore") %>% 
+  filter(engine %in% c("tidytof", "base")) %>% 
   filter(measure == "lines") %>% 
   group_by(analysis) %>% 
   mutate(
@@ -1006,7 +1007,7 @@ if (print_large) {
 # compared to whatever engine it's being compared to)
 plot_tibble_flowcore <- 
   code_tibble %>% 
-  filter(engine != "base") %>% 
+  filter(engine %in% c("tidytof", "flowcore")) %>% 
   filter(measure == "lines") %>% 
   filter(!(analysis %in% c("clustering", "feature extraction"))) %>% 
   group_by(analysis) %>% 
@@ -1077,6 +1078,80 @@ if (print_large) {
 
 ```
 
+```{r}
+# tibble with reduction column (percent reduction in lines of code in tidytof
+# compared to whatever engine it's being compared to)
+plot_tibble_cytofkit <- 
+  code_tibble %>% 
+  filter(engine %in% c("tidytof", "cytofkit")) %>% 
+  filter(measure == "lines") %>% 
+  group_by(analysis) %>% 
+  mutate(
+    lines = number, 
+    number = number / max(number), 
+    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
+  ) %>% 
+  ungroup() %>% 
+  drop_na()
+
+lines_plot_cytofkit <- 
+  plot_tibble_cytofkit %>% 
+  ggplot(aes(x = analysis, y = number, fill = engine)) + 
+  geom_segment(
+    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    size = 1.5, 
+    color = "gray60", 
+    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
+    alpha = 0.9, 
+    linejoin = "mitre", 
+    lineend = "butt"
+  ) + 
+  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
+  geom_point(shape = 21, size = 4) + 
+  geom_text(
+    mapping = aes(label = reduction), 
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    nudge_x = 0, 
+    nudge_y = -0.12, 
+    size = 3
+  ) + 
+  geom_text(
+    aes(color = engine, label = paste0(lines, " lines")), 
+    data = filter(plot_tibble_cytofkit, engine == "cytofkit"), 
+    nudge_y = 0.06, 
+    show.legend = FALSE, 
+    size = 3
+  ) + 
+  geom_text(
+    aes(color = engine, label = paste0(lines, if_else(lines == 1, " line", " lines"))), 
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    nudge_y = -0.06, 
+    show.legend = FALSE, 
+    size = 3
+  ) + 
+  scale_x_discrete(
+    labels = 
+      function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
+  ) + 
+  scale_y_continuous(labels = scales::label_percent()) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
+  ) + 
+  labs(
+    x = NULL, 
+    y = "Lines of code (% of cytofkit)", 
+    fill = NULL, 
+    color = NULL
+  )
+
+if (print_large) {
+  lines_plot_cytofkit
+}
+```
 
 
 
@@ -1098,6 +1173,15 @@ lines_plot_flowcore %>%
     width = 6, 
     height = 4
   )
+
+lines_plot_cytofkit %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "lines_plot_cytofkit.pdf"), 
+    device = "pdf", 
+    width = 6, 
+    height = 4
+  )
 ```
 
 ```{r analyze_raw_variables, message = FALSE, warning = FALSE}
@@ -1105,16 +1189,6 @@ variables_plot_raw <-
   code_tibble %>% 
   filter(measure == "variables") %>% 
   ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  # geom_line(
-  #   mapping = aes(group = analysis),
-  #   #data = filter(plot_tibble, engine == "tidytof"), 
-  #   size = 1, 
-  #   color = "gray60", 
-  #   arrow = arrow(length = unit(0.075, "inches"), type = "closed"), 
-  #   alpha = 0.9, 
-  #   data = filter(code_tibble, measure == "variables") %>% 
-  #     mutate(number = if_else(engine == "base", as.double(number), number + 1.5))
-  # ) +
   geom_line(aes(group = engine, color = engine)) + 
   geom_point(shape = 21, size = 3) + 
   theme_bw() + 
@@ -1154,7 +1228,7 @@ variables_plot_raw %>%
 # compared to whatever engine it's being compared to)
 plot_tibble_base <- 
   code_tibble %>% 
-  filter(engine != "flowcore") %>% 
+  filter(engine %in% c("tidytof", "base")) %>% 
   filter(measure == "variables") %>% 
   group_by(analysis) %>% 
   mutate(
@@ -1229,7 +1303,7 @@ if (print_large) {
 # compared to whatever engine it's being compared to)
 plot_tibble_flowcore <- 
   code_tibble %>% 
-  filter(engine != "base") %>% 
+  filter(engine %in% c("tidytof", "flowcore")) %>% 
   filter(measure == "variables") %>% 
   filter(!(analysis %in% c("clustering", "feature extraction"))) %>% 
   group_by(analysis) %>% 
@@ -1300,6 +1374,81 @@ if (print_large) {
 ```
 
 
+```{r analyze_relative_variables_cytofkit}
+# tibble with reduction column (percent reduction in variable assignments in tidytof
+# compared to whatever engine it's being compared to)
+plot_tibble_cytofkit <- 
+  code_tibble %>% 
+  filter(engine %in% c("tidytof", "cytofkit")) %>% 
+  filter(measure == "variables") %>% 
+  group_by(analysis) %>% 
+  mutate(
+    lines = number, 
+    number = number / max(number), 
+    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
+  ) %>% 
+  ungroup() %>% 
+  drop_na()
+
+variables_plot_cytofkit <- 
+  plot_tibble_cytofkit %>% 
+  ggplot(aes(x = analysis, y = number, fill = engine)) + 
+  geom_segment(
+    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    size = 1.5, 
+    color = "gray60", 
+    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
+    alpha = 0.9, 
+    linejoin = "mitre", 
+    lineend = "butt"
+  ) + 
+  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
+  geom_point(shape = 21, size = 4) + 
+  geom_text(
+    mapping = aes(label = reduction), 
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    nudge_x = 0, 
+    nudge_y = -0.12, 
+    size = 3
+  ) + 
+  geom_text(
+    aes(color = engine, label = paste0(lines, " vars")), 
+    data = filter(plot_tibble_cytofkit, engine == "cytofkit"), 
+    nudge_y = 0.06, 
+    show.legend = FALSE, 
+    size = 3
+  ) + 
+  geom_text(
+    aes(color = engine, label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
+    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
+    nudge_y = -0.06, 
+    show.legend = FALSE, 
+    size = 3
+  ) + 
+  scale_x_discrete(
+    labels = 
+      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
+  ) + 
+  scale_y_continuous(labels = scales::label_percent()) + 
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
+  ) + 
+  labs(
+    x = NULL, 
+    y = "Assigned variables (% of cytofkit)", 
+    fill = NULL, 
+    color = NULL
+  )
+
+if (print_large) {
+  variables_plot_cytofkit
+}
+
+```
 
 
 ```{r save_relative_variables_plots}
@@ -1316,6 +1465,15 @@ variables_plot_flowcore %>%
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "variables_plot_flowcore.pdf"), 
+    device = "pdf", 
+    width = 6.5, 
+    height = 5
+  )
+
+variables_plot_cytofkit %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "variables_plot_cytofkit.pdf"), 
     device = "pdf", 
     width = 6.5, 
     height = 5

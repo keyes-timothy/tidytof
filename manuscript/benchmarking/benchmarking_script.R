@@ -182,6 +182,7 @@ benchmark_master <-
             read_data_tidytof(file_names = file_paths),
             read_data_base(file_names = file_paths),
             read_data_flowcore(file_names = file_paths),
+            read_data_cytofkit(file_names = file_paths),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -191,6 +192,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -250,11 +252,12 @@ benchmark_master <-
       if (verbose) {print("benchmark downsampling")}
       ### Benchmarking function
       benchmark_downsample <-
-        function(data_frame, flowset) {
+        function(data_frame, flowset, file_names) {
           microbenchmark(
             downsample_tidytof(data_frame),
             downsample_base(data_frame),
             downsample_flowcore(flowset),
+            downsample_cytofkit(file_names),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -264,6 +267,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -279,9 +283,8 @@ benchmark_master <-
         ddpr_data_mini %>%
         mutate(
           downsample_benchmarks =
-            map2(
-              .x = tibbles,
-              .y = flowSets,
+            pmap(
+              .l = list(tibbles, flowSets, file_paths),
               .f = benchmark_downsample
             )
         ) %>%
@@ -297,11 +300,12 @@ benchmark_master <-
       if (verbose) {print("benchmark preprocessing")}
 
       benchmark_preprocess <-
-        function(data_frame, flowset) {
+        function(data_frame, flowset, file_names) {
           microbenchmark(
             preprocess_tidytof(data_frame),
             preprocess_base(data_frame),
             preprocess_flowcore(flowset),
+            preprocess_cytofkit(file_names),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -311,6 +315,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -325,7 +330,13 @@ benchmark_master <-
       ### Perform benchmarking
       preprocess_benchmarking <-
         ddpr_data_mini %>%
-        mutate(preprocess_benchmarks = map2(.x = tibbles, .y = flowSets, .f = benchmark_preprocess)) %>%
+        mutate(
+          preprocess_benchmarks =
+            pmap(
+              .l = list(tibbles, flowSets, file_paths),
+              .f = benchmark_preprocess
+            )
+          ) %>%
         select(-tibbles, -flowSets)
 
       # save benchmarking output as an .rds
@@ -435,6 +446,7 @@ benchmark_master <-
             tsne_tidytof(data_frame),
             tsne_base(data_frame),
             tsne_flowcore(flowset),
+            tsne_cytofkit(data_frame),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -444,6 +456,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -458,10 +471,12 @@ benchmark_master <-
       ### Perform benchmarking
       tsne_benchmark <-
         tsne_tibbles %>%
+        #slice_head(n = 5) %>%
         mutate(
-          tsne_benchmarks = map2(.x = data_frames, .y = tsne_flowSets, .f = benchmark_tsne)
+          tsne_benchmarks =
+            map2(.x = data_frames, .y = tsne_flowSets, .f = benchmark_tsne)
         ) %>%
-        select(-data_frames, - tsne_flowSets) %>%
+        select(-data_frames, -tsne_flowSets) %>%
         rename(num_cells = sample_cells)
 
       # save benchmarking output as an .rds
@@ -480,6 +495,7 @@ benchmark_master <-
             pca_tidytof(data_frame),
             pca_base(data_frame),
             pca_flowcore(flowset),
+            pca_cytofkit(data_frame),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -489,6 +505,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -533,6 +550,7 @@ benchmark_master <-
                 case_when(
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -568,12 +586,19 @@ benchmark_master <-
           microbenchmark(
             flowsom_tidytof(file_names = file_paths),
             flowsom_base(file_names = file_paths),
+            flowsom_cytofkit(file_names = file_paths),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
             as_tibble() %>%
             transmute(
-              engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"),
+              engine =
+                case_when(
+                  str_detect(expr, "tidytof")  ~ "tidytof",
+                  str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
+                  TRUE                         ~ "base"
+                ),
               time = time / (10^9)
             )
         }
@@ -586,7 +611,10 @@ benchmark_master <-
       ### perform benchmarking
       cluster_benchmarking <-
         ddpr_datasets_mini %>%
-        mutate(cluster_benchmarks = map(.x = file_paths, .f = benchmark_clustering))
+        #slice_head(n = 5L) %>%
+        mutate(
+          cluster_benchmarks = map(.x = file_paths, .f = benchmark_clustering)
+        )
 
       # save result as an .rds file
       cluster_benchmarking %>%
@@ -670,6 +698,9 @@ benchmark_master <-
       flowcore_functions <-
         mget(x = paste0(prefixes, "_flowcore"), ifnotfound = NA, envir = globalenv())
 
+      cytofkit_functions <-
+        mget(x = paste0(prefixes, "_cytofkit"), ifnotfound = NA, envir = globalenv())
+
       # make tibble
       code_tibble <-
         tibble(
@@ -677,9 +708,11 @@ benchmark_master <-
           base_lines = map_int(.x = base_functions, .f = get_lines),
           tidytof_lines = map_int(.x = tidytof_functions, .f = get_lines),
           flowcore_lines = map_int(.x = flowcore_functions, .f = get_lines),
+          cytofkit_lines = map_int(.x = cytofkit_functions, .f = get_lines),
           base_variables = map_int(.x = base_functions, .f = get_assignments),
           tidytof_variables = map_int(.x = tidytof_functions, .f = get_assignments),
-          flowcore_variables = map_int(.x = flowcore_functions, .f = get_assignments)
+          flowcore_variables = map_int(.x = flowcore_functions, .f = get_assignments),
+          cytofkit_variables = map_int(.x = cytofkit_functions, .f = get_assignments)
         ) %>%
         pivot_longer(
           cols = -analysis,

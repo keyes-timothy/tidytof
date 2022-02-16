@@ -22,9 +22,20 @@ test_that("flowsom result is a tibble with a single character vector column of c
     clust_data %>%
     tof_cluster_flowsom(cluster_cols = c(cd34, cd45, cd123, cd11b))
 
+  flowsom_2 <-
+    clust_data %>%
+    tof_cluster_flowsom(
+      cluster_cols = c(cd34, cd45, cd123, cd11b),
+      perform_metaclustering = FALSE
+    )
+
   expect_equal(nrow(clust_data), nrow(flowsom))
   expect_true(is.character(flowsom$.flowsom_metacluster))
   expect_equal(ncol(flowsom), 1L)
+
+  expect_equal(nrow(clust_data), nrow(flowsom_2))
+  expect_true(is.character(flowsom_2$.flowsom_cluster))
+  expect_equal(ncol(flowsom_2), 1L)
 
   })
 
