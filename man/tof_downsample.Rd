@@ -7,8 +7,8 @@
 tof_downsample(
   tof_tibble,
   group_cols = NULL,
-  method = c("constant", "prop", "density"),
-  ...
+  ...,
+  method = c("constant", "prop", "density")
 )
 }
 \arguments{
@@ -18,11 +18,11 @@ tof_downsample(
 be used to define groups within which the downsampling will be performed.
 Supports tidyselect helpers. Defaults to `NULL` (no grouping).}
 
-\item{method}{A string indicating which downsampling method to use: "constant"
-(the default), "prop", or "density".}
-
 \item{...}{Additional arguments to pass to the `tof_downsample_*` function
 family member corresponding to the chosen method.}
+
+\item{method}{A string indicating which downsampling method to use: "constant"
+(the default), "prop", or "density".}
 }
 \value{
 A downsampled `tof_tbl` with the same number of columns as the input

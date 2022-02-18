@@ -307,8 +307,10 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #' @importFrom purrr map
 #' @importFrom purrr map2
 #' @importFrom purrr pluck
+#'
 #' @importFrom tidyr nest
 #' @importFrom tidyr unnest
+#'
 #' @importFrom stringr str_remove_all
 #'
 tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble()) {

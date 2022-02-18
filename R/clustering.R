@@ -433,9 +433,6 @@ tof_cluster_ddpr <-
 #' should be used to group cells before clustering. Clustering is then performed
 #' on each group independently.
 #'
-#' @param method A string indicating which clustering methods should be used. Valid
-#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
-#'
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
 #'
@@ -447,6 +444,9 @@ tof_cluster_ddpr <-
 #' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
+#'
+#' @param method A string indicating which clustering methods should be used. Valid
+#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
 #' @family clustering functions
 #'

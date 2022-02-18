@@ -249,11 +249,12 @@ tof_downsample_density <-
 #' be used to define groups within which the downsampling will be performed.
 #' Supports tidyselect helpers. Defaults to `NULL` (no grouping).
 #'
-#' @param method A string indicating which downsampling method to use: "constant"
-#' (the default), "prop", or "density".
 #'
 #' @param ... Additional arguments to pass to the `tof_downsample_*` function
 #' family member corresponding to the chosen method.
+#'
+#' @param method A string indicating which downsampling method to use: "constant"
+#' (the default), "prop", or "density".
 #'
 #' @return A downsampled `tof_tbl` with the same number of columns as the input
 #' `tof_tibble`, but fewer rows. The number of rows in the result will depend
@@ -269,8 +270,8 @@ tof_downsample <-
   function(
     tof_tibble,
     group_cols = NULL,
-    method = c("constant", "prop", "density"),
-    ...
+    ...,
+    method = c("constant", "prop", "density")
   ) {
 
     # check method argument

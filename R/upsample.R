@@ -244,6 +244,9 @@ tof_upsample <-
     add_col = TRUE,
     method = c("distance", "neighbor")
   ) {
+
+    method <- rlang::arg_match(arg = method, values = c("distance", "neighbor"))
+
     if (method == "distance") {
       result <-
         tof_upsample_distance(
