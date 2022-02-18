@@ -6,25 +6,25 @@
 \usage{
 tof_reduce_dimensions(
   tof_tibble,
-  method = c("pca", "tsne", "umap"),
+  ...,
   add_cols = TRUE,
-  ...
+  method = c("pca", "tsne", "umap")
 )
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or `tibble`.}
 
-\item{method}{A method of dimensionality reduction. Currently, PCA, tSNE, and
-UMAP embedding are supported.}
+\item{...}{Arguments to be passed to the tof_reduce_* function corresponding to
+the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
+\code{\link{tof_reduce_umap}}.}
 
 \item{add_cols}{A boolean value indicating if the output should column-bind the
 dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
 (TRUE, the default) or if a tibble including only the low-dimensionality
 embeddings should be returned (FALSE).}
 
-\item{...}{Arguments to be passed to the tof_reduce_* function corresponding to
-the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
-\code{\link{tof_reduce_umap}}.}
+\item{method}{A method of dimensionality reduction. Currently, PCA, tSNE, and
+UMAP embedding are supported.}
 }
 \value{
 A tibble with the same number of rows as `tof_tibble`, each representing

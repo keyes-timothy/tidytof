@@ -42,7 +42,6 @@
 #'
 #' @export
 #'
-#'
 #' @importFrom recipes recipe
 #' @importFrom recipes all_numeric
 #' @importFrom recipes prep
@@ -80,7 +79,7 @@ tof_reduce_pca <-
       result <-
         pca_recipe %>%
         recipes::juice() %>%
-        dplyr::rename_with(.fn = ~ paste0(".", .x))
+        dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
       return(result)
     }
   }
@@ -274,7 +273,7 @@ tof_reduce_umap <-
       result <-
         umap_recipe %>%
         recipes::juice() %>%
-        dplyr::rename_with(.fn = ~ paste0(".", .x))
+        dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
       return(result)
     }
 
@@ -292,17 +291,17 @@ tof_reduce_umap <-
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
-#' @param method A method of dimensionality reduction. Currently, PCA, tSNE, and
-#' UMAP embedding are supported.
+#' @param ... Arguments to be passed to the tof_reduce_* function corresponding to
+#' the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
+#' \code{\link{tof_reduce_umap}}.
 #'
 #' @param add_cols A boolean value indicating if the output should column-bind the
 #' dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
 #' (TRUE, the default) or if a tibble including only the low-dimensionality
 #' embeddings should be returned (FALSE).
 #'
-#' @param ... Arguments to be passed to the tof_reduce_* function corresponding to
-#' the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
-#' \code{\link{tof_reduce_umap}}.
+#' @param method A method of dimensionality reduction. Currently, PCA, tSNE, and
+#' UMAP embedding are supported.
 #'
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
@@ -310,13 +309,21 @@ tof_reduce_umap <-
 #'
 #' @family dimensionality reduction functions
 #'
+#' @importFrom dplyr bind_cols
+#'
 #' @export
 #'
 #'
-tof_reduce_dimensions <- function(tof_tibble, method = c("pca", "tsne", "umap"), add_cols = TRUE, ...) {
+tof_reduce_dimensions <-
+  function(
+    tof_tibble,
+    ...,
+    add_cols = TRUE,
+    method = c("pca", "tsne", "umap")
+  ) {
 
   # check validity of method
-  method <- match.arg(method, choices = c("pca", "tsne", "umap"))
+  method <- rlang::arg_match(arg = method)
 
   if (method == "pca") {
     result <- tof_reduce_pca(tof_tibble, ...)
@@ -330,7 +337,7 @@ tof_reduce_dimensions <- function(tof_tibble, method = c("pca", "tsne", "umap"),
 
   if (add_cols == TRUE) {
     result <-
-      bind_cols(tof_tibble, result)
+      dplyr::bind_cols(tof_tibble, result)
   }
 
   return(result)

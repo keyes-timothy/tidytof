@@ -532,12 +532,15 @@ tof_write_csv <-
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidyr unite
+#'
 #' @importFrom tidyselect everything
+#'
 #' @importFrom stringr str_c
 #' @importFrom stringr str_replace
-#' @importFrom Biobase AnnotatedDataFrame
+#'
 #' @importFrom flowCore flowFrame
 #' @importFrom flowCore write.FCS
+#'
 #' @importFrom purrr walk2
 #'
 tof_write_fcs <-
@@ -577,7 +580,8 @@ tof_write_fcs <-
         dplyr::summarize(
           dplyr::across(
             -{{group_cols}},
-            .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+            .fns =
+              list(max = ~ max(.x, na.rm = TRUE), min = ~min(.x, na.rm = TRUE)),
             # use the many underscores because it's unlikely this will come up
             # in column names on their own
             .names = "{.col}_____{.fn}"
@@ -612,25 +616,6 @@ tof_write_fcs <-
 
     # extract the names of all non-grouping columns to be saved to the .fcs file
     data_cols <- maxes_and_mins$antigen
-
-    # # nest tof_tibble
-    # tof_tibble <-
-    #   suppressWarnings(
-    #     tof_tibble %>%
-    #       dplyr::group_by(dplyr::across({{group_cols}})) %>%
-    #       tidyr::nest() %>%
-    #       dplyr::ungroup()
-    #   )
-    #
-    # if (!is.null(group_cols)) {
-    #   tof_tibble <-
-    #     tof_tibble %>%
-    #     tidyr::unite(col = "prefix", -data, sep = sep)
-    # } else {
-    #   tof_tibble <-
-    #     tof_tibble %>%
-    #     dplyr::mutate(prefix = file_name)
-    # }
 
     # nest cells using group_cols if they are provided, otherwise nest
     # all cells into a single tof_tibble
@@ -684,7 +669,7 @@ tof_write_fcs <-
 
     # make the AnnotatedDataFrame
     parameters <-
-      Biobase::AnnotatedDataFrame(data = fcs_data, varMetadata = fcs_varMetadata)
+      new("AnnotatedDataFrame", data = fcs_data, varMetadata = fcs_varMetadata)
 
     # make flowFrames for each row of tof_tibble
     tof_tibble <-
@@ -733,9 +718,9 @@ tof_write_fcs <-
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param group_cols Unquoted names of the columns in `tof_tibble` that should
+#' @param group_cols Optional. Unquoted names of the columns in `tof_tibble` that should
 #' be used to group cells into separate files. Supports tidyselect helpers. Defaults to
-#' NULL (all cells are written into a single file).
+#' no grouping (all cells are written into a single file).
 #'
 #' @param out_path Path to the directory where output files should be saved.
 #'
@@ -745,7 +730,7 @@ tof_write_fcs <-
 #' to create the output .csv/.fcs file names. Defaults to "_".
 #'
 #' @param file_name If `group_cols` isn't specified, the name (without an extension)
-#' that should be used for the saved .csv file.
+#' that should be used for the saved file.
 #'
 #' @return This function does not explicitly return any values. Instead,
 #' it writes .csv and/or .fcs files to the specified `out_path`.

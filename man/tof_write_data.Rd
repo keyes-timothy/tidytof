@@ -16,9 +16,9 @@ tof_write_data(
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{group_cols}{Unquoted names of the columns in `tof_tibble` that should
+\item{group_cols}{Optional. Unquoted names of the columns in `tof_tibble` that should
 be used to group cells into separate files. Supports tidyselect helpers. Defaults to
-NULL (all cells are written into a single file).}
+no grouping (all cells are written into a single file).}
 
 \item{out_path}{Path to the directory where output files should be saved.}
 
@@ -28,7 +28,7 @@ NULL (all cells are written into a single file).}
 to create the output .csv/.fcs file names. Defaults to "_".}
 
 \item{file_name}{If `group_cols` isn't specified, the name (without an extension)
-that should be used for the saved .csv file.}
+that should be used for the saved file.}
 }
 \value{
 This function does not explicitly return any values. Instead,
