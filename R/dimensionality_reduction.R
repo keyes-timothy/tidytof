@@ -27,6 +27,13 @@
 #' @param scale A boolean value indicating if each column should be scaled to
 #' standard deviation = 1 before PCA analysis. Defaults to TRUE.
 #'
+#' @param return_recipe. A boolean value indicating if instead of the UMAP result, a
+#' prepped \code{\link[recipes]{recipe}} object containing the
+#' PCA embedding should be
+#' returned. Set this option to TRUE if you want to create the PCA embedding using
+#' one dataset but also want to project new observations onto the same embedding
+#' space later.
+#'
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
 #' a single cell. Each of the `num_comp` columns represents each cell's embedding
 #' in the calculated principal component space.
@@ -50,10 +57,12 @@ tof_reduce_pca <-
     num_comp = 5,
     threshold = NA,
     center = TRUE,
-    scale = TRUE
+    scale = TRUE,
+    return_recipe = FALSE
   ) {
 
-    recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) %>%
+    pca_recipe <-
+      recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) %>%
       # remove any variables that have 0 variance
       recipes::step_zv(recipes::all_numeric()) %>%
       recipes::step_pca(
@@ -62,9 +71,18 @@ tof_reduce_pca <-
         threshold = threshold,
         options = list(center = center, scale. = scale)
       ) %>%
-      recipes::prep() %>%
-      recipes::juice() %>%
-      dplyr::rename_with(.fn = ~ paste0(".", .x))
+      recipes::prep()
+
+    if (return_recipe) {
+      return(pca_recipe)
+
+    } else {
+      result <-
+        pca_recipe %>%
+        recipes::juice() %>%
+        dplyr::rename_with(.fn = ~ paste0(".", .x))
+      return(result)
+    }
   }
 
 
@@ -190,6 +208,13 @@ tof_reduce_tsne <-
 #' @param n_threads Number of threads to use during UMAP calculation. Defaults
 #' to 1.
 #'
+#' @param return_recipe. A boolean value indicating if instead of the UMAP result, a
+#' prepped \code{\link[recipes]{recipe}} object
+#' containing the UMAP embedding should be
+#' returned. Set this option to TRUE if you want to create the UMAP embedding using
+#' one dataset but also want to project new observations onto the same embedding
+#' space later.
+#'
 #' @param ... Optional. Other options to be passed as arguments to \code{\link[uwot]{umap}}.
 #'
 #' @return A tibble with the same number of rows as `tof_tibble`, each representing
@@ -200,6 +225,12 @@ tof_reduce_tsne <-
 #'
 #' @export
 #'
+#' @importFrom recipes recipe
+#' @importFrom recipes prep
+#' @importFrom recipes juice
+#' @importFrom recipes all_numeric
+#'
+#' @importFrom dplyr rename_with
 #'
 #' @importFrom embed step_umap
 #'
@@ -215,11 +246,13 @@ tof_reduce_umap <-
     epochs = NULL,
     verbose = FALSE,
     n_threads = 1,
+    return_recipe = FALSE,
     ...
   ) {
 
     suppressWarnings(
-      recipes::recipe(~ ., data = select(tof_tibble, {{umap_cols}})) %>%
+      umap_recipe <-
+        recipes::recipe(~ ., data = select(tof_tibble, {{umap_cols}})) %>%
         # remove any variables that have 0 variance
         recipes::step_zv(recipes::all_numeric()) %>%
         embed::step_umap(
@@ -231,10 +264,20 @@ tof_reduce_umap <-
           epochs = epochs,
           options = list(verbose = verbose, n_threads = n_threads, ...)
         ) %>%
-        recipes::prep() %>%
+        recipes::prep()
+    )
+
+    if (return_recipe) {
+      return(umap_recipe)
+
+    } else {
+      result <-
+        umap_recipe %>%
         recipes::juice() %>%
         dplyr::rename_with(.fn = ~ paste0(".", .x))
-    )
+      return(result)
+    }
+
   }
 
 

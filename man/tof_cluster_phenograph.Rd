@@ -33,7 +33,8 @@ for the nearest-neighbor calculation. Options include "euclidean"
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
 
-\item{...}{Optional additional parameters that can be passed to \code{\link{tof_find_knn}}.}
+\item{...}{Optional additional parameters that can be passed to
+\code{\link{tof_find_knn}}.}
 }
 \value{
 A tibble with one column named `.phenograph_cluster`. This column will contain an

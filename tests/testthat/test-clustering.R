@@ -1,10 +1,10 @@
+library(FlowSOM)
 library(dplyr)
 library(purrr)
 library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
-library(FlowSOM)
 
 # setup
 clust_data <-
@@ -75,6 +75,13 @@ test_that("phenograph result is a tibble with a single character vector column o
   expect_equal(ncol(phenograph), 1L)
 })
 
+test_that("phenograph result columns are named correctly", {
+  phenograph <-
+    clust_data %>%
+    tof_cluster_phenograph(cluster_cols = c(cd34, cd45, cd123, cd11b))
+
+  expect_equal(colnames(phenograph), ".phenograph_cluster")
+})
 
 # tof_cluster_kmeans -----------------------------------------------------------
 
@@ -120,6 +127,7 @@ test_that("ddpr result is a tibble with a single character vector column of corr
     dplyr::filter(str_detect(sample_name, "Healthy")) %>%
     dplyr::mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
+  # in series
   ddpr <-
     ddpr_data %>%
     tof_cluster_ddpr(
@@ -128,9 +136,23 @@ test_that("ddpr result is a tibble with a single character vector column of corr
       cluster_cols = c(cd34, cd45, cd19)
     )
 
+  # in parallel
+  ddpr_2 <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      parallel_cols = sample_name
+    )
+
   expect_equal(nrow(ddpr_data), nrow(ddpr))
   expect_true(is.character(ddpr$.mahalanobis_cluster))
   expect_equal(ncol(ddpr), 1L)
+
+  expect_equal(nrow(ddpr_data), nrow(ddpr_2))
+  expect_true(is.character(ddpr_2$.mahalanobis_cluster))
+  expect_equal(ncol(ddpr_2), 1L)
 
 })
 
@@ -140,6 +162,7 @@ test_that("return_distances argument works", {
     filter(str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
+  # in series
   ddpr <-
     ddpr_data %>%
     tof_cluster_ddpr(
@@ -149,11 +172,23 @@ test_that("return_distances argument works", {
       return_distances = TRUE
     )
 
+  # in parallel
+  ddpr_2 <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      parallel_cols = sample_name,
+      return_distances = TRUE
+    )
+
   expect_equal(ncol(ddpr), 3L)
+  expect_equal(ncol(ddpr_2), 3L)
 
 })
 
-test_that("output columns are named correctly", {
+test_that("output columns are named correctly in series", {
   healthy <-
     ddpr_data %>%
     filter(str_detect(sample_name, "Healthy")) %>%
@@ -165,6 +200,15 @@ test_that("output columns are named correctly", {
       healthy_tibble = healthy,
       healthy_label_col = cluster,
       cluster_cols = c(cd34, cd45, cd19)
+    )
+
+  ddpr_1b <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      return_distances = TRUE
     )
 
   ddpr_2 <-
@@ -186,6 +230,59 @@ test_that("output columns are named correctly", {
     )
 
   expect_true(str_detect(colnames(ddpr_1), "\\.mahalanobis"))
+  expect_true(all(str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
+  expect_true(str_detect(colnames(ddpr_2), "\\.cosine"))
+  expect_true(str_detect(colnames(ddpr_3), "\\.pearson"))
+
+})
+
+test_that("output columns are named correctly in parallel", {
+  healthy <-
+    ddpr_data %>%
+    filter(str_detect(sample_name, "Healthy")) %>%
+    mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
+
+  ddpr_1 <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      parallel_cols = sample_name
+    )
+
+  ddpr_1b <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      parallel_cols = sample_name,
+      return_distances = TRUE
+    )
+
+  ddpr_2 <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      distance_function = "cosine",
+      parallel_cols = sample_name
+    )
+
+  ddpr_3 <-
+    ddpr_data %>%
+    tof_cluster_ddpr(
+      healthy_tibble = healthy,
+      healthy_label_col = cluster,
+      cluster_cols = c(cd34, cd45, cd19),
+      distance_function = "pearson",
+      parallel_cols = sample_name
+    )
+
+  expect_true(str_detect(colnames(ddpr_1), "\\.mahalanobis"))
+  expect_true(all(str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
   expect_true(str_detect(colnames(ddpr_2), "\\.cosine"))
   expect_true(str_detect(colnames(ddpr_3), "\\.pearson"))
 
@@ -195,9 +292,138 @@ test_that("output columns are named correctly", {
 # tof_cluster_xshift -----------------------------------------------------------
 
 
+# tof_cluster_tibble -----------------------------------------------------------
+
+test_that("clustering output is identical for all methods", {
+  healthy <-
+    ddpr_data %>%
+    filter(str_detect(sample_name, "Healthy")) %>%
+    mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
+
+  expect_equal(
+    tof_cluster_flowsom(clust_data, seed = 20, perform_metaclustering = FALSE),
+    tof_cluster_tibble(clust_data, method = "flowsom", add_col = FALSE, seed = 20, perform_metacluster = FALSE)
+  )
+
+  expect_equal(
+    tof_cluster_kmeans(clust_data, seed = 20),
+    tof_cluster_tibble(clust_data, method = "kmeans", add_col = FALSE, seed = 20)
+  )
+
+  expect_equal(
+    tof_cluster_phenograph(clust_data),
+    tof_cluster_tibble(clust_data, method = "phenograph", add_col = FALSE, seed = 20)
+  )
+
+  expect_equal(
+    tof_cluster_ddpr(
+      ddpr_data,
+      healthy_tibble = healthy,
+      healthy_label_col = cluster
+    ),
+    tof_cluster_tibble(
+      ddpr_data,
+      method = "ddpr",
+      add_col = FALSE,
+      healthy_tibble = healthy,
+      healthy_label_col = cluster
+    )
+  )
+})
+
+
+# tof_cluster_grouped ----------------------------------------------------------
+
+test_that("result has the correct number of columns", {
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      method = "phenograph"
+    ) %>%
+      ncol(),
+    ncol(clust_data) + 1
+  )
+
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      add_col = FALSE,
+      method = "phenograph"
+    ) %>%
+      ncol(),
+    1
+  )
+})
+
+test_that("result has the correct number of rows", {
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      num_clusters = 3,
+      method = "kmeans"
+    ) %>%
+      nrow(),
+    nrow(clust_data)
+  )
+
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      add_col = FALSE,
+      method = "phenograph"
+    ) %>%
+      nrow(),
+    nrow(clust_data)
+  )
+})
+
+test_that("result has the correct number unique cluster ids", {
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      num_clusters = 3,
+      method = "kmeans"
+    ) %>%
+      distinct(.kmeans_cluster) %>%
+      nrow(),
+    3 * nrow(distinct(clust_data, sample_name))
+  )
+
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      num_clusters = 5,
+      method = "kmeans"
+    ) %>%
+      distinct(.kmeans_cluster) %>%
+      nrow(),
+    5 * nrow(distinct(clust_data, sample_name))
+  )
+
+  expect_equal(
+    tof_cluster_grouped(
+      tof_tibble = clust_data,
+      group_cols = sample_name,
+      num_clusters = 5,
+      method = "kmeans"
+    ) %>%
+      distinct(.kmeans_cluster) %>%
+      nrow(),
+    5 * nrow(distinct(clust_data, sample_name))
+  )
+
+})
+
+
+
 
 # tof_cluster ------------------------------------------------------------------
-
 test_that("clustering output is identical for all methods", {
   healthy <-
     ddpr_data %>%
@@ -234,5 +460,6 @@ test_that("clustering output is identical for all methods", {
     )
   )
 })
+
 
 

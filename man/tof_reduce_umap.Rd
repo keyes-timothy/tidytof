@@ -14,6 +14,7 @@ tof_reduce_umap(
   epochs = NULL,
   verbose = FALSE,
   n_threads = 1,
+  return_recipe = FALSE,
   ...
 )
 }
@@ -44,6 +45,13 @@ console. Defaults to FALSE.}
 to 1.}
 
 \item{...}{Optional. Other options to be passed as arguments to \code{\link[uwot]{umap}}.}
+
+\item{return_recipe.}{A boolean value indicating if instead of the UMAP result, a
+prepped \code{\link[recipes]{recipe}} object
+containing the UMAP embedding should be
+returned. Set this option to TRUE if you want to create the UMAP embedding using
+one dataset but also want to project new observations onto the same embedding
+space later.}
 }
 \value{
 A tibble with the same number of rows as `tof_tibble`, each representing

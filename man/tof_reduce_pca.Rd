@@ -10,7 +10,8 @@ tof_reduce_pca(
   num_comp = 5,
   threshold = NA,
   center = TRUE,
-  scale = TRUE
+  scale = TRUE,
+  return_recipe = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,13 @@ mean 0 before PCA analysis. Defaults to TRUE.}
 
 \item{scale}{A boolean value indicating if each column should be scaled to
 standard deviation = 1 before PCA analysis. Defaults to TRUE.}
+
+\item{return_recipe.}{A boolean value indicating if instead of the UMAP result, a
+prepped \code{\link[recipes]{recipe}} object containing the
+PCA embedding should be
+returned. Set this option to TRUE if you want to create the PCA embedding using
+one dataset but also want to project new observations onto the same embedding
+space later.}
 }
 \value{
 A tibble with the same number of rows as `tof_tibble`, each representing

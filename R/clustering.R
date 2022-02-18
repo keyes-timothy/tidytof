@@ -171,7 +171,8 @@ tof_cluster_flowsom <-
 #' Defaults to a random integer
 #'
 #'
-#' @param ... Optional additional parameters that can be passed to \code{\link{tof_find_knn}}.
+#' @param ... Optional additional parameters that can be passed to
+#' \code{\link{tof_find_knn}}.
 #'
 #' @return A tibble with one column named `.phenograph_cluster`. This column will contain an
 #' integer vector of length `nrow(tof_tibble)` indicating the id of
@@ -180,7 +181,6 @@ tof_cluster_flowsom <-
 #' @family clustering functions
 #'
 #' @export
-#'
 #'
 #'
 #'
@@ -247,6 +247,7 @@ tof_cluster_phenograph <-
 #'
 #' @importFrom stats kmeans
 #' @importFrom purrr pluck
+#' @importFrom dplyr tibble
 #'
 #'
 tof_cluster_kmeans <-
@@ -344,6 +345,9 @@ tof_cluster_kmeans <-
 #' @export
 #'
 #' @importFrom tidyselect all_of
+#' @importFrom dplyr select
+#' @importFrom dplyr pull
+#' @importFrom dplyr rename_with
 #'
 #'
 tof_cluster_ddpr <-
@@ -372,7 +376,7 @@ tof_cluster_ddpr <-
     classifier_fit <-
       tof_build_classifier(
         healthy_tibble = dplyr::select(healthy_tibble, -{{healthy_label_col}}),
-        healthy_cell_labels = pull(healthy_tibble, {{healthy_label_col}}),
+        healthy_cell_labels = dplyr::pull(healthy_tibble, {{healthy_label_col}}),
         classifier_markers = {{cluster_cols}},
         verbose = verbose
       )
@@ -425,6 +429,10 @@ tof_cluster_ddpr <-
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
+#' @param group_cols Optional. An unquoted column name indicating which columns
+#' should be used to group cells before clustering. Clustering is then performed
+#' on each group independently.
+#'
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
@@ -442,49 +450,251 @@ tof_cluster_ddpr <-
 #'
 #' @family clustering functions
 #'
+#' @importFrom dplyr select
+#' @importFrom dplyr select
+#' @importFrom dplyr select
+#'
 #' @export
 #'
-tof_cluster <- function(tof_tibble, method, ..., add_col = TRUE) {
+tof_cluster <-
+  function(
+    tof_tibble,
+    group_cols = NULL,
+    ...,
+    add_col = TRUE,
+    method
+  ) {
 
-  if (method == "flowsom") {
-    clusters <-
+    # find grouping column names
+    group_colnames <-
       tof_tibble %>%
-      tof_cluster_flowsom(...)
+      dplyr::select({{group_cols}}) %>%
+      colnames()
 
-  } else if (method == "phenograph") {
-    clusters <-
-      tof_tibble %>%
-      tof_cluster_phenograph(...)
+    # if groups are present
+    if (length(group_colnames) > 0) {
+      result <-
+        tof_cluster_grouped(
+          tof_tibble = tof_tibble,
+          group_cols = {{group_cols}},
+          ...,
+          add_col = add_col,
+          method = method
+        )
 
-  } else if (method == "kmeans") {
-    clusters <-
-      tof_tibble %>%
-      tof_cluster_kmeans(...)
-
-  } else if (method == "ddpr") {
-    clusters <-
-      tof_tibble %>%
-      tof_cluster_ddpr(...)
-
-  } else if (method == "xshift") {
-    # clusters <-
-    #   tof_tibble %>%
-    #   tof_cluster_xshift(...)
-    stop("X-shift is not yet implemented.")
-
-  } else {
-    stop("Not a valid clustering method.")
+      # if groups are not present
+    } else {
+      result <-
+        tof_cluster_tibble(
+          tof_tibble = tof_tibble,
+          ...,
+          add_col = add_col,
+          method = method
+        )
+    }
+    return(result)
   }
 
-  if (add_col == TRUE) {
+#' Cluster (ungrouped) CyTOF data.
+#'
+#' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
+#' provides a low-level API for clustering ungrouped data frames. It is a subroutine
+#' of tof_cluster and shouldn't be called directly by users.
+#'
+#' @param tof_tibble A `tof_tbl` or `tibble`.
+#'
+#' @param ... Additional arguments to pass to the `tof_cluster_*`
+#' function family member corresponding to the chosen method.
+#'
+#' @param add_col A boolean value indicating if the output should column-bind the
+#' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
+#' a single-column tibble including only the cluster ids should be returned (FALSE).
+#'
+#' @param method A string indicating which clustering methods should be used. Valid
+#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
+#'
+#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
+#' plus an additional column encoding the cluster ids.
+#'
+#' @importFrom dplyr bind_cols
+#'
+tof_cluster_tibble <-
+  function(
+    tof_tibble,
+    ...,
+    add_col = TRUE,
+    method
+  ) {
+    if (method == "flowsom") {
+      clusters <-
+        tof_tibble %>%
+        tof_cluster_flowsom(...)
+
+    } else if (method == "phenograph") {
+      clusters <-
+        tof_tibble %>%
+        tof_cluster_phenograph(...)
+
+    } else if (method == "kmeans") {
+      clusters <-
+        tof_tibble %>%
+        tof_cluster_kmeans(...)
+
+    } else if (method == "ddpr") {
+      clusters <-
+        tof_tibble %>%
+        tof_cluster_ddpr(...)
+
+    } else if (method == "xshift") {
+      stop("X-shift is not yet implemented.")
+
+    } else {
+      stop("Not a valid clustering method.")
+    }
+
+    if (add_col == TRUE) {
+      result <-
+        dplyr::bind_cols(tof_tibble, clusters)
+    } else {
+      result <- clusters
+    }
+
+    return(result)
+  }
+
+
+#' Cluster (grouped) CyTOF data.
+#'
+#' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
+#' provides a low-level API for clustering grouped data frames. It is a subroutine
+#' of tof_cluster and shouldn't be called directly by users.
+#'
+#' @param tof_tibble A `tof_tbl` or `tibble`.
+#'
+#' @param group_cols An unquoted column name indicating which columns
+#' should be used to group cells before clustering. Clustering is then performed
+#' on each group independently.
+#'
+#' @param ... Additional arguments to pass to the `tof_cluster_*`
+#' function family member corresponding to the chosen method.
+#'
+#' @param add_col A boolean value indicating if the output should column-bind the
+#' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
+#' a single-column tibble including only the cluster ids should be returned (FALSE).
+#'
+#' @param method A string indicating which clustering methods should be used. Valid
+#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
+#'
+#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
+#' plus an additional column encoding the cluster ids.
+#'
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
+#' @importFrom purrr map
+#' @importFrom purrr map2
+#'
+#' @importFrom tidyr unite
+#' @importFrom tidyr nest
+#' @importFrom tidyr unnest
+#'
+tof_cluster_grouped <-
+  function(
+    tof_tibble,
+    group_cols,
+    ...,
+    add_col = TRUE,
+    method
+  ) {
+    nested_tibble <-
+      tof_tibble %>%
+      dplyr::group_by({{group_cols}}) %>%
+      tidyr::nest() %>%
+      dplyr::ungroup()
+
+    # a list of data frames containing the independently
+    # clustered results (appended as columns to the rest of the input tibbles
+    # if requested by add_col)
+    # TO DO: allow this to be parallel
+    nested_clusters <-
+      purrr::map(
+        .x = nested_tibble$data,
+        .f = tof_cluster_tibble,
+        add_col = FALSE,
+        method  = method,
+        ...
+      )
+
+    # append each group's cluster labels to the group information itself
+    # so that cluster labels are distinct among all groups
     result <-
-      dplyr::bind_cols(tof_tibble, clusters)
-  } else {
-    result <- clusters
+      nested_tibble %>%
+      tidyr::unite(col = ".prefix", {{group_cols}}, remove = FALSE) %>%
+      dplyr::mutate(
+        clusters = nested_clusters,
+        clusters =
+          purrr::map2(
+            .x = .prefix,
+            .y = clusters,
+            .f = function(.x, .y) {
+              colname <- colnames(.y)
+              new_clusters <-
+                dplyr::tibble(cluster = paste(.y[[1]], .x, sep = "@"))
+              colnames(new_clusters) <- colname
+              return(new_clusters)
+            }
+          )
+      ) %>%
+      dplyr::select(-.prefix)
+
+    if (add_col) {
+      result <-
+        result %>%
+        tidyr::unnest(cols = c(data, clusters))
+    } else {
+      result <-
+        result %>%
+        dplyr::select(clusters) %>%
+        tidyr::unnest(cols = clusters)
+    }
+
+    return(result)
   }
 
-  return(result)
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
