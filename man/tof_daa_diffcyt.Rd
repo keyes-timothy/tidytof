@@ -10,7 +10,7 @@ tof_daa_diffcyt(
   cluster_col,
   fixed_effect_cols,
   random_effect_cols,
-  method = c("glmm", "edgeR", "voom"),
+  diffcyt_method = c("glmm", "edgeR", "voom"),
   include_observation_level_random_effects = FALSE,
   min_cells = 3,
   min_samples = 5,
@@ -50,7 +50,7 @@ Note that without multiple samples at each level of each of the
 random effect variables, it can be easy to overfit mixed models. For most CyTOF
 experiments, 2 or fewer (and often 0) random effect variables are appropriate.}
 
-\item{method}{A string indicating which diffcyt method should be used for the
+\item{diffcyt_method}{A string indicating which diffcyt method should be used for the
 differential abundance analysis. Valid methods include "glmm" (the default),
 "edgeR", and "voom".}
 

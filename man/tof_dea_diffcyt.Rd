@@ -11,7 +11,7 @@ tof_dea_diffcyt(
   marker_cols = where(tof_is_numeric),
   fixed_effect_cols,
   random_effect_cols,
-  method = c("lmm", "limma"),
+  diffcyt_method = c("lmm", "limma"),
   include_observation_level_random_effects = FALSE,
   min_cells = 3,
   min_samples = 5,
@@ -56,7 +56,7 @@ Note that without many samples at each level of each of the
 random effect variables, it can be easy to overfit mixed models. For most CyTOF
 experiments, 2 or fewer (and often 0) random effect variables are appropriate.}
 
-\item{method}{A string indicating which diffcyt method should be used for the
+\item{diffcyt_method}{A string indicating which diffcyt method should be used for the
 differential expression analysis. Valid methods include "lmm" (the default)
 and "limma".}
 

@@ -50,7 +50,7 @@
 #' random effect variables, it can be easy to overfit mixed models. For most CyTOF
 #' experiments, 2 or fewer (and often 0) random effect variables are appropriate.
 #'
-#' @param method A string indicating which diffcyt method should be used for the
+#' @param diffcyt_method A string indicating which diffcyt method should be used for the
 #' differential abundance analysis. Valid methods include "glmm" (the default),
 #' "edgeR", and "voom".
 #'
@@ -128,7 +128,7 @@ tof_daa_diffcyt <-
     cluster_col,
     fixed_effect_cols,
     random_effect_cols,
-    method = c("glmm", "edgeR", "voom"),
+    diffcyt_method = c("glmm", "edgeR", "voom"),
     include_observation_level_random_effects = FALSE,
     min_cells = 3,
     min_samples = 5,
@@ -148,11 +148,11 @@ tof_daa_diffcyt <-
     }
 
     # check method argument
-    method <- rlang::arg_match(method)
+    diffcyt_method <- rlang::arg_match(diffcyt_method)
 
     # edgeR can't model random effects, so we throw an error for the user
     # if they are included
-    if (method == "edgeR" & !missing(random_effect_cols)) {
+    if (diffcyt_method == "edgeR" & !missing(random_effect_cols)) {
       stop(
         "edgeR can't model random effects. Trying using another method or
            model everything as a fixed effect."
@@ -162,7 +162,7 @@ tof_daa_diffcyt <-
     # Only the "glmm" method supports observation-level random effects, so
     # provide a warning if include_observation_level_random_effects = TRUE
     # for any other method.
-    if (include_observation_level_random_effects == TRUE & method != "glmm") {
+    if (include_observation_level_random_effects == TRUE & diffcyt_method != "glmm") {
       warning(
         "Warning: Only the \"glmm\" method can use observation-level random effects.
         Setting include_observation_level_random_effects to FALSE.\n"
@@ -202,7 +202,7 @@ tof_daa_diffcyt <-
         marker_cols = any_of(marker_colnames),
         fixed_effect_cols = {{fixed_effect_cols}},
         random_effect_cols = {{random_effect_cols}},
-        method = method,
+        diffcyt_method = diffcyt_method,
         include_observation_level_random_effects = include_observation_level_random_effects
       )
 
@@ -210,7 +210,7 @@ tof_daa_diffcyt <-
     cell_counts <- diffcyt::calcCounts(diffcyt_args$data_diff)
 
     # perform difference abundance testing
-    if (method == "glmm") {
+    if (diffcyt_method == "glmm") {
       # if glmms are being used,
 
       result_tibble <-
@@ -239,7 +239,7 @@ tof_daa_diffcyt <-
         )
     }
 
-    else if (method == "voom") {
+    else if (diffcyt_method == "voom") {
       # if limma/voom is being used,
 
       # We unite all random effect columns and treat them as
@@ -396,7 +396,7 @@ tof_daa_diffcyt <-
 #' random effect variables, it can be easy to overfit mixed models. For most CyTOF
 #' experiments, 2 or fewer (and often 0) random effect variables are appropriate.
 #'
-#' @param method A string indicating which diffcyt method should be used for the
+#' @param diffcyt_method A string indicating which diffcyt method should be used for the
 #' differential expression analysis. Valid methods include "lmm" (the default)
 #' and "limma".
 #'
@@ -469,7 +469,7 @@ tof_dea_diffcyt <-
     marker_cols = where(tof_is_numeric),
     fixed_effect_cols,
     random_effect_cols,
-    method = c("lmm", "limma"),
+    diffcyt_method = c("lmm", "limma"),
     include_observation_level_random_effects = FALSE,
     min_cells = 3,
     min_samples = 5,
@@ -488,13 +488,13 @@ tof_dea_diffcyt <-
       )
     }
 
-    # check method argument
-    method <- match.arg(method, choices = c("lmm", "limma"))
+    # check diffcyt_method argument
+    diffcyt_method <- match.arg(diffcyt_method, choices = c("lmm", "limma"))
 
     # Only the "lmm" method supports observation-level random effects, so
     # provide a warning if include_observation_level_random_effects = TRUE
     # for any other method.
-    if (include_observation_level_random_effects == TRUE & method != "lmm") {
+    if (include_observation_level_random_effects == TRUE & diffcyt_method != "lmm") {
       warning(
         "Warning: Only the \"lmm\" method can use observation-level random effects.
         Setting include_observation_level_random_effects to FALSE.\n"
@@ -520,7 +520,7 @@ tof_dea_diffcyt <-
         marker_cols = {{marker_cols}},
         fixed_effect_cols = {{fixed_effect_cols}},
         random_effect_cols = {{random_effect_cols}},
-        method = method,
+        diffcyt_method = diffcyt_method,
         include_observation_level_random_effects = include_observation_level_random_effects
       )
 
@@ -535,7 +535,7 @@ tof_dea_diffcyt <-
       dplyr::pull(contrast_matrices) %>%
       purrr::pluck(1)
 
-    if (method == "lmm") {
+    if (diffcyt_method == "lmm") {
       # if lmm's are being used,
       result_tibble <-
         suppressWarnings(suppressMessages(
@@ -577,7 +577,7 @@ tof_dea_diffcyt <-
         ))
     }
 
-    else if (method == "limma") {
+    else if (diffcyt_method == "limma") {
       # if limma is being used,
 
       if (length(diffcyt_args$random_effect_colnames) != 0) {
@@ -1725,7 +1725,7 @@ tof_dea_ttest <-
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param daa_method A string indicating which statistical method should be used. Valid
+#' @param method A string indicating which statistical method should be used. Valid
 #' values include "diffcyt", "glmm", and "ttest".
 #'
 #' @param ... Additional arguments to pass onto the `tof_daa_*`
@@ -1744,18 +1744,18 @@ tof_dea_ttest <-
 tof_daa <-
   function(
     tof_tibble,
-    daa_method = c("diffcyt", "glmm", "ttest"),
+    method = c("diffcyt", "glmm", "ttest"),
     ...
   ) {
     # check method argument
     method <-
-      rlang::arg_match(arg = daa_method, values = c("diffcyt", "glmm", "ttest"))
+      rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
 
-    if (daa_method == "diffcyt") {
+    if (method == "diffcyt") {
       result <-
         tof_tibble %>%
         tof_daa_diffcyt(...)
-    } else if (daa_method == "glmm") {
+    } else if (method == "glmm") {
       result <-
         tof_tibble %>%
         tof_daa_glmm(...)
@@ -1780,7 +1780,7 @@ tof_daa <-
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param dea_method A string indicating which statistical method should be used. Valid
+#' @param method A string indicating which statistical method should be used. Valid
 #' values include "diffcyt", "lmm", and "ttest".
 #'
 #' @param ... Additional arguments to pass onto the `tof_dea_*`
@@ -1799,18 +1799,18 @@ tof_daa <-
 tof_dea <-
   function(
     tof_tibble,
-    dea_method = c("diffcyt", "glmm", "ttest"),
+    method = c("diffcyt", "glmm", "ttest"),
     ...
   ) {
     # check method argument
     method <-
-      rlang::arg_match(arg = dea_method, values = c("diffcyt", "glmm", "ttest"))
+      rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
 
-    if (dea_method == "diffcyt") {
+    if (method == "diffcyt") {
       result <-
         tof_tibble %>%
         tof_dea_diffcyt(...)
-    } else if (dea_method == "lmm") {
+    } else if (method == "lmm") {
       result <-
         tof_tibble %>%
         tof_dea_lmm(...)

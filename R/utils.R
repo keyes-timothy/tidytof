@@ -272,7 +272,7 @@ prepare_diffcyt_args <-
     marker_cols = where(tof_is_numeric),
     fixed_effect_cols,
     random_effect_cols,
-    method = c("glmm", "edgeR", "voom"),
+    diffcyt_method = c("glmm", "edgeR", "voom"),
     include_observation_level_random_effects = FALSE
   ) {
     # initialize formula
@@ -331,12 +331,12 @@ prepare_diffcyt_args <-
       dplyr::mutate(marker_class = "state")
 
     # create formula or design matrix depending on which method is being used
-    if (method %in% c("glmm", "lmm") & include_observation_level_random_effects) {
+    if (diffcyt_method %in% c("glmm", "lmm") & include_observation_level_random_effects) {
       random_effect_colnames <-
         c("sample_id", random_effect_colnames)
     }
 
-    if (method %in% c("glmm", "lmm")) {
+    if (diffcyt_method %in% c("glmm", "lmm")) {
       # if using glmms, create formula
 
       if (length(random_effect_colnames) == 0) {

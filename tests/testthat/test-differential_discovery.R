@@ -39,7 +39,7 @@ diffcyt_glmm <-
     cluster_col = .flowsom_metacluster,
     fixed_effect_cols = condition,
     random_effect_cols = stim,
-    method = "glmm"
+    diffcyt_method = "glmm"
   )
 
 diffcyt_glmm_fixed <-
@@ -48,7 +48,7 @@ diffcyt_glmm_fixed <-
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
     fixed_effect_cols = condition,
-    method = "glmm",
+    diffcyt_method = "glmm",
     min_cells = 3,
     min_samples = 2
   )
@@ -60,7 +60,7 @@ diffcyt_voom <-
     cluster_col = .flowsom_metacluster,
     fixed_effect_cols = condition,
     random_effect_cols = stim,
-    method = "voom"
+    diffcyt_method = "voom"
   )
 
 diffcyt_voom_fixed <-
@@ -69,7 +69,7 @@ diffcyt_voom_fixed <-
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
     fixed_effect_cols = condition,
-    method = "voom"
+    diffcyt_method = "voom"
   )
 
 diffcyt_edgeR <-
@@ -78,7 +78,7 @@ diffcyt_edgeR <-
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
     fixed_effect_cols = condition,
-    method = "edgeR"
+    diffcyt_method = "edgeR"
   )
 
 test_that("diffcyt results tibbles have the right dimensions", {
@@ -131,19 +131,19 @@ test_that("edgeR throws an error when you try to model random effects", {
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = condition,
         random_effect_cols = stim,
-        method = "edgeR"
+        diffcyt_method = "edgeR"
       )
   )
 })
 
-test_that("OLRE give a warning for any method that isn't GLMMs", {
+test_that("OLRE give a warning for any diffcyt_method that isn't GLMMs", {
   expect_warning(
     dd_data %>%
       tof_daa_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = condition,
-        method = "edgeR",
+        diffcyt_method = "edgeR",
         include_observation_level_random_effects = TRUE
       )
   )
@@ -154,7 +154,7 @@ test_that("OLRE give a warning for any method that isn't GLMMs", {
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = condition,
-        method = "voom",
+        diffcyt_method = "voom",
         include_observation_level_random_effects = TRUE
       )
   )
@@ -185,7 +185,7 @@ test_that("Using a fixed-effect with more than 2 levels results in a nested outp
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = stim_2,
-        method = "glmm"
+        diffcyt_method = "glmm"
       ) %>%
       nrow(),
     3L
@@ -353,7 +353,7 @@ diffcyt_lmm <-
     marker_cols = c(cd45, cd19),
     fixed_effect_cols = condition,
     random_effect_cols = stim,
-    method = "lmm"
+    diffcyt_method = "lmm"
   )
 
 diffcyt_lmm_fixed <-
@@ -363,7 +363,7 @@ diffcyt_lmm_fixed <-
     cluster_col = .flowsom_metacluster,
     marker_cols = c(cd45, cd19),
     fixed_effect_cols = condition,
-    method = "lmm"
+    diffcyt_method = "lmm"
   )
 
 diffcyt_lmm_tidyselection <-
@@ -374,7 +374,7 @@ diffcyt_lmm_tidyselection <-
     marker_cols = starts_with("cd", ignore.case = FALSE),
     fixed_effect_cols = condition,
     random_effect_cols = stim,
-    method = "lmm"
+    diffcyt_method = "lmm"
   )
 
 diffcyt_limma <-
@@ -385,7 +385,7 @@ diffcyt_limma <-
     marker_cols = c(cd45, cd19),
     fixed_effect_cols = condition,
     random_effect_cols = stim,
-    method = "limma"
+    diffcyt_method = "limma"
   )
 
 diffcyt_limma_fixed <-
@@ -395,7 +395,7 @@ diffcyt_limma_fixed <-
     cluster_col = .flowsom_metacluster,
     marker_cols = c(cd45, cd19),
     fixed_effect_cols = condition,
-    method = "limma"
+    diffcyt_method = "limma"
   )
 
 
@@ -439,14 +439,14 @@ test_that("diffcyt dea_results have the right content", {
 
 ### test arguments
 
-test_that("OLRE give a warning for any method that isn't GLMMs", {
+test_that("OLRE give a warning for any diffcyt_method that isn't GLMMs", {
   expect_warning(
     dd_data %>%
       tof_dea_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = condition,
-        method = "limma",
+        diffcyt_method = "limma",
         include_observation_level_random_effects = TRUE
       )
   )
@@ -477,7 +477,7 @@ test_that("Using a fixed-effect with more than 2 levels results in a larger outp
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
         fixed_effect_cols = stim_2,
-        method = "lmm"
+        diffcyt_method = "lmm"
       ) %>%
       nrow(),
     3L

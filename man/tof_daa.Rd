@@ -4,12 +4,12 @@
 \alias{tof_daa}
 \title{Perform Differential Abundance Analysis (DAA) on CyTOF data}
 \usage{
-tof_daa(tof_tibble, daa_method = c("diffcyt", "glmm", "ttest"), ...)
+tof_daa(tof_tibble, method = c("diffcyt", "glmm", "ttest"), ...)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{daa_method}{A string indicating which statistical method should be used. Valid
+\item{method}{A string indicating which statistical method should be used. Valid
 values include "diffcyt", "glmm", and "ttest".}
 
 \item{...}{Additional arguments to pass onto the `tof_daa_*`

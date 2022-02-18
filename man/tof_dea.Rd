@@ -4,12 +4,12 @@
 \alias{tof_dea}
 \title{Perform Differential Expression Analysis (DEA) on CyTOF data}
 \usage{
-tof_dea(tof_tibble, dea_method = c("diffcyt", "glmm", "ttest"), ...)
+tof_dea(tof_tibble, method = c("diffcyt", "glmm", "ttest"), ...)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{dea_method}{A string indicating which statistical method should be used. Valid
+\item{method}{A string indicating which statistical method should be used. Valid
 values include "diffcyt", "lmm", and "ttest".}
 
 \item{...}{Additional arguments to pass onto the `tof_dea_*`
