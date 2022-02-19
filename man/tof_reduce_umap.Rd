@@ -44,14 +44,14 @@ console. Defaults to FALSE.}
 \item{n_threads}{Number of threads to use during UMAP calculation. Defaults
 to 1.}
 
-\item{...}{Optional. Other options to be passed as arguments to \code{\link[uwot]{umap}}.}
-
-\item{return_recipe.}{A boolean value indicating if instead of the UMAP result, a
+\item{return_recipe}{A boolean value indicating if instead of the UMAP result, a
 prepped \code{\link[recipes]{recipe}} object
 containing the UMAP embedding should be
 returned. Set this option to TRUE if you want to create the UMAP embedding using
 one dataset but also want to project new observations onto the same embedding
 space later.}
+
+\item{...}{Optional. Other options to be passed as arguments to \code{\link[uwot]{umap}}.}
 }
 \value{
 A tibble with the same number of rows as `tof_tibble`, each representing

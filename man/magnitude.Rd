@@ -15,6 +15,3 @@ A scalar value (the magnitude of x).
 \description{
 Find the magnitude of a vector.
 }
-\examples{
-NULL
-}

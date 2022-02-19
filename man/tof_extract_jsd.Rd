@@ -9,8 +9,8 @@ tof_extract_jsd(
   cluster_col,
   group_cols = NULL,
   marker_cols = where(tof_is_numeric),
-  stimulation_col,
-  basal_level,
+  jsd_col,
+  reference_level,
   format = c("wide", "long"),
   num_bins = 100
 )
@@ -32,13 +32,15 @@ extraction calculation. Defaults to NULL (i.e. performing the extraction without
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselect helpers.}
 
-\item{stimulation_col}{Optional. An unquoted column name that indicates which
+\item{jsd_col}{An unquoted column name that indicates which
 column in `tof_tibble` contains information about which stimulation condition each cell
-was exposed to during data acquisition. If provided, the feature extraction will be
+was exposed to during data acquisition.
+
+If provided, the feature extraction will be
 further broken down into subgroups by stimulation condition (and features from each stimulation
 condition will be included as their own features in wide format).}
 
-\item{basal_level}{A string indicating what the value in `stimulation_col`
+\item{reference_level}{A string indicating what the value in `jsd_col`
 corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").}
 
 \item{format}{A string indicating if the data should be returned in "wide" format

@@ -493,6 +493,8 @@ tof_train_model <-
 #' @importFrom tibble tibble
 #' @importFrom rlang arg_match
 #'
+#' @importFrom stats predict
+#'
 tof_predict <-
   function(
     tof_model,
@@ -529,7 +531,7 @@ tof_predict <-
 
     # make predictions ---------------------------------------------------------
     predictions <-
-      predict(
+      stats::predict(
         object = model,
         newx = preprocessed_data$x,
         s = lambda,

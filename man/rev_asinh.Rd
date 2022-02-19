@@ -2,7 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{rev_asinh}
 \alias{rev_asinh}
-\title{Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.}
+\title{Reverses arcsinh transformation with cofactor `scale_factor` and a
+shift of `shift_factor`.}
 \usage{
 rev_asinh(x, shift_factor, scale_factor)
 }
@@ -22,5 +23,6 @@ A numeric vector after undergoing reverse
 arcsinh transformation
 }
 \description{
-Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.
+Reverses arcsinh transformation with cofactor `scale_factor` and a
+shift of `shift_factor`.
 }

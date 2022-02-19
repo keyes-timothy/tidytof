@@ -27,7 +27,7 @@
 #' @param scale A boolean value indicating if each column should be scaled to
 #' standard deviation = 1 before PCA analysis. Defaults to TRUE.
 #'
-#' @param return_recipe. A boolean value indicating if instead of the UMAP result, a
+#' @param return_recipe A boolean value indicating if instead of the UMAP result, a
 #' prepped \code{\link[recipes]{recipe}} object containing the
 #' PCA embedding should be
 #' returned. Set this option to TRUE if you want to create the PCA embedding using
@@ -207,7 +207,7 @@ tof_reduce_tsne <-
 #' @param n_threads Number of threads to use during UMAP calculation. Defaults
 #' to 1.
 #'
-#' @param return_recipe. A boolean value indicating if instead of the UMAP result, a
+#' @param return_recipe A boolean value indicating if instead of the UMAP result, a
 #' prepped \code{\link[recipes]{recipe}} object
 #' containing the UMAP embedding should be
 #' returned. Set this option to TRUE if you want to create the UMAP embedding using

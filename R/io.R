@@ -545,6 +545,8 @@ tof_write_csv <-
 #'
 #' @importFrom purrr walk2
 #'
+#' @importFrom methods new
+#'
 tof_write_fcs <-
   function(
     tof_tibble,
@@ -671,7 +673,11 @@ tof_write_fcs <-
 
     # make the AnnotatedDataFrame
     parameters <-
-      new("AnnotatedDataFrame", data = fcs_data, varMetadata = fcs_varMetadata)
+      methods::new(
+        "AnnotatedDataFrame",
+        data = fcs_data,
+        varMetadata = fcs_varMetadata
+      )
 
     # make flowFrames for each row of tof_tibble
     tof_tibble <-

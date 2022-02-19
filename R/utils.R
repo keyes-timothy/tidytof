@@ -1,5 +1,7 @@
 
-# tidytof_example_data ---------------------------------------------------------
+# reading data -----------------------------------------------------------------
+
+## tidytof_example_data --------------------------------------------------------
 
 #' Get paths to tidytof example data
 #'
@@ -28,12 +30,12 @@ tidytof_example_data <-
       dir(system.file("extdata", package = "tidytof"))
     }
     else {
-      system.file("extdata", dataset_name, package = "tidytof", mustWork = TRUE)#,
+      system.file("extdata", dataset_name, package = "tidytof", mustWork = TRUE)
     }
   }
 
 
-# get_extension ------------------
+## get_extension ---------------------------------------------------------------
 
 #' Find the extension for a file
 #'
@@ -55,8 +57,10 @@ get_extension <- function(filename) {
   return(ex[[length(ex)]])
 }
 
+# preprocessing/postprocessing -------------------------------------------------
 
-#' Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.
+#' Reverses arcsinh transformation with cofactor `scale_factor` and a
+#' shift of `shift_factor`.
 #'
 #' @param x A numeric vector.
 #'
@@ -81,147 +85,7 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 
 }
 
-#' Find if a vector is numeric
-#'
-#' This function takes an input vector `.vec` and checks if it is either an
-#' integer or a double (i.e. is the type of vector that might encode CyTOF
-#' measurements).
-#'
-#' @param .vec A vector.
-#'
-#' @return A boolean value indicating if .vec is of type integer or double.
-#'
-#' @importFrom purrr is_integer
-#' @importFrom purrr is_double
-#'
-#'
-tof_is_numeric <- function(.vec) {
-  return(purrr::is_integer(.vec) | purrr::is_double(.vec))
-}
-
-
-#' Find the k-nearest neighbors of each cell in a CyTOF dataset.
-#'
-#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
-#' and each column represents a CyTOF measurement.
-#'
-#' @param k An integer indicating the number of nearest neighbors to return for
-#' each cell.
-#'
-#' @param distance_function A string indicating which distance function to use
-#' for the nearest-neighbor calculation. Options include "euclidean"
-#' (the default) and "cosine" distances.
-#'
-#' @param ... Optional additional arguments to pass to RANN::nn2
-#'
-#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
-#' both of which are n by k matrices (in which n is the number of cells in the
-#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
-#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
-#' The [i,j]-th entry of "neighbor_distances" represents the distance between
-#' those two cells according to `distance_function`.
-#'
-#' @export
-#'
-#'
-tof_find_knn <-
-  function(
-    .data,
-    k = min(10, nrow(.data)),
-    distance_function = c("euclidean", "cosine"),
-    ...
-  ) {
-    # check distance function
-    distance_function <-
-      match.arg(distance_function, choices = c("euclidean", "cosine"))
-
-    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
-    # distance between l2-normalized vectors will scale with
-    # cosine distance (and this allows us to us to proceed as normal)
-    if (distance_function == "cosine") {
-      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
-    }
-
-    # compute result
-    # have found that eps up to 0.4 will provide NN accuracy above 95%
-    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
-    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
-
-    # remove the first-closest neighbor (column), which is always the point itself
-    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
-    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
-
-    # return result
-    return(nn_result)
-  }
-
-#' Find the KNN density estimate for each cell in a CyTOF dataset.
-#'
-#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
-#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
-#'
-#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
-#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
-#'
-#' @param method A string indicating how the relative density for each cell should be
-#' calculated from the distances between it and each of its k nearest neighbors. Options are
-#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
-#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
-#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
-#' distances to its nearest neighbors).
-#'
-#' @param normalize TO DO
-#'
-#' @return a vector of length N (number of cells) with the ith
-# entry representing the KNN-estimated density of the ith cell.
-#'
-#' @export
-#'
-#' @examples
-#' NULL
-tof_knn_density <-
-  function(
-    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
-    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
-    method = c("mean_distance", "sum_distance"),
-    normalize = TRUE
-  ) {
-
-    # check method argument
-    method <-
-      match.arg(method, choices = c("mean_distance", "sum_distance"))
-
-    # extract needed values
-    k <- ncol(neighbor_ids)
-    n <- nrow(neighbor_ids)
-
-    # find densities using one of 3 methods
-    if (method == "sum_distance") {
-      densities <- -base::rowSums(abs(neighbor_distances))
-    } else if (method == "mean_distance") {
-      densities <- -base::rowMeans(abs(neighbor_distances))
-    } else {
-    stop("Not a valid method.")
-    }
-
-    if (normalize) {
-      # normalize densities
-      densities <-
-        (densities - min(densities)) /
-        ((max(densities) - min(densities)))
-    }
-
-    return(densities) # a vector of length N (number of cells) with the ith
-    # entry representing the KNN-estimated density of the ith cell.
-  }
-
-make_binary_vector <- function(length, indices) {
-  result <- rep.int(0, times = length)
-  result[indices] <- 1
-
-  return(result)
-}
-
+# mathematical operations ------------------------------------------------------
 
 #' Find the dot product between two vectors.
 #'
@@ -242,22 +106,33 @@ dot <- function(x, y) {
 #'
 #' @return A scalar value (the magnitude of x).
 #'
-#' @examples
-#' NULL
 magnitude <- function(x) {
   return(sqrt(dot(x, x)))
 }
 
+#' L2 normalize an input vector x to a length of 1
+#'
+#' @param x a numeric vector
+#'
+#' @return a vector of length length(x) with a magnitude of 1
+#'
 l2_normalize <- function(x) {
   return(x / magnitude(x))
 }
 
+#' Find the cosine similarity between two vectors
+#'
+#' @param x a numeric vector
+#' @param y a numeric vector
+#'
+#' @return a scalar value representing the cosine similarity between x and y
+#'
 cosine_similarity <- function(x, y) {
   result <- dot(x, y) / (magnitude(x) * magnitude(y))
   return(result)
 }
 
-
+# differential discovery analysis ----------------------------------------------
 
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
@@ -461,8 +336,6 @@ prepare_diffcyt_args <-
     return(diffcyt_args)
   }
 
-
-
 #'
 #' @importFrom lme4 glmer
 #' @importFrom stats glm
@@ -476,8 +349,8 @@ fit_da_model <- function(data, formula, has_random_effects = TRUE) {
     model_fit <-
       stats::glm(formula, data, family = "binomial", weights = total_cells)
   }
-
 }
+
 
 #'
 #' @importFrom lmerTest lmer
@@ -494,6 +367,17 @@ fit_de_model <- function(data, formula, has_random_effects = TRUE) {
 }
 
 
+tof_ttest <-
+  function(enough_samples, x, y, paired = FALSE) {
+    if (enough_samples) {
+      return(t.test(x = x, y = y, paired = paired))
+    } else {
+      return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
+    }
+  }
+
+
+# feature_extraction -----------------------------------------------------------
 
 #' Find the earth-mover's distance between two numeric vectors
 #'
@@ -506,10 +390,14 @@ fit_de_model <- function(data, formula, has_random_effects = TRUE) {
 #'
 #' @return A double (of length 1) representing the EMD between the two vectors.
 #'
-#' @importFrom emdist emd2d
-#'
 #'
 tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
+
+  # check to see if emdist package is installed
+  rlang::check_installed(
+    pkg = "emdist",
+    reason = "to compute the Earth-mover's distance."
+  )
 
   # check that both vec_1 and vec_2 are numeric
   if (!is.numeric(vec_1) | ! is.numeric(vec_2)) {
@@ -539,7 +427,6 @@ tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
   return(em_dist)
 }
 
-
 #' Find the Jensen-Shannon Divergence (JSD) between two numeric vectors
 #'
 #' @param vec_1 A numeric vector.
@@ -547,15 +434,19 @@ tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
 #' @param vec_2 A numeric vector.
 #'
 #' @param num_bins An integer number of bins to use when binning
-#' across the two vectors' commbined range. Defaults to 100.
+#' across the two vectors' combined range. Defaults to 100.
 #'
 #' @return A double (of length 1) representing the JSD between the two vectors.
 #'
-#' @importFrom philentropy JSD
-#' @importFrom purrr quietly
 #'
 #'
 tof_find_jsd <- function(vec_1, vec_2, num_bins = 100) {
+
+  # check to see if philentropy package is installed
+  rlang::check_installed(
+    pkg = "philentropy",
+    reason = "to compute the Jensen-Shannon Divergence."
+  )
 
   # check that both vectors are numeric
   if (!is.numeric(vec_1) | ! is.numeric(vec_2)) {
@@ -594,8 +485,7 @@ tof_find_jsd <- function(vec_1, vec_2, num_bins = 100) {
 }
 
 
-
-
+#' @importFrom dplyr pull
 pull_unless_null <- function(tib, uq_colname) {
   if (is.null(tib)) {
     return(NULL)
@@ -603,6 +493,8 @@ pull_unless_null <- function(tib, uq_colname) {
     return(dplyr::pull(tib, {{uq_colname}}))
   }
 }
+
+# sample-level modeling --------------------------------------------------------
 
 # because rsample::nested_cv is a bit buggy when not used interactively
 # (call handling is a bit weird in the inside/outside arguments)
@@ -667,101 +559,160 @@ tof_nested_cv <-
 
     # return result
     return(split_result)
-
-
   }
+
+
+
+
+
+# miscellaneous ----------------------------------------------------------------
+
+#' Find if a vector is numeric
+#'
+#' This function takes an input vector `.vec` and checks if it is either an
+#' integer or a double (i.e. is the type of vector that might encode CyTOF
+#' measurements).
+#'
+#' @param .vec A vector.
+#'
+#' @return A boolean value indicating if .vec is of type integer or double.
+#'
+#' @importFrom purrr is_integer
+#' @importFrom purrr is_double
+#'
+#'
+tof_is_numeric <- function(.vec) {
+  return(purrr::is_integer(.vec) | purrr::is_double(.vec))
+}
+
+
+#' Find the k-nearest neighbors of each cell in a CyTOF dataset.
+#'
+#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
+#' and each column represents a CyTOF measurement.
+#'
+#' @param k An integer indicating the number of nearest neighbors to return for
+#' each cell.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
+#'
+#' @param ... Optional additional arguments to pass to RANN::nn2
+#'
+#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
+#' both of which are n by k matrices (in which n is the number of cells in the
+#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
+#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
+#' The [i,j]-th entry of "neighbor_distances" represents the distance between
+#' those two cells according to `distance_function`.
+#'
+#' @export
+#'
+#'
+tof_find_knn <-
+  function(
+    .data,
+    k = min(10, nrow(.data)),
+    distance_function = c("euclidean", "cosine"),
+    ...
+  ) {
+    # check distance function
+    distance_function <-
+      match.arg(distance_function, choices = c("euclidean", "cosine"))
+
+    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
+    # distance between l2-normalized vectors will scale with
+    # cosine distance (and this allows us to us to proceed as normal)
+    if (distance_function == "cosine") {
+      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
+    }
+
+    # compute result
+    # have found that eps up to 0.4 will provide NN accuracy above 95%
+    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
+    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
+
+    # remove the first-closest neighbor (column), which is always the point itself
+    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
+    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
+
+    # return result
+    return(nn_result)
+  }
+
+#' Find the KNN density estimate for each cell in a CyTOF dataset.
+#'
+#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
+#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
+#'
+#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
+#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
+#'
+#' @param method A string indicating how the relative density for each cell should be
+#' calculated from the distances between it and each of its k nearest neighbors. Options are
+#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
+#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
+#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
+#' distances to its nearest neighbors).
+#'
+#' @param normalize TO DO
+#'
+#' @return a vector of length N (number of cells) with the ith
+# entry representing the KNN-estimated density of the ith cell.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+tof_knn_density <-
+  function(
+    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
+    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
+    method = c("mean_distance", "sum_distance"),
+    normalize = TRUE
+  ) {
+
+    # check method argument
+    method <-
+      match.arg(method, choices = c("mean_distance", "sum_distance"))
+
+    # extract needed values
+    k <- ncol(neighbor_ids)
+    n <- nrow(neighbor_ids)
+
+    # find densities using one of 3 methods
+    if (method == "sum_distance") {
+      densities <- -base::rowSums(abs(neighbor_distances))
+    } else if (method == "mean_distance") {
+      densities <- -base::rowMeans(abs(neighbor_distances))
+    } else {
+      stop("Not a valid method.")
+    }
+
+    if (normalize) {
+      # normalize densities
+      densities <-
+        (densities - min(densities)) /
+        ((max(densities) - min(densities)))
+    }
+
+    return(densities) # a vector of length N (number of cells) with the ith
+    # entry representing the KNN-estimated density of the ith cell.
+  }
+
+make_binary_vector <- function(length, indices) {
+  result <- rep.int(0, times = length)
+  result[indices] <- 1
+
+  return(result)
+}
 
 where <- tidyselect::vars_select_helpers$where
-
-
-tof_ttest <-
-  function(enough_samples, x, y, paired = FALSE) {
-    if (enough_samples) {
-      return(t.test(x = x, y = y, paired = paired))
-    } else {
-      return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
-    }
-  }
 
 deframe <- function(x) {
   value <- x[[2L]]
   name <- x[[2L]]
   result <- setNames(value, nm = name)
   return(result)
-}
-
-#' Coerce flowFrames or flowSets into tof_tbl's.
-#'
-#' @param flow_data A flowFrame or flowSet
-#'
-#' @param sep A string indicating which symbol should be used to separate
-#' antigen names and metal names in the columns of the output tof_tbl.
-#'
-#'
-#' @export
-as_tof_tbl <- function(flow_data, sep = "|") {
-  UseMethod("as_tof_tbl")
-}
-
-#' @export
-as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
-  # check if flowset is empty
-  if (length(flow_data) < 1) {
-    stop("This flowSet is empty.")
-  }
-  panel_info <-
-    flow_data[[1]] %>%
-    tof_find_panel_info()
-
-  flowset_exprs <-
-    flow_data %>%
-    flowCore::fsApply(FUN = flowCore::exprs) %>%
-    tibble::as_tibble()
-
-  col_names <-
-    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
-
-  # prevent repeating names twice when antigen and metal are identical
-  repeat_indices <-
-    which(panel_info$metals == panel_info$antigens)
-  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
-
-  colnames(flowset_exprs) <- col_names
-
-  result <- new_tof_tibble(x = flowset_exprs, panel = panel_info)
-
-  return(result)
-}
-
-#' @export
-as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
-  panel_info <-
-    flow_data %>%
-    tof_find_panel_info()
-
-  col_names <-
-    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
-
-  # prevent repeating names twice when antigen and metal are identical
-  repeat_indices <-
-    which(panel_info$metals == panel_info$antigens)
-  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
-
-  flowframe_exprs <-
-    flow_data %>%
-    {
-      setNames(
-        object = tibble::as_tibble(flowCore::exprs(.)),
-        nm = col_names
-      )
-    }
-
-  result <-
-    new_tof_tibble(
-      x = flowframe_exprs,
-      panel = panel_info
-    )
-
-  return(result)
-
 }

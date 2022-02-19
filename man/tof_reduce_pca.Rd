@@ -34,7 +34,7 @@ mean 0 before PCA analysis. Defaults to TRUE.}
 \item{scale}{A boolean value indicating if each column should be scaled to
 standard deviation = 1 before PCA analysis. Defaults to TRUE.}
 
-\item{return_recipe.}{A boolean value indicating if instead of the UMAP result, a
+\item{return_recipe}{A boolean value indicating if instead of the UMAP result, a
 prepped \code{\link[recipes]{recipe}} object containing the
 PCA embedding should be
 returned. Set this option to TRUE if you want to create the PCA embedding using

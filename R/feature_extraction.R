@@ -327,18 +327,27 @@ tof_extract_threshold <-
 #' extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).
 #'
 #' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
-#' (i.e. which CyTOF protein measurements) should be included in the feature extraction
+#' (i.e. which CyTOF protein measurements) should be included in the earth-mover's distance
 #' calculation. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselect helpers.
 #'
-#' @param stimulation_col Optional. An unquoted column name that indicates which
-#' column in `tof_tibble` contains information about which stimulation condition each cell
-#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' @param emd_col An unquoted column name that indicates which
+#' column in `tof_tibble` should be used to group cells into different distributions
+#' to be compared with one another during the EMD calculation. For example,
+#' if you want to compare marker expression distributions across stimulation
+#' conditions, `emd_col` should be the column in `tof_tibble` containing
+#' information about which stimulation condition each cell
+#' was exposed to during data acquisition.
+#'
+#' If provided, the feature extraction will be
 #' further broken down into subgroups by stimulation condition (and features from each stimulation
 #' condition will be included as their own features in wide format).
 #'
-#' @param basal_level A string indicating what the value in `stimulation_col`
-#' corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").
+#' @param reference_level A string indicating what the value in `emd_col`
+#' corresponds to the "reference" value to which all other values in `emd_col`
+#' should be compared. For example, if `emd_col` represents the stimulation
+#' condition for a cell, reference_level might take the value of "basal" or
+#' "unstimulated" if you want to compare each stimulation to the basal state.
 #'
 #' @param format A string indicating if the data should be returned in "wide" format
 #' (the default; each cluster feature is given its own column) or in "long" format
@@ -384,8 +393,8 @@ tof_extract_emd <-
     cluster_col,
     group_cols = NULL,
     marker_cols = where(tof_is_numeric),
-    stimulation_col,
-    basal_level,
+    emd_col,
+    reference_level,
     format = c("wide", "long"),
     num_bins = 100
   ) {
@@ -393,15 +402,15 @@ tof_extract_emd <-
     format <- rlang::arg_match(format)
 
     # make sure that stimulation information is provided
-    if (missing(stimulation_col)) {
-      stop("`stimulation_col` must be provided.")
-    } else if (missing(basal_level)) {
-      stop("`basal_level` must be provided.")
+    if (missing(emd_col)) {
+      stop("`emd_col` must be provided.")
+    } else if (missing(reference_level)) {
+      stop("`reference_level` must be provided.")
     }
 
-    # check that the stimulation_col is not one of the group_cols
-    stimulation_colname <-
-      rlang::enquo(stimulation_col) %>%
+    # check that the emd_col is not one of the group_cols
+    emd_colname <-
+      rlang::enquo(emd_col) %>%
       tidyselect::eval_select(expr = ., data = tof_tibble) %>%
       names()
 
@@ -410,30 +419,30 @@ tof_extract_emd <-
       tidyselect::eval_select(expr = ., data = tof_tibble) %>%
       names()
 
-    if (stimulation_colname %in% group_colnames) {
-      stop("`stimulation_col` should not be one of the `group_cols`")
+    if (emd_colname %in% group_colnames) {
+      stop("`emd_col` should not be one of the `group_cols`")
     }
 
     # extract the stimulation "levels" present in the original tof_tibble
     stim_levels <-
       tof_tibble %>%
-      dplyr::pull({{stimulation_col}}) %>%
+      dplyr::pull({{emd_col}}) %>%
       unique()
 
     non_basal_stim_levels <-
-      setdiff(stim_levels, basal_level)
+      setdiff(stim_levels, reference_level)
 
     # nest data
     nested_data <-
       tof_tibble %>%
-      dplyr::select({{group_cols}}, {{cluster_col}}, {{stimulation_col}}, {{marker_cols}}) %>%
+      dplyr::select({{group_cols}}, {{cluster_col}}, {{emd_col}}, {{marker_cols}}) %>%
       tidyr::pivot_longer(cols = {{marker_cols}}, names_to = "marker", values_to = "expression") %>%
       tidyr::nest(data = expression) %>%
-      tidyr::pivot_wider(names_from = {{stimulation_col}}, values_from = data) %>%
+      tidyr::pivot_wider(names_from = {{emd_col}}, values_from = data) %>%
       # filter out any rows that don't have a basal stimulation condition,
       # as this means that emd to basal is undefined
       dplyr::filter(
-        purrr::map_lgl(.x = .data[[basal_level]], .f = ~!is.null(.x))
+        purrr::map_lgl(.x = .data[[reference_level]], .f = ~!is.null(.x))
       ) %>%
       # convert each column corresponding to a stimulation condition into a vector
       dplyr::mutate(
@@ -456,7 +465,7 @@ tof_extract_emd <-
           tidyselect::all_of(non_basal_stim_levels),
           .fns = ~ purrr::map2_dbl(
             .x = .x,
-            .y = .data[[basal_level]],
+            .y = .data[[reference_level]],
             .f = ~tof_find_emd(.y, .x, num_bins = num_bins)
           )
         )
@@ -513,13 +522,15 @@ tof_extract_emd <-
 #' calculation. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselect helpers.
 #'
-#' @param stimulation_col Optional. An unquoted column name that indicates which
+#' @param jsd_col An unquoted column name that indicates which
 #' column in `tof_tibble` contains information about which stimulation condition each cell
-#' was exposed to during data acquisition. If provided, the feature extraction will be
+#' was exposed to during data acquisition.
+#'
+#' If provided, the feature extraction will be
 #' further broken down into subgroups by stimulation condition (and features from each stimulation
 #' condition will be included as their own features in wide format).
 #'
-#' @param basal_level A string indicating what the value in `stimulation_col`
+#' @param reference_level A string indicating what the value in `jsd_col`
 #' corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").
 #'
 #' @param format A string indicating if the data should be returned in "wide" format
@@ -563,8 +574,8 @@ tof_extract_jsd <-
     cluster_col,
     group_cols = NULL,
     marker_cols = where(tof_is_numeric),
-    stimulation_col,
-    basal_level,
+    jsd_col,
+    reference_level,
     format = c("wide", "long"),
     num_bins = 100
   ) {
@@ -572,15 +583,15 @@ tof_extract_jsd <-
     format <- rlang::arg_match(format)
 
     # make sure that stimulation information is provided
-    if (missing(stimulation_col)) {
-      stop("`stimulation_col` must be provided.")
-    } else if (missing(basal_level)) {
-      stop("`basal_level` must be provided.")
+    if (missing(jsd_col)) {
+      stop("`jsd_col` must be provided.")
+    } else if (missing(reference_level)) {
+      stop("`reference_level` must be provided.")
     }
 
-    # check that the stimulation_col is not one of the group_cols
-    stimulation_colname <-
-      rlang::enquo(stimulation_col) %>%
+    # check that the jsd_col is not one of the group_cols
+    jsd_colname <-
+      rlang::enquo(jsd_col) %>%
       tidyselect::eval_select(expr = ., data = tof_tibble) %>%
       names()
 
@@ -589,30 +600,30 @@ tof_extract_jsd <-
       tidyselect::eval_select(expr = ., data = tof_tibble) %>%
       names()
 
-    if (stimulation_colname %in% group_colnames) {
-      stop("`stimulation_col` should not be one of the `group_cols`")
+    if (jsd_colname %in% group_colnames) {
+      stop("`jsd_col` should not be one of the `group_cols`")
     }
 
     # extract the stimulation "levels" present in the original tof_tibble
     stim_levels <-
       tof_tibble %>%
-      dplyr::pull({{stimulation_col}}) %>%
+      dplyr::pull({{jsd_col}}) %>%
       unique()
 
     non_basal_stim_levels <-
-      setdiff(stim_levels, basal_level)
+      setdiff(stim_levels, reference_level)
 
     # nest data
     nested_data <-
       tof_tibble %>%
-      dplyr::select({{group_cols}}, {{cluster_col}}, {{stimulation_col}}, {{marker_cols}}) %>%
+      dplyr::select({{group_cols}}, {{cluster_col}}, {{jsd_col}}, {{marker_cols}}) %>%
       tidyr::pivot_longer(cols = {{marker_cols}}, names_to = "marker", values_to = "expression") %>%
       tidyr::nest(data = expression) %>%
-      tidyr::pivot_wider(names_from = {{stimulation_col}}, values_from = data) %>%
+      tidyr::pivot_wider(names_from = {{jsd_col}}, values_from = data) %>%
       # filter out any rows that don't have a basal stimulation condition,
       # as this means that emd to basal is undefined
       dplyr::filter(
-        purrr::map_lgl(.x = .data[[basal_level]], .f = ~!is.null(.x))
+        purrr::map_lgl(.x = .data[[reference_level]], .f = ~!is.null(.x))
       ) %>%
       # convert each column corresponding to a stimulation condition into a vector
       dplyr::mutate(
@@ -635,7 +646,7 @@ tof_extract_jsd <-
           tidyselect::all_of(non_basal_stim_levels),
           .fns = ~purrr::map2_dbl(
             .x = .x,
-            .y = .data[[basal_level]],
+            .y = .data[[reference_level]],
             .f = ~tof_find_jsd(.y, .x, num_bins = num_bins)
           )
         )
@@ -887,8 +898,8 @@ tof_extract_features <-
             cluster_col = {{cluster_col}},
             group_cols = {{group_cols}},
             marker_cols = {{signaling_cols}},
-            stimulation_col = {{stimulation_col}},
-            basal_level = basal_level,
+            emd_col = {{stimulation_col}},
+            reference_level = basal_level,
             format = "wide",
             ...
           )
@@ -900,8 +911,8 @@ tof_extract_features <-
             cluster_col = {{cluster_col}},
             group_cols = {{group_cols}},
             marker_cols = {{signaling_cols}},
-            stimulation_col = {{stimulation_col}},
-            basal_level = basal_level,
+            jsd_col = {{stimulation_col}},
+            reference_level = basal_level,
             format = "wide",
             ...
           )

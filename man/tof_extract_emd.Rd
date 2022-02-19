@@ -9,8 +9,8 @@ tof_extract_emd(
   cluster_col,
   group_cols = NULL,
   marker_cols = where(tof_is_numeric),
-  stimulation_col,
-  basal_level,
+  emd_col,
+  reference_level,
   format = c("wide", "long"),
   num_bins = 100
 )
@@ -28,18 +28,27 @@ should be used to break the rows of `tof_tibble` into subgroups for the feature
 extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).}
 
 \item{marker_cols}{Unquoted column names representing which columns in `tof_tibble`
-(i.e. which CyTOF protein measurements) should be included in the feature extraction
+(i.e. which CyTOF protein measurements) should be included in the earth-mover's distance
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselect helpers.}
 
-\item{stimulation_col}{Optional. An unquoted column name that indicates which
-column in `tof_tibble` contains information about which stimulation condition each cell
-was exposed to during data acquisition. If provided, the feature extraction will be
+\item{emd_col}{An unquoted column name that indicates which
+column in `tof_tibble` should be used to group cells into different distributions
+to be compared with one another during the EMD calculation. For example,
+if you want to compare marker expression distributions across stimulation
+conditions, `emd_col` should be the column in `tof_tibble` containing
+information about which stimulation condition each cell
+was exposed to during data acquisition.
+
+If provided, the feature extraction will be
 further broken down into subgroups by stimulation condition (and features from each stimulation
 condition will be included as their own features in wide format).}
 
-\item{basal_level}{A string indicating what the value in `stimulation_col`
-corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").}
+\item{reference_level}{A string indicating what the value in `emd_col`
+corresponds to the "reference" value to which all other values in `emd_col`
+should be compared. For example, if `emd_col` represents the stimulation
+condition for a cell, reference_level might take the value of "basal" or
+"unstimulated" if you want to compare each stimulation to the basal state.}
 
 \item{format}{A string indicating if the data should be returned in "wide" format
 (the default; each cluster feature is given its own column) or in "long" format

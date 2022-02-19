@@ -269,8 +269,8 @@ emd_1 <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    emd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -281,8 +281,8 @@ emd_1b <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    emd_col = replicate,
+    reference_level = "1",
     num_bins = 30
   )
 
@@ -293,8 +293,8 @@ emd_2 <-
     cluster_col = cluster,
     group_cols = c(condition_1, condition_2),
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    emd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -305,8 +305,8 @@ emd_3 <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "2",
+    emd_col = replicate,
+    reference_level = "2",
     num_bins = 3
   )
 
@@ -315,8 +315,8 @@ emd_no_groups <-
   tof_extract_emd(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    emd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -327,8 +327,8 @@ emd_long <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    emd_col = replicate,
+    reference_level = "1",
     format = "long",
     num_bins = 3
   )
@@ -385,20 +385,19 @@ test_that("EMDs are symmetric", {
 })
 
 test_that("errors are thrown when required arguments are omitted", {
-  # stimulation_col argument is missing
+  # emd_col argument is missing
   expect_error(
     tof_extract_emd(dat, cluster_col = cluster)
   )
 
-  # basal_level argument is missing
+  # reference_level argument is missing
   expect_error(
-    tof_extract_emd(dat, cluster_col = cluster, stimulation_col = replicate)
+    tof_extract_emd(dat, cluster_col = cluster, emd_col = replicate)
   )
 })
 
 
 # tof_extract_jsd --------------------------------------------------------------
-
 
 jsd_1 <-
   dat %>%
@@ -407,8 +406,8 @@ jsd_1 <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    jsd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -419,8 +418,8 @@ jsd_1b <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    jsd_col = replicate,
+    reference_level = "1",
     num_bins = 30
   )
 
@@ -431,8 +430,8 @@ jsd_2 <-
     cluster_col = cluster,
     group_cols = c(condition_1, condition_2),
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    jsd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -443,8 +442,8 @@ jsd_3 <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "2",
+    jsd_col = replicate,
+    reference_level = "2",
     num_bins = 3
   )
 
@@ -453,8 +452,8 @@ jsd_no_groups <-
   tof_extract_jsd(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    jsd_col = replicate,
+    reference_level = "1",
     num_bins = 3
   )
 
@@ -465,8 +464,8 @@ jsd_long <-
     cluster_col = cluster,
     group_cols = condition,
     marker_cols = c(cd45, cd34),
-    stimulation_col = replicate,
-    basal_level = "1",
+    jsd_col = replicate,
+    reference_level = "1",
     format = "long",
     num_bins = 3
   )
@@ -502,7 +501,7 @@ test_that("changing the num_dims changes the numeric values", {
   expect_false(all(values_1 == values_2))
 })
 
-test_that("column names change when you change basal_level", {
+test_that("column names change when you change reference_level", {
   expect_false(identical(colnames(jsd_1), colnames))
 })
 
@@ -528,9 +527,9 @@ test_that("errors are thrown when required arguments are omitted", {
     tof_extract_jsd(dat, cluster_col = cluster)
   )
 
-  # basal_level argument is missing
+  # reference_level argument is missing
   expect_error(
-    tof_extract_jsd(dat, cluster_col = cluster, stimulation_col = replicate)
+    tof_extract_jsd(dat, cluster_col = cluster, jsd_col = replicate)
   )
 })
 

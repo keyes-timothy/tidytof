@@ -129,6 +129,8 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
 #' @importFrom tidyr unnest
 #' @importFrom purrr map
 #'
+#' @importFrom stats runif
+#'
 tof_downsample_density <-
   function(
     tof_tibble,
@@ -220,7 +222,7 @@ tof_downsample_density <-
         sample_prob = (densities / target_density),
       ) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(sample_value = runif(n = nrow(.))) %>%
+      dplyr::mutate(sample_value = stats::runif(n = nrow(.))) %>%
       dplyr::filter(percentile > outlier_percentile, sample_prob > sample_value) %>%
       dplyr::pull(cell_id)
 

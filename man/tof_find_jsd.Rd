@@ -12,7 +12,7 @@ tof_find_jsd(vec_1, vec_2, num_bins = 100)
 \item{vec_2}{A numeric vector.}
 
 \item{num_bins}{An integer number of bins to use when binning
-across the two vectors' commbined range. Defaults to 100.}
+across the two vectors' combined range. Defaults to 100.}
 }
 \value{
 A double (of length 1) representing the JSD between the two vectors.

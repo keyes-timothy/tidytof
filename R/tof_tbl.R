@@ -33,7 +33,7 @@ new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
   )
 }
 
-# tof_get_panel ------------------
+# tof_get_panel ----------------------------------------------------------------
 
 #' Get panel information from a tof_tibble
 #'
@@ -57,7 +57,7 @@ tof_get_panel <- function(tof_tibble) {
 }
 
 
-# tof_set_panel ---------------------------
+# tof_set_panel ----------------------------------------------------------------
 
 #' Set panel information from a tof_tibble
 #'
@@ -81,9 +81,9 @@ tof_set_panel <- function(tof_tibble, panel) {
 }
 
 
-# tof_tbl methods --------------------------------------------
+# tof_tbl methods --------------------------------------------------------------
 
-# tidyr methods
+## tidyr methods
 
 #' @export
 nest.tof_tbl <- function(.data, ..., .names_sep = NULL) {#, .key = deprecated()) {
@@ -116,7 +116,7 @@ group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_def
 }
 
 
-# dplyr methods
+## dplyr methods
 
 #' @export
 mutate.tof_tbl <- function(.data, ...) {
@@ -125,15 +125,15 @@ mutate.tof_tbl <- function(.data, ...) {
 }
 
 #' @export
-slice_sample.tof_tbl <- function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
-  panel <- tof_get_panel(.data)
-  return(new_tof_tibble(x = NextMethod(), panel = panel))
-}
+slice_sample.tof_tbl <-
+  function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
+    panel <- tof_get_panel(.data)
+    return(new_tof_tibble(x = NextMethod(), panel = panel))
+  }
 
+# grouped_tof_tbl methods ------------------------------------------------------
 
-# grouped_tof_tbl methods ---------------------------------
-
-# tidyr methods
+## tidyr methods
 
 #' @export
 nest.grouped_tof_tbl <- nest.tof_tbl
@@ -143,3 +143,82 @@ ungroup.grouped_tof_tbl <- function(x, ...) {
   panel <- tof_get_panel(x)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
+
+# for interoperability with flowCore -------------------------------------------
+
+#' @export
+as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
+  # check if flowset is empty
+  if (length(flow_data) < 1) {
+    stop("This flowSet is empty.")
+  }
+  panel_info <-
+    flow_data[[1]] %>%
+    tof_find_panel_info()
+
+  flowset_exprs <-
+    flow_data %>%
+    flowCore::fsApply(FUN = flowCore::exprs) %>%
+    tibble::as_tibble()
+
+  col_names <-
+    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+
+  # prevent repeating names twice when antigen and metal are identical
+  repeat_indices <-
+    which(panel_info$metals == panel_info$antigens)
+  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+  colnames(flowset_exprs) <- col_names
+
+  result <- new_tof_tibble(x = flowset_exprs, panel = panel_info)
+
+  return(result)
+}
+
+#' @export
+as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
+  panel_info <-
+    flow_data %>%
+    tof_find_panel_info()
+
+  col_names <-
+    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+
+  # prevent repeating names twice when antigen and metal are identical
+  repeat_indices <-
+    which(panel_info$metals == panel_info$antigens)
+  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+  flowframe_exprs <-
+    flow_data %>%
+    {
+      setNames(
+        object = tibble::as_tibble(flowCore::exprs(.)),
+        nm = col_names
+      )
+    }
+
+  result <-
+    new_tof_tibble(
+      x = flowframe_exprs,
+      panel = panel_info
+    )
+
+  return(result)
+
+}
+
+#' Coerce flowFrames or flowSets into tof_tbl's.
+#'
+#' @param flow_data A flowFrame or flowSet
+#'
+#' @param sep A string indicating which symbol should be used to separate
+#' antigen names and metal names in the columns of the output tof_tbl.
+#'
+#'
+#' @export
+as_tof_tbl <- function(flow_data, sep = "|") {
+  UseMethod("as_tof_tbl")
+}
+
