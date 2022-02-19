@@ -147,6 +147,11 @@ ungroup.grouped_tof_tbl <- function(x, ...) {
 # for interoperability with flowCore -------------------------------------------
 
 #' @export
+#'
+#' @importFrom flowCore fsApply
+#' @importFrom flowCore exprs
+#'
+#' @importFrom dplyr as_tibble
 as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
   # check if flowset is empty
   if (length(flow_data) < 1) {
@@ -159,10 +164,10 @@ as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
   flowset_exprs <-
     flow_data %>%
     flowCore::fsApply(FUN = flowCore::exprs) %>%
-    tibble::as_tibble()
+    dplyr::as_tibble()
 
   col_names <-
-    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+    base::paste(panel_info$antigens, panel_info$metals, sep = sep)
 
   # prevent repeating names twice when antigen and metal are identical
   repeat_indices <-
@@ -177,13 +182,18 @@ as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
 }
 
 #' @export
+#'
+#' @importFrom dplyr as_tibble
+#' @importFrom flowCore exprs
+#'
 as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
   panel_info <-
     flow_data %>%
     tof_find_panel_info()
 
   col_names <-
-    stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+    #stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+    base::paste(panel_info$antigens, panel_info$metals, sep = sep)
 
   # prevent repeating names twice when antigen and metal are identical
   repeat_indices <-
@@ -191,13 +201,10 @@ as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
   col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
 
   flowframe_exprs <-
-    flow_data %>%
-    {
-      setNames(
-        object = tibble::as_tibble(flowCore::exprs(.)),
-        nm = col_names
-      )
-    }
+    setNames(
+      object = dplyr::as_tibble(flowCore::exprs(flow_data)),
+      nm = col_names
+    )
 
   result <-
     new_tof_tibble(

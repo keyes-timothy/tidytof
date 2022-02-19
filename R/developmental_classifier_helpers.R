@@ -51,8 +51,8 @@ tof_build_classifier <- function(
   healthy_tibble <-
     healthy_tibble %>%
     dplyr::mutate(population = healthy_cell_labels) %>%
-    dplyr::select({{classifier_markers}}, population) %>%
-    dplyr::group_by(population) %>%
+    dplyr::select({{classifier_markers}}, .data$population) %>%
+    dplyr::group_by(.data$population) %>%
     tidyr::nest()
 
   # Calculate mean and covariance matrix for each population
@@ -62,7 +62,7 @@ tof_build_classifier <- function(
   classifier_fit <-
     healthy_tibble %>%
     dplyr::transmute(
-      population,
+      .data$population,
       centroid =
         map(
           data,
@@ -264,10 +264,11 @@ tof_apply_classifier <- function(
     classification_data <-
       tof_classify_cells(
         classifier_fit = classifier_fit,
-        cancer_data = select(cancer_tibble, all_of(classifier_markers)),
+        cancer_data =
+          dplyr::select(cancer_tibble, dplyr::all_of(classifier_markers)),
         distance_function = distance_function
       ) %>%
-      dplyr::rename_with(function(x) str_c(distance_function, x, sep = "_"), .cols = everything())
+      dplyr::rename_with(function(x) stringr::str_c(distance_function, x, sep = "_"), .cols = everything())
 
     # otherwise,
   } else {
@@ -280,12 +281,12 @@ tof_apply_classifier <- function(
       cancer_tibble %>%
       dplyr::select(
         {{parallel_vars}},
-        all_of(classifier_markers)
+        dplyr::all_of(classifier_markers)
       ) %>%
       mutate(
         ..cell_id = 1:nrow(cancer_tibble)
       ) %>%
-      tidyr::nest(data = -{{parallel_vars}}, ..cell_ids = ..cell_id) %>%
+      tidyr::nest(data = -{{parallel_vars}}, ..cell_ids = .data$..cell_id) %>%
       dplyr::ungroup()
 
     # set up parallel back-end
@@ -307,7 +308,7 @@ tof_apply_classifier <- function(
       ) %my_do%
       tof_classify_cells(
         classifier_fit = classifier_fit,
-        cancer_data = dplyr::select(expression_matrix, -..cell_id),
+        cancer_data = dplyr::select(expression_matrix, -.data$..cell_id),
         distance_function = distance_function
       )
 
@@ -323,8 +324,8 @@ tof_apply_classifier <- function(
         ..cell_ids = cancer_tibble$..cell_ids
       ) %>%
       tidyr::unnest(cols = c(classification_data, ..cell_ids)) %>%
-      dplyr::arrange(..cell_id) %>%
-      dplyr::select(-..cell_id) %>%
+      dplyr::arrange(.data$..cell_id) %>%
+      dplyr::select(-.data$..cell_id) %>%
       dplyr::rename_with(
         function(x) stringr::str_c(distance_function, x, sep = "_"),
         .cols = tidyselect::everything()

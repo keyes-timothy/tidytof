@@ -23,6 +23,9 @@
 #' @importFrom stringr str_remove_all
 #' @importFrom stringr str_c
 #'
+#' @importFrom dplyr if_else
+#' @importFrom dplyr tibble
+#'
 #'
 tof_find_panel_info <- function(input_flowFrame) {
 
@@ -96,10 +99,12 @@ tof_find_panel_info <- function(input_flowFrame) {
       antigens
     ) %>%
     stringr::str_remove("^[:punct:]|[:punct:]$") %>%
-    stringr::str_remove_all("\\(|\\)|Di") %>%
-    # if the antigen name of any given channel is still empty (or NA), just put
-    # the word "empty"
-    dplyr::if_else(. == "" | is.na(.), "empty", .)
+    stringr::str_remove_all("\\(|\\)|Di")
+
+  # if the antigen name of any given channel is still empty (or NA), just put
+  # the word "empty"
+  antigens <-
+    dplyr::if_else((antigens == "" | is.na(antigens)), "empty", antigens)
 
   # return result
   result <-
@@ -134,15 +139,19 @@ tof_find_panel_info <- function(input_flowFrame) {
 #' one additional attribute: "panel" (a tibble storing information about the
 #' panel used during data acquisition).
 #'
+#' @importFrom dplyr if_else
+#' @importFrom dplyr as_tibble
+#'
 #' @importFrom flowCore read.FCS
-#' @importFrom stringr str_c
+#'
+#' @importFrom utils capture.output
 #'
 tof_read_fcs <-
   function(file_path = NULL, sep = "|") {
 
     # read flowFrame from file
     invisible(
-      capture.output(
+      utils::capture.output(
         tof_flowFrame <-
           file_path %>%
           flowCore::read.FCS(transformation = FALSE, truncate_max_range = FALSE)
@@ -156,20 +165,17 @@ tof_read_fcs <-
     col_names <-
       # if the antigen and the metal name are the same,
       # use a simplified column name
-      if_else(
+      dplyr::if_else(
         panel_info$antigens == panel_info$metals,
         panel_info$antigens,
-        stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
+        base::paste(panel_info$antigens, panel_info$metals, sep = sep)
       )
 
     tof_tibble <-
-      tof_flowFrame %>%
-      {
-        setNames(
-          object = tibble::as_tibble(flowCore::exprs(.)),
-          nm = col_names
-        )
-      }
+      setNames(
+        object = dplyr::as_tibble(flowCore::exprs(tof_flowFrame)),
+        nm = col_names
+      )
 
     tof_tibble <-
       new_tof_tibble(
@@ -199,6 +205,9 @@ tof_read_fcs <-
 #' obvious from data read as a .csv file, this information must be provided
 #' manually from the user (unlike in `tof_read_fcs`).
 #'
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr tibble
+#' @importFrom dplyr select
 #'
 #' @importFrom readr read_csv
 #' @importFrom readr cols
@@ -220,7 +229,7 @@ tof_read_csv <-
       if(all(c("antigens", "metals") %in% panel_names)) {
         panel_info <-
           panel_info %>%
-          select(antigens, metals)
+          dplyr::select(.data$antigens, .data$metals)
       } else if (!identical(panel_info, dplyr::tibble())) {
         stop("panel_info must contain an \"antigens\" and a \"metals\" column")
       }
@@ -230,11 +239,9 @@ tof_read_csv <-
     }
 
     tof_tibble <-
-      tibble::new_tibble(
+      new_tof_tibble(
         x = tof_tibble,
-        panel = panel_info,
-        nrow = nrow(tof_tibble),
-        class = "tof_tbl"
+        panel = panel_info
       )
 
     return(tof_tibble)
@@ -530,6 +537,14 @@ tof_write_csv <-
 #'
 #' @export
 #'
+#' @importFrom dplyr select
+#' @importFrom dplyr summarize
+#' @importFrom dplyr across
+#' @importFrom dplyr everything
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr mutate
+#'
 #' @importFrom tidyr nest
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
@@ -585,7 +600,7 @@ tof_write_fcs <-
           dplyr::across(
             -{{group_cols}},
             .fns =
-              list(max = ~ max(.x, na.rm = TRUE), min = ~min(.x, na.rm = TRUE)),
+              list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
             # use the many underscores because it's unlikely this will come up
             # in column names on their own
             .names = "{.col}_____{.fn}"
@@ -597,7 +612,8 @@ tof_write_fcs <-
         dplyr::summarize(
           dplyr::across(
             dplyr::everything(),
-            .fns = list(max = ~max(.x, na.rm = TRUE), min= ~min(.x, na.rm = TRUE)),
+            .fns =
+              list(max = ~ max(.x, na.rm = TRUE), min= ~ min(.x, na.rm = TRUE)),
             # use the many underscores because it's unlikely this will come up
             # in column names on their own
             .names = "{.col}_____{.fn}"
@@ -608,14 +624,14 @@ tof_write_fcs <-
     maxes_and_mins <-
       maxes_and_mins %>%
       tidyr::pivot_longer(
-        cols = tidyselect::everything(),
+        cols = dplyr::everything(),
         names_to = c("antigen", "value_type"),
         values_to = "value",
         names_sep = "_____"
       )  %>%
       tidyr::pivot_wider(
-        names_from = value_type,
-        values_from = value
+        names_from = .data$value_type,
+        values_from = .data$value
       )
 
     # extract the names of all non-grouping columns to be saved to the .fcs file
@@ -661,8 +677,8 @@ tof_write_fcs <-
       dplyr::transmute(
         # have to change any instances of "|" in column names to another
         # separator, as "|" has special meaning as an .fcs file delimiter
-        name = stringr::str_replace(antigen, "\\|", "_"),
-        desc = stringr::str_replace(antigen, "\\|", "_"),
+        name = stringr::str_replace(.data$antigen, "\\|", "_"),
+        desc = stringr::str_replace(.data$antigen, "\\|", "_"),
         range = max - min,
         minRange = min,
         maxRange = max
@@ -683,7 +699,7 @@ tof_write_fcs <-
     tof_tibble <-
       tof_tibble %>%
       dplyr::transmute(
-        prefix,
+        .data$prefix,
         flowFrames =
           purrr::map(
             .x = data,

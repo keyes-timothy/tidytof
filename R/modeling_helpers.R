@@ -993,8 +993,8 @@ print.tof_model <- function(x, ...) {
     colnames(coefficients) <- c("feature", "coefficient")
 
     coefficients <-
-      dplyr::filter(coefficients, coefficient != 0) %>%
-      dplyr::arrange(-abs(coefficient))
+      dplyr::filter(coefficients, .data$coefficient != 0) %>%
+      dplyr::arrange(-abs(.data$coefficient))
 
   } else {
     coefficients <-
@@ -1009,8 +1009,8 @@ print.tof_model <- function(x, ...) {
           colnames(result) <- c("feature", "coefficient")
 
           result <-
-            dplyr::filter(result, coefficient != 0) %>%
-            dplyr::arrange(-abs(coefficient))
+            dplyr::filter(result, .data$coefficient != 0) %>%
+            dplyr::arrange(-abs(.data$coefficient))
 
           return(result)
         }

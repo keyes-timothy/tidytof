@@ -341,6 +341,9 @@ tof_create_grid <-
 #' @importFrom rlang as_name
 #' @importFrom rlang ensym
 #'
+#' @importFrom stats deviance
+#' @importFrom stats C
+#'
 tof_train_model <-
   function(
     split_data,
@@ -650,8 +653,8 @@ tof_assess_model <-
         ) %>%
         tibble::as_tibble() %>%
         dplyr::transmute(
-          true_outcome = True,
-          predicted_outcome = Predicted,
+          true_outcome = .data$True,
+          predicted_outcome = .data$Predicted,
           num_observations = n
         )
 
@@ -680,13 +683,13 @@ tof_assess_model <-
         as_tibble() %>%
         dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
         tidyr::pivot_longer(
-          cols = -.timepoint_index,
+          cols = -.data$.timepoint_index,
           names_to = "row_index",
           values_to = "probability"
         ) %>%
         dplyr::left_join(times, by = ".timepoint_index") %>%
-        dplyr::select(-.timepoint_index) %>%
-        tidyr::nest(survival_curve = -row_index)
+        dplyr::select(-.data$.timepoint_index) %>%
+        tidyr::nest(survival_curve = -.data$row_index)
 
     } else {
       survival_curves <- NULL

@@ -3,6 +3,22 @@
 # using a tidygraph implementation
 
 
+
+#'
+#' @importFrom rlang arg_match
+#'
+#' @importFrom dplyr select
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr filter
+#' @importFrom dplyr tibble
+#' @importFrom dplyr transmute
+#'
+#' @importFrom tidygraph tbl_graph
+#' @importFrom tidygraph mutate
+#' @importFrom tidygraph group_louvain
+#' @importFrom tidygraph graph_modularity
+#' @importFrom tidygraph as_tibble
+#'
 phenograph_cluster <-
   function(
     tof_tibble,
@@ -19,7 +35,7 @@ phenograph_cluster <-
     ## find knn for each cell in tof_tibble
     nn_result <-
       tof_tibble %>%
-      select({{cluster_cols}}) %>%
+      dplyr::select({{cluster_cols}}) %>%
       tof_find_knn(k = num_neighbors, distance_function = distance_function, ...)
 
     ## extract knn_ids (the ids of neighbors for each row/cell in tof_tibble)
@@ -35,12 +51,12 @@ phenograph_cluster <-
     colnames(jaccards) <- c("from", "to", "jaccard")
     jaccard_edges <-
       jaccards %>%
-      tibble::as_tibble() %>%
-      dplyr::filter(jaccard > 0)
+      dplyr::as_tibble() %>%
+      dplyr::filter(.data$jaccard > 0)
 
     jaccard_graph <-
       tidygraph::tbl_graph(
-        nodes = tibble::tibble(name = 1:nrow(tof_tibble)),
+        nodes = dplyr::tibble(name = 1:nrow(tof_tibble)),
         edges = jaccard_edges,
         directed = FALSE
       )
@@ -55,16 +71,19 @@ phenograph_cluster <-
     modularity <-
       jaccard_graph %>%
       tidygraph::mutate(
-        modularity = tidygraph::graph_modularity(group = .phenograph_cluster)
+        modularity =
+          tidygraph::graph_modularity(group = .data$.phenograph_cluster)
       ) %>%
-      tibble::as_tibble() %>%
-      dplyr::pull(modularity) %>%
+      dplyr::as_tibble() %>%
+      dplyr::pull(.data$modularity) %>%
       unique()
 
     clusters <-
       jaccard_graph %>%
       tidygraph::as_tibble() %>%
-      dplyr::transmute(.phenograph_cluster = as.character(.phenograph_cluster))
+      dplyr::transmute(
+        .phenograph_cluster = as.character(.data$.phenograph_cluster)
+      )
 
     attr(x = clusters, which = "modularity") <- modularity
 

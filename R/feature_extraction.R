@@ -62,16 +62,16 @@ tof_extract_proportion <-
       dplyr::summarize(abundance = dplyr::n()) %>%
       # two lines below can be compressed into a transmute if multidplyr is not being used
       dplyr::mutate(
-        prop = abundance / sum(abundance)
+        prop = .data$abundance / sum(.data$abundance)
       ) %>%
-      dplyr::select({{group_cols}}, {{cluster_col}}, prop)
+      dplyr::select({{group_cols}}, {{cluster_col}}, .data$prop)
 
     if (format == "wide") {
       abundances <-
         abundances %>%
         tidyr::pivot_wider(
           names_from = {{cluster_col}},
-          values_from = prop,
+          values_from = .data$prop,
           names_prefix = "prop@",
           # note that if a cluster is not present for a given group, it will
           # be filled in as having a relative abundance of 0.
@@ -180,13 +180,20 @@ tof_extract_central_tendency <-
         dplyr::group_by(dplyr::across({{group_cols}})) %>%
         dplyr::transmute(
           col_names =
-            stringr::str_c({{stimulation_col}}, "_", channel, "@", {{cluster_col}}, "_ct") %>%
+            stringr::str_c(
+              {{stimulation_col}},
+              "_",
+              .data$channel,
+              "@",
+              {{cluster_col}},
+              "_ct"
+            ) %>%
             stringr::str_remove("^_"),
-          values
+          .data$values
         ) %>%
         tidyr::pivot_wider(
-          names_from = col_names,
-          values_from = values
+          names_from = .data$col_names,
+          values_from = .data$values
         )
     }
 
@@ -275,8 +282,12 @@ tof_extract_threshold <-
       tof_tibble %>%
       # if the cluster column isn't a character vector, make it one
       dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) %>%
-      dplyr::group_by(dplyr::across({{group_cols}}), {{cluster_col}}, {{stimulation_col}}) %>%
-      dplyr::summarize(dplyr::across({{marker_cols}}, ~ mean(.x > threshold))) %>%
+      dplyr::group_by(
+        dplyr::across({{group_cols}}), {{cluster_col}}, {{stimulation_col}}
+      ) %>%
+      dplyr::summarize(
+        dplyr::across({{marker_cols}}, ~ mean(.x > threshold))
+      ) %>%
       tidyr::pivot_longer(
         cols = {{marker_cols}},
         names_to = "channel",
@@ -289,13 +300,20 @@ tof_extract_threshold <-
         dplyr::group_by(dplyr::across({{group_cols}})) %>%
         dplyr::transmute(
           col_names =
-            stringr::str_c({{stimulation_col}}, "_", channel, "@", {{cluster_col}}, "_threshold") %>%
+            stringr::str_c(
+              {{stimulation_col}},
+              "_",
+              .data$channel,
+              "@",
+              {{cluster_col}},
+              "_threshold"
+            ) %>%
             stringr::str_remove("^_"),
-          values
+          .data$values
         ) %>%
         tidyr::pivot_wider(
-          names_from = col_names,
-          values_from = values
+          names_from = .data$col_names,
+          values_from = .data$values
         )
     }
 
@@ -410,13 +428,17 @@ tof_extract_emd <-
 
     # check that the emd_col is not one of the group_cols
     emd_colname <-
-      rlang::enquo(emd_col) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(emd_col),
+        data = tof_tibble
+      ) %>%
       names()
 
     group_colnames <-
-      rlang::enquo(group_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(group_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     if (emd_colname %in% group_colnames) {
@@ -436,8 +458,12 @@ tof_extract_emd <-
     nested_data <-
       tof_tibble %>%
       dplyr::select({{group_cols}}, {{cluster_col}}, {{emd_col}}, {{marker_cols}}) %>%
-      tidyr::pivot_longer(cols = {{marker_cols}}, names_to = "marker", values_to = "expression") %>%
-      tidyr::nest(data = expression) %>%
+      tidyr::pivot_longer(
+        cols = {{marker_cols}},
+        names_to = "marker",
+        values_to = "expression"
+      ) %>%
+      tidyr::nest(data = .data$expression) %>%
       tidyr::pivot_wider(names_from = {{emd_col}}, values_from = data) %>%
       # filter out any rows that don't have a basal stimulation condition,
       # as this means that emd to basal is undefined
@@ -466,7 +492,7 @@ tof_extract_emd <-
           .fns = ~ purrr::map2_dbl(
             .x = .x,
             .y = .data[[reference_level]],
-            .f = ~tof_find_emd(.y, .x, num_bins = num_bins)
+            .f = ~ tof_find_emd(.y, .x, num_bins = num_bins)
           )
         )
       ) %>%
@@ -481,12 +507,19 @@ tof_extract_emd <-
         emd_tibble %>%
         dplyr::mutate(
           col_name =
-            stringr::str_c(stimulation, "_", marker, "@", {{cluster_col}}, "_emd")
+            stringr::str_c(
+              .data$stimulation,
+              "_",
+              .data$marker,
+              "@",
+              {{cluster_col}},
+              "_emd"
+            )
         ) %>%
-        dplyr::select({{group_cols}}, emd, col_name) %>%
+        dplyr::select({{group_cols}}, .data$emd, .data$col_name) %>%
         tidyr::pivot_wider(
-          names_from = col_name,
-          values_from = emd
+          names_from = .data$col_name,
+          values_from = .data$emd
         )
     }
 
@@ -591,13 +624,17 @@ tof_extract_jsd <-
 
     # check that the jsd_col is not one of the group_cols
     jsd_colname <-
-      rlang::enquo(jsd_col) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(jsd_col),
+        data = tof_tibble
+      ) %>%
       names()
 
     group_colnames <-
-      rlang::enquo(group_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(group_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     if (jsd_colname %in% group_colnames) {
@@ -631,7 +668,7 @@ tof_extract_jsd <-
           tidyselect::all_of(stim_levels),
           ~ purrr::map(
             .x = .x,
-            .f = ~pull_unless_null(.x, expression)
+            .f = ~ pull_unless_null(.x, expression)
           )
         )
       )
@@ -644,10 +681,10 @@ tof_extract_jsd <-
         marker,
         dplyr::across(
           tidyselect::all_of(non_basal_stim_levels),
-          .fns = ~purrr::map2_dbl(
+          .fns = ~ purrr::map2_dbl(
             .x = .x,
             .y = .data[[reference_level]],
-            .f = ~tof_find_jsd(.y, .x, num_bins = num_bins)
+            .f = ~ tof_find_jsd(.y, .x, num_bins = num_bins)
           )
         )
       ) %>%
@@ -662,12 +699,19 @@ tof_extract_jsd <-
         jsd_tibble %>%
         mutate(
           col_name =
-            stringr::str_c(stimulation, "_", marker, "@", {{cluster_col}}, "_jsd")
+            stringr::str_c(
+              .data$stimulation,
+              "_",
+              .data$marker,
+              "@",
+              {{cluster_col}},
+              "_jsd"
+            )
         ) %>%
-        dplyr::select({{group_cols}}, jsd, col_name) %>%
+        dplyr::select({{group_cols}}, .data$jsd, .data$col_name) %>%
         tidyr::pivot_wider(
-          names_from = col_name,
-          values_from = jsd
+          names_from = .data$col_name,
+          values_from = .data$jsd
         )
     }
 
@@ -786,15 +830,19 @@ tof_extract_features <-
     # extract stimulation column's name
     # will be an empty character vector if stimulation_col = NULL
     stimulation_colname <-
-      rlang::enquo(stimulation_col) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(stimulation_col),
+        data = tof_tibble
+      ) %>%
       names()
 
     # extract grouping columns' names'
     # will be an empty character vector if stimulation_col = NULL
     group_colnames <-
-      rlang::enquo(group_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(group_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     # check stimulation_col argument

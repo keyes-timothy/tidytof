@@ -155,28 +155,36 @@ prepare_diffcyt_args <-
 
     # extract sample column name as a string
     sample_colname <-
-      rlang::enquo(sample_col) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(sample_col),
+        data = tof_tibble
+      ) %>%
       names()
 
     # extract cluster column name as a string
     cluster_colname <-
-      rlang::enquo(cluster_col) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(cluster_col),
+        data = tof_tibble
+      ) %>%
       names()
 
     # extract fixed effect columns as a character vector
     # will return an empty character vector if the argument is missing
     fixed_effect_colnames <-
-      rlang::enquo(fixed_effect_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(fixed_effect_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     # extract random effect columns as a character vector
     # will return an empty character vector if the argument is missing
     random_effect_colnames <-
-      rlang::enquo(random_effect_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(random_effect_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     # find all marker names by process of elimination
@@ -198,7 +206,7 @@ prepare_diffcyt_args <-
       dplyr::select({{sample_col}}, {{fixed_effect_cols}}, {{random_effect_cols}}) %>%
       dplyr::distinct() %>%
       dplyr::rename(sample_id = {{sample_col}}) %>%
-      dplyr::arrange(sample_id)
+      dplyr::arrange(.data$sample_id)
 
     # create diffcyt marker_info
     marker_info <-
@@ -341,6 +349,9 @@ prepare_diffcyt_args <-
 #' @importFrom stats glm
 #'
 fit_da_model <- function(data, formula, has_random_effects = TRUE) {
+  if(is.null(formula)) {
+    total_cells <- NULL
+  }
 
   if (has_random_effects) {
     model_fit <-

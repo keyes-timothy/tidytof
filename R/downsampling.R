@@ -153,29 +153,39 @@ tof_downsample_density <-
 
     # extract group and density column names
     group_names <-
-      rlang::enquo(group_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      #rlang::enquo(group_cols) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(group_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     density_names <-
-      rlang::enquo(density_cols) %>%
-      tidyselect::eval_select(expr = ., data = tof_tibble) %>%
+      #rlang::enquo(density_cols) %>%
+      tidyselect::eval_select(
+        expr = rlang::enquo(density_cols),
+        data = tof_tibble
+      ) %>%
       names()
 
     # nest data needed to compute densities for each group
 
     nested_data <-
       result %>%
-      dplyr::select(cell_id, any_of(group_names), any_of(density_names)) %>%
-      tidyr::nest(cell_ids = cell_id, data = {{density_cols}})
+      dplyr::select(
+        .data$cell_id,
+        dplyr::any_of(group_names),
+        dplyr::any_of(density_names)
+      ) %>%
+      tidyr::nest(cell_ids = .data$cell_id, data = {{density_cols}})
 
     # find knn's for all samples
     knn_results <-
       nested_data %>%
-      dplyr::group_by(across({{group_cols}})) %>%
+      dplyr::group_by(dplyr::across({{group_cols}})) %>%
       dplyr::transmute(
-        dplyr::across(any_of(group_names)),
-        cell_ids,
+        dplyr::across(dplyr::any_of(group_names)),
+        .data$cell_ids,
         knn =
           purrr::map(
             .x = data,
@@ -183,11 +193,11 @@ tof_downsample_density <-
             k = num_neighbors,
             distance_function = knn_distance_function
           ),
-        neighbor_ids = purrr::map(.x = knn, ~.x$neighbor_ids),
-        neighbor_distances = purrr::map(.x = knn, ~.x$neighbor_distances)
+        neighbor_ids = purrr::map(.x = .data$knn, ~.x$neighbor_ids),
+        neighbor_distances = purrr::map(.x = .data$knn, ~.x$neighbor_distances)
       ) %>%
       dplyr::ungroup() %>%
-      dplyr::select(-knn)
+      dplyr::select(-.data$knn)
 
     # estimate knn densities for each cell
     densities <-
@@ -205,32 +215,35 @@ tof_downsample_density <-
 
     chosen_cells <-
       knn_results %>%
-      dplyr::select(any_of(group_names)) %>%
+      dplyr::select(dplyr::any_of(group_names)) %>%
       dplyr::mutate(
         cell_ids = knn_results$cell_ids,
         densities = densities,
         target_density = purrr::map_dbl(.x = densities, .f = quantile, probs = target_percentile)
       ) %>%
-      tidyr::unnest(cols = c(cell_ids, densities)) %>%
-      dplyr::group_by(across({{group_cols}})) %>%
-      dplyr::arrange(densities) %>%
+      tidyr::unnest(cols = c(.data$cell_ids, .data$densities)) %>%
+      dplyr::group_by(dplyr::across({{group_cols}})) %>%
+      dplyr::arrange(.data$densities) %>%
       dplyr::mutate(
         rank = 1:dplyr::n(),
         percentile = rank / dplyr::n()
       ) %>%
       dplyr::mutate(
-        sample_prob = (densities / target_density),
+        sample_prob = (.data$densities / .data$target_density),
       ) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(sample_value = stats::runif(n = nrow(.))) %>%
-      dplyr::filter(percentile > outlier_percentile, sample_prob > sample_value) %>%
-      dplyr::pull(cell_id)
+      dplyr::mutate(sample_value = stats::runif(n = dplyr::n())) %>%
+      dplyr::filter(
+        .data$percentile > outlier_percentile,
+        .data$sample_prob > sample_value
+      ) %>%
+      dplyr::pull(.data$cell_id)
 
     # filter only selected cells out of the original tof_tibble
     result <-
       result %>%
-      dplyr::filter(cell_id %in% chosen_cells) %>%
-      dplyr::select(-cell_id)
+      dplyr::filter(.data$cell_id %in% chosen_cells) %>%
+      dplyr::select(-.data$cell_id)
 
     return(result)
   }
