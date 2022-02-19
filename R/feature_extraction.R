@@ -486,7 +486,7 @@ tof_extract_emd <-
       dplyr::transmute(
         dplyr::across({{group_cols}}),
         {{cluster_col}},
-        marker,
+        .data$marker,
         dplyr::across(
           tidyselect::all_of(non_basal_stim_levels),
           .fns = ~ purrr::map2_dbl(
@@ -678,7 +678,7 @@ tof_extract_jsd <-
       dplyr::transmute(
         dplyr::across({{group_cols}}),
         {{cluster_col}},
-        marker,
+        .data$marker,
         dplyr::across(
           tidyselect::all_of(non_basal_stim_levels),
           .fns = ~ purrr::map2_dbl(

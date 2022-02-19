@@ -212,7 +212,13 @@ tof_tune_glmnet <-
         names()
 
       performance_metrics <-
-        tof_fit_split(split_data, prepped_recipe, hyperparameter_grid, model_type, outcome_colnames)
+        tof_fit_split(
+          split_data,
+          prepped_recipe,
+          hyperparameter_grid,
+          model_type,
+          outcome_colnames
+        )
 
     } else if (inherits(split_data, "rset")) {
 
@@ -268,22 +274,14 @@ tof_tune_glmnet <-
           performance_metrics = performance_metrics
         ) %>%
         tidyr::unnest(cols = performance_metrics) %>%
-        dplyr::group_by(mixture, penalty) %>%
+        dplyr::group_by(.data$mixture, .data$penalty) %>%
         dplyr::summarize(
           dplyr::across(
             dplyr::everything(),
             .fns = mean,
-            #.fns = list(mean = mean, sd = stats::sd),
-            #.names = "{.col}__tidytof__{.fn}"
             )
         ) %>%
-        dplyr::ungroup() #%>%
-        # tidyr::pivot_longer(
-        #   cols = c(-mixture, -penalty),
-        #   names_to = "metric",
-        #   values_to = "value"
-        # ) %>%
-        # tidyr::separate(metric, into = c("metric", "statistic"), sep = "__tidytof__")
+        dplyr::ungroup()
 
     } else {
       stop("split_data must be an rsplit or rset object.")
@@ -352,12 +350,6 @@ tof_fit_split <-
         new_data = rsample::training(rsplit_data)
       )
 
-    # # extract outcome column names
-    # outcome_colnames <-
-    #   rlang::enquo(outcome_cols) %>%
-    #   tidyselect::eval_select(data = training_data) %>%
-    #   names()
-
     # separate training and testing x and y (as needed by glmnet)
     training_x <-
       training_data %>%
@@ -409,18 +401,18 @@ tof_fit_split <-
     if (!missing(hyperparameter_grid)) {
       alphas <-
         hyperparameter_grid %>%
-        dplyr::pull(mixture) %>%
+        dplyr::pull(.data$mixture) %>%
         unique()
 
       lambdas <-
         hyperparameter_grid %>%
-        dplyr::pull(penalty) %>%
+        dplyr::pull(.data$penalty) %>%
         unique()
 
     } else {
       alphas <-
         tof_create_grid() %>%
-        dplyr::pull(mixture) %>%
+        dplyr::pull(.data$mixture) %>%
         unique()
 
       lambdas <- NULL
@@ -464,7 +456,7 @@ tof_fit_split <-
           s = lambdas
         )  %>%
           tibble::as_tibble() %>%
-          dplyr::mutate(penalty = lambdas)
+          dplyr::mutate(penalty = .data$lambdas)
       )
 
     # tidy model metrics for each alpha and lambda value used to fit a model
@@ -474,7 +466,7 @@ tof_fit_split <-
         model_metrics = model_metrics
       ) %>%
       tidyr::unnest(cols = model_metrics) %>%
-      dplyr::relocate(mixture, penalty, dplyr::everything())
+      dplyr::relocate(.data$mixture, .data$penalty, dplyr::everything())
 
 
     # use yardstick to compute the hand-till roc_auc for multiclass problems
@@ -487,7 +479,7 @@ tof_fit_split <-
 
       roc_auc_tibble <-
         hyperparameter_grid %>%
-        dplyr::arrange(mixture, penalty) %>%
+        dplyr::arrange(.data$mixture, .data$penalty) %>%
         dplyr::mutate(
           predictions =
             purrr::map2(
@@ -497,17 +489,17 @@ tof_fit_split <-
             ),
           roc_auc =
             purrr::map_dbl(
-              .x = predictions,
+              .x = .data$predictions,
               .f = ~
                 yardstick::roc_auc(
                   data = .x,
                   truth = validation_y,
                   dplyr::all_of(levels(validation_y))
                 ) %>%
-                dplyr::pull(.estimate)
+                dplyr::pull(.data$.estimate)
             )
         ) %>%
-        dplyr::select(penalty, mixture, roc_auc)
+        dplyr::select(.data$penalty, .data$mixture, .data$roc_auc)
 
       # combine multiclass roc_auc with other performance metrics
       result <-
@@ -540,8 +532,7 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
   if (model_type == "linear") {
     # mse = mse (mean squared error)
     # mae = mae (mean absolute error)
-    new_metric_tibble <-
-      metric_tibble
+    new_metric_tibble <- metric_tibble
 
   } else if (model_type == "two-class") {
     # binomial_deviance = deviance
@@ -552,9 +543,9 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        binomial_deviance = deviance,
-        misclassification_error = class,
-        roc_auc = auc
+        binomial_deviance = .data$deviance,
+        misclassification_error = .data$class,
+        roc_auc = .data$auc
       )
 
   } else if (model_type == "multiclass") {
@@ -565,8 +556,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        multinomial_deviance = deviance,
-        misclassification_error = class
+        multinomial_deviance = .data$deviance,
+        misclassification_error = .data$class
       )
 
   } else if (model_type == "survival") {
@@ -575,8 +566,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        neg_log_partial_likelihood = deviance,
-        concordance_index = C
+        neg_log_partial_likelihood = .data$deviance,
+        concordance_index = .data$C
       )
   }
 
@@ -660,16 +651,20 @@ tof_find_best <- function(performance_metrics, model_type, optimization_metric) 
   if (optimization_metric %in% c("roc_auc", "concordance_index")) {
     best_metrics <-
       performance_metrics %>%
-      dplyr::slice_max(order_by = optimizer, n = 1)
+      dplyr::slice_max(order_by = .data$optimizer, n = 1)
   } else {
       best_metrics <-
         performance_metrics %>%
-        dplyr::slice_min(order_by = optimizer, n = 1)
+        dplyr::slice_min(order_by = .data$optimizer, n = 1)
   }
 
   best_hyperparameters <-
     best_metrics %>%
-    dplyr::select(penalty, mixture, dplyr::any_of(optimization_metric))
+    dplyr::select(
+      .data$penalty,
+      .data$mixture,
+      dplyr::any_of(optimization_metric)
+    )
 
   return(best_hyperparameters)
 
@@ -692,8 +687,6 @@ tof_finalize_model <-
     feature_tibble,
     best_model_parameters,
     recipe,
-    #glmnet_x = NULL,
-    #glmnet_y = NULL,
     model_type,
     outcome_colnames
   ) {
@@ -716,8 +709,8 @@ tof_finalize_model <-
     # model and then the one that is closest to the lasso (alpha = 1).
     best_models <-
       best_model_parameters %>%
-      dplyr::slice_max(order_by = penalty) %>%
-      dplyr::slice_max(order_by = mixture)
+      dplyr::slice_max(order_by = .data$penalty) %>%
+      dplyr::slice_max(order_by = .data$mixture)
 
     best_alpha <- best_models$mixture
     best_lambda <- best_models$penalty

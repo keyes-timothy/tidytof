@@ -64,9 +64,9 @@ tof_build_classifier <- function(
     dplyr::transmute(
       .data$population,
       centroid =
-        map(
+        purrr::map(
           data,
-          ~ dplyr::summarize(.x, dplyr::across(tidyr::everything(), mean)) %>%
+          ~ dplyr::summarize(.x, dplyr::across(dplyr::everything(), mean)) %>%
             tidyr::pivot_longer(tidyr::everything()) %>%
             deframe()
         ),
@@ -115,13 +115,13 @@ tof_classify_cells <-
         dplyr::transmute(
           classification_data =
             purrr::map2(
-              .x = centroid,
-              .y = covariance_matrix,
+              .x = .data$centroid,
+              .y = .data$covariance_matrix,
               .f = ~ mahalanobis(cancer_data, center = .x, cov = .y)
             )
         ) %>%
-        dplyr::pull(classification_data) %>%
-        purrr::quietly(bind_cols)() %>%
+        dplyr::pull(.data$classification_data) %>%
+        purrr::quietly(dplyr::bind_cols)() %>%
         purrr::pluck("result")
 
     } else if (distance_function == "cosine") {
@@ -129,8 +129,8 @@ tof_classify_cells <-
         classifier_fit %>%
         dplyr::transmute(
           classification_data =
-            map(
-              .x = centroid,
+            purrr::map(
+              .x = .data$centroid,
               .f =
                 ~ tof_cosine_dist(
                   matrix = as.matrix(cancer_data),
@@ -138,9 +138,9 @@ tof_classify_cells <-
                 )
             )
         ) %>%
-        pull(classification_data) %>%
-        quietly(bind_cols)() %>%
-        pluck("result")
+        pull(.data$classification_data) %>%
+        purrr::quietly(dplyr::bind_cols)() %>%
+        purrr::pluck("result")
 
     } else if (distance_function == "pearson") {
       classifications <-
@@ -148,11 +148,11 @@ tof_classify_cells <-
         dplyr::mutate(
           classification_data =
             purrr::map(
-              .x = centroid,
+              .x = .data$centroid,
               .f = ~ 1 - cor(x = t(as.matrix(cancer_data)), y = .x)
             )
         ) %>%
-        pull(classification_data) %>%
+        dplyr::pull(.data$classification_data) %>%
         purrr::quietly(dplyr::bind_cols)() %>%
         purrr::pluck("result")
     }
@@ -162,24 +162,23 @@ tof_classify_cells <-
       classifications <- tibble::as_tibble(as.matrix(classifications))
     }
 
-    # This has to be optimized
     population_names <-
       classifications %>%
       dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
       tidyr::pivot_longer(
-        cols = -..cell_id,
+        cols = -.data$..cell_id,
         names_to = "cluster",
         values_to = "distance"
       ) %>%
-      dplyr::group_by(..cell_id) %>%
-      dplyr::filter(distance == min(distance)) %>%
-      dplyr::select(-distance)
+      dplyr::group_by(.data$..cell_id) %>%
+      dplyr::filter(.data$distance == min(.data$distance)) %>%
+      dplyr::select(-.data$distance)
 
     classifications <-
       classifications %>%
       dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
       dplyr::left_join(population_names, by = "..cell_id") %>%
-      dplyr::select(-..cell_id)
+      dplyr::select(-.data$..cell_id)
 
     return(classifications)
   }
@@ -296,6 +295,12 @@ tof_apply_classifier <- function(
       `%my_do%` <- `%dopar%`
     }
 
+    # hack-y way to get around R CMD check note for expression matrix
+    # not having a visible global binding due to NSE
+    if (is.null(cancer_tibble)) {
+      expression_matrix <- NULL
+    }
+
     # cluster each value of parallel_vars on a difference core simultaneously
     classification_data <-
       foreach::foreach(
@@ -323,7 +328,7 @@ tof_apply_classifier <- function(
         classification_data = classification_data,
         ..cell_ids = cancer_tibble$..cell_ids
       ) %>%
-      tidyr::unnest(cols = c(classification_data, ..cell_ids)) %>%
+      tidyr::unnest(cols = c(.data$classification_data, .data$..cell_ids)) %>%
       dplyr::arrange(.data$..cell_id) %>%
       dplyr::select(-.data$..cell_id) %>%
       dplyr::rename_with(

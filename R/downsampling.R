@@ -235,7 +235,7 @@ tof_downsample_density <-
       dplyr::mutate(sample_value = stats::runif(n = dplyr::n())) %>%
       dplyr::filter(
         .data$percentile > outlier_percentile,
-        .data$sample_prob > sample_value
+        .data$sample_prob > .data$sample_value
       ) %>%
       dplyr::pull(.data$cell_id)
 

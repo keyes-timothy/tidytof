@@ -190,7 +190,7 @@ tof_plot_cells_layout <-
       tibble::as_tibble() %>%
       dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) %>%
       tidyr::pivot_longer(
-        cols = -from,
+        cols = -.data$from,
         names_to = "neighbor_index",
         values_to = "to"
       )
@@ -207,7 +207,7 @@ tof_plot_cells_layout <-
         tibble::as_tibble() %>%
         dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
         tidyr::pivot_longer(
-          cols = -from,
+          cols = -.data$from,
           names_to = "neighbor_index",
           values_to = "distance"
         )
@@ -220,11 +220,11 @@ tof_plot_cells_layout <-
       if (distance_function == "euclidean") {
         edge_tibble <-
           edge_tibble %>%
-          dplyr::mutate(weight = 1 / (1 + distance))
+          dplyr::mutate(weight = 1 / (1 + .data$distance))
       } else {
         edge_tibble <-
           edge_tibble %>%
-          dplyr::mutate(weight = 1 - distance)
+          dplyr::mutate(weight = 1 - .data$distance)
       }
 
     } else {
@@ -246,7 +246,7 @@ tof_plot_cells_layout <-
         ggraph::ggraph(
           graph = knn_graph,
           layout = graph_layout,
-          weights = weight,
+          weights = .data$weight,
           ...
         )
     } else {
@@ -315,7 +315,7 @@ tof_plot_sample_model <-
     stop("This function is not yet implemented!")
 
     # find model type from model_fit
-    NULL
+    model_type <- NULL
 
     # make plot depending on the input model_fit
     if (model_type == "regression") {

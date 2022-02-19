@@ -27,7 +27,6 @@ License: MIT + file LICENSE
 Depends: 
     R (>= 2.10)
 Imports:
-    broom,
     broomExtra,
     doParallel,
     dplyr,
@@ -56,23 +55,24 @@ Imports:
     tibble,
     Rcpp
 Suggests:
-    SummarizedExperiment,
+    Biobase,
+    broom,
+    covr,
+    dials,
     diffcyt,
+    emdist,
     FlowSOM,
+    forcats,
+    ggrepel,
+    HDCytoData,
+    knitr,
+    markdown,
+    philentropy, 
+    rmarkdown,
     Rtsne,
     statmod,
-    testthat (>= 3.0.0),
-    covr,
-    HDCytoData,
-    dials,
-    knitr,
-    rmarkdown,
-    ggrepel,
-    forcats,
-    markdown,
-    Biobase,
-    emdist,
-    philentropy
+    SummarizedExperiment,
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

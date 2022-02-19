@@ -641,8 +641,8 @@ tof_cluster_grouped <-
         clusters = nested_clusters,
         clusters =
           purrr::map2(
-            .x = .prefix,
-            .y = clusters,
+            .x = .data$.prefix,
+            .y = .data$clusters,
             .f = function(.x, .y) {
               colname <- colnames(.y)
               new_clusters <-
@@ -652,17 +652,17 @@ tof_cluster_grouped <-
             }
           )
       ) %>%
-      dplyr::select(-.prefix)
+      dplyr::select(-.data$.prefix)
 
     if (add_col) {
       result <-
         result %>%
-        tidyr::unnest(cols = c(data, clusters))
+        tidyr::unnest(cols = c(.data$data, .data$clusters))
     } else {
       result <-
         result %>%
-        dplyr::select(clusters) %>%
-        tidyr::unnest(cols = clusters)
+        dplyr::select(.data$clusters) %>%
+        tidyr::unnest(cols = .data$clusters)
     }
 
     return(result)

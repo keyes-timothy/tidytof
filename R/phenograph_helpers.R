@@ -65,7 +65,7 @@ phenograph_cluster <-
     jaccard_graph <-
       jaccard_graph %>%
       tidygraph::mutate(
-        .phenograph_cluster = tidygraph::group_louvain(weights = jaccard)
+        .phenograph_cluster = tidygraph::group_louvain(weights = .data$jaccard)
       )
 
     modularity <-
