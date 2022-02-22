@@ -65,11 +65,12 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_reduce_pca</span><span class="op">(</span>
   <span class="va">tof_tibble</span>,
-  pca_cols <span class="op">=</span> <span class="fu">where</span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  pca_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
   num_comp <span class="op">=</span> <span class="fl">5</span>,
   threshold <span class="op">=</span> <span class="cn">NA</span>,
   center <span class="op">=</span> <span class="cn">TRUE</span>,
-  scale <span class="op">=</span> <span class="cn">TRUE</span>
+  scale <span class="op">=</span> <span class="cn">TRUE</span>,
+  return_recipe <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -94,6 +95,13 @@ mean 0 before PCA analysis. Defaults to TRUE.</p></dd>
 <dt>scale</dt>
 <dd><p>A boolean value indicating if each column should be scaled to
 standard deviation = 1 before PCA analysis. Defaults to TRUE.</p></dd>
+<dt>return_recipe</dt>
+<dd><p>A boolean value indicating if instead of the UMAP result, a
+prepped <code><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></code> object containing the
+PCA embedding should be
+returned. Set this option to TRUE if you want to create the PCA embedding using
+one dataset but also want to project new observations onto the same embedding
+space later.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>

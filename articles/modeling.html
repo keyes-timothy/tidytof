@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Building predictive models</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-02-05</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       
       <div class="d-none name"><code>modeling.Rmd</code></div>
@@ -119,7 +119,7 @@
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="st">"Healthy"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="../reference/where.html">where</a></span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span>
 <span class="co">#&gt;   patient_id gender mrd_risk nci_rome_risk relapse_status type_of_relapse cohort</span>
@@ -223,7 +223,7 @@
 <span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN2           0.139     0.066<span style="text-decoration: underline;">2</span>   0.022<span style="text-decoration: underline;">1</span>     0.082<span style="text-decoration: underline;">5</span>      2.25     0.454</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN3           0.633     0.023<span style="text-decoration: underline;">4</span>   0.016<span style="text-decoration: underline;">5</span>     0.032<span style="text-decoration: underline;">7</span>      2.25     0.226</span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN6           5.62      0.550    0.003<span style="text-decoration: underline;">74</span>    0.622       2.86     0.342</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN8           0.951     0.958    0.161      0.556       3.18     0.556</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span></span>
@@ -238,12 +238,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1,854</span></span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN10         0.003<span style="text-decoration: underline;">74</span>     0.761  0.000<span style="text-decoration: underline;">696</span>     0.829      3.19     0.886</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN15         0.051<span style="text-decoration: underline;">6</span>      1.37   0.006<span style="text-decoration: underline;">10</span>      0.915      2.55     0.236</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN19         2.05        0.780  0.002<span style="text-decoration: underline;">33</span>      0.298      2.36     0.481</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN22-Rx      0.064<span style="text-decoration: underline;">3</span>      1.68   0.080<span style="text-decoration: underline;">4</span>       1.56       3.06     0.529</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN35         0.094<span style="text-decoration: underline;">8</span>      0.138  0.155        0.839      3.46     0.970</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN35-Rx      0          <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> UPN7           0.474     0.966    0.124       1.24       2.59     0.243</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> UPN13          0.063<span style="text-decoration: underline;">4</span>    0.030<span style="text-decoration: underline;">0</span>   0.021<span style="text-decoration: underline;">9</span>      0.109      2.34     0.314</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> UPN18          0.405     0.258    0.028<span style="text-decoration: underline;">7</span>      0.851      2.48     0.253</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> UPN22-Rx       0.064<span style="text-decoration: underline;">3</span>    1.68     0.080<span style="text-decoration: underline;">4</span>      1.56       3.06     0.529</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> UPN25          0.018<span style="text-decoration: underline;">1</span>    0.026<span style="text-decoration: underline;">6</span>   0.001<span style="text-decoration: underline;">52</span>     0.108      2.73     0.386</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> UPN35-Rx       0        <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span></span>
@@ -266,7 +266,7 @@
 <p>The output of <code>tof_train_model</code> is a <code>tof_model</code>, an object containing information about the trained model (and that can be passed to the <code>tof_predict</code> and <code>tof_assess_model</code> verbs). When a <code>tof_model</code> is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
-<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 </span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 </span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 25 × 2</span></span>
 <span class="co">#&gt;    feature             coefficient</span>
 <span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

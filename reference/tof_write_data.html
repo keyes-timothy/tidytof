@@ -78,9 +78,9 @@
     <dl><dt>tof_tibble</dt>
 <dd><p>A `tof_tbl` or a `tibble`.</p></dd>
 <dt>group_cols</dt>
-<dd><p>Unquoted names of the columns in `tof_tibble` that should
+<dd><p>Optional. Unquoted names of the columns in `tof_tibble` that should
 be used to group cells into separate files. Supports tidyselect helpers. Defaults to
-NULL (all cells are written into a single file).</p></dd>
+no grouping (all cells are written into a single file).</p></dd>
 <dt>out_path</dt>
 <dd><p>Path to the directory where output files should be saved.</p></dd>
 <dt>format</dt>
@@ -90,7 +90,7 @@ NULL (all cells are written into a single file).</p></dd>
 to create the output .csv/.fcs file names. Defaults to "_".</p></dd>
 <dt>file_name</dt>
 <dd><p>If `group_cols` isn't specified, the name (without an extension)
-that should be used for the saved .csv file.</p></dd>
+that should be used for the saved file.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>

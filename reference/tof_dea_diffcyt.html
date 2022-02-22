@@ -79,10 +79,10 @@ data.</p>
   <span class="va">tof_tibble</span>,
   <span class="va">sample_col</span>,
   <span class="va">cluster_col</span>,
-  marker_cols <span class="op">=</span> <span class="fu">where</span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  marker_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
   <span class="va">fixed_effect_cols</span>,
   <span class="va">random_effect_cols</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lmm"</span>, <span class="st">"limma"</span><span class="op">)</span>,
+  diffcyt_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lmm"</span>, <span class="st">"limma"</span><span class="op">)</span>,
   include_observation_level_random_effects <span class="op">=</span> <span class="cn">FALSE</span>,
   min_cells <span class="op">=</span> <span class="fl">3</span>,
   min_samples <span class="op">=</span> <span class="fl">5</span>,
@@ -128,7 +128,7 @@ patient id (in a paired design), or patient age.</p>
 <p>Note that without many samples at each level of each of the
 random effect variables, it can be easy to overfit mixed models. For most CyTOF
 experiments, 2 or fewer (and often 0) random effect variables are appropriate.</p></dd>
-<dt>method</dt>
+<dt>diffcyt_method</dt>
 <dd><p>A string indicating which diffcyt method should be used for the
 differential expression analysis. Valid methods include "lmm" (the default)
 and "limma".</p></dd>

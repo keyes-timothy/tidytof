@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Clustering and metaclustering</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-02-05</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       
       <div class="d-none name"><code>clustering.Rmd</code></div>
@@ -118,12 +118,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
 <span class="co">#&gt;   sample_name    .flowsom_metacl… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph… 3                cluster1         0     2.46  0.733  3.96 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph… 3                cluster1         0.390 0.881 0      4.52 0.569</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph… 3                cluster1         0.569 2.70  1.02   4.77 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph… 3                cluster1         0.199 2.98  0.199  5.15 0.569</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGraph… 3                cluster1         0.199 2.98  0.199  4.53 0    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGraph… 3                cluster1         0.881 3.42  0.390  5.71 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph… 12               cluster1         0     2.46  0.733  3.96 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph… 8                cluster1         0.390 0.881 0      4.52 0.569</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph… 12               cluster1         0.569 2.70  1.02   4.77 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph… 5                cluster1         0.199 2.98  0.199  5.15 0.569</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGraph… 12               cluster1         0.199 2.98  0.199  4.53 0    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGraph… 5                cluster1         0.881 3.42  0.390  5.71 0    </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 18 more variables: cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;, cd44 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;,</span></span>
 <span class="co">#&gt; <span style="color: #949494;">#   pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;,</span></span>
@@ -133,14 +133,20 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">.flowsom_metacluster</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 3</span></span>
-<span class="co">#&gt;   phenograph_cluster .flowsom_metacluster     n</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> cluster2           2                     <span style="text-decoration: underline;">1</span>000</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> cluster3           1                      999</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> cluster1           3                      996</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cluster1           1                        4</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> cluster3           3                        1</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 23 × 3</span></span>
+<span class="co">#&gt;    phenograph_cluster .flowsom_metacluster     n</span>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> cluster3           18                     460</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> cluster2           6                      371</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> cluster2           19                     243</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> cluster1           3                      242</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> cluster3           17                     234</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> cluster3           20                     232</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> cluster2           15                     201</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> cluster2           1                      163</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> cluster1           4                      157</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> cluster1           5                      156</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 13 more rows</span></span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -179,12 +185,12 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1</span></span>
 <span class="co">#&gt;   .kmeans_cluster</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 19             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 19             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 13             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 13</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 11             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 8              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 11             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 12             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 11             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 9</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="metaclustering-with-tof_metacluster">Metaclustering with <code>tof_metacluster()</code><a class="anchor" aria-label="anchor" href="#metaclustering-with-tof_metacluster"></a>

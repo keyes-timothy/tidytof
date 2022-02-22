@@ -210,6 +210,11 @@ from a flowFrame (read from a .fcs file.)</dd>
         <dd>Perform FlowSOM clustering on CyTOF data</dd>
       </dl><dl><dt>
           
+          <code><a href="tof_cluster_grouped.html">tof_cluster_grouped()</a></code> 
+        </dt>
+        <dd>Cluster (grouped) CyTOF data.</dd>
+      </dl><dl><dt>
+          
           <code><a href="tof_cluster_kmeans.html">tof_cluster_kmeans()</a></code> 
         </dt>
         <dd>Perform k-means clustering on CyTOF data.</dd>
@@ -218,6 +223,11 @@ from a flowFrame (read from a .fcs file.)</dd>
           <code><a href="tof_cluster_phenograph.html">tof_cluster_phenograph()</a></code> 
         </dt>
         <dd>Perform PhenoGraph clustering on CyTOF data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_cluster_tibble.html">tof_cluster_tibble()</a></code> 
+        </dt>
+        <dd>Cluster (ungrouped) CyTOF data.</dd>
       </dl><dl><dt>
           
           <code><a href="tof_apply_classifier.html">tof_apply_classifier()</a></code> 
@@ -247,6 +257,51 @@ similar healthy developmental subpopulation.</dd>
       
 
       <dl><dt>
+          
+          <code><a href="tof_metacluster.html">tof_metacluster()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_metacluster_consensus.html">tof_metacluster_consensus()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data using consensus clustering</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_metacluster_flowsom.html">tof_metacluster_flowsom()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data using FlowSOM's built-in metaclustering algorithm</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_metacluster_hierarchical.html">tof_metacluster_hierarchical()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data using hierarchical agglomerative clustering</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_metacluster_kmeans.html">tof_metacluster_kmeans()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data using k-means clustering</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_metacluster_phenograph.html">tof_metacluster_phenograph()</a></code> 
+        </dt>
+        <dd>Metacluster clustered CyTOF data using PhenoGraph clustering</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_upsample.html">tof_upsample()</a></code> 
+        </dt>
+        <dd>Upsample cells into the closest cluster in a reference dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_upsample_distance.html">tof_upsample_distance()</a></code> 
+        </dt>
+        <dd>Upsample cells into the closest cluster in a reference dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_upsample_neighbor.html">tof_upsample_neighbor()</a></code> 
+        </dt>
+        <dd>Upsample cells into the cluster of their nearest neighbor a reference dataset</dd>
+      </dl><dl><dt>
           
           <code><a href="tof_daa.html">tof_daa()</a></code> 
         </dt>
@@ -430,7 +485,7 @@ similar healthy developmental subpopulation.</dd>
 
       <dl><dt>
           
-          <code><a href="tof_plot_cells_dr.html">tof_plot_cells_dr()</a></code> 
+          <code><a href="tof_plot_cells_embedding.html">tof_plot_cells_embedding()</a></code> 
         </dt>
         <dd>Title</dd>
       </dl><dl><dt>
@@ -438,6 +493,11 @@ similar healthy developmental subpopulation.</dd>
           <code><a href="tof_plot_cells_layout.html">tof_plot_cells_layout()</a></code> 
         </dt>
         <dd>Title</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_cluster_mst.html">tof_plot_cluster_mst()</a></code> 
+        </dt>
+        <dd>Visualize clusters using a minimum spanning tree (MST).</dd>
       </dl></div><div class="section level2">
       <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
       
@@ -458,7 +518,18 @@ similar healthy developmental subpopulation.</dd>
           
           <code><a href="rev_asinh.html">rev_asinh()</a></code> 
         </dt>
-        <dd>Reverses arcsinh transformation with cofactor `scale_factor` and a shift of `shift_factor`.</dd>
+        <dd>Reverses arcsinh transformation with cofactor `scale_factor` and a
+shift of `shift_factor`.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="cosine_similarity.html">cosine_similarity()</a></code> 
+        </dt>
+        <dd>Find the cosine similarity between two vectors</dd>
+      </dl><dl><dt>
+          
+          <code><a href="l2_normalize.html">l2_normalize()</a></code> 
+        </dt>
+        <dd>L2 normalize an input vector x to a length of 1</dd>
       </dl><dl><dt>
           
           <code><a href="dot.html">dot()</a></code> 
@@ -469,6 +540,11 @@ similar healthy developmental subpopulation.</dd>
           <code><a href="magnitude.html">magnitude()</a></code> 
         </dt>
         <dd>Find the magnitude of a vector.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="where.html">where()</a></code> 
+        </dt>
+        <dd>Select variables with a function</dd>
       </dl><dl><dt>
           
           <code><a href="tof_cosine_dist.html">tof_cosine_dist()</a></code> 

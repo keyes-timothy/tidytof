@@ -82,9 +82,9 @@ subgroups using `group_cols`.</p>
   <span class="va">tof_tibble</span>,
   <span class="va">cluster_col</span>,
   group_cols <span class="op">=</span> <span class="cn">NULL</span>,
-  marker_cols <span class="op">=</span> <span class="fu">where</span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
-  <span class="va">stimulation_col</span>,
-  <span class="va">basal_level</span>,
+  marker_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  <span class="va">emd_col</span>,
+  <span class="va">reference_level</span>,
   format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wide"</span>, <span class="st">"long"</span><span class="op">)</span>,
   num_bins <span class="op">=</span> <span class="fl">100</span>
 <span class="op">)</span></code></pre></div>
@@ -105,18 +105,26 @@ should be used to break the rows of `tof_tibble` into subgroups for the feature
 extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).</p></dd>
 <dt>marker_cols</dt>
 <dd><p>Unquoted column names representing which columns in `tof_tibble`
-(i.e. which CyTOF protein measurements) should be included in the feature extraction
+(i.e. which CyTOF protein measurements) should be included in the earth-mover's distance
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselect helpers.</p></dd>
-<dt>stimulation_col</dt>
-<dd><p>Optional. An unquoted column name that indicates which
-column in `tof_tibble` contains information about which stimulation condition each cell
-was exposed to during data acquisition. If provided, the feature extraction will be
+<dt>emd_col</dt>
+<dd><p>An unquoted column name that indicates which
+column in `tof_tibble` should be used to group cells into different distributions
+to be compared with one another during the EMD calculation. For example,
+if you want to compare marker expression distributions across stimulation
+conditions, `emd_col` should be the column in `tof_tibble` containing
+information about which stimulation condition each cell
+was exposed to during data acquisition.</p>
+<p>If provided, the feature extraction will be
 further broken down into subgroups by stimulation condition (and features from each stimulation
 condition will be included as their own features in wide format).</p></dd>
-<dt>basal_level</dt>
-<dd><p>A string indicating what the value in `stimulation_col`
-corresponds to the basal stimulation condition (i.e. "basal" or "unstimulated").</p></dd>
+<dt>reference_level</dt>
+<dd><p>A string indicating what the value in `emd_col`
+corresponds to the "reference" value to which all other values in `emd_col`
+should be compared. For example, if `emd_col` represents the stimulation
+condition for a cell, reference_level might take the value of "basal" or
+"unstimulated" if you want to compare each stimulation to the basal state.</p></dd>
 <dt>format</dt>
 <dd><p>A string indicating if the data should be returned in "wide" format
 (the default; each cluster feature is given its own column) or in "long" format

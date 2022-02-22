@@ -71,7 +71,7 @@ standard pre-processing steps before CyTOF data analysis.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_preprocess</span><span class="op">(</span>
   tof_tibble <span class="op">=</span> <span class="cn">NULL</span>,
-  channel_cols <span class="op">=</span> <span class="fu">where</span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  channel_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
   undo_noise <span class="op">=</span> <span class="cn">TRUE</span>,
   transform_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></span><span class="op">(</span><span class="va">x</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>

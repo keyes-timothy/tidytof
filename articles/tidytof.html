@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Getting started with tidytof</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-02-05</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       
       <div class="d-none name"><code>tidytof.Rmd</code></div>
@@ -95,8 +95,7 @@ p.caption {
 }
 </style>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span></code></pre></div>
 <p>Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.</p>
 <p><br></p>
 <div class="figure">
@@ -149,7 +148,7 @@ Figure 1: Researchers are often interested in biological questions that manifest
 <li>
 <code><a href="../reference/tof_cluster.html">tof_cluster()</a></code> clusters cells using one of several algorithms commonly applied to CyTOF data</li>
 <li>
-<code>tof_metacluster()</code> agglomerates clusters into a smaller number of metaclusters</li>
+<code><a href="../reference/tof_metacluster.html">tof_metacluster()</a></code> agglomerates clusters into a smaller number of metaclusters</li>
 <li>
 <code><a href="../reference/tof_daa.html">tof_daa()</a></code> performs differential abundance analysis (DAA) for clusters or metaclusters across experimental groups</li>
 <li>
@@ -194,7 +193,7 @@ Figure 1: Researchers are often interested in biological questions that manifest
   <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
     cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span>
     method <span class="op">=</span> <span class="st">"flowsom"</span>, <span class="co"># method specification, </span>
-    num_metaclusters <span class="op">=</span> <span class="fl">5</span> <span class="co"># method specification</span>
+    num_metaclusters <span class="op">=</span> <span class="fl">4L</span> <span class="co"># method specification</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
     group_cols <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, <span class="co"># column specification</span>
@@ -204,8 +203,8 @@ Figure 1: Researchers are often interested in biological questions that manifest
   <span class="fu"><a href="../reference/tof_plot_cells_layout.html">tof_plot_cells_layout</a></span><span class="op">(</span>
     knn_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span>
     color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, <span class="co"># column specification</span>
-    num_neighbors <span class="op">=</span> <span class="fl">7</span>, <span class="co"># method specification</span>
-    node_size <span class="op">=</span> <span class="fl">2</span> <span class="co"># method specification</span>
+    num_neighbors <span class="op">=</span> <span class="fl">7L</span>, <span class="co"># method specification</span>
+    node_size <span class="op">=</span> <span class="fl">2L</span> <span class="co"># method specification</span>
   <span class="op">)</span>
 <span class="co">#&gt; Loading required namespace: FlowSOM</span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
@@ -229,19 +228,20 @@ Figure 1: Researchers are often interested in biological questions that manifest
   <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
     cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, 
     method <span class="op">=</span> <span class="st">"flowsom"</span>, 
+    num_metaclusters <span class="op">=</span> <span class="fl">4L</span>, 
     seed <span class="op">=</span> <span class="fl">2020L</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># step 3</span>
   <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
     group_cols <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, 
     method <span class="op">=</span> <span class="st">"constant"</span>, 
-    num_cells <span class="op">=</span> <span class="fl">500</span>
+    num_cells <span class="op">=</span> <span class="fl">350</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># step 4</span>
   <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># step 5</span>
-  <span class="fu"><a href="../reference/tof_plot_cells_dr.html">tof_plot_cells_dr</a></span><span class="op">(</span>
-    dr_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,
+  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>
+    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,
     color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span> 
   <span class="op">)</span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>

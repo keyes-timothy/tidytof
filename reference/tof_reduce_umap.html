@@ -65,7 +65,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_reduce_umap</span><span class="op">(</span>
   <span class="va">tof_tibble</span>,
-  umap_cols <span class="op">=</span> <span class="fu">where</span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  umap_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
   num_comp <span class="op">=</span> <span class="fl">2</span>,
   neighbors <span class="op">=</span> <span class="fl">5</span>,
   min_dist <span class="op">=</span> <span class="fl">0.01</span>,
@@ -73,6 +73,7 @@
   epochs <span class="op">=</span> <span class="cn">NULL</span>,
   verbose <span class="op">=</span> <span class="cn">FALSE</span>,
   n_threads <span class="op">=</span> <span class="fl">1</span>,
+  return_recipe <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -104,6 +105,13 @@ console. Defaults to FALSE.</p></dd>
 <dt>n_threads</dt>
 <dd><p>Number of threads to use during UMAP calculation. Defaults
 to 1.</p></dd>
+<dt>return_recipe</dt>
+<dd><p>A boolean value indicating if instead of the UMAP result, a
+prepped <code><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></code> object
+containing the UMAP embedding should be
+returned. Set this option to TRUE if you want to create the UMAP embedding using
+one dataset but also want to project new observations onto the same embedding
+space later.</p></dd>
 <dt>...</dt>
 <dd><p>Optional. Other options to be passed as arguments to <code><a href="https://rdrr.io/pkg/uwot/man/umap.html" class="external-link">umap</a></code>.</p></dd>
 </dl></div>

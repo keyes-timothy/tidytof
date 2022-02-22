@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Feature extraction</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-02-05</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       
       <div class="d-none name"><code>feature-extraction.Rmd</code></div>
@@ -288,7 +288,7 @@
 <div class="section level2">
 <h2 id="calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd">Calculating differences in marker distributions using <code>tof_extract_emd()</code> and <code>tof_extract_jsd()</code><a class="anchor" aria-label="anchor" href="#calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd"></a>
 </h2>
-<p>The two final members of the <code>tof_extract_*</code> function family – <code>tof_extract_emd</code> and <code>tof_extract_jsd</code> – are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a <code>stimulation_col</code> that identifies which stimulation condition each cell is in, and a <code>basal_level</code> that specifies the reference (i.e. unstimulated) condition within the <code>stimulation_col</code>.</p>
+<p>The two final members of the <code>tof_extract_*</code> function family – <code>tof_extract_emd</code> and <code>tof_extract_jsd</code> – are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a stimulation column (using the <code>emd_col</code> or <code>jsd_col</code> argument) that identifies the stimulation condition each cell is in, and a <code>reference_level</code> that specifies the reference (i.e. unstimulated) condition within the <code>emd_col</code> or <code>jsd_col</code>.</p>
 <p>With these additional arguments, <code>tof_extract_emd</code> computes the Earth-mover’s distance between each marker’s distribution in the stimulation conditions (within each cluster) and the basal condition; similarly, <code>tof_extract_jsd</code> computes the Jensen-Shannon divergence index between the same distributions. Both of these values are ways to compare how different 2 distributions are to one another and are more computationally expensive (but also higher-resolution) than simply comparing measures of central tendency.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Earth-mover's distance</span>
@@ -297,8 +297,8 @@
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>, 
     marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    stimulation_col <span class="op">=</span> <span class="va">stimulation</span>, 
-    basal_level <span class="op">=</span> <span class="st">"Basal"</span>
+    emd_col <span class="op">=</span> <span class="va">stimulation</span>, 
+    reference_level <span class="op">=</span> <span class="st">"Basal"</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>
@@ -324,8 +324,8 @@
     cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>,  
     marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    stimulation_col <span class="op">=</span> <span class="va">stimulation</span>, 
-    basal_level <span class="op">=</span> <span class="st">"Basal"</span>
+    jsd_col <span class="op">=</span> <span class="va">stimulation</span>, 
+    reference_level <span class="op">=</span> <span class="st">"Basal"</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>

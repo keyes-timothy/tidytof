@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Differential discovery analysis</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-02-05</h4>
+            <h4 data-toc-skip class="date">2022-02-22</h4>
       
       
       <div class="d-none name"><code>differential-discovery-analysis.Rmd</code></div>
@@ -159,7 +159,7 @@
     effect_col <span class="op">=</span> <span class="va">stimulation</span>, 
     group_cols <span class="op">=</span> <span class="va">patient</span>, 
     test_type <span class="op">=</span> <span class="st">"paired"</span>, 
-    daa_method <span class="op">=</span> <span class="st">"ttest"</span>
+    method <span class="op">=</span> <span class="st">"ttest"</span>
   <span class="op">)</span>
 
 <span class="va">daa_result</span>
@@ -255,7 +255,7 @@
   <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>channel_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_dea.html">tof_dea</a></span><span class="op">(</span>
-    dea_method <span class="op">=</span> <span class="st">"ttest"</span>, 
+    method <span class="op">=</span> <span class="st">"ttest"</span>, 
     cluster_col <span class="op">=</span> <span class="va">population_id</span>, 
     marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>, 
     effect_col <span class="op">=</span> <span class="va">stimulation</span>,
