@@ -8,7 +8,7 @@
 #'
 #' This function performs FlowSOM clustering on CyTOF data using a user-specified
 #' selection of input variables/CyTOF measurements. It is mostly a convenient
-#' wrapper around \code{\link[FlowSOM]{BuildSOM}} and \code{\link[FlowSOM]{MetaClustering}}.
+#' wrapper around \code{\link[FlowSOM]{SOM}} and \code{\link[FlowSOM]{MetaClustering}}.
 #'
 #' For additional details about the FlowSOM algorithm,
 #' see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
@@ -38,7 +38,7 @@
 #' @param num_metaclusters An integer indicating the maximum number of metaclusters
 #' that should be returned after metaclustering. Defaults to 20.
 #'
-#' @param seed An integer used to set the random seed for the FlowSOM clustering.
+#' @param seed An integer used to set the random seed for the clustering.
 #' Setting this argument explicitly can be useful for reproducibility purposes.
 #' Defaults to a random integer
 #'
@@ -166,7 +166,7 @@ tof_cluster_flowsom <-
 #' for the nearest-neighbor calculation. Options include "euclidean"
 #' (the default) and "cosine" distances.
 #'
-#' @param seed An integer used to set the random seed for the FlowSOM clustering.
+#' @param seed An integer used to set the random seed for the clustering.
 #' Setting this argument explicitly can be useful for reproducibility purposes.
 #' Defaults to a random integer
 #'
@@ -227,9 +227,9 @@ tof_cluster_phenograph <-
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
 #' @param num_clusters An integer indicating the maximum number of clusters
-#' that should be returned Defaults to 20.
+#' that should be returned. Defaults to 20.
 #'
-#' @param seed An integer used to set the random seed for the FlowSOM clustering.
+#' @param seed An integer used to set the random seed for the clustering.
 #' Setting this argument explicitly can be useful for reproducibility purposes.
 #' Defaults to a random integer
 #'
@@ -425,7 +425,7 @@ tof_cluster_ddpr <-
 #'
 #' This function is a wrapper around {tidytof}'s tof_cluster_* function family.
 #' It performs clustering on CyTOF data using a user-specified method (of 5 choices)
-#' and each method's corresponding input parameters
+#' and each method's corresponding input parameters.
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
@@ -440,13 +440,13 @@ tof_cluster_ddpr <-
 #' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 #' a single-column tibble including only the cluster ids should be returned (FALSE).
 #'
+#' @param method A string indicating which clustering methods should be used. Valid
+#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
+#'
 #' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
 #' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
-#'
-#' @param method A string indicating which clustering methods should be used. Valid
-#' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
 #' @family clustering functions
 #'
@@ -554,7 +554,7 @@ tof_cluster_tibble <-
       stop("Not a valid clustering method.")
     }
 
-    if (add_col == TRUE) {
+    if (add_col) {
       result <-
         dplyr::bind_cols(tof_tibble, clusters)
     } else {

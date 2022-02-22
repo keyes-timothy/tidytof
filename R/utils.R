@@ -85,6 +85,73 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 
 }
 
+# metaclustering ---------------------------------------------------------------
+
+tof_summarize_clusters <-
+  function(
+    tof_tibble,
+    cluster_col,
+    metacluster_cols,
+    central_tendency_function = stats::median
+  ) {
+    result <-
+      tof_tibble %>%
+      tof_extract_central_tendency(
+        cluster_col = {{cluster_col}},
+        marker_cols = {{metacluster_cols}},
+        central_tendency_function = central_tendency_function,
+        format = "long"
+      ) %>%
+      tidyr::pivot_wider(
+        names_from = .data$channel,
+        values_from = .data$values
+      )
+
+    return(result)
+  }
+
+tof_join_metacluster <-
+  function(
+    tof_tibble,
+    meta_tibble,
+    cluster_col,
+    metacluster_vector
+  ) {
+    cluster_colname <- colnames(dplyr::select(tof_tibble, {{cluster_col}}))
+
+    cluster_dictionary <-
+      meta_tibble %>%
+      dplyr::select({{cluster_col}}) %>%
+      dplyr::mutate(.metacluster = metacluster_vector)
+
+    result <-
+      tof_tibble %>%
+      dplyr::select({{cluster_col}}) %>%
+      dplyr::left_join(cluster_dictionary, by = cluster_colname) %>%
+      dplyr::select(-{{cluster_col}})
+
+    return(result)
+  }
+
+flowsom_consensus <-
+  function(data_matrix, num_clusters) {
+    tof_tibble <-
+      t(data_matrix) %>%
+      dplyr::as_tibble()
+
+    result <-
+      tof_cluster_flowsom(
+      tof_tibble = tof_tibble,
+      som_xdim = num_clusters,
+      som_ydim = 1,
+      som_distance_function = "euclidean",
+      perform_metaclustering = FALSE
+    ) %>%
+      dplyr::pull(.data$flowsom_cluster)
+
+    return(result)
+  }
+
 # mathematical operations ------------------------------------------------------
 
 #' Find the dot product between two vectors.
@@ -93,8 +160,6 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 #' @param y A numeric vector.
 #'
 #' @return The dot product between x and y.
-#'
-#'
 #'
 dot <- function(x, y) {
   return(as.numeric(t(x) %*% y))
@@ -718,8 +783,6 @@ make_binary_vector <- function(length, indices) {
 
   return(result)
 }
-
-where <- tidyselect::vars_select_helpers$where
 
 deframe <- function(x) {
   value <- x[[2L]]

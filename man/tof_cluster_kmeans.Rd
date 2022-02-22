@@ -20,9 +20,9 @@ use in computing the k-means clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{num_clusters}{An integer indicating the maximum number of clusters
-that should be returned Defaults to 20.}
+that should be returned. Defaults to 20.}
 
-\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+\item{seed}{An integer used to set the random seed for the clustering.
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
 

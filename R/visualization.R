@@ -169,6 +169,11 @@ tof_plot_cells_layout <-
     # check graph type
     graph_type = rlang::arg_match(graph_type)
 
+    # throw error if color_col is missing
+    if (missing(color_col)) {
+      stop("color_col must be specified.")
+    }
+
     knn_data <-
       tof_tibble %>%
       # select only knn_cols

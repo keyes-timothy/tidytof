@@ -42,7 +42,7 @@ Defaults to TRUE.}
 \item{num_metaclusters}{An integer indicating the maximum number of metaclusters
 that should be returned after metaclustering. Defaults to 20.}
 
-\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+\item{seed}{An integer used to set the random seed for the clustering.
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
 
@@ -58,7 +58,7 @@ the flowSOM cluster to which each cell (i.e. each row) in `tof_tibble` was assig
 \description{
 This function performs FlowSOM clustering on CyTOF data using a user-specified
 selection of input variables/CyTOF measurements. It is mostly a convenient
-wrapper around \code{\link[FlowSOM]{BuildSOM}} and \code{\link[FlowSOM]{MetaClustering}}.
+wrapper around \code{\link[FlowSOM]{SOM}} and \code{\link[FlowSOM]{MetaClustering}}.
 }
 \details{
 For additional details about the FlowSOM algorithm,

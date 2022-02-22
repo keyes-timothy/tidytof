@@ -29,7 +29,7 @@ will add time to the computation). Defaults to 30.}
 for the nearest-neighbor calculation. Options include "euclidean"
 (the default) and "cosine" distances.}
 
-\item{seed}{An integer used to set the random seed for the FlowSOM clustering.
+\item{seed}{An integer used to set the random seed for the clustering.
 Setting this argument explicitly can be useful for reproducibility purposes.
 Defaults to a random integer}
 

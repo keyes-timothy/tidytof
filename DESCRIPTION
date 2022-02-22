@@ -55,6 +55,7 @@ Imports:
     tibble,
     Rcpp
 Suggests:
+    ConsensusClusterPlus,
     Biobase,
     broom,
     covr,
@@ -67,7 +68,7 @@ Suggests:
     HDCytoData,
     knitr,
     markdown,
-    philentropy, 
+    philentropy,
     rmarkdown,
     Rtsne,
     statmod,

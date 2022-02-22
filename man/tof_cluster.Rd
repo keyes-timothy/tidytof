@@ -32,7 +32,7 @@ plus an additional column encoding the cluster ids.
 \description{
 This function is a wrapper around {tidytof}'s tof_cluster_* function family.
 It performs clustering on CyTOF data using a user-specified method (of 5 choices)
-and each method's corresponding input parameters
+and each method's corresponding input parameters.
 }
 \seealso{
 Other clustering functions: 
