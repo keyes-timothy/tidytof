@@ -30,6 +30,8 @@ reference:
 - title: "Cluster-level data analysis"
   desc: "Functions for data processing tasks at the cluster or cell subpopulation level"
   contents:
+  - starts_with("tof_metacluster")
+  - starts_with("tof_upsample")
   - starts_with("tof_daa")
   - starts_with("tof_dea")
   - starts_with("tof_extract")
@@ -57,8 +59,11 @@ reference:
   contents:
   - get_extension
   - rev_asinh
+  - cosine_similarity
+  - l2_normalize
   - dot
   - magnitude
+  - where
   - tof_cosine_dist
   - tof_is_numeric
   - tof_find_knn
