@@ -91,13 +91,20 @@ tof_summarize_clusters <-
   function(
     tof_tibble,
     cluster_col,
-    metacluster_cols,
+    metacluster_cols = where(tof_is_numeric),
+    group_cols,
     central_tendency_function = stats::median
   ) {
+
+    if (missing(group_cols)) {
+      group_cols <- NULL
+    }
+
     result <-
       tof_tibble %>%
       tof_extract_central_tendency(
         cluster_col = {{cluster_col}},
+        group_cols = {{group_cols}},
         marker_cols = {{metacluster_cols}},
         central_tendency_function = central_tendency_function,
         format = "long"
@@ -776,6 +783,92 @@ tof_knn_density <-
     return(densities) # a vector of length N (number of cells) with the ith
     # entry representing the KNN-estimated density of the ith cell.
   }
+
+
+tof_make_knn_graph <-
+  function(
+    tof_tibble, # single-cell data
+    knn_cols, # unquoted column names of columns to use in the knn calculation
+    num_neighbors, # number of knn's
+    distance_function = c("euclidean", "cosine"),
+    knn_error = 0, # eps value in RANN::nn2
+    graph_type = c("weighted", "unweighted") # weighted or unweighted graph
+  ) {
+    knn_data <-
+      tof_tibble %>%
+      # select only knn_cols
+      dplyr::select({{knn_cols}}) %>%
+      tof_find_knn(
+        k = num_neighbors,
+        distance_function = distance_function,
+        eps = knn_error
+      )
+
+    # extract knn_ids and put them into long format
+    knn_ids <-
+      knn_data %>%
+      purrr::pluck("neighbor_ids")
+    colnames(knn_ids) <- 1:ncol(knn_ids)
+
+    knn_ids <-
+      knn_ids %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) %>%
+      tidyr::pivot_longer(
+        cols = -.data$from,
+        names_to = "neighbor_index",
+        values_to = "to"
+      )
+
+    if (graph_type == "weighted") {
+      # extract knn distances and put them into long format
+      knn_dists <-
+        knn_data %>%
+        purrr::pluck("neighbor_distances")
+      colnames(knn_dists) <- 1:ncol(knn_dists)
+
+      knn_dists <-
+        knn_dists %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
+        tidyr::pivot_longer(
+          cols = -.data$from,
+          names_to = "neighbor_index",
+          values_to = "distance"
+        )
+
+      # join knn distances with knn ids for final edge tibble
+      edge_tibble <-
+        knn_ids %>%
+        dplyr::left_join(knn_dists, by = (c("from", "neighbor_index")))
+
+      if (distance_function == "euclidean") {
+        edge_tibble <-
+          edge_tibble %>%
+          dplyr::mutate(weight = 1 / (1 + .data$distance))
+      } else {
+        edge_tibble <-
+          edge_tibble %>%
+          dplyr::mutate(weight = 1 - .data$distance)
+      }
+
+    } else {
+      edge_tibble <-
+        knn_ids
+    }
+
+    # create the knn_graph as a tidygraph object
+    knn_graph <-
+      tidygraph::tbl_graph(
+        nodes = tof_tibble,
+        edges = edge_tibble,
+        directed = FALSE
+      )
+
+    return(knn_graph)
+
+  }
+
 
 make_binary_vector <- function(length, indices) {
   result <- rep.int(0, times = length)

@@ -160,7 +160,7 @@ citrus_data %>%
 
 ## Calculating differences in marker distributions using `tof_extract_emd()` and `tof_extract_jsd()`
 
-The two final members of the `tof_extract_*` function family -- `tof_extract_emd` and `tof_extract_jsd` -- are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a `stimulation_col` that identifies which stimulation condition each cell is in, and a `basal_level` that specifies the reference (i.e. unstimulated) condition within the `stimulation_col`. 
+The two final members of the `tof_extract_*` function family -- `tof_extract_emd` and `tof_extract_jsd` -- are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a stimulation column (using the `emd_col` or `jsd_col` argument) that identifies the stimulation condition each cell is in, and a `reference_level` that specifies the reference (i.e. unstimulated) condition within the `emd_col` or `jsd_col`. 
 
 With these additional arguments, `tof_extract_emd` computes the Earth-mover's distance between each marker's distribution in the stimulation conditions (within each cluster) and the basal condition; similarly, `tof_extract_jsd` computes the Jensen-Shannon divergence index between the same distributions. Both of these values are ways to compare how different 2 distributions are to one another and are more computationally expensive (but also higher-resolution) than simply comparing measures of central tendency.
 
@@ -171,8 +171,8 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient, 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    emd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 ```
@@ -184,8 +184,8 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient,  
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    jsd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 ```

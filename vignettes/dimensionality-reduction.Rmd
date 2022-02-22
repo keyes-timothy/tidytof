@@ -83,22 +83,22 @@ phenograph_data %>%
 
 see `?tof_reduce_pca`, `?tof_reduce_umap`, and `?tof_reduce_tsne` for additional details.
 
-## Visualization using tof_plot_cells_dr()
+## Visualization using `tof_plot_cells_embedding()`
 
 Regardless of the method used, reduced-dimension feature embeddings can be visualized using `{ggplot2}` (or any graphics package). `{tidytof}` also provides some helper functions for easily generating dimensionality reduction plots from a `tof_tbl` or tibble with columns representing embedding dimensions:
 
 ```{r}
 # plot the tsne embeddings using color to distinguish between clusters
 phenograph_tsne %>% 
-  tof_plot_cells_dr(
-    dr_cols = contains(".tsne"), 
+  tof_plot_cells_embedding(
+    embedding_cols = contains(".tsne"), 
     color_col = phenograph_cluster
   )
 
 # plot the tsne embeddings using color to represent CD11b expression
 phenograph_tsne %>% 
-  tof_plot_cells_dr(
-    dr_cols = contains(".tsne"), 
+  tof_plot_cells_embedding(
+    embedding_cols = contains(".tsne"), 
     color_col = cd11b
   ) + 
   ggplot2::scale_fill_viridis_c()

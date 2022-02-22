@@ -20,7 +20,8 @@ group defined by `group_cols`.}
 A `tof_tbl` with the same number of columns as the input `tof_tibble`,
 but fewer rows. Specifically, the number of rows will be `num_cells` multiplied
 by the number of unique combinations of the values in `group_cols`. If any group
-has fewer than `num_cells` number of cells, an error will be thrown.
+has fewer than `num_cells` number of cells, all cells from that group will be
+kept.
 }
 \description{
 This function downsamples the number of cells in a `tof_tbl` by randomly selecting

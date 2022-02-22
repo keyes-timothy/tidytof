@@ -34,7 +34,6 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 ```{r setup, message = FALSE}
 library(tidytof)
-library(dplyr)
 ```
 
 Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
@@ -117,7 +116,7 @@ ddpr_data %>%
   tof_cluster(
     cluster_cols = starts_with("cd"), # column specification
     method = "flowsom", # method specification, 
-    num_metaclusters = 5 # method specification
+    num_metaclusters = 4L # method specification
   ) %>% 
   tof_downsample(
     group_cols = .flowsom_metacluster, # column specification
@@ -127,8 +126,8 @@ ddpr_data %>%
   tof_plot_cells_layout(
     knn_cols = starts_with("cd"), # column specification
     color_col = .flowsom_metacluster, # column specification
-    num_neighbors = 7, # method specification
-    node_size = 2 # method specification
+    num_neighbors = 7L, # method specification
+    node_size = 2L # method specification
   )
 ```
 
@@ -154,19 +153,20 @@ ddpr_data %>%
   tof_cluster(
     cluster_cols = starts_with("cd"), 
     method = "flowsom", 
+    num_metaclusters = 4L, 
     seed = 2020L
-  ) %>% 
+  ) %>%
   # step 3
   tof_downsample(
     group_cols = .flowsom_metacluster, 
     method = "constant", 
-    num_cells = 500
+    num_cells = 350
   ) %>% 
   # step 4
   tof_reduce_dimensions(method = "tsne") %>% 
   # step 5
-  tof_plot_cells_dr(
-    dr_cols = contains("tsne"),
+  tof_plot_cells_embedding(
+    embedding_cols = contains("tsne"),
     color_col = .flowsom_metacluster 
   )
 ```

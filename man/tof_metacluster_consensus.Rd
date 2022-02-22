@@ -56,7 +56,7 @@ clustering. Defaults to 1 (all features are included).}
 during consensus clustering. Defaults to 20.}
 
 \item{clustering_algorithm}{A string indicating which clustering algorithm
-\code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}} should use to metacluster
+\code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}} should use to metacluster
 the subsampled clusters during each resampling. Options are "hierarchical"
 (the default), "pam" (partitioning around medoids), and "kmeans".}
 
@@ -64,10 +64,10 @@ the subsampled clusters during each resampling. Options are "hierarchical"
 be used to compute the distances between clusters during consensus clustering.
 Options are "euclidean" (the default),
 "manhattan", "minkowski", "pearson", "spearman", "maximum", "binary", and
-"canberra". See \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}}.}
+"canberra". See \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}}.}
 
 \item{...}{Optional additional arguments to pass to
-\code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}}.}
+\code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}}.}
 }
 \value{
 A tibble with a single column (`.consensus_metacluster`) and
@@ -78,7 +78,7 @@ indicates the metacluster label assigned to the same row in `tof_tibble`.
 This function performs consensus metaclustering on a `tof_tbl` containing CyTOF data
 using a user-specified selection of input variables/CyTOF measurements and
 the number of desired metaclusters.
-See \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}} for additional
+See \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}} for additional
 details.
 }
 \seealso{

@@ -142,8 +142,9 @@ consensus <- function(data, max, seed = NULL, ...){
   ))
 }
 
-SSE <- function(data,clustering){
-  if(!is(clustering, "numeric"))
+#' @importFrom methods is
+SSE <- function(data, clustering){
+  if(!methods::is(clustering, "numeric"))
     clustering <- as.numeric(as.factor(clustering))
   c_wss <- 0
   for(j in seq_along(clustering)){

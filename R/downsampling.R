@@ -21,7 +21,8 @@
 #' @return A `tof_tbl` with the same number of columns as the input `tof_tibble`,
 #' but fewer rows. Specifically, the number of rows will be `num_cells` multiplied
 #' by the number of unique combinations of the values in `group_cols`. If any group
-#' has fewer than `num_cells` number of cells, an error will be thrown.
+#' has fewer than `num_cells` number of cells, all cells from that group will be
+#' kept.
 #'
 #' @family downsampling functions
 #'
@@ -32,7 +33,8 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
   result <-
     tof_tibble %>%
     dplyr::group_by(dplyr::across({{group_cols}})) %>%
-    dplyr::slice_sample(n = num_cells) %>%
+    dplyr::slice_sample(prop = 1) %>%
+    dplyr::slice_head(n = num_cells) %>%
     dplyr::ungroup()
 
   return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))

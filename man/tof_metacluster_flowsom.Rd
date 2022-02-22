@@ -46,6 +46,9 @@ detect the optimal number of metaclusters.}
 Options are "consensus" (the default), "hierarchical", "kmeans", and "som"
 (i.e. self-organizing map; the FlowSOM algorithm itself).}
 
+\item{seed}{Optional. An integer to set a random seed for the metaclustering
+procedure..}
+
 \item{...}{Optional additional arguments to pass to
 \code{\link[FlowSOM]{MetaClustering}}.}
 }

@@ -35,8 +35,25 @@ rlang::.data
 
 # tidyselect reexports ---------------------------------------------------------
 
+#' Select variables with a function
+#'
+#' This is a copy of \code{\link[tidyselect]{where}}, a selection helper that
+#' selects the variables for which a predicate function returns TRUE. See
+#'  \code{\link[tidyselect]{language}} for more details about tidyselection.
+#'
+#' This help file was replicated verbatim from \code{\link[tidyselect]{tidyselect-package}}.
+#'
+#' @param fn 	A function that returns TRUE or FALSE (technically, a predicate function).
+#' Can also be a purrr-like formula.
+#'
 #' @importFrom tidyselect vars_select_helpers
+#'
 #' @export
+#'
+#' @references  Lionel Henry and Hadley Wickham (2021). tidyselect:
+#' Select from a Set of Strings. R package version 1.1.1.
+#' https://CRAN.R-project.org/package=tidyselect
+#'
 where <- tidyselect::vars_select_helpers$where
 
 # Alias required for help links in downstream packages

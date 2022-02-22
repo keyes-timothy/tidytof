@@ -456,7 +456,7 @@ tof_fit_split <-
           s = lambdas
         )  %>%
           tibble::as_tibble() %>%
-          dplyr::mutate(penalty = .data$lambdas)
+          dplyr::mutate(penalty = lambdas)
       )
 
     # tidy model metrics for each alpha and lambda value used to fit a model

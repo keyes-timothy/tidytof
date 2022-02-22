@@ -312,7 +312,7 @@ tof_metacluster_phenograph <-
 #' This function performs consensus metaclustering on a `tof_tbl` containing CyTOF data
 #' using a user-specified selection of input variables/CyTOF measurements and
 #' the number of desired metaclusters.
-#' See \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}} for additional
+#' See \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}} for additional
 #' details.
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
@@ -351,7 +351,7 @@ tof_metacluster_phenograph <-
 #' during consensus clustering. Defaults to 20.
 #'
 #' @param clustering_algorithm A string indicating which clustering algorithm
-#' \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}} should use to metacluster
+#' \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}} should use to metacluster
 #' the subsampled clusters during each resampling. Options are "hierarchical"
 #' (the default), "pam" (partitioning around medoids), and "kmeans".
 #'
@@ -359,10 +359,10 @@ tof_metacluster_phenograph <-
 #' be used to compute the distances between clusters during consensus clustering.
 #' Options are "euclidean" (the default),
 #' "manhattan", "minkowski", "pearson", "spearman", "maximum", "binary", and
-#' "canberra". See \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}}.
+#' "canberra". See \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}}.
 #'
 #' @param ... Optional additional arguments to pass to
-#' \code{\link[ConsensusClusterPlus]{ConcensusClusterPlus}}.
+#' \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}}.
 #'
 #' @return A tibble with a single column (`.consensus_metacluster`) and
 #' the same number of rows as the input `tof_tibble`. Each entry in the column
@@ -518,6 +518,9 @@ tof_metacluster_consensus <-
 #' \code{\link[FlowSOM]{MetaClustering}} should use to perform the metaclustering.
 #' Options are "consensus" (the default), "hierarchical", "kmeans", and "som"
 #' (i.e. self-organizing map; the FlowSOM algorithm itself).
+#'
+#' @param seed Optional. An integer to set a random seed for the metaclustering
+#' procedure..
 #'
 #' @param ... Optional additional arguments to pass to
 #' \code{\link[FlowSOM]{MetaClustering}}.

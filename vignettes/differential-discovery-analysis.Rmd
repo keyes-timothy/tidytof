@@ -99,7 +99,7 @@ daa_result <-
     effect_col = stimulation, 
     group_cols = patient, 
     test_type = "paired", 
-    daa_method = "ttest"
+    method = "ttest"
   )
 
 daa_result
@@ -187,7 +187,7 @@ dea_result <-
   citrus_data %>% 
   tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
   tof_dea(
-    dea_method = "ttest", 
+    method = "ttest", 
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
     effect_col = stimulation,
