@@ -56,6 +56,7 @@ benchmark_master <-
         run_pca, run_tsne, run_umap, run_preprocess, run_memory
       )
     ) {
+      if (verbose) {message("Reading in data")}
 
       # put together a small benchmarking dataset that includes a set of 1 to
       # 20 FCS files from the largest ddpr cohort
@@ -67,8 +68,33 @@ benchmark_master <-
         mutate(
           tidytof_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "tidytof"),
           flowcore_memory = map_dbl(.x = file_paths, .f = get_memory, mode = "flowcore"),
+          immunocluster_memory =
+            map_dbl(.x = file_paths, .f = get_memory, mode = "immunocluster"),
+          cytofkit_memory =
+            map_dbl(.x = file_paths, .f = get_memory, mode = "cytofkit"),
+          spectre_memory =
+            map_dbl(.x = file_paths, .f = get_memory, mode = "spectre"),
           num_cells = map_int(.x = file_paths, .f = ~nrow(tof_read_data(.x)))
         )
+
+      ddpr_spectre <-
+        read_data_spectre(file_names = largest_cohort_paths[1:20], file_type = ".fcs")
+
+      ddpr_spectre_mini <-
+        tibble(
+          num_files = ddpr_datasets_mini$num_files,
+          file_names =
+            map(
+              .x = num_files,
+              .f = ~ str_remove(largest_cohort_names, pattern = ".fcs")[1:.x]
+            ),
+          data_table =
+            map(
+              .x = file_names,
+              .f = ~ ddpr_spectre[FileName %in% .x, ]
+            )
+        )
+
       # if needed, create CSV versions of the files in ddpr_datasets_mini
       if (set_up_csvs) {
         ddpr_large <-
@@ -101,6 +127,13 @@ benchmark_master <-
           files = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]]
         )
 
+      # same as above, but in SCE form (SCE of 20 experiments)
+      ddpr_mini_sce <-
+        read_data_immunocluster(
+          file_names = ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]],
+          group = basename(ddpr_datasets_mini$file_paths[[nrow(ddpr_datasets_mini)]])
+        )
+
       # store each benchmark iteration as a single row in a tibble.
       # Each row is an iteration. The "tibbles" column contains a single tibble
       # with all the cells for that iteration. The "flowSets" column contains a single
@@ -119,9 +152,20 @@ benchmark_master <-
             map(
               .x = 1:nrow(ddpr_datasets_mini),
               .f = ~ddpr_mini_flowset[1:.x]
+            ),
+          data_tables = ddpr_spectre_mini$data_table,
+          SCEs =
+            map(
+              .x = 1:nrow(ddpr_datasets_mini),
+              .f = ~
+                ddpr_mini_sce[
+                  ,
+                  ddpr_mini_sce@metadata$group %in% unique(ddpr_mini_sce@metadata$group)[1:.x]
+              ]
             )
         )
     }
+
     # handle the file paths for saving/loading benchmarking results
     in_out_paths <-
       tibble(
@@ -174,7 +218,7 @@ benchmark_master <-
 
     # reading files
     if (run_io) {
-      if (verbose) {print("benchmark io")}
+      if (verbose) {message("benchmark io")}
       ### Benchmarking function
       benchmark_io <-
         function(file_paths) {
@@ -183,6 +227,8 @@ benchmark_master <-
             read_data_base(file_names = file_paths),
             read_data_flowcore(file_names = file_paths),
             read_data_cytofkit(file_names = file_paths),
+            read_data_immunocluster(file_names = file_paths, group = file_paths),
+            read_data_spectre(file_names = file_paths, file_type = ".fcs"),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -193,6 +239,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -204,12 +252,21 @@ benchmark_master <-
           microbenchmark(
             read_data_tidytof(file_names = file_paths),
             read_data_base(file_names = file_paths),
+            read_data_spectre(file_names = file_paths, file_type = ".csv"),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
             as_tibble() %>%
             transmute(
-              engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"),
+              engine =
+                case_when(
+                  str_detect(expr, "tidytof")  ~ "tidytof",
+                  str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
+                  TRUE                         ~ "base"
+                ),
               time = time / (10^9)
             )
         }
@@ -228,6 +285,7 @@ benchmark_master <-
       ### Perform benchmarking
       io_benchmarking <-
         ddpr_datasets_mini %>%
+        #slice_head(n = 2L) %>%
         mutate(io_benchmarks = map(.x = file_paths, .f = benchmark_io))
 
       io_benchmarking_csv <-
@@ -247,17 +305,19 @@ benchmark_master <-
         write_rds(file = here::here("manuscript", "benchmarking", file_name_csv))
       }
 
-    # dowsampling
+    # downsampling
     if (run_downsample) {
-      if (verbose) {print("benchmark downsampling")}
+      if (verbose) {message("benchmark downsampling")}
       ### Benchmarking function
       benchmark_downsample <-
-        function(data_frame, flowset, file_names) {
+        function(data_frame, flowset, file_names, data_table) {
           microbenchmark(
             downsample_tidytof(data_frame),
             downsample_base(data_frame),
             downsample_flowcore(flowset),
             downsample_cytofkit(file_names),
+            downsample_immunocluster(file_names = file_names, group = file_names, num_cells = 200L),
+            downsample_spectre(data_table = data_table, num_cells = 200L),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -268,6 +328,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -284,11 +346,11 @@ benchmark_master <-
         mutate(
           downsample_benchmarks =
             pmap(
-              .l = list(tibbles, flowSets, file_paths),
+              .l = list(tibbles, flowSets, file_paths, data_tables),
               .f = benchmark_downsample
             )
         ) %>%
-        select(-tibbles, -flowSets)
+        select(-tibbles, -flowSets, -data_tables, -SCEs)
 
       # save results as .rds
       downsample_benchmarking %>%
@@ -297,15 +359,17 @@ benchmark_master <-
 
     # preprocessing
     if (run_preprocess) {
-      if (verbose) {print("benchmark preprocessing")}
+      if (verbose) {message("benchmark preprocessing")}
 
       benchmark_preprocess <-
-        function(data_frame, flowset, file_names) {
+        function(data_frame, flowset, file_names, data_table) {
           microbenchmark(
             preprocess_tidytof(data_frame),
-            preprocess_base(data_frame),
-            preprocess_flowcore(flowset),
-            preprocess_cytofkit(file_names),
+            #preprocess_base(data_frame),
+            #preprocess_flowcore(flowset),
+            #preprocess_cytofkit(file_names),
+            preprocess_immunocluster(file_names, group = file_names),
+            preprocess_spectre(data_table),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -316,6 +380,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -333,11 +399,11 @@ benchmark_master <-
         mutate(
           preprocess_benchmarks =
             pmap(
-              .l = list(tibbles, flowSets, file_paths),
+              .l = list(tibbles, flowSets, file_paths, data_tables),
               .f = benchmark_preprocess
             )
           ) %>%
-        select(-tibbles, -flowSets)
+        select(-tibbles, -flowSets, -data_tables, -SCEs)
 
       # save benchmarking output as an .rds
       preprocess_benchmarking %>%
@@ -432,21 +498,61 @@ benchmark_master <-
           flowSets = map(.x = file_paths, .f = read.flowSet)
         )
 
+      tsne_sces <-
+        map(
+          .x = tsne_flowsets$file_paths,
+          .f = ~ read_data_immunocluster(file_names = .x, group = .x)
+        )
+
+      new_dir <-
+        file.path(
+          tempdir(),
+          "tsne_files"
+        )
+      dir.create(path = new_dir, recursive = TRUE)
+
+      tsne_data_tables <-
+        map2(
+          .x = tsne_flowsets$file_paths,
+          .y = tsne_flowsets$num_cells,
+          .f = function(.x, .y) {
+            current_dir <- file.path(new_dir, .y)
+            dir.create(current_dir)
+            for (i in 1:length(.x)) {
+              file_name <- .x[[i]]
+              base_name <- base::basename(.x[[i]])
+              file.copy(from = file_name, to = file.path(current_dir, base_name))
+            }
+            input_data <-
+              Spectre::read.files(
+                file.loc = current_dir,
+                file.type = ".fcs",
+                do.embed.file.names = TRUE
+              )
+            result <- Spectre::do.merge.files(input_data)
+            return(result)
+          }
+        )
+
       tsne_tibbles$tsne_flowSets <- tsne_flowsets$flowSets
+      tsne_tibbles$data_tables <- tsne_data_tables
+      tsne_tibbles$SCEs <- tsne_sces
     }
 
     # tsne
     if (run_tsne) {
-      if (verbose) {print("benchmark tsne")}
+      if (verbose) {message("benchmark tsne")}
 
       ### Benchmarking function
       benchmark_tsne <-
-        function(data_frame, flowset) {
+        function(data_frame, flowset, data_table, SCE) {
           microbenchmark(
             tsne_tidytof(data_frame),
             tsne_base(data_frame),
             tsne_flowcore(flowset),
             tsne_cytofkit(data_frame),
+            tsne_spectre(data_table),
+            tsne_immunocluster(SCE),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -457,6 +563,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -471,13 +579,15 @@ benchmark_master <-
       ### Perform benchmarking
       tsne_benchmark <-
         tsne_tibbles %>%
-        #slice_head(n = 5) %>%
         mutate(
           tsne_benchmarks =
-            map2(.x = data_frames, .y = tsne_flowSets, .f = benchmark_tsne)
+            pmap(
+              .l = list(data_frames, tsne_flowSets, data_tables, SCEs),
+              .f = benchmark_tsne
+            )
         ) %>%
-        select(-data_frames, -tsne_flowSets) %>%
-        rename(num_cells = sample_cells)
+        select(-data_frames, -tsne_flowSets, -data_tables, -SCEs) %>%
+        dplyr::rename(num_cells = sample_cells)
 
       # save benchmarking output as an .rds
       tsne_benchmark %>%
@@ -487,7 +597,7 @@ benchmark_master <-
 
     # pca
     if (run_pca) {
-      if (verbose) {print("benchmark pca")}
+      if (verbose) {message("benchmark pca")}
 
       benchmark_pca <-
         function(data_frame, flowset) {
@@ -533,14 +643,16 @@ benchmark_master <-
 
     # umap
     if (run_umap) {
-      if (verbose) {print("benchmark umap")}
+      if (verbose) {message("benchmark umap")}
 
       benchmark_umap <-
-        function(data_frame, flowset) {
+        function(data_frame, flowset, data_table, SCE) {
           microbenchmark(
             umap_tidytof(data_frame),
-            umap_base(data_frame),
-            umap_flowcore(flowset),
+            #umap_base(data_frame),
+            #umap_flowcore(flowset),
+            umap_spectre(data_table),
+            umap_immunocluster(SCE),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -551,6 +663,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -566,10 +680,14 @@ benchmark_master <-
       umap_benchmark <-
         tsne_tibbles %>%
         mutate(
-          umap_benchmarks = map2(.x = data_frames, .y = tsne_flowSets, .f = benchmark_umap)
+          umap_benchmarks =
+            pmap(
+              .l = list(data_frames, tsne_flowSets, data_tables, SCEs),
+              .f = benchmark_umap
+            )
         ) %>%
-        select(-data_frames, - tsne_flowSets) %>%
-        rename(num_cells = sample_cells)
+        select(-data_frames, -tsne_flowSets, -data_tables, -SCEs) %>%
+        dplyr::rename(num_cells = sample_cells)
 
       # save benchmarking output as an .rds
       umap_benchmark %>%
@@ -579,7 +697,7 @@ benchmark_master <-
 
     # clustering
     if (run_cluster) {
-      if (verbose) {print("benchmark clustering")}
+      if (verbose) {message("benchmark clustering")}
 
       benchmark_clustering <-
         function(file_paths) {
@@ -587,6 +705,8 @@ benchmark_master <-
             flowsom_tidytof(file_names = file_paths),
             flowsom_base(file_names = file_paths),
             flowsom_cytofkit(file_names = file_paths),
+            flowsom_immunocluster(file_paths, group = file_paths),
+            flowsom_spectre(file_names = file_paths),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
@@ -597,6 +717,8 @@ benchmark_master <-
                   str_detect(expr, "tidytof")  ~ "tidytof",
                   str_detect(expr, "flowcore") ~ "flowcore",
                   str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
                   TRUE                         ~ "base"
                 ),
               time = time / (10^9)
@@ -611,7 +733,6 @@ benchmark_master <-
       ### perform benchmarking
       cluster_benchmarking <-
         ddpr_datasets_mini %>%
-        #slice_head(n = 5L) %>%
         mutate(
           cluster_benchmarks = map(.x = file_paths, .f = benchmark_clustering)
         )
@@ -622,19 +743,29 @@ benchmark_master <-
     }
 
     if (run_extract) {
-      if (verbose) {print("benchmark feature extraction")}
+      if (verbose) {message("benchmark feature extraction")}
 
       benchmark_extract <-
-        function(data_frame) {
+        function(data_frame, data_table, sce) {
           microbenchmark(
             extract_tidytof(data_frame = data_frame),
-            extract_base(data_frame = data_frame),
+            #extract_base(data_frame = data_frame),
+            extract_immunocluster(sce),
+            extract_spectre(data_table),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%
             as_tibble() %>%
             transmute(
-              engine = if_else(str_detect(expr, "tidytof"), "tidytof", "base"),
+              engine =
+                case_when(
+                  str_detect(expr, "tidytof")  ~ "tidytof",
+                  str_detect(expr, "flowcore") ~ "flowcore",
+                  str_detect(expr, "cytofkit") ~ "cytofkit",
+                  str_detect(expr, "immunocluster") ~ "immunocluster",
+                  str_detect(expr, "spectre") ~ "spectre",
+                  TRUE                         ~ "base"
+                ),
               time = time / (10^9)
             )
         }
@@ -657,10 +788,40 @@ benchmark_master <-
                   my_cluster =
                     sample(c("a", "b", "c", "d"), size = nrow(.x), replace = TRUE)
                 )
+            ),
+          data_tables = map(
+            .x = data_tables,
+            .f = ~
+              .x[,
+                 my_cluster :=
+                   sample(c("a", "b", "c", "d"), size = nrow(.x), replace = TRUE)
+              ]
+          ),
+          SCEs =
+            map2(
+              .x = SCEs,
+              .y = file_paths,
+              .f = function(sce, file_names) {
+                metadata <-
+                  sce@metadata %>%
+                  dplyr::filter(file %in% file_names) %>%
+                  mutate(
+                    my_cluster =
+                      sample(c("a", "b", "c", "d"), size = ncol(sce), replace = TRUE)
+                  )
+                sce@metadata <- metadata
+                return(sce)
+              }
             )
         ) %>%
-        mutate(extract_benchmarks = map(.x = tibbles, .f = benchmark_extract)) %>%
-        select(-tibbles, -flowSets)
+        mutate(
+          extract_benchmarks =
+            pmap(
+              .l = list(tibbles, data_tables, SCEs),
+              .f = benchmark_extract
+            )
+        ) %>%
+        dplyr::select(-tibbles, -flowSets, -data_tables, -SCEs)
 
       # save result as an .rds file
       extract_benchmarking %>%
@@ -669,11 +830,11 @@ benchmark_master <-
 
     # memory
     if (run_memory) {
-      if (verbose) {print("benchmark memory")}
+      if (verbose) {message("benchmark memory")}
 
       memory_tibble <-
         ddpr_datasets_mini %>%
-        select(num_files, num_cells, tidytof_memory, flowcore_memory)
+        select(num_files, ends_with("_memory"))
 
       memory_tibble %>%
         write_rds(file = here::here("manuscript", "benchmarking", "memory.rds"))
@@ -681,7 +842,7 @@ benchmark_master <-
 
     # style
     if (run_style) {
-      if (verbose) {print("benchmark style")}
+      if (verbose) {message("benchmark style")}
 
       prefixes <-
         c("read_data", "preprocess", "downsample", "pca", "tsne", "umap", "flowsom", "extract")
@@ -701,6 +862,12 @@ benchmark_master <-
       cytofkit_functions <-
         mget(x = paste0(prefixes, "_cytofkit"), ifnotfound = NA, envir = globalenv())
 
+      immunocluster_functions <-
+        mget(x = paste0(prefixes, "_immunocluster"), ifnotfound = NA, envir = globalenv())
+
+      spectre_functions <-
+        mget(x = paste0(prefixes, "_spectre"), ifnotfound = NA, envir = globalenv())
+
       # make tibble
       code_tibble <-
         tibble(
@@ -708,11 +875,15 @@ benchmark_master <-
           base_lines = map_int(.x = base_functions, .f = get_lines),
           tidytof_lines = map_int(.x = tidytof_functions, .f = get_lines),
           flowcore_lines = map_int(.x = flowcore_functions, .f = get_lines),
+          immunocluster_lines = map_int(.x = immunocluster_functions, .f = get_lines),
           cytofkit_lines = map_int(.x = cytofkit_functions, .f = get_lines),
+          spectre_lines = map_int(.x = spectre_functions, .f = get_lines),
           base_variables = map_int(.x = base_functions, .f = get_assignments),
           tidytof_variables = map_int(.x = tidytof_functions, .f = get_assignments),
           flowcore_variables = map_int(.x = flowcore_functions, .f = get_assignments),
-          cytofkit_variables = map_int(.x = cytofkit_functions, .f = get_assignments)
+          cytofkit_variables = map_int(.x = cytofkit_functions, .f = get_assignments),
+          immunocluster_variables = map_int(.x = immunocluster_functions, .f = get_assignments),
+          spectre_variables = map_int(.x = spectre_functions, .f = get_assignments)
         ) %>%
         pivot_longer(
           cols = -analysis,
@@ -723,7 +894,6 @@ benchmark_master <-
 
       code_tibble %>%
         write_rds(file = here::here("manuscript", "benchmarking", "code_style.rds"))
-
     }
 
   }

@@ -26,6 +26,9 @@ knitr::opts_chunk$set(
 
 ```{r libraries_globals}
 # libraries
+library(plyr)
+library(immunoCluster)
+library(Spectre)
 library(cytofkit)
 library(flowCore)
 library(tidytof)
@@ -34,12 +37,14 @@ library(microbenchmark)
 library(patchwork)
 filter <- dplyr::filter
 count <- dplyr::count
+summarize <- dplyr::summarize
 
 # source benchmarking functions 
 source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
+largest_file_name <- FALSE
 machine <- "excalibur"
 num_repeats <- 10L
 charizard <- 
@@ -47,32 +52,39 @@ charizard <-
     "base" = "#207394", 
     "tidytof" = "#cd5241", 
     "flowcore" = "#eeb45a", 
-    "cytofkit" = "#833118"
+    "cytofkit" = "#833118", 
+    "spectre" = "#837b92", 
+    "immunocluster" = "#FFEEB0"
   )
 engine_labels <- 
   c(
     "base" = "base", 
     "tidytof" = "tidytof", 
     "flowcore" = "flowCore", 
-    "cytofkit" = "cytofkit"
+    "cytofkit" = "cytofkit",
+    "spectre" = "Spectre", 
+    "immunocluster" = "immunoCluster"
   )
 
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
-run_io <- FALSE
-run_downsample <- FALSE
-run_preprocess <- FALSE
-run_tsne <- FALSE
-run_pca <- FALSE
-run_umap <- FALSE
+run_io <- TRUE
+run_downsample <- TRUE
+run_preprocess <- TRUE
+run_tsne <- TRUE
+run_pca <- TRUE
+run_umap <- TRUE
 run_cluster <- TRUE
-run_extract <- FALSE
-run_memory <- FALSE
+run_extract <- TRUE
+run_memory <- TRUE
 run_style <- TRUE
-verbose <- FALSE
 
 # should I print the large versions of each plot
 print_large <- FALSE
+
+# should messages be printed during benchmarking
+verbose <- FALSE
+
 
 # file paths 
 if (machine == "galaxia") { 
@@ -92,9 +104,14 @@ mini_path <-
 ddpr_files <- 
   dir(ddpr_path, full.names = TRUE)
 
+spectre_path <- 
+  file.path(base_path, "tidytof_benchmarking") %>% 
+  dir(full.names = TRUE) %>% 
+  purrr::pluck(1)
+
 ```
 
-```{r run_all_benchmarking, warning = FALSE, message = FALSE}
+```{r run_all_benchmarking, warning = FALSE, message = TRUE}
 # run all benchmarking from scratch 
 benchmark_master(
   set_up_csvs = set_up_csvs,
@@ -113,6 +130,9 @@ benchmark_master(
   base_path = base_path, 
   verbose = verbose
 )
+filter <- dplyr::filter
+count <- dplyr::count
+summarize <- dplyr::summarize
 ```
 
 
@@ -166,6 +186,7 @@ in_out_paths <-
 
 
 ```{r io_file_names}
+if (largest_file_name) { 
 # file paths
 file_name <- 
   in_out_paths %>% 
@@ -176,6 +197,21 @@ file_name_csv <-
   in_out_paths %>% 
   filter(process == "csv") %>% 
   pull(file_name)
+} else {
+  file_name <- 
+    in_out_paths %>% 
+    filter(process == "fcs") %>% 
+    pull(pattern) %>% 
+    str_replace("\\[\\:digit\\:\\]\\+", as.character(num_repeats)) %>% 
+    str_c(., ".rds")
+  
+  file_name_csv <- 
+    in_out_paths %>% 
+    filter(process == "csv") %>% 
+    pull(pattern) %>% 
+    str_replace("\\[\\:digit\\:\\]\\+", as.character(num_repeats)) %>% 
+    str_c(., ".rds")
+}
 ```
 
 
@@ -207,12 +243,12 @@ io_speed_plot <-
   unnest(cols = io_benchmarks) %>% 
   #mutate(engine = if_else(engine == "base", "flowcore", engine)) %>% 
   group_by(num_files, num_cells, engine) %>% 
-  summarize(
+  dplyr::summarize(
     mean_time = median(time), 
     max_time = quantile(time, 0.75), 
     min_time = quantile(time, 0.25)
   ) %>% 
-  ungroup() %>% 
+  dplyr::ungroup() %>% 
   ggplot(
     aes(
       x = num_cells, 
@@ -327,10 +363,20 @@ io_speed_plot_csv %>%
 
 
 ```{r downsample_file_names}
-file_name <- 
-  in_out_paths %>% 
-  filter(process == "downsampling") %>% 
-  pull(file_name)
+if (largest_file_name) { 
+  file_name <- 
+    in_out_paths %>% 
+    filter(process == "downsampling") %>% 
+    pull(file_name)
+} else {
+  file_name <- 
+    in_out_paths %>% 
+    filter(process == "downsampling") %>% 
+    pull(pattern) %>% 
+    str_replace("\\[\\:digit\\:\\]\\+", as.character(num_repeats)) %>% 
+    str_c(., ".rds")
+}
+
 ```
 
 
@@ -1756,9 +1802,10 @@ In addition to its competitive computational speed relative to equivalent base R
 \ 
 
 ```{r}
-make_style_plot <- function(raw, base, flowcore) { 
+make_style_plot <- function(raw, base, flowcore, cytofkit) { 
   base <- base + theme(legend.position = "none")
   flowcore <- flowcore + theme(legend.position = "none")
+  cytofkit <- cytofkit + theme(legend.position = "none")
   
   result <- 
     raw +
@@ -1766,12 +1813,14 @@ make_style_plot <- function(raw, base, flowcore) {
        flowcore + 
        plot_layout(nrow = 1, widths = c(5.8, 4.2))
     ) + 
+    cytofkit +
     plot_layout(
       guides = "collect", 
-      heights = c(4, 6),
+      heights = c(4, 6, 6),
       design = "
       #1111#
       222222
+      333###
     "
     ) + 
     plot_annotation(tag_levels = "A") + 
@@ -1783,12 +1832,13 @@ make_style_plot <- function(raw, base, flowcore) {
 ```
 
 
-```{r, fig.width = 10, fig.height = 7}
+```{r, fig.width = 10, fig.height = 10}
 lines_patchwork <- 
   make_style_plot(
     raw = lines_plot_raw, 
     base = lines_plot_base, 
-    flowcore = lines_plot_flowcore
+    flowcore = lines_plot_flowcore,
+    cytofkit = lines_plot_cytofkit
   )
 
 lines_patchwork
@@ -1800,7 +1850,7 @@ lines_patchwork %>%
       here::here("manuscript", "benchmarking", "lines_patchwork.png"), 
     device = "png", 
     width = 9.8, 
-    height = 7
+    height = 10
   )
 
 
@@ -1810,7 +1860,7 @@ lines_patchwork %>%
       here::here("manuscript", "benchmarking", "lines_patchwork.pdf"), 
     device = "pdf", 
     width = 9.8, 
-    height = 7
+    height = 10
   )
   
 ```
@@ -1821,12 +1871,13 @@ lines_patchwork %>%
 \newpage 
 
 
-```{r, fig.width = 9.5, fig.height = 7}
+```{r, fig.width = 9.5, fig.height = 10}
 variables_patchwork <- 
   make_style_plot(
     raw = variables_plot_raw, 
     base = variables_plot_base, 
-    flowcore = variables_plot_flowcore
+    flowcore = variables_plot_flowcore, 
+    cytofkit = variables_plot_cytofkit
   )
 
 print(variables_patchwork)
@@ -1837,7 +1888,7 @@ variables_patchwork %>%
       here::here("manuscript", "benchmarking", "variables_patchwork.png"), 
     device = "png", 
     width = 9.2, 
-    height = 7
+    height = 10
   )
 
 variables_patchwork %>% 
@@ -1846,7 +1897,7 @@ variables_patchwork %>%
       here::here("manuscript", "benchmarking", "variables_patchwork.pdf"), 
     device = "pdf", 
     width = 9.2, 
-    height = 7
+    height = 10
   )
   
 ```
