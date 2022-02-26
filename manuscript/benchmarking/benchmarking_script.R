@@ -365,9 +365,9 @@ benchmark_master <-
         function(data_frame, flowset, file_names, data_table) {
           microbenchmark(
             preprocess_tidytof(data_frame),
-            #preprocess_base(data_frame),
-            #preprocess_flowcore(flowset),
-            #preprocess_cytofkit(file_names),
+            preprocess_base(data_frame),
+            preprocess_flowcore(flowset),
+            preprocess_cytofkit(file_names),
             preprocess_immunocluster(file_names, group = file_names),
             preprocess_spectre(data_table),
             times = num_repeats,
@@ -834,7 +834,7 @@ benchmark_master <-
 
       memory_tibble <-
         ddpr_datasets_mini %>%
-        select(num_files, ends_with("_memory"))
+        select(num_files, num_cells, ends_with("_memory"))
 
       memory_tibble %>%
         write_rds(file = here::here("manuscript", "benchmarking", "memory.rds"))
