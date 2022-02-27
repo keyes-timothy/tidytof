@@ -649,8 +649,8 @@ benchmark_master <-
         function(data_frame, flowset, data_table, SCE) {
           microbenchmark(
             umap_tidytof(data_frame),
-            #umap_base(data_frame),
-            #umap_flowcore(flowset),
+            umap_base(data_frame),
+            umap_flowcore(flowset),
             umap_spectre(data_table),
             umap_immunocluster(SCE),
             times = num_repeats,

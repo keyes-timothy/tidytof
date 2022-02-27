@@ -73,10 +73,10 @@ run_downsample <- FALSE
 run_preprocess <- TRUE
 run_tsne <- FALSE
 run_pca <- FALSE
-run_umap <- FALSE
+run_umap <- TRUE
 run_cluster <- FALSE
 run_extract <- FALSE
-run_memory <- TRUE
+run_memory <- FALSE
 run_style <- TRUE
 
 # should I print the large versions of each plot
@@ -263,8 +263,8 @@ io_speed_plot <-
   geom_line(aes(group = engine)) + 
   geom_point(shape = 21, size = 2, color = "black") + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) +
+  scale_fill_manual(values = my_palette, labels = engine_labels) + 
+  scale_color_manual(values = my_palette, labels = engine_labels) +
   theme_bw() + 
   labs(
     subtitle = "FCS reader",
