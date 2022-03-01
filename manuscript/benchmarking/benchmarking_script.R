@@ -748,10 +748,10 @@ benchmark_master <-
       benchmark_extract <-
         function(data_frame, data_table, sce) {
           microbenchmark(
-            #extract_tidytof(data_frame = data_frame),
+            extract_tidytof(data_frame = data_frame),
             extract_base(data_frame = data_frame),
-            #extract_immunocluster(sce),
-            #extract_spectre(data_table),
+            extract_immunocluster(sce),
+            extract_spectre(data_table),
             times = num_repeats,
             unit = "s" # seconds
           ) %>%

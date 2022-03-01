@@ -611,6 +611,23 @@ file_name <-
 extract_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
+# base_extract <-
+#   read_rds(file = here::here("manuscript", "benchmarking", "base_extract.rds"))
+# 
+# 
+# extract_benchmarking <- 
+#   extract_benchmarking %>% 
+#   mutate(
+#     base_extract_speed = base_extract$extract_benchmarks, 
+#     extract_benchmarks = 
+#       map2(
+#         .x = extract_benchmarks, 
+#         .y = base_extract_speed, 
+#         .f = bind_rows
+#       )
+#   ) %>% 
+#   select(-base_extract_speed)
+
 extract_speed_plots <- 
   extract_benchmarking %>% 
   plot_benchmarks_split(subtitle = "Feature extraction", dodge = 0)
