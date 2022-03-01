@@ -173,7 +173,11 @@ downsample_base <-
     for (i in 1:num_file_names) {
       file_name <- file_names[[i]]
       file_indices <- which(data_frame$file_name == file_name)
-      subset_indices <- sample(x = file_indices, size = 200L)
+      if (length(file_indices) > 200L) {
+        subset_indices <- sample(x = file_indices, size = 200L)
+      } else {
+        subset_indices <- sample(x = file_indices, size = length(file_indices))
+      }
       final_subset[[file_name]] <- subset_indices
     }
     final_subset <- sort(as.numeric(c(final_subset, recursive = TRUE)))
@@ -186,7 +190,11 @@ downsample_flowcore <-
   function(flowset) {
     subset_flowframe <- function(flowframe) {
       num_cells <- nrow(flowframe)
-      sample_indices <- sort(sample(x = 1:num_cells, size = 200L))
+      if (num_cells > 200L) {
+        sample_indices <- sample(x = 1:num_cells, size = 200L)
+      } else {
+        sample_indices <- sample(x = 1:num_cells, size = num_cells)
+      }
       subsampled_flowframe <- flowframe[sample_indices]
       return(subsampled_flowframe)
     }

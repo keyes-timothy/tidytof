@@ -44,9 +44,9 @@ source(here::here("manuscript", "benchmarking", "benchmarking_functions.R"))
 source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
-largest_file_name <- FALSE
-machine <- "excalibur"
-num_repeats <- 10L
+largest_file_name <- TRUE
+machine <- "galaxia"
+num_repeats <- 1L
 charizard <- 
   c(
     "base" = "#207394", 
@@ -193,23 +193,24 @@ plot_benchmarks <-
   function(
     benchmark_data, 
     subtitle = "[Insert subtitle]", 
-    api = c("all", "high", "low")
+    api = c("all", "high", "low"), 
+    dodge = 0
   ) {
     if (api == "all") { 
       benchmark_data <- 
         benchmark_data %>% 
-        select(num_files, num_cells, last_col()) %>% 
+        select(num_cells, last_col()) %>% 
         unnest(last_col()) 
     } else if (api == "high") { 
          benchmark_data <- 
            benchmark_data %>% 
-           select(num_files, num_cells, last_col()) %>% 
+           select(num_cells, last_col()) %>% 
            unnest(last_col()) %>% 
            filter(engine %in% high_level_apis)
     } else if (api == "low") { 
       benchmark_data <- 
         benchmark_data %>% 
-        select(num_files, num_cells, last_col()) %>% 
+        select(num_cells, last_col()) %>% 
         unnest(last_col()) %>% 
         filter(engine %in% low_level_apis) 
     }
@@ -245,9 +246,17 @@ plot_benchmarks <-
           ymax = max_time
         )
       ) + 
-      geom_errorbar(width = width) + 
+      geom_errorbar(
+        width = width, 
+        #position = position_dodge(width = dodge)
+      ) + 
       geom_line(aes(group = engine)) + 
-      geom_point(shape = 21, size = 2, color = "black") + 
+      geom_point(
+        shape = 21, 
+        size = 2, 
+        color = "black", 
+        position = position_dodge(width = dodge)
+      ) + 
       scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
       scale_fill_manual(values = my_palette, labels = engine_labels) + 
       scale_color_manual(values = my_palette, labels = engine_labels) +
@@ -266,19 +275,20 @@ plot_benchmarks <-
 
 plot_benchmarks_split <- function(
   benchmark_data, 
-  subtitle =  "[Insert subtitle]"
+  subtitle =  "[Insert subtitle]", 
+  dodge = FALSE
 ) { 
   full_plot <- 
     benchmark_data %>% 
-    plot_benchmarks(subtitle = subtitle, api = "all")
+    plot_benchmarks(subtitle = subtitle, api = "all", dodge = dodge)
   
   high_plot <- 
     benchmark_data %>% 
-    plot_benchmarks(subtitle = subtitle, api = "high") 
+    plot_benchmarks(subtitle = subtitle, api = "high", dodge = dodge) 
   
   low_plot <- 
     benchmark_data %>% 
-    plot_benchmarks(subtitle = subtitle, api = "low")
+    plot_benchmarks(subtitle = subtitle, api = "low", dodge = dodge)
   
   result <- 
     list(
@@ -381,7 +391,7 @@ io_benchmarking <-
 
 io_speed_plots <- 
   io_benchmarking %>% 
-  plot_benchmarks_split(subtitle = "FCS reader")
+  plot_benchmarks_split(subtitle = "FCS reader", dodge = 1000)
 
 io_speed_plot <- io_speed_plots$full_plot
 io_high_plot <- io_speed_plots$high_plot
@@ -443,7 +453,7 @@ downsample_benchmarking <-
 
 downsample_speed_plots <- 
   downsample_benchmarking %>% 
-  plot_benchmarks_split(subtitle = "Downsampling")
+  plot_benchmarks_split(subtitle = "Downsampling", dodge = 3000)
 
 downsample_speed_plots %>% 
   save_bench_plots(file_name = file_name)
@@ -463,14 +473,6 @@ file_name <-
 ```
 
 
-```{r}
-preprocess_benchmarking %>%
-  select(num_cells, preprocess_benchmarks) %>% 
-  unnest() %>% 
-  group_by(num_cells, engine) %>% 
-  summarize(time = mean(time))
-```
-
 
 ```{r visualize_benchmarking_result, message = FALSE}
 preprocess_benchmarking <- 
@@ -478,7 +480,7 @@ preprocess_benchmarking <-
 
 preprocess_speed_plots <- 
   preprocess_benchmarking %>% 
-  plot_benchmarks_split(subtitle = "Preprocessing")
+  plot_benchmarks_split(subtitle = "Preprocessing", dodge = 5000)
 
 preprocess_speed_plots %>% 
   save_bench_plots(file_name = file_name)
