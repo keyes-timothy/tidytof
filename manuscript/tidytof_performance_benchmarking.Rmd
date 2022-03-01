@@ -45,8 +45,8 @@ source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
 largest_file_name <- TRUE
-machine <- "excalibur"
-num_repeats <- 10L
+machine <- "galaxia"
+num_repeats <- 1L
 charizard <- 
   c(
     "base" = "#207394", 
@@ -453,7 +453,7 @@ downsample_benchmarking <-
 
 downsample_speed_plots <- 
   downsample_benchmarking %>% 
-  plot_benchmarks_split(subtitle = "Downsampling", dodge = 3000)
+  plot_benchmarks_split(subtitle = "Downsampling", dodge = 5000)
 
 downsample_speed_plots %>% 
   save_bench_plots(file_name = file_name)
@@ -480,7 +480,7 @@ preprocess_benchmarking <-
 
 preprocess_speed_plots <- 
   preprocess_benchmarking %>% 
-  plot_benchmarks_split(subtitle = "Preprocessing", dodge = 5000)
+  plot_benchmarks_split(subtitle = "Preprocessing", dodge = 7500)
 
 preprocess_speed_plots %>% 
   save_bench_plots(file_name = file_name)
@@ -519,22 +519,17 @@ tsne_benchmark <-
 
 tsne_speed_plots <- 
   tsne_benchmark %>% 
-  plot_benchmarks_split(subtitle = "tSNE")
+  plot_benchmarks_split(subtitle = "tSNE", dodge = 10)
 
-tsne_speed_plot <- tsne_speed_plots$
+tsne_speed_plot <- tsne_speed_plots$full_plot
 
 if (print_large) {
   print(tsne_speed_plots)
 }
 
-tsne_speed_plot %>% 
-  ggsave(
-    filename = 
-      here::here("manuscript", "benchmarking", str_replace(file_name_tsne, ".rds", ".pdf")), 
-    device = "pdf", 
-    width = 5, 
-    height = 3
-  )
+tsne_speed_plots %>% 
+  save_bench_plots(file_name = file_name_tsne)
+
 
 ```
 
@@ -544,69 +539,16 @@ tsne_speed_plot %>%
 pca_benchmark <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_pca))
 
-max_cells <- max(pca_benchmark$num_cells)
-width <- max_cells * 0.05
-  
-engines <- 
+pca_speed_plots <- 
   pca_benchmark %>% 
-  select(pca_benchmarks) %>% 
-  unnest(pca_benchmarks) %>% 
-  pull(engine) %>% 
-  unique()
-
-num_engines <- length(engines)
-
-my_palette <- charizard[which(names(charizard) %in% engines)]
-
-# make a plot to summarize 
-pca_speed_plot <- 
-  pca_benchmark %>%
-  select(num_cells, pca_benchmarks) %>% 
-  unnest(cols = pca_benchmarks) %>% 
-  group_by(num_cells, engine) %>% 
-  summarize(
-    mean_time = median(time), 
-    max_time = quantile(time, 0.75), 
-    min_time = quantile(time, 0.25)
-  ) %>% 
-  ungroup() %>% 
-  ggplot(
-    aes(
-      x = num_cells, 
-      y = mean_time, 
-      fill = engine, 
-      color = engine, 
-      ymin = min_time, 
-      ymax = max_time
-    )
-  ) + 
-  geom_errorbar(width = width) + 
-  geom_line(aes(group = engine)) + 
-  geom_point(shape = 21, size = 2, color = "black") + 
-  scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  labs(
-    subtitle = "PCA",
-    x = "Number of cells", 
-    y = "Time (seconds)", 
-    fill = NULL, 
-    color = NULL
-  )
+  plot_benchmarks_split(subtitle = "PCA", dodge = 2000)
 
 if (print_large) {
-  pca_speed_plot
+  pca_speed_plots
 }
 
-pca_speed_plot %>% 
-  ggsave(
-    filename = 
-      here::here("manuscript", "benchmarking", str_replace(file_name_pca, ".rds", ".pdf")), 
-    device = "pdf", 
-    width = 5, 
-    height = 3
-  )
+pca_speed_plots %>% 
+  save_bench_plots(file_name = file_name_pca)
 
 ```
 
@@ -615,69 +557,17 @@ pca_speed_plot %>%
 umap_benchmark <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_umap))
 
-max_cells <- max(umap_benchmark$num_cells)
-width <- max_cells * 0.05
-  
-engines <- 
+umap_speed_plots <- 
   umap_benchmark %>% 
-  select(umap_benchmarks) %>% 
-  unnest(umap_benchmarks) %>% 
-  pull(engine) %>% 
-  unique()
+  plot_benchmarks_split(subtitle = "UMAP", dodge = 40)
 
-num_engines <- length(engines)
-
-my_palette <- charizard[which(names(charizard) %in% engines)]
-
-# make a plot to summarize 
-umap_speed_plot <- 
-  umap_benchmark %>%
-  select(num_cells, umap_benchmarks) %>% 
-  unnest(cols = umap_benchmarks) %>% 
-  group_by(num_cells, engine) %>% 
-  summarize(
-    mean_time = mean(time), 
-    max_time = max(time), 
-    min_time = min(time)
-  ) %>% 
-  ungroup() %>% 
-  ggplot(
-    aes(
-      x = num_cells, 
-      y = mean_time, 
-      fill = engine, 
-      color = engine, 
-      ymin = min_time, 
-      ymax = max_time
-    )
-  ) + 
-  geom_errorbar(width = width) + 
-  geom_line(aes(group = engine)) + 
-  geom_point(shape = 21, size = 2, color = "black") + 
-  scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  labs(
-    subtitle = "UMAP",
-    x = "Number of cells", 
-    y = "Time (seconds)", 
-    fill = NULL, 
-    color = NULL
-  )
+umap_speed_plots %>% 
+  save_bench_plots(file_name = file_name_umap)
 
 if (print_large) {
-  umap_speed_plot
+  umap_speed_plots
 }
 
-umap_speed_plot %>% 
-  ggsave(
-    filename = 
-      here::here("manuscript", "benchmarking", str_replace(file_name_umap, ".rds", ".pdf")), 
-    device = "pdf", 
-    width = 5, 
-    height = 3
-  )
 ```
 
 
@@ -694,73 +584,17 @@ file_name <-
 cluster_benchmarking <-
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
-max_cells <- max(cluster_benchmarking$num_cells)
-width <- max_cells * 0.05
-  
-
-engines <- 
+flowsom_speed_plots <- 
   cluster_benchmarking %>% 
-  select(cluster_benchmarks) %>% 
-  unnest(cluster_benchmarks) %>% 
-  pull(engine) %>% 
-  unique()
+  plot_benchmarks_split(subtitle = "FlowSOM", dodge = 1000)
 
-num_engines <- length(engines)
-
-my_palette <- charizard[which(names(charizard) %in% engines)]
-
-flowsom_speed_plot <- 
-  cluster_benchmarking %>% 
-  select(num_files, num_cells, cluster_benchmarks) %>% 
-  unnest(cols = cluster_benchmarks) %>% 
-  group_by(num_files, num_cells, engine) %>% 
-  summarize(
-    mean_time = median(time), 
-    max_time = quantile(time, 0.75), 
-    min_time = quantile(time, 0.25)
-  ) %>% 
-  ungroup() %>% 
-  ggplot(
-    aes(
-      x = num_cells, 
-      y = mean_time, 
-      fill = engine, 
-      color = engine, 
-      ymin = min_time, 
-      ymax = max_time
-    )
-  ) + 
-  geom_errorbar(width = width) + 
-  geom_line() +
-  geom_point(shape = 21, size = 2, color = "black") + 
-  scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  labs(
-    subtitle = "FlowSOM",
-    x = "Number of cells", 
-    y = "Time (seconds)", 
-    fill = NULL, 
-    color = NULL
-  )
+flowsom_speed_plots %>% 
+  save_bench_plots(file_name = file_name)
 
 if (print_large) {
-  flowsom_speed_plot
+  flowsom_speed_plots
 }
 
-flowsom_speed_plot %>% 
-  ggsave(
-    filename = 
-      here::here(
-        "manuscript", 
-        "benchmarking", 
-        str_replace(file_name, ".rds", ".pdf")
-      ), 
-    device = "pdf", 
-    width = 5, 
-    height = 3
-  )
 
 ```
 
@@ -777,73 +611,16 @@ file_name <-
 extract_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
-max_cells <- max(extract_benchmarking$num_cells)
-width <- max_cells * 0.05
-  
-
-engines <- 
+extract_speed_plots <- 
   extract_benchmarking %>% 
-  select(extract_benchmarks) %>% 
-  unnest(extract_benchmarks) %>% 
-  pull(engine) %>% 
-  unique()
+  plot_benchmarks_split(subtitle = "Feature extraction", dodge = 0)
 
-num_engines <- length(engines)
-
-my_palette <- charizard[which(names(charizard) %in% engines)]
-
-extract_speed_plot <- 
-  extract_benchmarking %>% 
-  select(num_files, num_cells, extract_benchmarks) %>% 
-  unnest(cols = extract_benchmarks) %>% 
-  group_by(num_files, num_cells, engine) %>% 
-  summarize(
-    mean_time = median(time), 
-    max_time = quantile(time, 0.75), 
-    min_time = quantile(time, 0.25)
-  ) %>% 
-  ungroup() %>% 
-  ggplot(
-    aes(
-      x = num_cells, 
-      y = mean_time, 
-      fill = engine, 
-      color = engine, 
-      ymin = min_time, 
-      ymax = max_time
-    )
-  ) + 
-  geom_errorbar(width = width) +
-  geom_line(aes(group = engine)) +
-  geom_point(shape = 21, size = 2, color = "black") + 
-  scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) + 
-  theme_bw() + 
-  labs(
-    subtitle = "Feature extraction",
-    x = "Number of cells", 
-    y = "Time (seconds)", 
-    fill = NULL, 
-    color = NULL
-  )
+extract_speed_plots %>% 
+  save_bench_plots(file_name = file_name)
 
 if (print_large) {
-  extract_speed_plot
+  print(extract_speed_plots)
 }
-
-extract_speed_plot %>% 
-  ggsave(
-    filename = 
-      here::here(
-        "manuscript", 
-        "benchmarking", 
-        str_replace(file_name, ".rds", ".pdf")
-      ), 
-    device = "pdf", 
-    width = 5, 
-    height = 3
-  )
 
 ```
 
