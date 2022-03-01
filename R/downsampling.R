@@ -28,13 +28,21 @@
 #'
 #' @export
 #'
+#' @importFrom dplyr across
+#' @importFrom dplyr filter
+#' @importFrom dplyr group_by
+#' @importFrom dplyr n
+#' @importFrom dplyr ungroup
+#'
+#'
 tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 
   result <-
     tof_tibble %>%
     dplyr::group_by(dplyr::across({{group_cols}})) %>%
-    dplyr::slice_sample(prop = 1) %>%
-    dplyr::slice_head(n = num_cells) %>%
+    dplyr::filter(
+      sample(x = 1:dplyr::n(), size = dplyr::n(), replace = FALSE) %in% 1:num_cells
+    ) %>%
     dplyr::ungroup()
 
   return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))
@@ -65,6 +73,11 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 #' @family downsampling functions
 #'
 #' @export
+#'
+#' @importFrom dplyr across
+#' @importFrom dplyr group_by
+#' @importFrom dplyr slice_sample
+#' @importFrom dplyr ungroup
 #'
 tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
   result <-
@@ -124,11 +137,26 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
 #'
 #' @export
 #'
+#' @importFrom dplyr across
+#' @importFrom dplyr any_of
+#' @importFrom dplyr arrange
+#' @importFrom dplyr filter
+#' @importFrom dplyr group_by
+#' @importFrom dplyr mutate
+#' @importFrom dplyr n
+#' @importFrom dplyr pull
+#' @importFrom dplyr select
+#' @importFrom dplyr transmute
+#' @importFrom dplyr ungroup
+#'
 #' @importFrom rlang arg_match
 #' @importFrom rlang enquo
+#'
 #' @importFrom tidyselect eval_select
+#'
 #' @importFrom tidyr nest
 #' @importFrom tidyr unnest
+#'
 #' @importFrom purrr map
 #'
 #' @importFrom stats runif
