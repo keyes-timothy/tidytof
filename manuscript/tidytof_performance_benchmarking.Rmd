@@ -45,8 +45,8 @@ source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
 largest_file_name <- TRUE
-machine <- "galaxia"
-num_repeats <- 1L
+machine <- "excalibur"
+num_repeats <- 10L
 charizard <- 
   c(
     "base" = "#207394", 
