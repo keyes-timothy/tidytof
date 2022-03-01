@@ -45,8 +45,8 @@ source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
 largest_file_name <- TRUE
-machine <- "galaxia"
-num_repeats <- 1L
+machine <- "excalibur"
+num_repeats <- 10L
 charizard <- 
   c(
     "base" = "#207394", 
@@ -72,13 +72,13 @@ low_level_apis <- c("tidytof", "flowcore", "base")
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
 run_io <- FALSE
-run_downsample <- TRUE
+run_downsample <- FALSE
 run_preprocess <- FALSE
 run_tsne <- FALSE
 run_pca <- FALSE
 run_umap <- FALSE
 run_cluster <- FALSE
-run_extract <- FALSE
+run_extract <- TRUE
 run_memory <- FALSE
 run_style <- TRUE
 
