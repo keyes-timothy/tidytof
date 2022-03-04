@@ -762,7 +762,6 @@ tof_dea_diffcyt <-
 #' @importFrom stringr str_c
 #' @importFrom stats as.formula
 #' @importFrom purrr map
-#' @importFrom broomExtra tidy
 #'
 tof_daa_glmm <-
   function(
@@ -775,6 +774,14 @@ tof_daa_glmm <-
     min_samples = 5,
     alpha = 0.05
   ) {
+
+    # check to see if broomExtra is installed
+    rlang::check_installed(pkg = "broomExtra")
+
+    if (!requireNamespace(package = "broomExtra")) {
+      stop("tof_daa_glmm requires the broomExtra package to be installed")
+    }
+
     # extract fixed effect columns as a character vector
     # will return an empty character vector if the argument is missing
     fixed_effect_colnames <-
@@ -1024,13 +1031,18 @@ tof_daa_glmm <-
 #' @export
 #'
 #' @importFrom rlang enquo
+#' @importFrom rlang check_installed
+#' @importFrom rlang is_installed
+#'
 #' @importFrom tidyselect eval_select
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr nest
+#'
 #' @importFrom stringr str_c
+#'
 #' @importFrom stats as.formula
+#'
 #' @importFrom purrr map
-#' @importFrom broomExtra tidy
 #'
 #' @family differential expression analysis functions
 #'
@@ -1048,6 +1060,13 @@ tof_dea_lmm <-
     min_samples = 5,
     alpha = 0.05
   ) {
+
+    # check to see if broomExtra is installed
+    rlang::check_installed(pkg = "broomExtra")
+
+    if (!requireNamespace(package = "broomExtra")) {
+      stop("tof_dea_lmm requires the broomExtra package to be installed")
+    }
 
     # extract fixed effect columns as a character vector
     # will return an empty character vector if the argument is missing

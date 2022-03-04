@@ -417,10 +417,17 @@ prepare_diffcyt_args <-
   }
 
 #'
-#' @importFrom lme4 glmer
 #' @importFrom stats glm
 #'
 fit_da_model <- function(data, formula, has_random_effects = TRUE) {
+
+  # check to see if lme4 is installed
+  rlang::check_installed(pkg = "lme4")
+
+  if (!requireNamespace(package = "lme4")) {
+    stop("tof_daa_glmm requires the lme4 package to be installed")
+  }
+
   if(is.null(formula)) {
     total_cells <- NULL
   }
@@ -432,22 +439,33 @@ fit_da_model <- function(data, formula, has_random_effects = TRUE) {
     model_fit <-
       stats::glm(formula, data, family = "binomial", weights = total_cells)
   }
+
+  return(model_fit)
 }
 
 
 #'
-#' @importFrom lmerTest lmer
 #' @importFrom stats glm
 #'
-fit_de_model <- function(data, formula, has_random_effects = TRUE) {
-  if (has_random_effects) {
-    model_fit <-
-      lmerTest::lmer(formula, data)
-  } else {
+fit_de_model <-
+  function(data, formula, has_random_effects = TRUE) {
+
+    # check to see if lmerTest is installed
+    rlang::check_installed(pkg = "lmerTest")
+
+    if (!requireNamespace(package = "lmerTest")) {
+      stop("tof_dea_lmm requires the lmerTest package to be installed")
+    }
+
+    if (has_random_effects) {
+      model_fit <-
+        lmerTest::lmer(formula, data)
+    } else {
       model_fit <-
         stats::glm(formula, data, family = "gaussian")
+    }
   }
-}
+
 
 
 tof_ttest <-
