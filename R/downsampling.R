@@ -45,7 +45,11 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
     ) %>%
     dplyr::ungroup()
 
-  return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))
+  if (inherits(tof_tibble, "tof_tbl")) {
+    return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))
+  } else {
+    return(result)
+  }
 }
 
 
@@ -86,8 +90,11 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
     dplyr::slice_sample(prop = prop_cells) %>%
     dplyr::ungroup()
 
-  return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))
-
+  if (inherits(tof_tibble, "tof_tbl")) {
+    return(new_tof_tibble(x = result, panel = tof_get_panel(tof_tibble)))
+  } else {
+    return(result)
+  }
 }
 
 
