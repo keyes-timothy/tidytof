@@ -7,7 +7,7 @@
 tof_reduce_dimensions(
   tof_tibble,
   ...,
-  add_cols = TRUE,
+  augment = TRUE,
   method = c("pca", "tsne", "umap")
 )
 }
@@ -18,7 +18,7 @@ tof_reduce_dimensions(
 the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
 \code{\link{tof_reduce_umap}}.}
 
-\item{add_cols}{A boolean value indicating if the output should column-bind the
+\item{augment}{A boolean value indicating if the output should column-bind the
 dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
 (TRUE, the default) or if a tibble including only the low-dimensionality
 embeddings should be returned (FALSE).}

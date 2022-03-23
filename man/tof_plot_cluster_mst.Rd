@@ -2,60 +2,98 @@
 % Please edit documentation in R/visualization.R
 \name{tof_plot_cluster_mst}
 \alias{tof_plot_cluster_mst}
-\title{Visualize clusters using a minimum spanning tree (MST).}
+\title{Visualize clusters in CyTOF data using a minimum spanning tree (MST).}
 \usage{
 tof_plot_cluster_mst(
   tof_tibble,
   cluster_col,
-  group_cols,
   knn_cols = where(tof_is_numeric),
   color_col,
   num_neighbors = 5L,
-  graph_type = c("weighted", "unweighted"),
-  graph_layout = "fr",
+  graph_type = c("unweighted", "weighted"),
+  graph_layout = "nicely",
   central_tendency_function = stats::median,
   distance_function = c("euclidean", "cosine"),
   knn_error = 0,
-  edge_alpha = 0.25,
-  node_size = 2,
+  edge_alpha = 0.4,
+  node_size = "cluster_size",
   theme = ggplot2::theme_void(),
   ...
 )
 }
 \arguments{
-\item{tof_tibble}{TO DO}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{cluster_col}{TO DO}
+\item{cluster_col}{An unquoted column name indicating which column in `tof_tibble`
+stores the cluster ids for the cluster to which each cell belongs.
+Cluster labels can be produced via any method the user chooses - including manual gating,
+any of the functions in the `tof_cluster_*` function family, or any other method.}
 
-\item{group_cols}{TO DO}
+\item{knn_cols}{Unquoted column names indicating which columns in `tof_tibble`
+should be used to compute the cluster-to-cluster distances used to construct
+the k-nearest-neighbor graph. Supports tidyselect helpers. Defaults to all
+numeric columns.}
 
-\item{knn_cols}{TO DO}
+\item{color_col}{Unquoted column name indicating which column in `tof_tibble`
+should be used to color the nodes in the MST.}
 
-\item{color_col}{TO DO}
+\item{num_neighbors}{An integer specifying how many neighbors should be used
+to construct the k-nearest neighbor graph.}
 
-\item{num_neighbors}{TO DO}
+\item{graph_type}{A string specifying if the k-nearest neighbor graph should
+be "weighted" (the default) or "unweighted".}
 
-\item{graph_type}{TO DO}
+\item{graph_layout}{This argument specifies a layout for the MST in one of two ways.
+Option 1: Provide a string specifying which algorithm should be used to
+compute the force-directed layout. Passed to \code{\link[ggraph]{ggraph}}.
+Defaults to "nicely", which tries to automatically select a visually-appealing
+layout. Other examples include "fr", "gem", "kk", and many others. See
+\code{\link[ggraph]{layout_tbl_graph_igraph}} for other examples.
+Option 2: Provide a ggraph object previously generated with this
+function. The layout used to plot this ggraph object will then be used as a
+template for the new plot. Using this option, number of clusters (and their
+labels) must be identical to the template. This option is useful if you want
+to make multiple plots of the same tof_tibble colored by different protein
+markers, for example.}
 
-\item{graph_layout}{TO DO}
+\item{central_tendency_function}{A function to use for computing the
+measure of central tendency that will be aggregated from each cluster in
+cluster_col. Defaults to the median.}
 
-\item{central_tendency_function}{TO DO}
+\item{distance_function}{A string indicating which distance function to use
+in computing the cluster-to-clusters distances in constructing the MST.
+Valid options include "euclidean" (the default) and "cosine".}
 
-\item{distance_function}{TO DO}
+\item{knn_error}{A value > 0 used in the k-nearest-neighbor approximation.
+`knn_error` is an error bound such that the ratio between the a cell's reported
+ith nearest neighbor and its true ith nearest neighbor will be at most
+1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
+Will generally be between 0 and 1. Larger values will result in more
+approximate KNN calculations (i.e. a higher likelihood of small errors) but
+will also decrease the computational time of the algorithm significantly.}
 
-\item{knn_error}{TO DO}
+\item{edge_alpha}{A numeric value between 0 and 1 specifying the transparency
+of the edges drawn in the force-directed layout. Defaults to 0.25.}
 
-\item{edge_alpha}{TO DO}
+\item{node_size}{Either a numeric value specifying the size of the nodes in the
+MST or the string "cluster_size", in which case the size of the node representing
+each cluster will be scaled according to the number of cells in that cluster
+(the default).}
 
-\item{node_size}{TO DO}
+\item{theme}{A ggplot2 theme to apply to the force-directed layout.
+Defaults to \code{\link[ggplot2]{theme_void}}}
 
-\item{theme}{TO DO}
+\item{...}{Not currently used.}
 
-\item{...}{TO DO}
+\item{group_cols}{An unquoted column name indicating which columns
+should be used to group cells.}
 }
 \value{
-TO DO
+A ggraph/ggplot object.
 }
 \description{
-Visualize clusters using a minimum spanning tree (MST).
+This function plots a minimum-spanning tree using clustered single-cell data
+in order to summarize cluster-level characteristics. Each node in the MST
+represents a single cluster colored using a user-specified variable (either
+continuous or discrete).
 }

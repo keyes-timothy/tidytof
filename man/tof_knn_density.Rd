@@ -2,37 +2,58 @@
 % Please edit documentation in R/utils.R
 \name{tof_knn_density}
 \alias{tof_knn_density}
-\title{Find the KNN density estimate for each cell in a CyTOF dataset.}
+\title{Estimate cells' local densities using K-nearest-neighbor density estimation}
 \usage{
 tof_knn_density(
-  neighbor_ids,
-  neighbor_distances,
-  method = c("mean_distance", "sum_distance"),
-  normalize = TRUE
+  tof_tibble,
+  distance_cols = where(tof_is_numeric),
+  num_neighbors = min(15L, nrow(tof_tibble)),
+  distance_function = c("euclidean", "cosine"),
+  estimation_method = c("mean_distance", "sum_distance"),
+  normalize = TRUE,
+  ...
 )
 }
 \arguments{
-\item{neighbor_ids}{A n by k matrix returned by `tof_find_knn` representing the row indices
-of the k nearest neighbors of each of the n cells in a CyTOF dataset.}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{neighbor_distances}{A n by k matrix returned by `tof_find_knn` representing the pairwise distances
-between a cell and each of its k nearest neighbors in a CyTOF dataset.}
+\item{distance_cols}{Unquoted names of the columns in `tof_tibble` to use in
+calculating cell-to-cell distances duringthe local density estimation for
+each cell. Defaults to all numeric columns in `tof_tibble`.}
 
-\item{method}{A string indicating how the relative density for each cell should be
+\item{num_neighbors}{An integer indicating the number of nearest neighbors
+to use in estimating the local density of each cell. Defaults to the minimum
+of 15 and the number of rows in `tof_tibble`.}
+
+\item{distance_function}{A string indicating which distance function to use
+for calculating cell-to-cell distances during local density estimation. Options
+include "euclidean" (the default) and "cosine".}
+
+\item{estimation_method}{A string indicating how the relative density for each cell should be
 calculated from the distances between it and each of its k nearest neighbors. Options are
 "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
 taking the negative average of the distances to its nearest neighbors) and "sum_distance"
 (estimates the relative density for a cell's neighborhood by taking the negative sum of the
 distances to its nearest neighbors).}
 
-\item{normalize}{TO DO}
+\item{normalize}{A boolean value indicating if the vector of local density
+estimates should be normalized to values between 0 and 1. Defaults to TRUE.}
+
+\item{...}{Additional optional arguments to pass to
+\code{\link{tof_find_knn}}.}
 }
 \value{
-a vector of length N (number of cells) with the ith
+A tibble with a single column named ".knn_density" containing the
+local density estimates for each input cell in `tof_tibble`.
 }
 \description{
-Find the KNN density estimate for each cell in a CyTOF dataset.
+This function uses the distances between a cell and each of its K nearest
+neighbors to estimate local density of each cell in a
+`tof_tbl` or `tibble` containing CyTOF data.
 }
-\examples{
-NULL
+\seealso{
+Other local density estimation functions: 
+\code{\link{tof_estimate_density}()},
+\code{\link{tof_spade_density}()}
 }
+\concept{local density estimation functions}

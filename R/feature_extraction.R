@@ -43,6 +43,8 @@
 #' @export
 #'
 #' @importFrom tidyr pivot_wider
+#' @importFrom tidyr unite
+#' @importFrom tidyr separate
 #' @importFrom rlang arg_match
 #'
 #'
@@ -56,19 +58,62 @@ tof_extract_proportion <-
     # check format argument
     format <- rlang::arg_match(format)
 
-    abundances <-
+    group_colnames <-
       tof_tibble %>%
-      dplyr::group_by(dplyr::across({{group_cols}}), {{cluster_col}}) %>%
-      dplyr::summarize(abundance = dplyr::n()) %>%
-      # two lines below can be compressed into a transmute if multidplyr is not being used
-      dplyr::mutate(
-        prop = .data$abundance / sum(.data$abundance)
-      ) %>%
-      dplyr::select({{group_cols}}, {{cluster_col}}, .data$prop)
+      dplyr::select({{group_cols}}) %>%
+      colnames()
 
-    if (format == "wide") {
+      my_sep <- "________"
+
+      if (length(group_colnames) != 0) {
+        abundances <-
+          tof_tibble %>%
+          tidyr::unite(
+            col = ".group",
+            {{group_cols}},
+            sep = my_sep
+          ) %>%
+          dplyr::mutate(.group = as.factor(.data$.group))
+
+      } else {
+        group_cols <- NULL
+
+        abundances <-
+          tof_tibble %>%
+          dplyr::mutate(.group = 1)
+      }
+
       abundances <-
         abundances %>%
+        dplyr::mutate(
+          group = as.factor(.data$.group),
+          "{{cluster_col}}" := as.factor({{cluster_col}})
+        ) %>%
+        dplyr::count(.data$.group, {{cluster_col}}, .drop = FALSE, name = "abundance") %>%
+        dplyr::group_by(.data$.group) %>%
+        dplyr::mutate(
+          prop = .data$abundance / sum(.data$abundance),
+          "{{cluster_col}}" := as.character({{cluster_col}})
+        ) %>%
+        dplyr::ungroup()
+
+      if (length(group_colnames) != 0) {
+        abundances <-
+          abundances %>%
+          tidyr::separate(col = .data$.group, into = group_colnames, sep = my_sep)
+      } else {
+        abundances <-
+          abundances %>%
+          dplyr::select(-.data$.group)
+      }
+      abundances <-
+        abundances %>%
+        dplyr::select({{group_cols}}, {{cluster_col}}, .data$prop)
+
+      if (format == "wide") {
+      abundances <-
+        abundances %>%
+        dplyr::filter(.data$prop != 0) %>%
         tidyr::pivot_wider(
           names_from = {{cluster_col}},
           values_from = .data$prop,
@@ -77,9 +122,9 @@ tof_extract_proportion <-
           # be filled in as having a relative abundance of 0.
           values_fill = 0
         )
-    }
+      }
 
-    return(dplyr::ungroup(abundances))
+      return(dplyr::ungroup(abundances))
   }
 
 # tof_extract_central_tendency -------------------------------------------------

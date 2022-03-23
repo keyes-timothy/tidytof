@@ -8,10 +8,12 @@ tof_downsample_density(
   tof_tibble,
   group_cols = NULL,
   density_cols = where(tof_is_numeric),
+  target_num_cells,
+  target_prop_cells,
+  target_percentile = 0.03,
   outlier_percentile = 0.01,
-  target_percentile = 0.1,
-  num_neighbors = 15,
-  knn_distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine"),
+  density_estimation_method = c("mean_distance", "sum_distance", "spade"),
   ...
 )
 }
@@ -25,26 +27,44 @@ Supports tidyselect helpers. Defaults to `NULL` (no grouping).}
 \item{density_cols}{Unquoted names of the columns in `tof_tibble` to use in the
 density estimation for each cell. Defaults to all numeric columns in `tof_tibble`.}
 
-\item{outlier_percentile}{The local density percentile (i.e. a value between 0 and 1)
-below which cells should be considered outliers (and discarded). Cells with a local
-density below `outlier_percentile` will never be selected during the downsampling
-proceure. Defaults to 0.01 (cells below the 1st local density percentile will be removed).}
+\item{target_num_cells}{An approximate constant number of cells (between 0 and 1)
+that should be sampled from each group defined by `group_cols`. Slightly more
+or fewer cells may be returned due to how the density calculation is performed.}
+
+\item{target_prop_cells}{An approximate proportion of cells (between 0 and 1)
+that should be sampled from each group defined by `group_cols`. Slightly more
+or fewer cells may be returned due to how the density calculation is performed.
+Ignored if `target_num_cells` is specified.}
 
 \item{target_percentile}{The local density percentile (i.e. a value between 0 and 1) to which the downsampling
 procedure should adjust all cells. In short, the algorithm will continue to remove
 cells from the input `tof_tibble` until the local densities of all remaining cells
 is equal to `target_percentile`. Lower values will result in more cells being removed.
 See \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}
-for details. Defaults to 0.1 (the 10th percentile of local densities).}
+for details. Defaults to 0.1 (the 10th percentile of local densities). Ignored
+if either `target_num_cells` or `target_prop_cells` are specified.}
 
-\item{num_neighbors}{An integer indicating the number of neighbors to use
-in the k-nearest neighbor local density estimation. Defaults to 15.}
+\item{outlier_percentile}{The local density percentile (i.e. a value between 0 and 1)
+below which cells should be considered outliers (and discarded). Cells with a local
+density below `outlier_percentile` will never be selected during the downsampling
+procedure. Defaults to 0.01 (cells below the 1st local density percentile will be removed).}
 
-\item{knn_distance_function}{A character vector indicating which
-distance function should be used to compute the k-nearest neighbors of each
-input cell in `tof_tibble`. Valid options are "euclidean" (the default) and "cosine".}
+\item{distance_function}{A string indicating which distance function to use
+for the cell-to-cell distance calculations. Options include "euclidean"
+(the default) and "cosine" distances.}
 
-\item{...}{Optional additional arguments to pass to \code{\link[RANN]{nn2}}.}
+\item{density_estimation_method}{A string indicating which algorithm should be
+used to calculate the local density estimate for each cell. Options include
+k-nearest neighbor density estimation using the mean distance to a cell's
+k-nearest neighbors ("mean_distance"; the default), k-nearest neighbor density
+estimation using the summed distance to a cell's k nearest neighbors
+("sum_distance") and counting the number of neighboring cells within a
+spherical radius around each cell as described in Qiu et al., 2011  ("spade").
+While "spade" often produces the best results, it is slower than
+knn-density estimation methods.}
+
+\item{...}{Optional additional arguments to pass to
+\code{\link{tof_knn_density}} or \code{\link{tof_spade_density}}.}
 }
 \value{
 A `tof_tbl` with the same number of columns as the input `tof_tibble`,

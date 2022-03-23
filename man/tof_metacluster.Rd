@@ -10,7 +10,7 @@ tof_metacluster(
   metacluster_cols = where(tof_is_numeric),
   central_tendency_function = stats::median,
   ...,
-  add_col = TRUE,
+  augment = TRUE,
   method = c("consensus", "hierarchical", "kmeans", "phenograph", "flowsom")
 )
 }
@@ -37,16 +37,16 @@ Defaults to \code{\link[stats]{median}}.}
 \item{...}{Additional arguments to pass to the `tof_metacluster_*` function
 family member corresponding to the chosen `method`.}
 
-\item{add_col}{A boolean value indicating if the output should column-bind the
+\item{augment}{A boolean value indicating if the output should column-bind the
 metacluster ids of each cell as a new column in `tof_tibble` (TRUE; the default) or if
 a single-column tibble including only the metacluster ids should be returned (FALSE).}
 
-\item{method}{A string indicating which clustering methods should be used. Valid
+\item{method}{A string indicating which clustering method should be used. Valid
 values include "consensus", "hierarchical", "kmeans", "phenograph", and "flowsom".}
 }
 \value{
-A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-the metacluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+the metacluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the metacluster ids.
 }

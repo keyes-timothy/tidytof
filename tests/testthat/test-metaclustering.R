@@ -77,6 +77,46 @@ test_that("metaclustering result has the right name", {
   expect_equal(colnames(result), ".phenograph_metacluster")
 })
 
+test_that("metaclustering result works with various kinds of tidyselection", {
+
+  result_1 <-
+    clust_data %>%
+    tof_metacluster_phenograph(
+      cluster_col = .kmeans_cluster,
+      metacluster_cols = contains("cd")
+    )
+
+  result_2 <-
+    clust_data %>%
+    tof_metacluster_phenograph(
+      cluster_col = .kmeans_cluster,
+      metacluster_cols = c(contains("cd"), -cd45)
+    )
+
+  result_3 <-
+    clust_data %>%
+    tof_metacluster_phenograph(
+      cluster_col = .kmeans_cluster,
+      metacluster_cols = c(cd45)
+    )
+
+  result_4 <-
+    clust_data %>%
+    tof_metacluster_phenograph(
+      cluster_col = .kmeans_cluster,
+      metacluster_cols = c(cd45, -sample_name)
+    )
+
+  expect_equal(nrow(result_1), nrow(clust_data))
+  expect_equal(ncol(result_1), 1L)
+  expect_equal(nrow(result_2), nrow(clust_data))
+  expect_equal(ncol(result_2), 1L)
+  expect_equal(nrow(result_3), nrow(clust_data))
+  expect_equal(ncol(result_3), 1L)
+  expect_equal(nrow(result_4), nrow(clust_data))
+  expect_equal(ncol(result_4), 1L)
+})
+
 # tof_metacluster_consensus ----------------------------------------------------
 test_that("metaclustering result is the right shape", {
   result <-
@@ -199,7 +239,7 @@ test_that("hclust tof_metacluster results are identical to subroutine", {
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
-      add_col = FALSE,
+      augment = FALSE,
       method = "hierarchical"
     )
 
@@ -219,7 +259,7 @@ test_that("kmeans tof_metacluster results are identical to subroutine", {
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       seed = 2020L,
-      add_col = FALSE,
+      augment = FALSE,
       method = "kmeans"
     )
 
@@ -239,7 +279,7 @@ test_that("phenograph tof_metacluster results are identical to subroutine", {
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       seed = 2020L,
-      add_col = FALSE,
+      augment = FALSE,
       method = "phenograph"
     )
 
@@ -259,7 +299,7 @@ test_that("consensus tof_metacluster results are identical to subroutine", {
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       seed = 2020L,
-      add_col = FALSE,
+      augment = FALSE,
       method = "consensus"
     )
 
@@ -279,7 +319,7 @@ test_that("flowsom tof_metacluster results are identical to subroutine", {
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       seed = 2020L,
-      add_col = FALSE,
+      augment = FALSE,
       method = "flowsom"
     )
 

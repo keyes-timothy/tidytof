@@ -81,12 +81,18 @@ tof_metacluster_hierarchical <-
       stop("cluster_col must be specified")
     }
 
+    # extract metacluster colnames
+    metacluster_colnames <-
+      tof_tibble %>%
+      dplyr::select({{metacluster_cols}}) %>%
+      colnames()
+
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
       tof_tibble %>%
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
-        metacluster_cols = {{metacluster_cols}},
+        metacluster_cols = dplyr::any_of(metacluster_colnames),
         central_tendency_function = central_tendency_function
       )
 
@@ -177,12 +183,18 @@ tof_metacluster_kmeans <-
       stop("cluster_col must be specified")
     }
 
+    # extract metacluster colnames
+    metacluster_colnames <-
+      tof_tibble %>%
+      dplyr::select({{metacluster_cols}}) %>%
+      colnames()
+
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
       tof_tibble %>%
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
-        metacluster_cols = {{metacluster_cols}},
+        metacluster_cols = dplyr::any_of(metacluster_colnames),
         central_tendency_function = central_tendency_function
       )
 
@@ -190,7 +202,7 @@ tof_metacluster_kmeans <-
     kmeans_metaclusters <-
       meta_tibble %>%
       tof_cluster_kmeans(
-        cluster_cols = {{metacluster_cols}},
+        cluster_cols = dplyr::any_of(metacluster_colnames),
         num_clusters = num_metaclusters,
         ...
       ) %>%
@@ -272,12 +284,18 @@ tof_metacluster_phenograph <-
       stop("cluster_col must be specified")
     }
 
+    # extract metacluster colnames
+    metacluster_colnames <-
+      tof_tibble %>%
+      dplyr::select({{metacluster_cols}}) %>%
+      colnames()
+
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
       tof_tibble %>%
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
-        metacluster_cols = {{metacluster_cols}},
+        metacluster_cols = dplyr::any_of(metacluster_colnames),
         central_tendency_function = central_tendency_function
       )
 
@@ -285,7 +303,7 @@ tof_metacluster_phenograph <-
     pheno_metaclusters <-
       meta_tibble %>%
       tof_cluster_phenograph(
-        cluster_cols = {{metacluster_cols}},
+        cluster_cols = dplyr::any_of(metacluster_colnames),
         num_neighbors = num_neighbors,
         ...
       ) %>%
@@ -600,7 +618,8 @@ tof_metacluster_flowsom <-
         max = num_metaclusters,
         seed = seed,
         ...
-      )
+      ) %>%
+      as.character()
 
     # return result
     result <-
@@ -644,15 +663,15 @@ tof_metacluster_flowsom <-
 #' @param ... Additional arguments to pass to the `tof_metacluster_*` function
 #' family member corresponding to the chosen `method`.
 #'
-#' @param add_col A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' metacluster ids of each cell as a new column in `tof_tibble` (TRUE; the default) or if
 #' a single-column tibble including only the metacluster ids should be returned (FALSE).
 #'
-#' @param method A string indicating which clustering methods should be used. Valid
+#' @param method A string indicating which clustering method should be used. Valid
 #' values include "consensus", "hierarchical", "kmeans", "phenograph", and "flowsom".
 #'
-#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-#' the metacluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+#' the metacluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the metacluster ids.
 #'
@@ -672,7 +691,7 @@ tof_metacluster <-
     metacluster_cols = where(tof_is_numeric),
     central_tendency_function = stats::median,
     ...,
-    add_col = TRUE,
+    augment = TRUE,
     method = c("consensus", "hierarchical", "kmeans", "phenograph", "flowsom")
   ) {
     # check arguments
@@ -728,7 +747,7 @@ tof_metacluster <-
     }
 
     # return result
-    if (add_col) {
+    if (augment) {
       result <- dplyr::bind_cols(tof_tibble, metaclusters)
     } else {
       result <- metaclusters

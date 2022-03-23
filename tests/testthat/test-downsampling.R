@@ -1,7 +1,5 @@
 library(dplyr)
 library(purrr)
-library(readr)
-library(stringr)
 library(tidytof)
 
 # tof_downsample_constant ------------------------------------------------------
@@ -87,25 +85,65 @@ test_that("Output shape is correct.", {
 
 # tof_downsample_density ----------------------------------------------------------
 
-
-
 ### downsampling without grouping
 
-test_that("Output shape is correct.", {
+###### KNN density estimation
+
+test_that("Output shape is correct using KNN density estimation.", {
   result <-
     phenograph_data %>%
     tof_downsample_density(target_percentile = 0.05, density_cols = c(cd19, cd11b))
 
+  result_2 <-
+    phenograph_data %>%
+    tof_downsample_density(target_num_cells = 100L)
+
+  result_3 <-
+    phenograph_data %>%
+    tof_downsample_density(target_prop_cells = 0.1, density_estimation_method = "sum_distance")
+
   # number of columns is unchanged
   expect_identical(ncol(result), ncol(phenograph_data))
+  expect_identical(ncol(result_2), ncol(phenograph_data))
+  expect_identical(ncol(result_3), ncol(phenograph_data))
 
   # number of rows is smaller after density-dependent downsampling
   expect_true(nrow(result) < nrow(phenograph_data))
+  expect_true(nrow(result_2) < nrow(phenograph_data))
+  expect_true(nrow(result_3) < nrow(phenograph_data))
+})
+
+###### spade density estimation
+
+test_that("Output shape is correct using KNN density estimation.", {
+  result <-
+    phenograph_data %>%
+    tof_downsample_density(target_percentile = 0.05, density_cols = c(cd19, cd11b))
+
+  result_2 <-
+    phenograph_data %>%
+    tof_downsample_density(target_num_cells = 100L)
+
+  result_3 <-
+    phenograph_data %>%
+    tof_downsample_density(target_prop_cells = 0.1, density_estimation_method = "sum_distance")
+
+  # number of columns is unchanged
+  expect_identical(ncol(result), ncol(phenograph_data))
+  expect_identical(ncol(result_2), ncol(phenograph_data))
+  expect_identical(ncol(result_3), ncol(phenograph_data))
+
+  # number of rows is smaller after density-dependent downsampling
+  expect_true(nrow(result) < nrow(phenograph_data))
+  expect_true(nrow(result_2) < nrow(phenograph_data))
+  expect_true(nrow(result_3) < nrow(phenograph_data))
 })
 
 ### downsampling with grouping
 
-test_that("Output shape is correct.", {
+###### KNN density estimation
+
+test_that("Output shape is correct using KNN density estimation.", {
   result <-
     phenograph_data %>%
     tof_downsample_density(
@@ -118,15 +156,86 @@ test_that("Output shape is correct.", {
     phenograph_data %>%
     tof_downsample_density(
       group_cols = c(sample_name, phenograph_cluster),
-      target_percentile = 0.05,
-      density_cols = c(cd19, cd11b)
+      target_prop_cells = 0.1,
+      #density_cols = where,
+      density_estimation_method = "mean_distance"
+    )
+
+  result_3 <-
+    phenograph_data %>%
+    tof_downsample_density(
+      group_cols = c(sample_name, phenograph_cluster),
+      target_num_cells = 100L,
+      density_estimation_method = "sum_distance"
     )
 
   # number of columns is unchanged
   expect_identical(ncol(result), ncol(phenograph_data))
   expect_identical(ncol(result_2), ncol(phenograph_data))
+  expect_identical(ncol(result_3), ncol(phenograph_data))
 
   # number of rows is correct
   expect_true(nrow(result) < nrow(phenograph_data))
   expect_true(nrow(result_2) < nrow(phenograph_data))
+  expect_true(nrow(result_3) < nrow(phenograph_data))
+
+  expect_true(nrow(result) > 0)
+  expect_true(nrow(result_2) > 0)
+  expect_true(nrow(result_3) > 0)
+})
+
+###### spade density estimation
+
+test_that("Output shape is correct with SPADE density estimation.", {
+  result <-
+    phenograph_data %>%
+    tof_downsample_density(
+      group_cols = sample_name,
+      density_cols = c(cd19, cd11b),
+      target_percentile = 0.05,
+      density_estimation_method = "spade"
+    )
+
+  result_2 <-
+    phenograph_data %>%
+    tof_downsample_density(
+      group_cols = c(sample_name, phenograph_cluster),
+      target_prop_cells = 0.1,
+      density_estimation_method = "spade"
+    )
+
+  result_3 <-
+    phenograph_data %>%
+    tof_downsample_density(
+      group_cols = c(sample_name, phenograph_cluster),
+      target_num_cells = 100L,
+      density_estimation_method = "spade"
+    )
+
+  # number of columns is unchanged
+  expect_identical(ncol(result), ncol(phenograph_data))
+  expect_identical(ncol(result_2), ncol(phenograph_data))
+  expect_identical(ncol(result_3), ncol(phenograph_data))
+
+  # number of rows is correct
+  expect_true(nrow(result) < nrow(phenograph_data))
+  expect_true(nrow(result_2) < nrow(phenograph_data))
+  expect_true(nrow(result_3) < nrow(phenograph_data))
+
+  # all results have more than 0 rows
+  expect_true(nrow(result) > 0)
+  expect_true(nrow(result_2) > 0)
+  expect_true(nrow(result_3) > 0)
+
+  # expect error when arguments for a different density estimation method
+  # are provided
+  expect_error(
+      phenograph_data %>%
+      tof_downsample_density(
+        group_cols = sample_name,
+        target_prop_cells = 0.1,
+        num_neighbors = 10,
+        density_estimation_method = "spade"
+      )
+  )
 })

@@ -7,7 +7,7 @@
 tof_dea_ttest(
   tof_tibble,
   cluster_col,
-  marker_cols,
+  marker_cols = where(tof_is_numeric),
   effect_col,
   group_cols,
   test_type = c("unpaired", "paired"),

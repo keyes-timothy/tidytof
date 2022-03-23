@@ -217,16 +217,16 @@ tof_upsample_neighbor <-
 #' @param ... Additional arguments to pass to the `tof_upsample_*`
 #' function family member corresponding to the chosen method.
 #'
-#' @param add_col A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 #' a single-column tibble including only the cluster ids should be returned (FALSE).
 #'
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "distance" (default) and "neighbor".
 #'
-#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
 #' the upsampled cluster ids for each cell in `tof_tibble`.
-#' If add_col = TRUE, it will have
+#' If augment = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
 #'
@@ -241,7 +241,7 @@ tof_upsample <-
     reference_cluster_col,
     upsample_cols,
     ...,
-    add_col = TRUE,
+    augment = TRUE,
     method = c("distance", "neighbor")
   ) {
 
@@ -269,7 +269,7 @@ tof_upsample <-
       stop("Not a valid method.")
     }
 
-    if (add_col) {
+    if (augment) {
       result <-
         dplyr::bind_cols(tof_tibble, result)
     }

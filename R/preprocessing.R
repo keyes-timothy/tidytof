@@ -21,7 +21,7 @@
 #' @param undo_noise A boolean value indicating whether to remove the uniform noise that
 #' Fluidigm software adds to each CyTOF measurement for aesthetic
 #' and visualization purposes. See \href{https://pubmed.ncbi.nlm.nih.gov/30277658/}{this paper}.
-#' Defaults to TRUE.
+#' Defaults to FALSE.
 #'
 #' @param transform_fun A vectorized function to apply to each protein value for
 #' variance stabilization. Defaults to \code{\link[base]{asinh}} transformation
@@ -41,7 +41,7 @@ tof_preprocess <-
   function(
     tof_tibble = NULL,
     channel_cols = where(tof_is_numeric),
-    undo_noise = TRUE,
+    undo_noise = FALSE,
     transform_fun = function(x) asinh(x/5)
   ) {
     # first remove noise if specified

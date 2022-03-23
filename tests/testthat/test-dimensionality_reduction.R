@@ -109,7 +109,7 @@ test_that("return_recipe argument works", {
 test_that("pca results are identical to tof_reduce_pca", {
   expect_equal(
     tof_reduce_pca(ddpr),
-    tof_reduce_dimensions(ddpr, method = "pca", add_cols = FALSE)
+    tof_reduce_dimensions(ddpr, method = "pca", augment = FALSE)
   )
 })
 
@@ -117,7 +117,7 @@ test_that("tsne results are identical to tof_reduce_tsne", {
   set.seed(2020)
   tsne_1 <- tof_reduce_tsne(ddpr)
   set.seed(2020)
-  tsne_2 <- tof_reduce_dimensions(ddpr, method = "tsne", add_cols = FALSE)
+  tsne_2 <- tof_reduce_dimensions(ddpr, method = "tsne", augment = FALSE)
   expect_equal(
     tsne_1,
     tsne_2
@@ -128,14 +128,14 @@ test_that("umap results are identical to tof_reduce_umap", {
   set.seed(2020)
   umap_1 <- tof_reduce_umap(ddpr)
   set.seed(2020)
-  umap_2 <- tof_reduce_dimensions(ddpr, method = "umap", add_cols = FALSE)
+  umap_2 <- tof_reduce_dimensions(ddpr, method = "umap", augment = FALSE)
   expect_equal(
     umap_1,
     umap_2
   )
 })
 
-test_that("add_cols argument produces output with the correct shape", {
+test_that("augment argument produces output with the correct shape", {
   ddpr_pca <- tof_reduce_dimensions(ddpr, method = "pca", num_comp = 3)
 
   expect_equal(ncol(ddpr_pca), ncol(ddpr) + 3L)

@@ -1,40 +1,205 @@
 
 
-# single-cell visualizations ----------------------------
+# single-cell visualizations ---------------------------------------------------
 
-tof_plot_cells_histogram <-
+#' Plot marker expression density plots
+#'
+#' This function plots marker expression density plots for a user-specified
+#' column in a tof_tbl. Optionally, cells can be grouped to plot multiple
+#' vertically-arranged density plots
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param marker_col An unquoted column name representing which column in `tof_tibble`
+#' (i.e. which CyTOF protein measurement) should be included in the feature extraction
+#' calculation.
+#'
+#' @param group_col Unquoted column names representing which column in `tof_tibble`
+#' should be used to break the rows of `tof_tibble` into subgroups to be plotted
+#' as separate histograms. Defaults to plotting without subgroups.
+#'
+#' @param num_points The number of points along the full range of `marker_col` at
+#' which the density should be calculated
+#'
+#' @param theme The ggplot2 theme for the plot. Defaults to
+#' \code{\link[ggplot2]{theme_bw}}
+#'
+#' @param use_ggridges A boolean value indicting if
+#' \code{\link[ggridges]{geom_ridgeline}} should be used to plot overlain
+#' histograms. Defaults to FALSE. If TRUE, the ggridges package must be installed.
+#'
+#' @param scale Use to set the `scale` argument in \code{\link[ggridges]{geom_ridgeline}},
+#' which controls how far apart (vertically) density plots are arranged along the
+#' y-axis. Defaults to 1.
+#'
+#' @param ... Additional optional arguments to send to \code{\link[ggridges]{geom_ridgeline}}.
+#'
+#' @return A ggplot object
+#'
+#' @export
+#'
+#' @importFrom dplyr mutate
+#' @importFrom dplyr pull
+#' @importFrom dplyr select
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 facet_grid
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 vars
+#'
+#' @importFrom purrr map
+#'
+#' @importFrom rlang check_installed
+#'
+#' @importFrom stats density
+#'
+#' @importFrom tidyr nest
+#' @importFrom tidyr unnest
+#'
+#' @importFrom tidyselect everything
+#'
+#'
+tof_plot_cells_density <-
   function(
     tof_tibble,
-    x_col,
-    y_col,
-    facet_cols,
+    marker_col,
+    group_col,
+    num_points = 512,
     theme = ggplot2::theme_bw(),
+    use_ggridges = FALSE,
+    scale = 1,
     ...
   ) {
-    stop("This function is not yet implemented!")
+    # collect marker column name as a string
+    marker_colname <-
+      tof_tibble %>%
+      dplyr::select({{marker_col}}) %>%
+      colnames()
+
+    # calculate the density for each group independently
+    # ggplot2 can do this, but will store every cell in the resulting plot
+    # so this is more memory (and therefore speed) efficient
+    marker_tibble <-
+      tof_tibble %>%
+      dplyr::select({{marker_col}}, {{group_col}}) %>%
+      tidyr::nest(data = {{marker_col}}) %>%
+      dplyr::mutate(
+        densities =
+          purrr::map(
+            .x = .data$data,
+            .f = ~
+              stats::density(dplyr::pull(.x, {{marker_col}}), n = num_points)
+          ),
+        expression = purrr::map(.x = densities, .f = ~ .x$x),
+        density = purrr::map(.x = densities, .f = ~ .x$y)
+      ) %>%
+      dplyr::select({{group_col}}, .data$expression, .data$density) %>%
+      tidyr::unnest(cols = tidyselect::everything())
+
+    # if ggridges requested
+    if (use_ggridges) {
+      # check to see if ggridges is installed
+      rlang::check_installed(pkg = "ggridges")
+
+      if (!requireNamespace(package = "ggridges")) {
+        stop("if use_ggridges == TRUE, the ggridges package must be installed")
+      }
+
+      # if no group_col is provided, just plot without ggridges
+      if (missing(group_col)) {
+        return(
+          tof_plot_cells_density(
+            tof_tibble,
+            marker_col = {{marker_col}},
+            num_points = num_points,
+            theme = theme,
+            use_ggridges = FALSE,
+            scale = scale,
+            ...
+          )
+        )
+      }
+
+      result <-
+        ggplot2::ggplot(
+          ggplot2::aes(
+            x = expression,
+            y = {{group_col}},
+            fill = {{group_col}},
+            height = density
+          ),
+          data = marker_tibble
+        ) +
+        ggridges::geom_ridgeline(scale = scale, ...)
+
+    } else {
+      # no ggridges
+      result <-
+        ggplot2::ggplot(
+          ggplot2::aes(x = expression, y = density),
+          data = marker_tibble
+        ) +
+        ggplot2::geom_line()
+
+      if (!missing(group_col)) {
+        result <-
+          result +
+          ggplot2::facet_grid(
+            rows = ggplot2::vars({{group_col}}),
+            scales = "free_y"
+          )
+      }
+    }
+
+    # add x axis label
+    result <-
+      result +
+      ggplot2::labs(x = paste0(marker_colname, " expression"))
+
+    return(result + theme)
   }
 
-#' Title
+#' Plot scatterplots of single-cell data using low-dimensional feature embeddings
 #'
-#' description
+#' This function makes scatterplots using single-cell data embedded in a
+#' low-dimensional space (such as that generated by
+#' \code{\link{tof_reduce_dimensions}}, with each point colored using a
+#' user-specified variable.
 #'
-#' @param tof_tibble TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param color_col TO DO
+#' @param color_col An unquoted column name specifying which column in
+#' `tof_tibble` should be used to color each point in the scatterplot.
 #'
-#' @param facet_cols TO DO
+#' @param facet_cols An unquoted column name specifying which column in
+#' `tof_tibble` should be used to break the scatterplot into facets using
+#' \code{\link[ggplot2]{facet_wrap}}.
 #'
-#' @param point_alpha TO DO
+#' @param point_alpha A numeric value between 0 and 1 to set the transparency
+#' (alpha) of each point in the scatterplot.
 #'
-#' @param theme TO DO
+#' @param theme A ggplot2 theme to apply to the scatterplot. Defaults to
+#' \code{\link[ggplot2]{theme_bw}}
 #'
-#' @param ... TO DO
+#' @param ... Optional additional arguments to pass to
+#' \code{\link{tof_reduce_dimensions}}.
 #'
-#' @param embedding_cols TO DO
+#' @param embedding_cols Unquoted column names indicating which columns in
+#' `tof_tibble` should be used as the x and y axes of the scatterplot. Supports
+#' tidyselect helpers. Must select exactly 2 columns. If not provided, a
+#' feature embedding can be computed from scratch using the method provided
+#' using the `embedding_method` argument and the
+#' \code{\link{tof_reduce_dimensions}} arguments passed to `...`.
 #'
-#' @param embedding_method TO DO
+#' @param embedding_method A string indicating which method should be used for
+#' the feature embedding (if `embedding_cols` are not provided). Options
+#' (which are pass to \code{\link{tof_reduce_dimensions}}) are "pca" (the default),
+#' "tsne", and "umap".
 #'
-#' @return TO DO
+#' @return A ggplot object.
 #'
 #' @family visualization functions
 #'
@@ -59,7 +224,7 @@ tof_plot_cells_embedding <-
     embedding_method = c("pca", "tsne", "umap"),
     point_alpha = 1,
     theme = ggplot2::theme_bw(),
-    ...# optional additional arguments to the specified tof_dr_* family function
+    ...# optional additional arguments to the specified tof_reduce_* family function
   ) {
 
     # if no dr_cols are specified, use the embedding_method to compute them
@@ -71,9 +236,9 @@ tof_plot_cells_embedding <-
       }
       # check embedding_method columns
       embedding_method <- rlang::arg_match(embedding_method)
-      embedding_method <-
+      embed_tibble <-
         tof_tibble %>%
-        tof_reduce_dimensions(method = embedding_method, ...)
+        tof_reduce_dimensions(..., augment = FALSE, method = embedding_method)
 
     # if there are embedding_cols specified, just use those
     } else {
@@ -87,7 +252,7 @@ tof_plot_cells_embedding <-
         ncol()
 
       if (num_embed_cols != 2) {
-        stop("2 dimensionality reduction columns must be selected.")
+        stop("2 embedding columns must be selected.")
       }
     }
 
@@ -128,37 +293,63 @@ tof_plot_cells_embedding <-
     return(result + theme)
   }
 
-#' Title
+#' Plot force-directed layouts of single-cell data
 #'
-#' description
+#' This function makes force-directed layouts using single-cell data embedded in
+#' a 2-dimensional space representing a k-nearest-neighbor graph constructed
+#' using cell-to-cell similarities. Each node in the force-directed layout
+#' represents a single cell colored using a user-specified variable.
 #'
-#' @param tof_tibble TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
-#' @param knn_cols TO DO
+#' @param knn_cols Unquoted column names indicating which columns in `tof_tibble`
+#' should be used to compute the cell-to-cell distances used to construct
+#' the k-nearest-neighbor graph. Supports tidyselect helpers. Defaults to all
+#' numeric columns.
 #'
-#' @param color_col TO DO
+#' @param color_col Unquoted column name indicating which column in `tof_tibble`
+#' should be used to color the nodes in the force-directed layout.
 #'
-#' @param facet_cols TO DO
+#' @param facet_cols Unquoted column names indicating which columns in `tof_tibble`
+#' should be used to separate nodes into different force-directed layouts.
 #'
-#' @param num_neighbors TO DO
+#' @param num_neighbors An integer specifying how many neighbors should be used
+#' to construct the k-nearest neighbor graph.
 #'
-#' @param graph_type TO DO
+#' @param graph_type A string specifying if the k-nearest neighbor graph should
+#' be "weighted" (the default) or "unweighted".
 #'
-#' @param graph_layout TO DO
+#' @param graph_layout A string specifying which algorithm should be used to
+#' compute the force-directed layout. Passed to \code{\link[ggraph]{ggraph}}.
+#' Defaults to "fr", the Fruchterman-Reingold algorithm. Other examples include
+#' "nicely", "gem", "kk", and many others. See
+#' \code{\link[ggraph]{layout_tbl_graph_igraph}} for other examples.
 #'
-#' @param distance_function TO DO
+#' @param distance_function A string indicating which distance function to use
+#' in computing the cell-to-cell distances. Valid options include "euclidean"
+#' (the default) and "cosine".
 #'
-#' @param knn_error TO DO
+#' @param knn_error A value > 0 used in the k-nearest-neighbor approximation.
+#' `knn_error` is an error bound such that the ratio between the a cell's reported
+#' ith nearest neighbor and its true ith nearest neighbor will be at most
+#' 1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
+#' Will generally be between 0 and 1. Larger values will result in more
+#' approximate KNN calculations (i.e. a higher likelihood of small errors) but
+#' will also decrease the computational time of the algorithm significantly.
 #'
-#' @param edge_alpha TO DO
+#' @param edge_alpha A numeric value between 0 and 1 specifying the transparency
+#' of the edges drawn in the force-directed layout. Defaults to 0.25.
 #'
-#' @param node_size TO DO
+#' @param node_size A numeric value specifying the size of the nodes in the
+#' force-directed layout. Defaults to 2.
 #'
-#' @param theme TO DO
+#' @param theme A ggplot2 theme to apply to the force-directed layout.
+#' Defaults to \code{\link[ggplot2]{theme_void}}
 #'
-#' @param ... TO DO
+#' @param ... Optional additional arguments to pass to
+#' \code{\link[ggraph]{ggraph}}
 #'
-#' @return TO DO
+#' @return A ggraph/ggplot object.
 #'
 #' @family visualization functions
 #'
@@ -277,27 +468,82 @@ tof_plot_cells_layout <-
 
 
 
-# community-level visualizations ----------------------------
+# community-level visualizations -----------------------------------------------
 
-#' Visualize clusters using a minimum spanning tree (MST).
+#' Visualize clusters in CyTOF data using a minimum spanning tree (MST).
 #'
-#' @param tof_tibble TO DO
-#' @param cluster_col TO DO
-#' @param group_cols TO DO
-#' @param knn_cols TO DO
-#' @param color_col TO DO
-#' @param num_neighbors TO DO
-#' @param graph_type TO DO
-#' @param graph_layout TO DO
-#' @param central_tendency_function TO DO
-#' @param distance_function TO DO
-#' @param knn_error TO DO
-#' @param edge_alpha TO DO
-#' @param node_size TO DO
-#' @param theme TO DO
-#' @param ... TO DO
+#' This function plots a minimum-spanning tree using clustered single-cell data
+#' in order to summarize cluster-level characteristics. Each node in the MST
+#' represents a single cluster colored using a user-specified variable (either
+#' continuous or discrete).
 #'
-#' @return TO DO
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the cluster ids for the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
+#'
+#' @param group_cols An unquoted column name indicating which columns
+#' should be used to group cells.
+#'
+#' @param knn_cols Unquoted column names indicating which columns in `tof_tibble`
+#' should be used to compute the cluster-to-cluster distances used to construct
+#' the k-nearest-neighbor graph. Supports tidyselect helpers. Defaults to all
+#' numeric columns.
+#'
+#' @param color_col Unquoted column name indicating which column in `tof_tibble`
+#' should be used to color the nodes in the MST.
+#'
+#' @param num_neighbors An integer specifying how many neighbors should be used
+#' to construct the k-nearest neighbor graph.
+#'
+#' @param graph_type A string specifying if the k-nearest neighbor graph should
+#' be "weighted" (the default) or "unweighted".
+#'
+#' @param graph_layout This argument specifies a layout for the MST in one of two ways.
+#' Option 1: Provide a string specifying which algorithm should be used to
+#' compute the force-directed layout. Passed to \code{\link[ggraph]{ggraph}}.
+#' Defaults to "nicely", which tries to automatically select a visually-appealing
+#' layout. Other examples include "fr", "gem", "kk", and many others. See
+#' \code{\link[ggraph]{layout_tbl_graph_igraph}} for other examples.
+#' Option 2: Provide a ggraph object previously generated with this
+#' function. The layout used to plot this ggraph object will then be used as a
+#' template for the new plot. Using this option, number of clusters (and their
+#' labels) must be identical to the template. This option is useful if you want
+#' to make multiple plots of the same tof_tibble colored by different protein
+#' markers, for example.
+#'
+#' @param central_tendency_function A function to use for computing the
+#' measure of central tendency that will be aggregated from each cluster in
+#' cluster_col. Defaults to the median.
+#'
+#' @param distance_function  A string indicating which distance function to use
+#' in computing the cluster-to-clusters distances in constructing the MST.
+#' Valid options include "euclidean" (the default) and "cosine".
+#'
+#' @param knn_error A value > 0 used in the k-nearest-neighbor approximation.
+#' `knn_error` is an error bound such that the ratio between the a cell's reported
+#' ith nearest neighbor and its true ith nearest neighbor will be at most
+#' 1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
+#' Will generally be between 0 and 1. Larger values will result in more
+#' approximate KNN calculations (i.e. a higher likelihood of small errors) but
+#' will also decrease the computational time of the algorithm significantly.
+#'
+#' @param edge_alpha A numeric value between 0 and 1 specifying the transparency
+#' of the edges drawn in the force-directed layout. Defaults to 0.25.
+#'
+#' @param node_size Either a numeric value specifying the size of the nodes in the
+#' MST or the string "cluster_size", in which case the size of the node representing
+#' each cluster will be scaled according to the number of cells in that cluster
+#' (the default).
+#'
+#' @param theme A ggplot2 theme to apply to the force-directed layout.
+#' Defaults to \code{\link[ggplot2]{theme_void}}
+#'
+#' @param ... Not currently used.
+#'
+#' @return A ggraph/ggplot object.
 #'
 #' @export
 #'
@@ -320,26 +566,24 @@ tof_plot_cluster_mst <-
   function(
     tof_tibble,
     cluster_col,
-    group_cols,
     knn_cols = where(tof_is_numeric),
-    color_col,
-    #facet_cols,
+    color_col, # each value in cluster_col must map onto only 1 value of group_cols
     num_neighbors = 5L,
-    graph_type = c("weighted", "unweighted"),
-    graph_layout = "fr",
+    graph_type = c("unweighted", "weighted"),
+    graph_layout = "nicely",
     central_tendency_function = stats::median,
     distance_function = c("euclidean", "cosine"),
     knn_error = 0,
-    edge_alpha = 0.25,
-    node_size = 2,
+    edge_alpha = 0.4,
+    node_size = "cluster_size",
     theme = ggplot2::theme_void(),
     ...
   ) {
-
-    # check distance function
+    # check arguments ----------------------------------------------------------
+    # check distance_function argument
     distance_function <- rlang::arg_match(distance_function)
 
-    # check graph type
+    # check graph_type argument
     graph_type = rlang::arg_match(graph_type)
 
     # throw error if color_col is missing
@@ -347,54 +591,204 @@ tof_plot_cluster_mst <-
       stop("color_col must be specified.")
     }
 
-    if (missing(group_cols)) {
-      group_cols <- NULL
+    # summarize the clusters ---------------------------------------------------
+    color_vector <- dplyr::pull(tof_tibble, {{color_col}})
+
+    # if color_col is a numeric vector
+    if (tof_is_numeric(color_vector)) {
+      # use a continuous fill scale
+      scale_fill <- ggplot2::scale_fill_viridis_c()
+
+      # compute cluster-wise summary statistics
+      cluster_tibble <-
+        tof_tibble %>%
+        dplyr::select(
+          {{cluster_col}},
+          {{color_col}},
+          {{knn_cols}}
+        ) %>%
+        # compute one summary statistic for each cluster across all knn_cols
+        tof_summarize_clusters(
+          cluster_col = {{cluster_col}},
+          metacluster_cols = c({{knn_cols}}, {{color_col}}),
+          central_tendency_function = central_tendency_function
+        )
+
+      # compute the size of each cluster
+      cluster_sizes <-
+        tof_tibble %>%
+        dplyr::count(
+          {{cluster_col}},
+          name = ".cluster_size"
+        )
+
+      # if color_col is a character or factor vector
+    } else if (is.character(color_vector) | is.factor(color_vector)) {
+      # check that each cluster maps to exactly one color
+      cluster_groups <-
+        tof_tibble %>%
+        dplyr::distinct({{cluster_col}}, {{color_col}}) %>%
+        dplyr::count({{cluster_col}})
+
+      if (any(cluster_groups$n > 1)) {
+        stop(
+          "If color_col is a character vector or factor, each cluster must map to exactly one color (i.e. cluster IDs must be nested within color IDs)"
+        )
+      } else {
+        # use a discrete fill scale
+        scale_fill <- ggplot2::scale_fill_discrete()
+
+        # compute summary statistics
+        cluster_tibble <-
+          tof_tibble %>%
+          dplyr::select(
+            {{cluster_col}},
+            {{color_col}},
+            {{knn_cols}}
+          ) %>%
+          # compute one summary statistic for each cluster across all knn_cols
+          # but also hold onto each cluster's color_col for plotting
+          tof_summarize_clusters(
+            cluster_col = {{cluster_col}},
+            metacluster_cols = {{knn_cols}},
+            group_cols = {{color_col}},
+            central_tendency_function = central_tendency_function
+          )
+
+
+        # compute cluster sizes
+        cluster_sizes <-
+          tof_tibble %>%
+          dplyr::count(
+            {{cluster_col}},
+            {{color_col}},
+            name = ".cluster_size"
+          )
+      }
     }
 
-    # if (missing(facet_cols)) {
-    #   has_facets <- FALSE
-    #   facet_cols <- NULL
-    # } else {
-    #   has_facets <- TRUE
-    # }
+    # save the names of the clusters to use for calculating each cluster's KNNs
+    knn_names <-
+      cluster_tibble %>%
+      dplyr::select({{knn_cols}}) %>%
+      colnames()
 
-    # summarize the clusters
-    cluster_tibble <-
-      tof_tibble %>%
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = {{knn_cols}},
-        group_cols = c({{group_cols}}, {{color_col}}), #, {{facet_cols}}),
-        central_tendency_function = central_tendency_function
-      )
-
-    cluster_sizes <-
-      tof_tibble %>%
-      dplyr::count(
-        {{group_cols}}, {{cluster_col}}, {{color_col}},
-        name = ".cluster_size"
-      )
-
+    # add the sizes of each cluster to the summary statistics for each cluster
     cluster_tibble <-
       suppressMessages(
         cluster_tibble %>%
           dplyr::left_join(cluster_sizes)
       )
 
-    # make the knn graph
-    knn_graph <-
-      cluster_tibble %>%
-      tof_make_knn_graph(
-        knn_cols = {{knn_cols}},
-        num_neighbors = num_neighbors,
-        distance_function = distance_function,
-        knn_error = knn_error,
-        graph_type = graph_type
-      )
+    # make the knn graph -------------------------------------------------------
 
-    # make the mst -------------------------------------------------------------
+    # if graph_layout is a previously-plotted mst
+    # extract coordinates for each cluster in the mst
+    if (inherits(graph_layout, "ggraph")) {
+      # save the names of cluster_col and color_col as strings
+      cluster_colname <-
+        colnames(dplyr::select(cluster_tibble, {{cluster_col}}))
 
-    # make the edges depending on whether the graph is weighted or unweighted
+      if (!(cluster_colname %in% colnames(graph_layout$data))) {
+        stop("The original layout must have been computed using the same cluster_col as the new plot")
+      }
+
+      color_colname <-
+        colnames(dplyr::select(cluster_tibble, {{color_col}}))
+
+      # find columns that are shared between the original layout and cluster_tibble
+      common_columns <-
+        intersect(colnames(cluster_tibble), colnames(graph_layout$data)) %>%
+        purrr::discard(.p = ~ .x %in% c(cluster_colname))
+
+      # join any new columns in the cluster_tibble that weren't in the original
+
+      layout_attributes <-
+        attributes(graph_layout$data)
+
+      new_layout <-
+        graph_layout$data %>%
+        dplyr::select(-dplyr::any_of(common_columns)) %>%
+        # join
+        dplyr::left_join(cluster_tibble, by = cluster_colname)
+
+      # use the new layout to create a new knn_graph from the old one, plus
+      # any new information
+      knn_graph <-
+        layout_attributes[["graph"]] %>%
+        tidygraph::activate("nodes")
+
+      if (color_colname %in% colnames(tidygraph::as_tibble(knn_graph)) &
+          color_colname %in% colnames(new_layout)) {
+        # avoid duplicating the color_col - introduces a bug in the discrete case
+        knn_graph <-
+          knn_graph %>%
+          tidygraph::select(-{{color_col}})
+
+      }
+
+      # make sure that clusters are encoded as character vectors in both
+      # representations
+      if (!is.character(dplyr::pull(new_layout, {{cluster_col}}))) {
+        new_layout[[cluster_colname]] <- as.character(new_layout[[cluster_colname]])
+      }
+
+      graph_cluster_vector <-
+        knn_graph %>%
+        tidygraph::pull({{cluster_col}})
+
+      if (!is.character(graph_cluster_vector)) {
+        knn_graph <-
+          knn_graph %>%
+          tidygraph::mutate(
+            "{{cluster_col}}" := as.character({{cluster_col}})
+          )
+      }
+
+      knn_graph <-
+        knn_graph %>%
+        tidygraph::select(
+          {{cluster_col}},
+        ) %>%
+        tidygraph::left_join(
+          new_layout %>%
+            dplyr::select(
+              -.data$x,
+              -.data$y,
+              -.data$.ggraph.index,
+              -.data$.ggraph.orig_index,
+              -.data$circular
+            ),
+          by = cluster_colname
+        )
+
+      graph_layout <-
+        knn_graph %>%
+        tidygraph::activate("nodes") %>%
+        tidygraph::as_tibble() %>%
+        dplyr::left_join(
+          new_layout %>%
+            dplyr::select({{cluster_col}}, .data$x, .data$y),
+          by = cluster_colname
+        ) %>%
+        dplyr::select(.data$x, .data$y)
+
+    } else {
+      #calculate the KNN graph from scratch
+      knn_graph <-
+        cluster_tibble %>%
+        tof_make_knn_graph(
+          knn_cols = dplyr::any_of(knn_names),
+          num_neighbors = num_neighbors,
+          distance_function = distance_function,
+          knn_error = knn_error,
+          graph_type = graph_type
+        )
+    }
+
+    # make the mst plot --------------------------------------------------------
+
+    # create the edges depending on whether the graph is weighted or unweighted
     if (graph_type == "weighted") {
       mst <-
         knn_graph %>%
@@ -438,27 +832,476 @@ tof_plot_cluster_mst <-
         )
     }
 
-    # if (has_facets) {
-    #   mst_plot <-
-    #     mst_plot +
-    #     ggraph::facet_nodes(facets = ggplot2::vars({{facet_cols}}))
-    # }
-
     # return result
-    result <- mst_plot + theme
+    result <- mst_plot + scale_fill + theme
     return(result)
   }
 
+
+
+
+#' Create a volcano plot from differential expression analysis results
+#'
+#' This function makes a volcano plot using the results of a differential
+#' expression analysis (DEA) produced by one of the `tof_dea_*` verbs. Each
+#' point in the volcano plot represents a single cluster-marker pair, colored by
+#' significance level and the direction of the marker expression difference.
+#'
+#' @param dea_result A tibble containing the differential expression analysis (DEA)
+#' results produced by one of the members of the `tof_dea_*` function family.
+#'
+#' @param num_top_pairs An integer representing the number of most significant
+#' cluster-marker pairs that should be labeled in the volcano plot.
+#'
+#' @param alpha A numeric value between 0 and 1 representing the significance
+#' level below which a p-value should be considered
+#' statistically significant. Defaults to 0.05.
+#'
+#' @param point_size A numeric value specifying the size of the points in the
+#' volcano plot.
+#'
+#' @param label_size A numeric value specifying the size of the text labeling
+#' cluster-marker pairs.
+#'
+#' @param nudge_x A numeric value specifying how far cluster-marker pair labels
+#' should be adjusted to the left (if `nudge_x` is negative) or to the right
+#' (if `nudge_x` is positive) to avoid overlap with the plotted points.
+#' Passed to  \code{\link[ggplot2]{geom_text}}, and ignored if
+#' `use_ggrepel` = TRUE. Defaults to 0.
+#'
+#' @param nudge_y A numeric value specifying how far cluster-marker pair labels
+#' should be adjusted downwards (if `nudge_y` is negative) or upwards
+#' (if `nudge_y` is positive) to avoid overlap with the plotted points.
+#' Passed to  \code{\link[ggplot2]{geom_text}}, and ignored if
+#' `use_ggrepel` = TRUE. Defaults to 0.25.
+#'
+#' @param increase_color A hex code specifying which fill color should
+#' be used for points corresponding to cluster-marker pairs where significant
+#' increases were detected.
+#'
+#' @param decrease_color A hex code specifying which fill color should
+#' be used for points corresponding to cluster-marker pairs where significant
+#' decreases were detected.
+#'
+#' @param insignificant_color A hex code specifying which fill color should
+#' be used for points corresponding to cluster-marker pairs where no significant
+#' differences were detected.
+#'
+#' @param use_ggrepel A boolean value indicting if
+#' \code{\link[ggrepel]{geom_text_repel}} should be used to plot labels for
+#' cluster-marker pairs. Defaults to FALSE.
+#' If TRUE, the ggrepel package must be installed.
+#'
+#' @param theme A ggplot2 theme to apply to the volcano plot.
+#' Defaults to \code{\link[ggplot2]{theme_bw}}
+#'
+#' @return A ggplot object.
+#'
+#' @export
+#'
+#' @importFrom dplyr arrange
+#' @importFrom dplyr case_when
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr transmute
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_hline
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_vline
+#'
+#' @importFrom rlang check_installed
+#'
+#' @importFrom tidyr drop_na
+#' @importFrom tidyr unnest
+#'
 tof_plot_cluster_volcano <-
   function(
-    ...
+    dea_result,
+    num_top_pairs = 10L,
+    alpha = 0.05,
+    point_size = 2,
+    label_size = 3,
+    nudge_x = 0,
+    nudge_y = 0.25,
+    increase_color = "#207394",
+    decrease_color = "#cd5241",
+    insignificant_color = "#cdcdcd",
+    use_ggrepel = FALSE,
+    theme = ggplot2::theme_bw()
   ) {
-    stop("This function is not yet implemented!")
+    # extract dea method from dea_result object
+    dea_method <- attr(dea_result, which = "dea_method")
+
+    # if there are multiple results, plot the omnibus
+    if("dea_results" %in% colnames(dea_result)) {
+      plot_tibble <-
+        dea_result %>%
+        dplyr::filter(.data$tested_effect == "omnibus") %>%
+        tidyr::unnest(cols = .data$dea_results)
+    } else {
+      plot_tibble <- dea_result
+    }
+
+    num_top_pairs <- min(num_top_pairs, nrow(tidyr::drop_na(dea_result)))
+
+    cluster_index <-
+      switch(
+        dea_method,
+        "lmm" = 2L,
+        "t_unpaired" = 1L,
+        "t_paired" = 1L,
+        "diffcyt_lmm" = 2L,
+        "diffcyt_limma" = 2L
+      )
+
+    colnames(plot_tibble)[[cluster_index]] <- "cluster"
+
+    if (dea_method %in% c("lmm", "t_unpaired", "t_paired")) {
+      plot_tibble <-
+        plot_tibble %>%
+        dplyr::transmute(
+          .data$cluster,
+          .data$marker,
+          log2_fc = log(.data$mean_fc, base = 2),
+          log_p = -log(.data$p_adj),
+          significance = .data$significant,
+          direction =
+            dplyr::case_when(
+              .data$significance != "*" ~ "No change",
+              .data$mean_fc > 1         ~ "Increase",
+              .data$mean_fc < 1         ~ "Decrease"
+            )
+        )
+    } else if (dea_method %in% "diffcyt_limma") {
+      plot_tibble <-
+        plot_tibble %>%
+        dplyr::transmute(
+          .data$cluster,
+          .data$marker,
+          log2_fc = logFC,
+          log_p = -log(.data$p_adj),
+          significance = .data$significant,
+          direction =
+            dplyr::case_when(
+              .data$significance != "*" ~ "No change",
+              .data$logFC > 0           ~ "Increase",
+              .data$logFC < 0           ~ "Decrease"
+            )
+        )
+    } else if (dea_method %in% "diffcyt_lmm") {
+      stop("diffcyt doesn't report enough information about model fitting to make a volcano plot when diffcyt_method == \"lmm\". Try using tof_dea_lmm()")
+    }
+
+    plot_tibble <-
+      plot_tibble %>%
+      dplyr::arrange(-.data$log_p) %>%
+      dplyr::mutate(label = paste(.data$marker, .data$cluster, sep = "@"))
+
+    volcano_plot <-
+      plot_tibble %>%
+      ggplot2::ggplot(aes(x = log2_fc, y = log_p, fill = direction)) +
+      ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+      ggplot2::geom_hline(yintercept = -log(alpha), linetype = "dashed", color = "red") +
+      ggplot2::geom_point(shape = 21, size = point_size)
+
+    if (use_ggrepel) {
+      # if ggrepel requested
+      # check to see if ggridges is installed
+      rlang::check_installed(pkg = "ggridges")
+
+      if (!requireNamespace(package = "ggridges")) {
+        stop("if use_ggridges == TRUE, the ggridges package must be installed")
+      }
+      volcano_plot <-
+        volcano_plot +
+        ggrepel::geom_text_repel(
+          ggplot2::aes(label = label),
+          data = dplyr::slice_head(plot_tibble, n = num_top_pairs),
+          size = label_size
+        )
+    } else {
+      volcano_plot <-
+        volcano_plot +
+        ggplot2::geom_text(
+          ggplot2::aes(label = label),
+          data = dplyr::slice_head(plot_tibble, n = num_top_pairs),
+          nudge_x = nudge_x,
+          nudge_y = nudge_y,
+          size = label_size
+        )
+    }
+
+    volcano_plot <-
+      volcano_plot +
+      ggplot2::scale_fill_manual(
+        values =
+          c(
+            "Decrease" = decrease_color,
+            "Increase" = increase_color,
+            "No change" = insignificant_color
+          )
+      ) +
+      ggplot2::labs(
+        x = "log2(Fold-change)",
+        y = "-log10(p-value)",
+        fill = NULL,
+        caption =
+          paste0(
+            "Labels indicate the ",
+            as.character(num_top_pairs),
+            " most significant cluster-marker pairs"
+          )
+      )
+    return(volcano_plot + theme)
+  }
+
+
+
+#' Title
+#'
+#' Description
+#'
+#' @param tof_tibble TO DO
+#' @param daa_result TO DO
+#' @param cluster_col TO DO
+#' @param group_cols TO DO
+#' @param color_col TO DO
+#' @param dodge_width TO DO
+#' @param asterisk_size TO DO
+#' @param theme TO DO
+#'
+#' @return TO DO
+#'
+tof_plot_cluster_abundance <-
+  function(
+    tof_tibble,
+    daa_result,
+    cluster_col,
+    group_cols, # columns that should be used to group cells into independent observations
+    color_col,
+    dodge_width = 0.4,
+    asterisk_size = 5,
+    theme = ggplot2::theme_bw()
+  ) {
+
+    # extract cluster_col name
+    cluster_colname <-
+      tof_tibble %>%
+      dplyr::select({{cluster_col}}) %>%
+      colnames()
+
+    if (!(cluster_colname %in% colnames(daa_result))) {
+      stop("The name of the {{cluster_col}} must be the same in tof_tibble and daa_result.")
+    }
+
+    # format daa_result depending on the daa_method
+    plot_tibble <-
+      tof_tibble %>%
+      dplyr::mutate(
+        dplyr::across(
+          c({{cluster_col}}, {{color_col}}, {{group_cols}}),
+          .f = as.factor
+        )
+      )
+
+    plot_tibble <-
+      plot_tibble %>%
+      dplyr::count(
+        dplyr::across({{group_cols}}),
+        {{color_col}},
+        {{cluster_col}},
+        .drop = FALSE
+      ) %>%
+      dplyr::left_join(
+        dplyr::select(daa_result, {{cluster_col}}, .data$significant),
+        by = cluster_colname
+      ) %>%
+      dplyr::group_by(dplyr::across({{group_cols}})) %>%
+      dplyr::mutate(prop = n / sum(n)) %>%
+      dplyr::ungroup()
+
+    sig_tibble <-
+      plot_tibble %>%
+      dplyr::group_by({{cluster_col}}) %>%
+      dplyr::slice_max(.data$prop) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(
+        {{cluster_col}},
+        {{color_col}},
+        .data$prop,
+        .data$significant
+      )
+
+    violin_plot <-
+      plot_tibble %>%
+      ggplot2::ggplot(
+        ggplot2::aes(x = {{cluster_col}}, y = prop, fill = {{color_col}})
+      ) +
+      ggplot2::geom_boxplot(
+        position = position_dodge(width = dodge_width),
+        outlier.shape = NA
+      ) +
+      ggplot2::geom_point(position = position_dodge(width = dodge_width)) +
+      ggplot2::geom_text(
+        ggplot2::aes(label = .data$significant),
+        size = asterisk_size,
+        data = sig_tibble
+      ) +
+      ggplot2::labs(
+        y = "Proportion of cells per group"
+      )
+
+    return(violin_plot + theme)
+
+  }
+
+#' Make a heatmap summarizing cluster marker expression patterns in CyTOF data
+#'
+#' This function makes a heatmap of cluster-to-cluster marker expression patterns
+#' in single-cell data. Markers are plotted along the horizontal (x-) axis of
+#' the heatmap and cluster IDs are plotted along the vertical (y-) axis of the
+#' heatmap.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the cluster ids for the cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
+#'
+#' @param marker_cols Unquoted column names indicating which columsn in `tof_tibble`
+#' should be interpreted as markers to be plotted along the x-axis of the heatmap.
+#' Supports tidyselect helpers.
+#'
+#' @param central_tendency_function A function to use for computing the
+#' measure of central tendency that will be aggregated from each cluster in
+#' cluster_col. Defaults to the median.
+#'
+#' @param scale_markerwise A boolean value indicating if the heatmap should
+#' rescale the columns of the heatmap such that the maximum value for each
+#' marker is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param scale_clusterwise A boolean value indicating if the heatmap should
+#' rescale the rows of the heatmap such that the maximum value for each
+#' cluster is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param line_width A numeric value indicating how thick the lines separating
+#' the tiles of the heatmap should be. Defaults to 0.25.
+#'
+#' @param theme A ggplot2 theme to apply to the heatmap.
+#' Defaults to \code{\link[ggplot2]{theme_minimal}}
+#'
+#' @return A ggplot object.
+#'
+#' @export
+#'
+#' @importFrom ggplot2 theme_minimal
+#'
+#' @importFrom stats median
+#'
+#'
+#'
+tof_plot_cluster_heatmap <-
+  function(
+    tof_tibble,
+    cluster_col,
+    marker_cols = where(tof_is_numeric),
+    central_tendency_function = stats::median,
+    scale_markerwise = FALSE,
+    scale_clusterwise = FALSE,
+    line_width = 0.25,
+    theme = ggplot2::theme_minimal()
+  ) {
+
+    result <-
+      tof_tibble %>%
+      tof_plot_heatmap(
+        y_col = {{cluster_col}},
+        marker_cols = {{marker_cols}},
+        central_tendency_function = central_tendency_function,
+        scale_markerwise = scale_markerwise,
+        scale_ywise = scale_clusterwise,
+        line_width = line_width,
+        theme = theme
+      )
+
+    return(result)
 
   }
 
 
 # sample-level visualizations --------------------------------------------------
+
+#' Make a heatmap summarizing sample marker expression patterns in CyTOF data
+#'
+#' This function makes a heatmap of sample-to-sample marker expression patterns
+#' in single-cell data. Markers are plotted along the horizontal (x-) axis of
+#' the heatmap and sample IDs are plotted along the vertical (y-) axis of the
+#' heatmap.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param sample_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the ids for the sample to which each cell belongs.
+#'
+#' @param marker_cols Unquoted column names indicating which columsn in `tof_tibble`
+#' should be interpreted as markers to be plotted along the x-axis of the heatmap.
+#' Supports tidyselect helpers.
+#'
+#' @param central_tendency_function A function to use for computing the
+#' measure of central tendency that will be aggregated from each sample in
+#' cluster_col. Defaults to the median.
+#'
+#' @param scale_markerwise A boolean value indicating if the heatmap should
+#' rescale the columns of the heatmap such that the maximum value for each
+#' marker is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param scale_samplewise A boolean value indicating if the heatmap should
+#' rescale the rows of the heatmap such that the maximum value for each
+#' sample is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param line_width A numeric value indicating how thick the lines separating
+#' the tiles of the heatmap should be. Defaults to 0.25.
+#'
+#' @param theme A ggplot2 theme to apply to the heatmap.
+#' Defaults to \code{\link[ggplot2]{theme_minimal}}
+#'
+#' @return A ggplot object.
+#'
+#' @export
+#'
+#' @importFrom ggplot2 theme_minimal
+#'
+#' @importFrom stats median
+#'
+#'
+#'
+tof_plot_sample_heatmap <-
+  function(
+    tof_tibble,
+    sample_col,
+    marker_cols = where(tof_is_numeric),
+    central_tendency_function = stats::median,
+    scale_markerwise = FALSE,
+    scale_samplewise = FALSE,
+    line_width = 0.25,
+    theme = ggplot2::theme_minimal()
+  ) {
+    result <-
+      tof_tibble %>%
+      tof_plot_heatmap(
+        y_col = {{sample_col}},
+        marker_cols = {{marker_cols}},
+        central_tendency_function = central_tendency_function,
+        scale_markerwise = scale_markerwise,
+        scale_ywise = scale_samplewise,
+        line_width = line_width,
+        theme = theme
+      )
+    return(result)
+  }
 
 tof_plot_sample_features <-
   function(

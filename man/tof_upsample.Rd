@@ -10,7 +10,7 @@ tof_upsample(
   reference_cluster_col,
   upsample_cols,
   ...,
-  add_col = TRUE,
+  augment = TRUE,
   method = c("distance", "neighbor")
 )
 }
@@ -32,7 +32,7 @@ in `tof_tibble`. Supports tidyselect helpers.}
 \item{...}{Additional arguments to pass to the `tof_upsample_*`
 function family member corresponding to the chosen method.}
 
-\item{add_col}{A boolean value indicating if the output should column-bind the
+\item{augment}{A boolean value indicating if the output should column-bind the
 cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 a single-column tibble including only the cluster ids should be returned (FALSE).}
 
@@ -40,9 +40,9 @@ a single-column tibble including only the cluster ids should be returned (FALSE)
 values include "distance" (default) and "neighbor".}
 }
 \value{
-A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
+A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
 the upsampled cluster ids for each cell in `tof_tibble`.
-If add_col = TRUE, it will have
+If augment = TRUE, it will have
 ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.
 }

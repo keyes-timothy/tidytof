@@ -141,11 +141,11 @@ tof_split_data <-
 #' @param penalty_values A numeric vector of the unique elastic net penalty values ("lambda")
 #' to include in the
 #' hyperparameter grid. If unspecified, a regular grid with `num_penalty_values` between
-#' 10^(-10) and 10^(0) will be used.
+#' 10^(-10) and 10^(0) will be used. Ignored if `grid_type` is "entropy".
 #'
 #' @param mixture_values  A numeric vector of all elastic net mixture values ("alpha") to include in the
 #' hyperparameter grid. If unspecified, a regular grid with `num_mixture_values` between
-#' 0 and 1 will be used.
+#' 0 and 1 will be used. Ignored if `grid_type` is "entropy".
 #'
 #' @param grid_type A string indicating if a regular grid ("regular"; the default) or maximum-entropy
 #' ("entropy") search grid should be returned. Ignored if both `penalty_values` and
@@ -172,8 +172,11 @@ tof_split_data <-
 #'
 #' @export
 #'
-#' @importFrom rlang arg_match
+#' @importFrom dplyr rename
+#'
 #' @importFrom tidyr expand_grid
+#'
+#' @importFrom rlang arg_match
 #'
 #' @examples
 #' tof_create_grid()
@@ -199,6 +202,14 @@ tof_create_grid <-
           "Creating a maximum-entropy search grid requires the {dials} package. Install it with this code:\n
            install.packages(\"dials\")"
         )
+      }
+
+      if (!missing(penalty_values)) {
+        warning("grid_type is entropy, so penalty_values will be ignored.")
+      }
+
+      if (!missing(mixture_values)) {
+        warning("grid_type is entropy, so mixture_values will be ignored.")
       }
 
       hyperparams <-

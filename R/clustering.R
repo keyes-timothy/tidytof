@@ -436,15 +436,15 @@ tof_cluster_ddpr <-
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
 #'
-#' @param add_col A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 #' a single-column tibble including only the cluster ids should be returned (FALSE).
 #'
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
-#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
 #'
@@ -461,7 +461,7 @@ tof_cluster <-
     tof_tibble,
     group_cols = NULL,
     ...,
-    add_col = TRUE,
+    augment = TRUE,
     method
   ) {
 
@@ -478,7 +478,7 @@ tof_cluster <-
           tof_tibble = tof_tibble,
           group_cols = {{group_cols}},
           ...,
-          add_col = add_col,
+          augment = augment,
           method = method
         )
 
@@ -488,7 +488,7 @@ tof_cluster <-
         tof_cluster_tibble(
           tof_tibble = tof_tibble,
           ...,
-          add_col = add_col,
+          augment = augment,
           method = method
         )
     }
@@ -506,15 +506,15 @@ tof_cluster <-
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
 #'
-#' @param add_col A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 #' a single-column tibble including only the cluster ids should be returned (FALSE).
 #'
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
-#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
 #'
@@ -524,7 +524,7 @@ tof_cluster_tibble <-
   function(
     tof_tibble,
     ...,
-    add_col = TRUE,
+    augment = TRUE,
     method
   ) {
     if (method == "flowsom") {
@@ -554,7 +554,7 @@ tof_cluster_tibble <-
       stop("Not a valid clustering method.")
     }
 
-    if (add_col) {
+    if (augment) {
       result <-
         dplyr::bind_cols(tof_tibble, clusters)
     } else {
@@ -580,15 +580,15 @@ tof_cluster_tibble <-
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
 #'
-#' @param add_col A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 #' a single-column tibble including only the cluster ids should be returned (FALSE).
 #'
 #' @param method A string indicating which clustering methods should be used. Valid
 #' values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".
 #'
-#' @return A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-#' the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+#' the cluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 #' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 #' plus an additional column encoding the cluster ids.
 #'
@@ -610,7 +610,7 @@ tof_cluster_grouped <-
     tof_tibble,
     group_cols,
     ...,
-    add_col = TRUE,
+    augment = TRUE,
     method
   ) {
     nested_tibble <-
@@ -621,13 +621,13 @@ tof_cluster_grouped <-
 
     # a list of data frames containing the independently
     # clustered results (appended as columns to the rest of the input tibbles
-    # if requested by add_col)
+    # if requested by augment)
     # TO DO: allow this to be parallel
     nested_clusters <-
       purrr::map(
         .x = nested_tibble$data,
         .f = tof_cluster_tibble,
-        add_col = FALSE,
+        augment = FALSE,
         method  = method,
         ...
       )
@@ -654,7 +654,7 @@ tof_cluster_grouped <-
       ) %>%
       dplyr::select(-.data$.prefix)
 
-    if (add_col) {
+    if (augment) {
       result <-
         result %>%
         tidyr::unnest(cols = c(.data$data, .data$clusters))

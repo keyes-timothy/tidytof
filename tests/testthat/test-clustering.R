@@ -302,17 +302,17 @@ test_that("clustering output is identical for all methods", {
 
   expect_equal(
     tof_cluster_flowsom(clust_data, seed = 20, perform_metaclustering = FALSE),
-    tof_cluster_tibble(clust_data, method = "flowsom", add_col = FALSE, seed = 20, perform_metacluster = FALSE)
+    tof_cluster_tibble(clust_data, method = "flowsom", augment = FALSE, seed = 20, perform_metacluster = FALSE)
   )
 
   expect_equal(
     tof_cluster_kmeans(clust_data, seed = 20),
-    tof_cluster_tibble(clust_data, method = "kmeans", add_col = FALSE, seed = 20)
+    tof_cluster_tibble(clust_data, method = "kmeans", augment = FALSE, seed = 20)
   )
 
   expect_equal(
     tof_cluster_phenograph(clust_data),
-    tof_cluster_tibble(clust_data, method = "phenograph", add_col = FALSE, seed = 20)
+    tof_cluster_tibble(clust_data, method = "phenograph", augment = FALSE, seed = 20)
   )
 
   expect_equal(
@@ -324,7 +324,7 @@ test_that("clustering output is identical for all methods", {
     tof_cluster_tibble(
       ddpr_data,
       method = "ddpr",
-      add_col = FALSE,
+      augment = FALSE,
       healthy_tibble = healthy,
       healthy_label_col = cluster
     )
@@ -349,7 +349,7 @@ test_that("result has the correct number of columns", {
     tof_cluster_grouped(
       tof_tibble = clust_data,
       group_cols = sample_name,
-      add_col = FALSE,
+      augment = FALSE,
       method = "phenograph"
     ) %>%
       ncol(),
@@ -373,7 +373,7 @@ test_that("result has the correct number of rows", {
     tof_cluster_grouped(
       tof_tibble = clust_data,
       group_cols = sample_name,
-      add_col = FALSE,
+      augment = FALSE,
       method = "phenograph"
     ) %>%
       nrow(),
@@ -432,17 +432,17 @@ test_that("clustering output is identical for all methods", {
 
   expect_equal(
     tof_cluster_flowsom(clust_data, seed = 20, perform_metaclustering = FALSE),
-    tof_cluster(clust_data, method = "flowsom", add_col = FALSE, seed = 20, perform_metacluster = FALSE)
+    tof_cluster(clust_data, method = "flowsom", augment = FALSE, seed = 20, perform_metacluster = FALSE)
   )
 
   expect_equal(
     tof_cluster_kmeans(clust_data, seed = 20),
-    tof_cluster(clust_data, method = "kmeans", add_col = FALSE, seed = 20)
+    tof_cluster(clust_data, method = "kmeans", augment = FALSE, seed = 20)
   )
 
   expect_equal(
     tof_cluster_phenograph(clust_data),
-    tof_cluster(clust_data, method = "phenograph", add_col = FALSE, seed = 20)
+    tof_cluster(clust_data, method = "phenograph", augment = FALSE, seed = 20)
   )
 
   expect_equal(
@@ -454,7 +454,7 @@ test_that("clustering output is identical for all methods", {
     tof_cluster(
       ddpr_data,
       method = "ddpr",
-      add_col = FALSE,
+      augment = FALSE,
       healthy_tibble = healthy,
       healthy_label_col = cluster
     )

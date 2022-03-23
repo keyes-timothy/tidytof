@@ -531,9 +531,9 @@ test_that("lmm result tibbles have the right dimensions", {
   expect_equal(nrow(dea_lmm_tidyselection), num_clusters * 3)
 
   # have correct number of columns
-  expect_equal(ncol(dea_lmm), 11L)
-  expect_equal(ncol(dea_lmm_fixed), 10L)
-  expect_equal(ncol(dea_lmm_tidyselection), 11L)
+  expect_equal(ncol(dea_lmm), 12L)
+  expect_equal(ncol(dea_lmm_fixed), 11L)
+  expect_equal(ncol(dea_lmm_tidyselection), 12L)
 
 })
 

@@ -17,11 +17,11 @@ tof_create_grid(
 \item{penalty_values}{A numeric vector of the unique elastic net penalty values ("lambda")
 to include in the
 hyperparameter grid. If unspecified, a regular grid with `num_penalty_values` between
-10^(-10) and 10^(0) will be used.}
+10^(-10) and 10^(0) will be used. Ignored if `grid_type` is "entropy".}
 
 \item{mixture_values}{A numeric vector of all elastic net mixture values ("alpha") to include in the
 hyperparameter grid. If unspecified, a regular grid with `num_mixture_values` between
-0 and 1 will be used.}
+0 and 1 will be used. Ignored if `grid_type` is "entropy".}
 
 \item{num_penalty_values}{Optional. If `penalty_values` is not supplied, `num_penalty_values`
 (an integer) can be given to specify how many equally-spaced penalty values between

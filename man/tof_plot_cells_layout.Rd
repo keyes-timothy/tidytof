@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualization.R
 \name{tof_plot_cells_layout}
 \alias{tof_plot_cells_layout}
-\title{Title}
+\title{Plot force-directed layouts of single-cell data}
 \usage{
 tof_plot_cells_layout(
   tof_tibble,
@@ -21,37 +21,63 @@ tof_plot_cells_layout(
 )
 }
 \arguments{
-\item{tof_tibble}{TO DO}
+\item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{knn_cols}{TO DO}
+\item{knn_cols}{Unquoted column names indicating which columns in `tof_tibble`
+should be used to compute the cell-to-cell distances used to construct
+the k-nearest-neighbor graph. Supports tidyselect helpers. Defaults to all
+numeric columns.}
 
-\item{color_col}{TO DO}
+\item{color_col}{Unquoted column name indicating which column in `tof_tibble`
+should be used to color the nodes in the force-directed layout.}
 
-\item{facet_cols}{TO DO}
+\item{facet_cols}{Unquoted column names indicating which columns in `tof_tibble`
+should be used to separate nodes into different force-directed layouts.}
 
-\item{num_neighbors}{TO DO}
+\item{num_neighbors}{An integer specifying how many neighbors should be used
+to construct the k-nearest neighbor graph.}
 
-\item{graph_type}{TO DO}
+\item{graph_type}{A string specifying if the k-nearest neighbor graph should
+be "weighted" (the default) or "unweighted".}
 
-\item{graph_layout}{TO DO}
+\item{graph_layout}{A string specifying which algorithm should be used to
+compute the force-directed layout. Passed to \code{\link[ggraph]{ggraph}}.
+Defaults to "fr", the Fruchterman-Reingold algorithm. Other examples include
+"nicely", "gem", "kk", and many others. See
+\code{\link[ggraph]{layout_tbl_graph_igraph}} for other examples.}
 
-\item{distance_function}{TO DO}
+\item{distance_function}{A string indicating which distance function to use
+in computing the cell-to-cell distances. Valid options include "euclidean"
+(the default) and "cosine".}
 
-\item{knn_error}{TO DO}
+\item{knn_error}{A value > 0 used in the k-nearest-neighbor approximation.
+`knn_error` is an error bound such that the ratio between the a cell's reported
+ith nearest neighbor and its true ith nearest neighbor will be at most
+1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
+Will generally be between 0 and 1. Larger values will result in more
+approximate KNN calculations (i.e. a higher likelihood of small errors) but
+will also decrease the computational time of the algorithm significantly.}
 
-\item{edge_alpha}{TO DO}
+\item{edge_alpha}{A numeric value between 0 and 1 specifying the transparency
+of the edges drawn in the force-directed layout. Defaults to 0.25.}
 
-\item{node_size}{TO DO}
+\item{node_size}{A numeric value specifying the size of the nodes in the
+force-directed layout. Defaults to 2.}
 
-\item{theme}{TO DO}
+\item{theme}{A ggplot2 theme to apply to the force-directed layout.
+Defaults to \code{\link[ggplot2]{theme_void}}}
 
-\item{...}{TO DO}
+\item{...}{Optional additional arguments to pass to
+\code{\link[ggraph]{ggraph}}}
 }
 \value{
-TO DO
+A ggraph/ggplot object.
 }
 \description{
-description
+This function makes force-directed layouts using single-cell data embedded in
+a 2-dimensional space representing a k-nearest-neighbor graph constructed
+using cell-to-cell similarities. Each node in the force-directed layout
+represents a single cell colored using a user-specified variable.
 }
 \seealso{
 Other visualization functions: 

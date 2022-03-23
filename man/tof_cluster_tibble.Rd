@@ -4,7 +4,7 @@
 \alias{tof_cluster_tibble}
 \title{Cluster (ungrouped) CyTOF data.}
 \usage{
-tof_cluster_tibble(tof_tibble, ..., add_col = TRUE, method)
+tof_cluster_tibble(tof_tibble, ..., augment = TRUE, method)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or `tibble`.}
@@ -12,7 +12,7 @@ tof_cluster_tibble(tof_tibble, ..., add_col = TRUE, method)
 \item{...}{Additional arguments to pass to the `tof_cluster_*`
 function family member corresponding to the chosen method.}
 
-\item{add_col}{A boolean value indicating if the output should column-bind the
+\item{augment}{A boolean value indicating if the output should column-bind the
 cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 a single-column tibble including only the cluster ids should be returned (FALSE).}
 
@@ -20,8 +20,8 @@ a single-column tibble including only the cluster ids should be returned (FALSE)
 values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".}
 }
 \value{
-A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+the cluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.
 }

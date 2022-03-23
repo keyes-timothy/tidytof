@@ -443,11 +443,11 @@ We might wonder if there are certain clusters that expand or deplete within pati
 daa_result <- 
   citrus_data %>% 
   tof_daa(
-    daa_method = "ttest", 
     cluster_col = population_id, 
     effect_col = stimulation, 
     group_cols = patient, 
-    test_type = "paired"
+    test_type = "paired", 
+    method = "ttest"
   )
 
 daa_result
@@ -481,7 +481,7 @@ plot_data <-
         mean_fc < 1 & significant == "*" ~ "decrease", 
         TRUE ~ NA_character_
       )
-  ) 
+  )
 
 significance_data <- 
   plot_data %>% 
@@ -533,12 +533,12 @@ dea_result <-
   citrus_data %>% 
   tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
   tof_dea(
-    dea_method = "ttest", 
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
     effect_col = stimulation,
     group_cols = patient, 
-    test_type = "paired"
+    test_type = "paired", 
+    method = "ttest"
   )
 
 dea_result %>% 
@@ -567,7 +567,8 @@ volcano_data <-
     pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
   )
 
-volcano_data %>% 
+volcano_plot <- 
+  volcano_data %>% 
   ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
   geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
@@ -587,6 +588,8 @@ volcano_data %>%
     fill = NULL, 
     caption = "Labels indicate the 10 most significant marker-cluster pairs"
   )
+
+volcano_plot
 ```
 
 ### Analyzing data at the patient- and sample-level

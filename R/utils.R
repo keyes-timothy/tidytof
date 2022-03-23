@@ -85,6 +85,36 @@ rev_asinh <- function(x, shift_factor, scale_factor) {
 
 }
 
+# downsampling -----------------------------------------------------------------
+
+tof_spade_downsampling <-
+  function(densities, cell_ids, target_num_cells, power = 1) {
+    densities_sorted <- sort(densities)
+
+    # a fast estimate of the expected number
+    # of cells that will be sampled at each density threshold (starting
+    # with the most inclusive threshold)
+    cdf <- rev(cumsum(1.0 / rev(densities_sorted)))
+
+    max_number_cells <- cdf[[1]]
+
+    boundary <- target_num_cells / max_number_cells
+
+    if (boundary > densities_sorted[1]) {
+      targets <- (target_num_cells - (1:length(densities_sorted))) / cdf
+      boundary <- targets[which.min(targets - densities_sorted > 0)]
+    }
+
+    result_indices <-
+      which((boundary / densities)^power > stats::runif(length(densities)))
+
+    result <-
+      cell_ids$..cell_id[result_indices]
+
+    return(result)
+
+  }
+
 # metaclustering ---------------------------------------------------------------
 
 tof_summarize_clusters <-
@@ -663,6 +693,365 @@ tof_nested_cv <-
   }
 
 
+# local density estimation -----------------------------------------------------
+
+
+#' Estimate the local densities for all cells in a CyTOF dataset.
+#'
+#' This function is a wrapper around {tidytof}'s tof_*_density() function family.
+#' It performs local density estimation on CyTOF data using a user-specified
+#' method (of 3 choices) and each method's corresponding input parameters.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
+#' calculating cell-to-cell distances duringthe local density estimation for
+#' each cell. Defaults to all numeric columns in `tof_tibble`.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for calculating cell-to-cell distances during local density estimation. Options
+#' include "euclidean" (the default) and "cosine".
+#'
+#' @param normalize A boolean value indicating if the vector of local density
+#' estimates should be normalized to values between 0 and 1. Defaults to TRUE.
+#'
+#' @param ... Additional arguments to pass to the `tof_*_density()` function family
+#' member corresponding to the chosen `method`.
+#'
+#' @param augment A boolean value indicating if the output should column-bind the
+#' local density estimates of each cell as a new column in `tof_tibble` (TRUE; the default) or if
+#' a single-column tibble including only thelocal density estimates should be returned (FALSE).
+#'
+#' @param method  A string indicating which local density estimation method should be used.
+#' Valid values include "mean_distance", "sum_distance", and "spade".
+#'
+#' @return A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+#' the local density estimates for each cell in `tof_tibble`. If augment = TRUE, it will have
+#' ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
+#' plus an additional column encoding the local density estimates.
+#'
+#' @family local density estimation functions
+#'
+#' @export
+#'
+tof_estimate_density <-
+  function(
+    tof_tibble,
+    distance_cols = where(tof_is_numeric),
+    distance_function = c("euclidean", "cosine"),
+    normalize = TRUE,
+    ...,
+    augment = TRUE,
+    method = c("mean_distance", "sum_distance", "spade")
+  ) {
+  # check method argument
+    method <-
+      rlang::arg_match(method, values = c("mean_distance", "sum_distance", "spade"))
+
+    if (method %in% c("mean_distance", "sum_distance")) {
+      densities <-
+        tof_knn_density(
+          tof_tibble = tof_tibble,
+          distance_cols = {{distance_cols}},
+          distance_function = distance_function,
+          estimation_method = method,
+          normalize = normalize,
+          ...
+        )
+    } else if (method == "spade") {
+      densities <-
+        tof_spade_density(
+          tof_tibble = tof_tibble,
+          distance_cols = {{distance_cols}},
+          distance_function = distance_function,
+          normalize = normalize,
+          ...
+        )
+    }
+
+    if (augment) {
+      result <-
+        dplyr::bind_cols(tof_tibble, densities)
+    } else {
+      result <- densities
+    }
+
+    return(result)
+}
+
+#' Estimate cells' local densities as done in Spanning-tree Progression Analysis of Density-normalized Events (SPADE)
+#'
+#' This function uses the algorithm described in
+#' \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)} to estimate
+#' the local density of each cell in a `tof_tbl` or `tibble` containing CyTOF data.
+#' Briefly, this algorithm involves counting the number of neighboring cells
+#' within  a sphere of radius alpha surrounding each cell. Here, we do so using
+#' the \code{\link[RANN]{nn2}} function.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
+#' calculating cell-to-cell distances duringthe local density estimation for
+#' each cell. Defaults to all numeric columns in `tof_tibble`.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for calculating cell-to-cell distances during local density estimation. Options
+#' include "euclidean" (the default) and "cosine".
+#'
+#' @param num_alpha_cells An integer indicating how many cells from `tof_tibble`
+#' should be randomly sampled from `tof_tibble` in order to estimate `alpha`, the
+#' radius of the sphere constructed around each cell during local density
+#' estimation. Alpha is calculated by taking the median nearest-neighbor distance
+#' from the `num_alpha_cells` randomly-sampled cells and multiplying it by
+#' `alpha_multiplier`. Defaults to 2000.
+#'
+#' @param alpha_multiplier An numeric value indicating the multiplier that should be used
+#' when calculating `alpha`, the radius of the sphere constructed around each
+#' cell during local density estimation. Alpha is calculated by taking
+#' the median nearest-neighbor distance from the `num_alpha_cells` cells
+#' randomly-sampled from `tof_tibble` and multiplying it by
+#' `alpha_multiplier`. Defaults to 5.
+#'
+#' @param max_neighbors An integer indicating the maximum number of neighbors
+#' that can be counted within the sphere surrounding any given cell. Implemented
+#' to reduce the density estimation procedure's speed and memory requirements.
+#' Defaults to 1\% of the number of rows in `tof_tibble`.
+#'
+#' @param normalize A boolean value indicating if the vector of local density
+#' estimates should be normalized to values between 0 and 1. Defaults to TRUE.
+#'
+#' @param ... Additional optional arguments to pass to \code{\link{tof_find_knn}}.
+#'
+#' @return A tibble with a single column named ".spade_density" containing the
+#' local density estimates for each input cell in `tof_tibble`.
+#'
+#' @family local density estimation functions
+#'
+#' @export
+#'
+tof_spade_density <-
+  function(
+    tof_tibble,
+    distance_cols = where(tof_is_numeric),
+    distance_function = c("euclidean", "cosine"),
+    num_alpha_cells = 2000L,
+    alpha_multiplier = 5,
+    max_neighbors = round(0.01 * nrow(tof_tibble)),
+    normalize = TRUE,
+    ...
+  ) {
+    # estimate alpha -----------------------------------------------------------
+
+    # find median nearest-neighbor distances for num_alpha_cells sampled cells
+    alpha_knns <-
+      tof_tibble %>%
+      tof_downsample_constant(num_cells = num_alpha_cells) %>%
+      dplyr::select({{distance_cols}}) %>%
+      tof_find_knn(
+        k = 1L,
+        distance_function = distance_function,
+        ...
+      )
+    alpha_median <- median(alpha_knns$neighbor_distances)
+    alpha <- alpha_multiplier * alpha_median
+
+    # estimate local densities -------------------------------------------------
+
+    # compute number of neighbors within a sphere of radius alpha for each
+    # input cell in tof_tibble
+    spade_neighbors <-
+      tof_tibble %>%
+      dplyr::select({{distance_cols}}) %>%
+      tof_find_knn(
+        k = max_neighbors,
+        distance_function = distance_function,
+        searchtype = "radius",
+        radius = alpha
+      )
+
+    # calculate densities equal to the number of neighbors
+    # (up to max_neighbors) that each cell has
+    num_zeros <-
+      (spade_neighbors$neighbor_ids == 0) %>%
+      rowSums()
+    densities <- (max_neighbors) - num_zeros
+
+    if (normalize) {
+      # normalize densities
+      densities <-
+        (densities - min(densities)) /
+        ((max(densities) - min(densities)))
+    }
+
+    # return result
+    result <-
+      dplyr::tibble(.spade_density = densities)
+
+    return(result)
+  }
+
+
+#' Estimate cells' local densities using K-nearest-neighbor density estimation
+#'
+#' This function uses the distances between a cell and each of its K nearest
+#' neighbors to estimate local density of each cell in a
+#' `tof_tbl` or `tibble` containing CyTOF data.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
+#' calculating cell-to-cell distances duringthe local density estimation for
+#' each cell. Defaults to all numeric columns in `tof_tibble`.
+#'
+#' @param num_neighbors An integer indicating the number of nearest neighbors
+#' to use in estimating the local density of each cell. Defaults to the minimum
+#' of 15 and the number of rows in `tof_tibble`.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for calculating cell-to-cell distances during local density estimation. Options
+#' include "euclidean" (the default) and "cosine".
+#'
+#' @param estimation_method A string indicating how the relative density for each cell should be
+#' calculated from the distances between it and each of its k nearest neighbors. Options are
+#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
+#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
+#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
+#' distances to its nearest neighbors).
+#'
+#' @param normalize A boolean value indicating if the vector of local density
+#' estimates should be normalized to values between 0 and 1. Defaults to TRUE.
+#'
+#' @param ... Additional optional arguments to pass to
+#' \code{\link{tof_find_knn}}.
+#'
+#' @return A tibble with a single column named ".knn_density" containing the
+#' local density estimates for each input cell in `tof_tibble`.
+#'
+#' @family local density estimation functions
+#'
+#' @export
+#'
+tof_knn_density <-
+  function(
+    tof_tibble,
+    distance_cols = where(tof_is_numeric),
+    num_neighbors = min(15L, nrow(tof_tibble)),
+    distance_function = c("euclidean", "cosine"),
+    estimation_method = c("mean_distance", "sum_distance"),
+    normalize = TRUE,
+    ...
+  ) {
+
+    # check method argument
+    estimation_method <-
+      rlang::arg_match(estimation_method, values = c("mean_distance", "sum_distance"))
+
+    # compute knn information
+    knn_result <-
+      tof_tibble %>%
+      dplyr::select({{distance_cols}}) %>%
+      tof_find_knn(
+        k = num_neighbors,
+        distance_function = distance_function,
+        ...
+      )
+
+    # find densities using one of 2 methods
+    if (estimation_method == "sum_distance") {
+      densities <- -base::rowSums(abs(knn_result$neighbor_distances))
+    } else if (estimation_method == "mean_distance") {
+      densities <- -base::rowMeans(abs(knn_result$neighbor_distances))
+    } else {
+      stop("Not a valid estimation_method.")
+    }
+
+    if (normalize) {
+      # normalize densities
+      densities <-
+        (densities - min(densities)) /
+        ((max(densities) - min(densities)))
+    }
+
+    result <-
+      dplyr::tibble(.knn_density = densities)
+
+    # a tibble with N (number of cells) rows with the ith
+    # row representing the KNN-estimated density of the ith cell.
+    return(result)
+  }
+
+
+#' Find the KNN density estimate for each cell in a CyTOF dataset (legacy version).
+#'
+#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
+#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
+#'
+#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
+#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
+#'
+#' @param method A string indicating how the relative density for each cell should be
+#' calculated from the distances between it and each of its k nearest neighbors. Options are
+#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
+#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
+#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
+#' distances to its nearest neighbors).
+#'
+#' @param normalize TO DO
+#'
+#' @return a vector of length N (number of cells) with the ith
+# entry representing the KNN-estimated density of the ith cell.
+#'
+#'
+tof_knn_density_legacy <-
+  function(
+    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
+    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
+    method = c("mean_distance", "sum_distance", "spade"),
+    normalize = TRUE
+  ) {
+
+    # check method argument
+    method <-
+      match.arg(method, choices = c("mean_distance", "sum_distance", "spade"))
+
+    # extract needed values
+    k <- ncol(neighbor_ids)
+    n <- nrow(neighbor_ids)
+
+    # find densities using one of 3 methods
+    if (method == "sum_distance") {
+      densities <- -base::rowSums(abs(neighbor_distances))
+    } else if (method == "mean_distance") {
+      densities <- -base::rowMeans(abs(neighbor_distances))
+    } else if (method == "spade") {
+      alpha <- spade_multiplier * median(neighbor_distances[,1])
+      spade_neighbors <-
+        tof_tibble %>%
+        tof_find_knn(
+          k = max_neighbors,
+          distance_function = distance_function,
+          searchtype = "radius",
+          radius = alpha
+        )
+      num_zeros <-
+        (spade_neighbors$neighbor_ids == 0) %>%
+        rowSums()
+      densities <- (max_neighbors) - num_zeros
+
+    } else {
+      stop("Not a valid method.")
+    }
+
+    if (normalize) {
+      # normalize densities
+      densities <-
+        (densities - min(densities)) /
+        ((max(densities) - min(densities)))
+    }
+
+    return(densities) # a vector of length N (number of cells) with the ith
+    # entry representing the KNN-estimated density of the ith cell.
+  }
 
 
 
@@ -742,65 +1131,6 @@ tof_find_knn <-
     return(nn_result)
   }
 
-#' Find the KNN density estimate for each cell in a CyTOF dataset.
-#'
-#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
-#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
-#'
-#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
-#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
-#'
-#' @param method A string indicating how the relative density for each cell should be
-#' calculated from the distances between it and each of its k nearest neighbors. Options are
-#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
-#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
-#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
-#' distances to its nearest neighbors).
-#'
-#' @param normalize TO DO
-#'
-#' @return a vector of length N (number of cells) with the ith
-# entry representing the KNN-estimated density of the ith cell.
-#'
-#' @export
-#'
-#' @examples
-#' NULL
-tof_knn_density <-
-  function(
-    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
-    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
-    method = c("mean_distance", "sum_distance"),
-    normalize = TRUE
-  ) {
-
-    # check method argument
-    method <-
-      match.arg(method, choices = c("mean_distance", "sum_distance"))
-
-    # extract needed values
-    k <- ncol(neighbor_ids)
-    n <- nrow(neighbor_ids)
-
-    # find densities using one of 3 methods
-    if (method == "sum_distance") {
-      densities <- -base::rowSums(abs(neighbor_distances))
-    } else if (method == "mean_distance") {
-      densities <- -base::rowMeans(abs(neighbor_distances))
-    } else {
-      stop("Not a valid method.")
-    }
-
-    if (normalize) {
-      # normalize densities
-      densities <-
-        (densities - min(densities)) /
-        ((max(densities) - min(densities)))
-    }
-
-    return(densities) # a vector of length N (number of cells) with the ith
-    # entry representing the KNN-estimated density of the ith cell.
-  }
 
 
 tof_make_knn_graph <-
@@ -887,6 +1217,27 @@ tof_make_knn_graph <-
 
   }
 
+tof_make_mst <-
+  function(
+    cluster_tibble, # cluster-level data
+    knn_cols, # unquoted column names of columns to use in the knn calculation
+    num_neighbors, # number of knn's
+    distance_function = c("euclidean", "cosine"),
+    knn_error = 0, # eps value in RANN::nn2
+    graph_type = c("weighted", "unweighted") # weighted or unweighted graph
+  ) {
+
+  # make knn graph from all input points
+
+    # prune to mst
+    mst <-
+      knn_graph %>%
+      tidygraph::convert(
+        .f = tidygraph::to_minimum_spanning_tree,
+        weights = .data$weight
+      )
+  }
+
 
 make_binary_vector <- function(length, indices) {
   result <- rep.int(0, times = length)
@@ -897,7 +1248,176 @@ make_binary_vector <- function(length, indices) {
 
 deframe <- function(x) {
   value <- x[[2L]]
-  name <- x[[2L]]
+  name <- x[[1L]]
   result <- setNames(value, nm = name)
   return(result)
 }
+
+tof_rescale <-
+  function(.vec) {
+    vec_max <- max(.vec)
+    vec_min <- min(.vec)
+    vec_diff <- vec_max - vec_min
+
+    result <- (.vec - vec_min) / vec_diff
+    return(result)
+  }
+
+
+#' Make a heatmap summarizing group marker expression patterns in CyTOF data
+#'
+#' This function makes a heatmap of group-to-group marker expression patterns
+#' in single-cell data. Markers are plotted along the horizontal (x-) axis of
+#' the heatmap and cluster IDs are plotted along the vertical (y-) axis of the
+#' heatmap.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param y_col An unquoted column name indicating which column in `tof_tibble`
+#' stores the ids for the group to which each cell belongs.
+#'
+#' @param marker_cols Unquoted column names indicating which columsn in `tof_tibble`
+#' should be interpreted as markers to be plotted along the x-axis of the heatmap.
+#' Supports tidyselect helpers.
+#'
+#' @param central_tendency_function A function to use for computing the
+#' measure of central tendency that will be aggregated from each cluster in
+#' cluster_col. Defaults to the median.
+#'
+#' @param scale_markerwise A boolean value indicating if the heatmap should
+#' rescale the columns of the heatmap such that the maximum value for each
+#' marker is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param scale_ywise A boolean value indicating if the heatmap should
+#' rescale the rows of the heatmap such that the maximum value for each
+#' group is 1 and the minimum value is 0. Defaults to FALSE.
+#'
+#' @param line_width A numeric value indicating how thick the lines separating
+#' the tiles of the heatmap should be. Defaults to 0.25.
+#'
+#' @param theme A ggplot2 theme to apply to the heatmap.
+#' Defaults to \code{\link[ggplot2]{theme_minimal}}
+#'
+#' @return A ggplot object.
+#'
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr bind_cols
+#' @importFrom dplyr mutate
+#' @importFrom dplyr pull
+#' @importFrom dplyr select
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_tile
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_fill_viridis_c
+#' @importFrom ggplot2 theme_minimal
+#'
+#' @importFrom purrr pluck
+#'
+#' @importFrom stats dist
+#' @importFrom stats hclust
+#'
+#' @importFrom tidyr pivot_longer
+#'
+tof_plot_heatmap <-
+  function(
+    tof_tibble,
+    y_col,
+    marker_cols = where(tof_is_numeric),
+    central_tendency_function = stats::median,
+    scale_markerwise = FALSE,
+    scale_ywise = FALSE,
+    line_width = 0.25,
+    theme = ggplot2::theme_minimal()
+  ) {
+    # compute summary statistics for each group ------------------------------
+    group_tibble <-
+      tof_tibble %>%
+      dplyr::select(
+        {{y_col}},
+        {{marker_cols}}
+      ) %>%
+      # compute one summary statistic for each group across all knn_cols
+      tof_summarize_clusters(
+        cluster_col = {{y_col}},
+        metacluster_cols = c({{marker_cols}}),
+        central_tendency_function = central_tendency_function
+      )
+
+    group_matrix <-
+      group_tibble %>%
+      dplyr::select({{marker_cols}}) %>%
+      as.matrix()
+
+    marker_names <- colnames(group_matrix)
+
+    if (scale_markerwise) {
+      group_matrix <-
+        apply(X = group_matrix, MARGIN = 2, FUN = tof_rescale)
+
+      # if there are NaN values, tell the user
+      if (any(is.nan(group_matrix))) {
+        stop("NaN values resulted from marker-wise scaling.
+                Consider setting scale_markerwise to FALSE.")
+      }
+    }
+
+    if (scale_ywise) {
+      group_matrix <-
+        apply(X = group_matrix, MARGIN = 1, FUN = tof_rescale) %>%
+        t()
+
+      # if there are NaN values, tell the user
+      if (any(is.nan(group_matrix))) {
+        stop("NaN values resulted from group-wise scaling.
+                Consider setting scale_* to FALSE.")
+      }
+    }
+
+    colnames(group_matrix) <- marker_names
+
+    marker_order <-
+      group_matrix %>%
+      t() %>%
+      stats::dist(method = "euclidean") %>%
+      stats::hclust() %>%
+      purrr::pluck("order")
+    marker_order <- marker_names[marker_order]
+
+    group_order <-
+      stats::dist(x = group_matrix, method = "euclidean") %>%
+      stats::hclust() %>%
+      purrr::pluck("order")
+    group_order <- dplyr::pull(group_tibble, {{y_col}})[group_order]
+
+    group_tibble_long <-
+      group_matrix %>%
+      dplyr::as_tibble() %>%
+      dplyr::bind_cols(dplyr::select(group_tibble, {{y_col}})) %>%
+      tidyr::pivot_longer(
+        cols = {{marker_cols}},
+        names_to = "marker",
+        values_to = "expression"
+      ) %>%
+      dplyr::mutate(
+        "{{y_col}}" := factor({{y_col}}, levels = group_order),
+        marker = factor(.data$marker, levels = marker_order)
+      )
+
+    heatmap <-
+      group_tibble_long %>%
+      ggplot2::ggplot(ggplot2::aes(x = marker, y = {{y_col}}, fill = expression)) +
+      ggplot2::geom_tile(color = "black", size = line_width) +
+      ggplot2::scale_fill_viridis_c()
+
+    # rotate x axis labels
+    theme <-
+      theme +
+      ggplot2::theme(
+        axis.text.x =
+          element_text(angle = 90, hjust = 1, vjust = 0.5)
+      )
+
+    return(heatmap + theme)
+
+  }

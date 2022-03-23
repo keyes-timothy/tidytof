@@ -264,7 +264,7 @@ tof_apply_classifier <- function(
       tof_classify_cells(
         classifier_fit = classifier_fit,
         cancer_data =
-          dplyr::select(cancer_tibble, dplyr::all_of(classifier_markers)),
+          dplyr::select(cancer_tibble, dplyr::any_of(classifier_markers)),
         distance_function = distance_function
       ) %>%
       dplyr::rename_with(function(x) stringr::str_c(distance_function, x, sep = "_"), .cols = everything())
@@ -280,7 +280,7 @@ tof_apply_classifier <- function(
       cancer_tibble %>%
       dplyr::select(
         {{parallel_vars}},
-        dplyr::all_of(classifier_markers)
+        dplyr::any_of(classifier_markers)
       ) %>%
       mutate(
         ..cell_id = 1:nrow(cancer_tibble)

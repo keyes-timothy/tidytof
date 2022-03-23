@@ -295,7 +295,7 @@ tof_reduce_umap <-
 #' the embedding method. See \code{\link{tof_reduce_pca}}, \code{\link{tof_reduce_tsne}}, and
 #' \code{\link{tof_reduce_umap}}.
 #'
-#' @param add_cols A boolean value indicating if the output should column-bind the
+#' @param augment A boolean value indicating if the output should column-bind the
 #' dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
 #' (TRUE, the default) or if a tibble including only the low-dimensionality
 #' embeddings should be returned (FALSE).
@@ -318,7 +318,7 @@ tof_reduce_dimensions <-
   function(
     tof_tibble,
     ...,
-    add_cols = TRUE,
+    augment = TRUE,
     method = c("pca", "tsne", "umap")
   ) {
 
@@ -335,7 +335,7 @@ tof_reduce_dimensions <-
       stop("Method no implemented")
   }
 
-  if (add_cols == TRUE) {
+  if (augment == TRUE) {
     result <-
       dplyr::bind_cols(tof_tibble, result)
   }
