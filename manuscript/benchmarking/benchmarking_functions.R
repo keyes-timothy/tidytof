@@ -660,6 +660,8 @@ flowsom_base <-
     clusters <- data.frame(.flowsom_metacluster = metacluster_labels)
   }
 
+flowsom_flowcore <- flowsom_base
+
 # cytofkit
 flowsom_cytofkit <-
   function(file_names) {

@@ -76,7 +76,7 @@ phenograph_data %>%
   head()
 ```
 
-To change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a one-column `tibble` that only includes the cluster labels (as opposed to the cluster labels added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`.
+To change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a one-column `tibble` that only includes the cluster labels (as opposed to the cluster labels added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
 
 ```{r}
 # will result in a tibble with only 1 column (the cluster labels)
@@ -85,7 +85,7 @@ phenograph_data %>%
   tof_cluster(
     cluster_cols = contains("cd"),
     method = "kmeans", 
-    add_col = FALSE
+    augment = FALSE
   ) %>% 
   head()
 ```

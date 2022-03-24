@@ -929,7 +929,6 @@ tof_spade_density <-
 #'
 #' @family local density estimation functions
 #'
-#' @export
 #'
 tof_knn_density <-
   function(
@@ -979,80 +978,6 @@ tof_knn_density <-
     # row representing the KNN-estimated density of the ith cell.
     return(result)
   }
-
-
-#' Find the KNN density estimate for each cell in a CyTOF dataset (legacy version).
-#'
-#' @param neighbor_ids A n by k matrix returned by `tof_find_knn` representing the row indices
-#' of the k nearest neighbors of each of the n cells in a CyTOF dataset.
-#'
-#' @param neighbor_distances A n by k matrix returned by `tof_find_knn` representing the pairwise distances
-#' between a cell and each of its k nearest neighbors in a CyTOF dataset.
-#'
-#' @param method A string indicating how the relative density for each cell should be
-#' calculated from the distances between it and each of its k nearest neighbors. Options are
-#' "mean_distance" (the default; estimates the relative density for a cell's neighborhood by
-#' taking the negative average of the distances to its nearest neighbors) and "sum_distance"
-#' (estimates the relative density for a cell's neighborhood by taking the negative sum of the
-#' distances to its nearest neighbors).
-#'
-#' @param normalize TO DO
-#'
-#' @return a vector of length N (number of cells) with the ith
-# entry representing the KNN-estimated density of the ith cell.
-#'
-#'
-tof_knn_density_legacy <-
-  function(
-    neighbor_ids, # an N by K matrix representing each of N cell's knn IDs
-    neighbor_distances, # an N by K matrix representing each of N cell's knn distances
-    method = c("mean_distance", "sum_distance", "spade"),
-    normalize = TRUE
-  ) {
-
-    # check method argument
-    method <-
-      match.arg(method, choices = c("mean_distance", "sum_distance", "spade"))
-
-    # extract needed values
-    k <- ncol(neighbor_ids)
-    n <- nrow(neighbor_ids)
-
-    # find densities using one of 3 methods
-    if (method == "sum_distance") {
-      densities <- -base::rowSums(abs(neighbor_distances))
-    } else if (method == "mean_distance") {
-      densities <- -base::rowMeans(abs(neighbor_distances))
-    } else if (method == "spade") {
-      alpha <- spade_multiplier * median(neighbor_distances[,1])
-      spade_neighbors <-
-        tof_tibble %>%
-        tof_find_knn(
-          k = max_neighbors,
-          distance_function = distance_function,
-          searchtype = "radius",
-          radius = alpha
-        )
-      num_zeros <-
-        (spade_neighbors$neighbor_ids == 0) %>%
-        rowSums()
-      densities <- (max_neighbors) - num_zeros
-
-    } else {
-      stop("Not a valid method.")
-    }
-
-    if (normalize) {
-      # normalize densities
-      densities <-
-        (densities - min(densities)) /
-        ((max(densities) - min(densities)))
-    }
-
-    return(densities) # a vector of length N (number of cells) with the ith
-    # entry representing the KNN-estimated density of the ith cell.
-  }
-
 
 
 # miscellaneous ----------------------------------------------------------------
@@ -1217,27 +1142,6 @@ tof_make_knn_graph <-
 
   }
 
-tof_make_mst <-
-  function(
-    cluster_tibble, # cluster-level data
-    knn_cols, # unquoted column names of columns to use in the knn calculation
-    num_neighbors, # number of knn's
-    distance_function = c("euclidean", "cosine"),
-    knn_error = 0, # eps value in RANN::nn2
-    graph_type = c("weighted", "unweighted") # weighted or unweighted graph
-  ) {
-
-  # make knn graph from all input points
-
-    # prune to mst
-    mst <-
-      knn_graph %>%
-      tidygraph::convert(
-        .f = tidygraph::to_minimum_spanning_tree,
-        weights = .data$weight
-      )
-  }
-
 
 make_binary_vector <- function(length, indices) {
   result <- rep.int(0, times = length)
@@ -1307,6 +1211,7 @@ tof_rescale <-
 #' @importFrom dplyr select
 #'
 #' @importFrom ggplot2 aes
+#' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 geom_tile
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 scale_fill_viridis_c
@@ -1406,7 +1311,9 @@ tof_plot_heatmap <-
 
     heatmap <-
       group_tibble_long %>%
-      ggplot2::ggplot(ggplot2::aes(x = marker, y = {{y_col}}, fill = expression)) +
+      ggplot2::ggplot(
+        ggplot2::aes(x = .data$marker, y = {{y_col}}, fill = .data$expression)
+      ) +
       ggplot2::geom_tile(color = "black", size = line_width) +
       ggplot2::scale_fill_viridis_c()
 
@@ -1415,7 +1322,7 @@ tof_plot_heatmap <-
       theme +
       ggplot2::theme(
         axis.text.x =
-          element_text(angle = 90, hjust = 1, vjust = 0.5)
+          ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5)
       )
 
     return(heatmap + theme)

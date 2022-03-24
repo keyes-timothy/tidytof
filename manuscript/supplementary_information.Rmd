@@ -7,6 +7,7 @@ output:
   pdf_document: 
     toc: true
     toc_depth: 2
+    fig_caption: false
   officedown::rdocx_document:
     mapstyles:
       Normal: First Paragraph
@@ -29,11 +30,23 @@ knitr::opts_chunk$set(
 
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 
-library(tidyverse)
+# libraries
+library(plyr)
+library(immunoCluster)
+library(Spectre)
+library(cytofkit)
+library(flowCore)
 library(tidytof)
+library(tidyverse)
+library(microbenchmark)
+library(patchwork)
 library(kableExtra)
 library(flextable)
 library(officer)
+filter <- dplyr::filter
+count <- dplyr::count
+summarize <- dplyr::summarize
+
 ```
 
 <!---BLOCK_TOC--->
@@ -245,26 +258,27 @@ sup_table_data %>%
 | tof_cluster()        | - tof_cluster_ddpr()            | Assign cluster labels to each cell|
 |                      | - tof_cluster_flowsom()         | in a dataset using one of several |
 |                      | - tof_cluster_kmeans()          | clustering algorithms commonly    | 
-|                      | - tof_cluster_phenograph()      | applied to mass cytometry data.   | 
-|                      | - tof_cluster_xshift()          |[@ddpr; @pheno; @flowsom; @xshift] |
+|                      | - tof_cluster_phenograph()      | applied to mass cytometry data    | 
+|                      | - tof_cluster_xshift()          |[@ddpr; @pheno; @flowsom; @xshift].|
 |                      |                                 |                                   |
 +----------------------+---------------------------------+-----------------------------------+
 | tof_metacluster()    | - tof_metacluster_consensus()   | Agglomerate clusters into a       |
-|                      | - tof_metacluster_hierarchical()| smaller, user-specified number of |
-|                      | - tof_metacluster_kmeans()      | metaclusters using several common |
-|                      | - tof_metacluster_phenograph()  | methods.                          |
+|                      | - tof_metacluster_flowsom()     | smaller, user-specified number of |
+|                      | - tof_metacluster_hierarchical()| metaclusters using several common |
+|                      | - tof_metacluster_kmeans()      | methods [@ccp; @pheno; @flowsom]. |
+|                      | - tof_metacluster_phenograph()  |                                   |
 +----------------------+---------------------------------+-----------------------------------+
 | tof_daa()            | - tof_daa_diffcyt()             | Perform differential abundance    |
 |                      | - tof_daa_glmm()                | analysis (DAA) of clusters across |
 |                      | - tof_daa_ttest()               | experimental conditions using one |
-|                      |                                 | of 3 statistical methods.         |
-|                      |                                 | [@diffcyt; @f1000]                |
+|                      |                                 | of 3 statistical methods          |
+|                      |                                 | [@diffcyt; @f1000].               |
 +----------------------+---------------------------------+-----------------------------------+
 | tof_dea()            | - tof_dea_diffcyt()             | Perform differential expression   |
 |                      | - tof_dea_lmm()                 | analysis (DEA) of clusters across |
 |                      | - tof_dea_ttest()               | experimental conditions using one |
-|                      |                                 | of 3 statistical methods.         |
-|                      |                                 | [@diffcyt; @f1000]                |
+|                      |                                 | of 3 statistical methods          |
+|                      |                                 | [@diffcyt; @f1000].               |
 +----------------------+---------------------------------+-----------------------------------+
 |tof_extract_features()| - tof_extract_central_tendency()| Aggregate cluster-level           |
 |                      | - tof_extract_proportion()      | information across single cells to|
@@ -274,8 +288,8 @@ sup_table_data %>%
 |                      |                                 | central tendencies (i.e. mean,    | 
 |                      |                                 | median), and the proportion of    | 
 |                      |                                 | cells with marker expression over |
-|                      |                                 | a given threshold.                |
-|                      |                                 | [@ddpr; @citrus]                  |
+|                      |                                 | a given threshold                 |
+|                      |                                 | [@ddpr; @citrus].                 |
 +----------------------+---------------------------------+-----------------------------------+
 | tof_upsample()       | - tof_upsample_distance()       | Map each cell in a dataset to     | 
 |                      | - tof_upsample_neighbor()       | its most similar cluster in a set |
@@ -284,7 +298,7 @@ sup_table_data %>%
 |                      |                                 | downsampled dataset for           |
 |                      |                                 | computational efficiency, but     | 
 |                      |                                 | cluster labels are needed for the |
-|                      |                                 | full dataset.  @spade             |
+|                      |                                 | full dataset @spade.              |
 +----------------------+---------------------------------+-----------------------------------+
 
 **Supplementary Table 3 - Cluster-level verbs.** A comprehensive table of `{tidytof}` verbs that operate at the cluster level.
@@ -300,7 +314,7 @@ sup_table_data %>%
 |                      | training and test set for            |
 |                      | predictive modeling (including k-fold|
 |                      | cross-validation and bootstrapped    |
-|                      | resampling).   @rsample              |
+|                      | resampling) @rsample.                |
 +----------------------+--------------------------------------+
 | tof_create_grid()    | Create a search grid of candidate    |
 |                      | hyperparameters to test during model |
@@ -311,18 +325,18 @@ sup_table_data %>%
 |                      | regression), categorical (logistic   |
 |                      | and multinomial regression), or      |
 |                      | time-to-event (Cox proportional-     |
-|                      | hazards regression) outcomes.        |
-|                      | [@glmnet; @coxnet]                   |
+|                      | hazards regression) outcomes         |
+|                      | [@glmnet; @coxnet].                  |
 +----------------------+--------------------------------------+
 | tof_predict()        | Apply a trained {tidytof} model to a |
 |                      | new dataset to predict sample-level  |
-|                      | outcomes.                            |
-|                      | [@glmnet; @coxnet]                   |
+|                      | outcomes                             |
+|                      | [@glmnet; @coxnet].                  |
 +----------------------+--------------------------------------+
 | tof_assess()         | Interrogate a trained {tidytof}      |
 |                      | model's performance by calculating   |
-|                      | evaluation metrics.                  |
-|                      | [@glmnet; @coxnet]                   |
+|                      | evaluation metrics                   |
+|                      | [@glmnet; @coxnet].                  |
 +----------------------+--------------------------------------+
 
 **Supplementary Table 4 - Sample-level verbs.** A comprehensive table of `{tidytof}` verbs that operate at the whole-sample level.

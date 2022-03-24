@@ -93,8 +93,8 @@ tof_plot_cells_density <-
             .f = ~
               stats::density(dplyr::pull(.x, {{marker_col}}), n = num_points)
           ),
-        expression = purrr::map(.x = densities, .f = ~ .x$x),
-        density = purrr::map(.x = densities, .f = ~ .x$y)
+        expression = purrr::map(.x = .data$densities, .f = ~ .x$x),
+        density = purrr::map(.x = .data$densities, .f = ~ .x$y)
       ) %>%
       dplyr::select({{group_col}}, .data$expression, .data$density) %>%
       tidyr::unnest(cols = tidyselect::everything())
@@ -484,8 +484,6 @@ tof_plot_cells_layout <-
 #' Cluster labels can be produced via any method the user chooses - including manual gating,
 #' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
-#' @param group_cols An unquoted column name indicating which columns
-#' should be used to group cells.
 #'
 #' @param knn_cols Unquoted column names indicating which columns in `tof_tibble`
 #' should be used to compute the cluster-to-cluster distances used to construct
@@ -980,7 +978,7 @@ tof_plot_cluster_volcano <-
         dplyr::transmute(
           .data$cluster,
           .data$marker,
-          log2_fc = logFC,
+          log2_fc = .data$logFC,
           log_p = -log(.data$p_adj),
           significance = .data$significant,
           direction =
@@ -1001,7 +999,7 @@ tof_plot_cluster_volcano <-
 
     volcano_plot <-
       plot_tibble %>%
-      ggplot2::ggplot(aes(x = log2_fc, y = log_p, fill = direction)) +
+      ggplot2::ggplot(aes(x = .data$log2_fc, y = .data$log_p, fill = .data$direction)) +
       ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
       ggplot2::geom_hline(yintercept = -log(alpha), linetype = "dashed", color = "red") +
       ggplot2::geom_point(shape = 21, size = point_size)
@@ -1017,7 +1015,7 @@ tof_plot_cluster_volcano <-
       volcano_plot <-
         volcano_plot +
         ggrepel::geom_text_repel(
-          ggplot2::aes(label = label),
+          ggplot2::aes(label = .data$label),
           data = dplyr::slice_head(plot_tibble, n = num_top_pairs),
           size = label_size
         )
@@ -1025,7 +1023,7 @@ tof_plot_cluster_volcano <-
       volcano_plot <-
         volcano_plot +
         ggplot2::geom_text(
-          ggplot2::aes(label = label),
+          ggplot2::aes(label = .data$label),
           data = dplyr::slice_head(plot_tibble, n = num_top_pairs),
           nudge_x = nudge_x,
           nudge_y = nudge_y,
@@ -1074,6 +1072,21 @@ tof_plot_cluster_volcano <-
 #'
 #' @return TO DO
 #'
+#' @importFrom dplyr across
+#' @importFrom dplyr count
+#' @importFrom dplyr group_by
+#' @importFrom dplyr mutate
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr select
+#' @importFrom dplyr slice_max
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_boxplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_text
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 position_dodge
+#'
 tof_plot_cluster_abundance <-
   function(
     tof_tibble,
@@ -1119,7 +1132,7 @@ tof_plot_cluster_abundance <-
         by = cluster_colname
       ) %>%
       dplyr::group_by(dplyr::across({{group_cols}})) %>%
-      dplyr::mutate(prop = n / sum(n)) %>%
+      dplyr::mutate(prop = .data$n / sum(.data$n)) %>%
       dplyr::ungroup()
 
     sig_tibble <-
@@ -1137,13 +1150,13 @@ tof_plot_cluster_abundance <-
     violin_plot <-
       plot_tibble %>%
       ggplot2::ggplot(
-        ggplot2::aes(x = {{cluster_col}}, y = prop, fill = {{color_col}})
+        ggplot2::aes(x = {{cluster_col}}, y = .data$prop, fill = {{color_col}})
       ) +
       ggplot2::geom_boxplot(
-        position = position_dodge(width = dodge_width),
+        position = ggplot2::position_dodge(width = dodge_width),
         outlier.shape = NA
       ) +
-      ggplot2::geom_point(position = position_dodge(width = dodge_width)) +
+      ggplot2::geom_point(position = ggplot2::position_dodge(width = dodge_width)) +
       ggplot2::geom_text(
         ggplot2::aes(label = .data$significant),
         size = asterisk_size,

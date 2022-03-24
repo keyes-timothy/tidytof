@@ -46,22 +46,22 @@ phenograph_tsne %>%
   head()
 ```
 
-By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `add_cols` to `FALSE` (as in `tof_cluster`).
+By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `augment` to `FALSE` (as in `tof_cluster`).
 
 ```{r}
 phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_reduce_dimensions(method = "tsne", add_cols = FALSE)
+  tof_reduce_dimensions(method = "tsne", augment = FALSE)
 ```
 
 Changing the `method` argument results in different low-dimensional embeddings: 
 
 ```{r}
 phenograph_data %>% 
-  tof_reduce_dimensions(method = "umap", add_cols = FALSE)
+  tof_reduce_dimensions(method = "umap", augment = FALSE)
 
 phenograph_data %>% 
-  tof_reduce_dimensions(method = "pca", add_cols = FALSE)
+  tof_reduce_dimensions(method = "pca", augment = FALSE)
 ```
 
 

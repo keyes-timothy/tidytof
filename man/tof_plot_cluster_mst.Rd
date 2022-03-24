@@ -84,9 +84,6 @@ each cluster will be scaled according to the number of cells in that cluster
 Defaults to \code{\link[ggplot2]{theme_void}}}
 
 \item{...}{Not currently used.}
-
-\item{group_cols}{An unquoted column name indicating which columns
-should be used to group cells.}
 }
 \value{
 A ggraph/ggplot object.

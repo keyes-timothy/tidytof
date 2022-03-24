@@ -9,7 +9,7 @@ output:
       width: 1.0
   html_document:
     df_print: paged
-bibliography: benchmarking_references.bib
+bibliography: supplementary_references.bib
 csl: biomed-central.csl
 urlcolor: blue
 ---
@@ -45,29 +45,29 @@ source(here::here("manuscript", "benchmarking", "benchmarking_script.R"))
 
 # globals
 largest_file_name <- TRUE
-machine <- "excalibur"
-num_repeats <- 10L
+machine <- "galaxia"
+num_repeats <- 1L
 charizard <- 
   c(
     "base" = "#207394", 
-    "tidytof" = "#cd5241", 
     "flowcore" = "#eeb45a", 
     "cytofkit" = "#833118", 
+    "immunocluster" = "#FFEEB0", 
     "spectre" = "#837b92", 
-    "immunocluster" = "#FFEEB0"
+    "tidytof" = "#cd5241"
   )
 engine_labels <- 
   c(
     "base" = "base", 
-    "tidytof" = "tidytof", 
     "flowcore" = "flowCore", 
     "cytofkit" = "cytofkit",
+    "immunocluster" = "immunoCluster", 
     "spectre" = "Spectre", 
-    "immunocluster" = "immunoCluster"
+    "tidytof" = "tidytof"
   )
 
-high_level_apis <- c("tidytof", "cytofkit", "spectre", "immunocluster")
-low_level_apis <- c("tidytof", "flowcore", "base")
+high_level_apis <- c("cytofkit", "immunocluster", "spectre", "tidytof")
+low_level_apis <- c("base", "flowcore", "tidytof")
 
 # which benchmarking sections to run from scratch
 set_up_csvs <- FALSE
@@ -78,7 +78,7 @@ run_tsne <- FALSE
 run_pca <- FALSE
 run_umap <- FALSE
 run_cluster <- FALSE
-run_extract <- TRUE
+run_extract <- FALSE
 run_memory <- FALSE
 run_style <- TRUE
 
@@ -188,7 +188,7 @@ in_out_paths <-
 ```
 
 
-```{r}
+```{r declare_benchmark_plotting_functions}
 plot_benchmarks <- 
   function(
     benchmark_data, 
@@ -224,7 +224,7 @@ plot_benchmarks <-
     my_palette <- charizard[which(names(charizard) %in% engines)]
     
     max_cells <- max(benchmark_data$num_cells)
-    width <- max_cells * 0.05
+    width <- max_cells * 0.075
     
     # make a plot to summarize 
     speed_plot <- 
@@ -514,11 +514,11 @@ file_name_umap <-
 
 
 ```{r visualize_tsne_result, message = FALSE}
-tsne_benchmark <- 
+tsne_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_tsne))
 
 tsne_speed_plots <- 
-  tsne_benchmark %>% 
+  tsne_benchmarking %>% 
   plot_benchmarks_split(subtitle = "tSNE", dodge = 10)
 
 tsne_speed_plot <- tsne_speed_plots$full_plot
@@ -536,11 +536,11 @@ tsne_speed_plots %>%
 
 
 ```{r visualize_pca_result, message = FALSE}
-pca_benchmark <- 
+pca_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_pca))
 
 pca_speed_plots <- 
-  pca_benchmark %>% 
+  pca_benchmarking %>% 
   plot_benchmarks_split(subtitle = "PCA", dodge = 2000)
 
 if (print_large) {
@@ -554,11 +554,11 @@ pca_speed_plots %>%
 
 
 ```{r visualize_umap_result, message = FALSE}
-umap_benchmark <- 
+umap_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name_umap))
 
 umap_speed_plots <- 
-  umap_benchmark %>% 
+  umap_benchmarking %>% 
   plot_benchmarks_split(subtitle = "UMAP", dodge = 40)
 
 umap_speed_plots %>% 
@@ -595,7 +595,6 @@ if (print_large) {
   flowsom_speed_plots
 }
 
-
 ```
 
 
@@ -611,22 +610,22 @@ file_name <-
 extract_benchmarking <- 
   read_rds(file = here::here("manuscript", "benchmarking", file_name))
 
-# base_extract <-
-#   read_rds(file = here::here("manuscript", "benchmarking", "base_extract.rds"))
-# 
-# 
-# extract_benchmarking <- 
-#   extract_benchmarking %>% 
-#   mutate(
-#     base_extract_speed = base_extract$extract_benchmarks, 
-#     extract_benchmarks = 
-#       map2(
-#         .x = extract_benchmarks, 
-#         .y = base_extract_speed, 
-#         .f = bind_rows
-#       )
-#   ) %>% 
-#   select(-base_extract_speed)
+base_extract <-
+  read_rds(file = here::here("manuscript", "benchmarking", "base_extract.rds"))
+
+
+extract_benchmarking <-
+  extract_benchmarking %>%
+  mutate(
+    base_extract_speed = base_extract$extract_benchmarks,
+    extract_benchmarks =
+      map2(
+        .x = extract_benchmarks,
+        .y = base_extract_speed,
+        .f = bind_rows
+      )
+  ) %>%
+  select(-base_extract_speed)
 
 extract_speed_plots <- 
   extract_benchmarking %>% 
@@ -642,9 +641,209 @@ if (print_large) {
 ```
 
 
+```{r impute_tsne}
+tsne_data <- 
+  tsne_benchmarking %>% 
+  unnest(cols = tsne_benchmarks) %>% 
+  group_by(num_cells, engine) %>% 
+  summarize(time = mean(time)) %>% 
+  ungroup() %>% 
+  mutate(engine = as.factor(engine))
+
+tsne_model <- 
+  lm(time ~ num_cells * engine, data = tsne_data)
+
+tsne_imputation_data <- 
+  expand_grid(
+    num_cells = io_benchmarking$num_cells, 
+    engine = unique(tsne_data$engine)
+  ) %>% 
+  mutate(engine = as.factor(engine))
+
+
+
+tsne_imputations <- 
+  predict(tsne_model, newdata = tsne_imputation_data)
+
+tsne_imputation_data <- 
+  tsne_imputation_data %>% 
+  mutate(time = tsne_imputations)
+
+
+```
+
+
+```{r impute_pca}
+pca_data <- 
+  pca_benchmarking %>% 
+  unnest(cols = pca_benchmarks) %>% 
+  group_by(num_cells, engine) %>% 
+  summarize(time = mean(time)) %>% 
+  ungroup() %>% 
+  mutate(engine = as.factor(engine))
+
+pca_model <- 
+  lm(time ~ num_cells * engine, data = pca_data)
+
+pca_imputation_data <- 
+  expand_grid(
+    num_cells = io_benchmarking$num_cells, 
+    engine = unique(pca_data$engine)
+  ) %>% 
+  mutate(engine = as.factor(engine))
+
+pca_imputations <- 
+  predict(pca_model, newdata = pca_imputation_data)
+
+pca_imputation_data <- 
+  pca_imputation_data %>% 
+  mutate(time = pca_imputations)
+
+```
+
+
+```{r impute_umap}
+umap_data <- 
+  umap_benchmarking %>% 
+  unnest(cols = umap_benchmarks) %>% 
+  group_by(num_cells, engine) %>% 
+  summarize(time = mean(time)) %>% 
+  ungroup() %>% 
+  mutate(engine = as.factor(engine))
+
+umap_model <- 
+  lm(time ~ num_cells * engine, data = umap_data)
+
+umap_imputation_data <- 
+  expand_grid(
+    num_cells = io_benchmarking$num_cells, 
+    engine = unique(umap_data$engine)
+  ) %>% 
+  mutate(engine = as.factor(engine))
+
+umap_imputations <- 
+  predict(umap_model, newdata = umap_imputation_data)
+
+umap_imputation_data <- 
+  umap_imputation_data %>% 
+  mutate(time = umap_imputations)
+
+```
+
+```{r}
+dr_tibble <- 
+  bind_rows(
+    mutate(tsne_imputation_data, workflow = "tsne"), 
+    mutate(pca_imputation_data, workflow = "pca"), 
+    mutate(umap_imputation_data, workflow = "umap")
+  )
+
+```
+
+
+
+```{r visualize_total_time, message = FALSE}
+benchmark_names <- 
+  ls()[str_detect(ls(), "_benchmarking")] %>% 
+  discard(.p = ~str_detect(., "tsne|umap|pca"))
+
+all_benchmarks <- 
+  mget(benchmark_names)
+
+all_benchmarks <- 
+  map2(
+    .x = all_benchmarks, 
+    .y = names(all_benchmarks), 
+    .f = ~ 
+      dplyr::rename(.x, benchmarks = last_col()) %>% 
+      dplyr::mutate(workflow = .y)
+  )
+
+all_benchmarks_df2 <- 
+  all_benchmarks %>% 
+  bind_rows() %>% 
+  filter(!str_detect(workflow, "pca|tsne|umap")) %>% 
+  unnest(cols = benchmarks) %>% 
+  bind_rows(dr_tibble) %>%
+  # find the average of each workflow for each engine across all replicates
+  group_by(num_cells, engine, workflow) %>% 
+  summarize(time = mean(time)) %>% 
+  # find the speed per cell for each workflow for each engine
+  ungroup() %>% 
+  # mutate(
+  #   engine = 
+  #     case_when(
+  #       engine == "tidytof" ~ "tidytof", 
+  #       engine %in% low_level_apis ~ "low-level APIs", 
+  #       engine %in% high_level_apis ~ "high-level APIs",
+  #       TRUE ~ "NA"
+  #     )
+  # ) %>% 
+  # find the average of times for all workflows across all APIs
+  group_by(num_cells, engine, workflow) %>% 
+  summarize(time = mean(time)) %>% 
+  ungroup()
+
+all <- 
+  tidyr::expand(all_benchmarks_df2, engine, workflow, num_cells)
+
+base_benchmarks <- 
+  all_benchmarks_df2 %>% 
+  filter(engine == "base") %>% 
+  mutate(impute_time = time) %>% 
+  select(num_cells, workflow, impute_time)
+
+all_benchmarks_df2 <- 
+  all_benchmarks_df2 %>% 
+  right_join(all) %>% 
+  left_join(base_benchmarks, by = c("num_cells", "workflow")) %>% 
+  mutate(time = if_else(is.na(time), impute_time, time)) %>% 
+  filter(workflow != "tsne") %>% 
+  filter(workflow != "pca") %>% 
+  filter(workflow != "umap") %>% 
+  group_by(num_cells, engine) %>% 
+  summarize(time = sum(time))
+
+total_time_plot <- 
+  all_benchmarks_df2 %>% 
+  #filter(engine == "base") %>% 
+  ggplot(aes(x = num_cells, y = time, fill = engine, color = engine)) + 
+  geom_line() + 
+  geom_point(
+    shape = 21, 
+    size = 3, 
+    color = "black", 
+    position = position_dodge(width = 10000)
+  ) + 
+  # ggthemes::scale_fill_tableau() +  
+  # ggthemes::scale_color_tableau() + 
+  scale_color_manual(values = charizard, labels = engine_labels) + 
+  scale_fill_manual(values = charizard, labels = engine_labels) + 
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(n = 5), 
+    labels = scales::label_scientific()
+  ) + 
+  theme_bw() +
+  labs(
+    x = "Number of cells", 
+    y = "Time (seconds)", 
+    subtitle = "Total time", 
+    color = NULL, 
+    fill = NULL
+  )
+
+if (print_large) { 
+  print(total_time_plot)
+}
+  
+```
+
+
+
 ```{r visualize_lines_of_code}
 code_tibble <- 
-  read_rds(file = here::here("manuscript", "benchmarking", "code_style.rds"))
+  read_rds(file = here::here("manuscript", "benchmarking", "code_style.rds")) #%>% 
+  # mutate(engine = factor(engine, levels = names(engine_labels)))
 
 # visualize lines of code
 engines <- 
@@ -652,32 +851,47 @@ engines <-
   pull(engine) %>% 
   unique()
 
-my_palette <- charizard[names(charizard) %in% engines]
-
-lines_plot_raw <- 
-  code_tibble %>% 
-  filter(measure == "lines") %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_line(aes(group = engine, color = engine)) + 
-  geom_point(shape = 21, size = 3) + 
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) + 
-  labs(
-    x = NULL, 
-    y = "Lines of code", 
-    fill = NULL, 
-    color = NULL
-  )
-
-if (print_large) {
-  lines_plot_raw
+plot_lines_raw <- function(
+  code_tibble, 
+  engines = c("base", "tidytof", "flowcore", "immunocluster", "spectre", "cytofkit")
+) {
+  my_palette <- charizard[which(names(charizard) %in% engines)]
+  
+  lines_plot_raw <- 
+    code_tibble %>% 
+    filter(measure == "lines", engine %in% engines) %>% 
+    ggplot(aes(x = analysis, y = number, fill = engine)) + 
+    geom_line(aes(group = engine, color = engine)) + 
+    geom_point(shape = 21, size = 3, position = position_dodge(width = 0.05)) + 
+    theme_bw() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    scale_x_discrete(
+      labels = 
+        function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
+    ) + 
+    scale_fill_manual(values = my_palette, labels = engine_labels) + 
+    scale_color_manual(values = my_palette, labels = engine_labels) + 
+    labs(
+      x = NULL, 
+      y = "Lines of code", 
+      fill = NULL, 
+      color = NULL
+    )
+  
+  return(lines_plot_raw)
 }
+
+lines_plot_raw <- plot_lines_raw(code_tibble)
+lines_plot_low <- plot_lines_raw(code_tibble, low_level_apis)
+lines_plot_high <- plot_lines_raw(code_tibble, high_level_apis)
+
+if (print_large) { 
+  print(lines_plot_raw)
+  print(lines_plot_low)
+  print(lines_plot_high)
+}
+
+
 ```
 
 
@@ -693,236 +907,150 @@ lines_plot_raw %>%
 ```
 
 
-```{r analyze_relative_lines_base}
-# tibble with reduction column (percent reduction in lines of code in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_base <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "base")) %>% 
-  filter(measure == "lines") %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup()
-
-lines_plot_base <- 
-  plot_tibble_base %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " lines")), 
-    data = filter(plot_tibble_base, engine == "base"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " line", " lines"))), 
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Lines of code (% of base R)", 
-    fill = NULL, 
-    color = NULL
-  )
-
-if (print_large) {
-  lines_plot_base
+```{r analyze_relative_lines}
+make_lines_plot <- function(code_tibble, reference_engine = "base", black_text = FALSE) { 
+  plot_tibble_engine <- 
+    code_tibble %>% 
+    filter(engine %in% c("tidytof", reference_engine)) %>% 
+    filter(measure == "lines") %>% 
+    group_by(analysis) %>% 
+    mutate(
+      lines = number, 
+      number = number / max(number), 
+      reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
+    ) %>% 
+    ungroup()
+  
+  plot_tibble_engine <- 
+    plot_tibble_engine %>% 
+    drop_na()
+  
+  lines_plot_engine <- 
+    plot_tibble_engine %>% 
+    ggplot(aes(x = analysis, y = number, fill = engine)) + 
+    geom_segment(
+      mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
+      data = filter(plot_tibble_engine, engine == "tidytof"), 
+      size = 1.5, 
+      color = "gray60", 
+      arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
+      alpha = 0.9, 
+      linejoin = "mitre", 
+      lineend = "butt"
+    ) + 
+    # horizontal reference line
+    geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
+    # points for each engine
+    geom_point(shape = 21, size = 4) + 
+    # percentage reduction text
+    geom_text(
+      mapping = aes(label = reduction), 
+      data = filter(plot_tibble_engine, engine == "tidytof"), 
+      nudge_x = 0, 
+      nudge_y = -0.12, 
+      size = 3
+    ) + 
+    # tidytof lines of text (bottom text)
+    geom_text(
+      aes(
+        color = engine, 
+        label = paste0(lines, if_else(lines == 1, " line", " lines"))
+      ), 
+      data = filter(plot_tibble_engine, engine == "tidytof"), 
+      nudge_y = -0.06, 
+      show.legend = FALSE, 
+      size = 3
+    )
+  
+  
+  if (black_text) {
+    # black top text
+    lines_plot_engine <- 
+      lines_plot_engine + 
+      geom_text(
+        aes(label = paste0(lines, if_else(lines == 1, " line", " lines"))), 
+        data = filter(plot_tibble_engine, engine == reference_engine), 
+        color = "black", 
+        nudge_y = 0.06, 
+        show.legend = FALSE, 
+        size = 3
+      )
+    
+  } else { 
+    # colored top text
+    lines_plot_engine <- 
+      lines_plot_engine +
+      geom_text(
+        aes(color = engine, label = paste0(lines, " lines")),
+        data = filter(plot_tibble_engine, engine == reference_engine),
+        nudge_y = 0.06,
+        show.legend = FALSE,
+        size = 3
+      )
+  }
+  
+  lines_plot_engine <- 
+    lines_plot_engine + 
+    scale_x_discrete(
+      labels = 
+        function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
+    ) + 
+    scale_y_continuous(
+      breaks = c(0, 0.25, 0.5, 0.75, 1), 
+      labels = scales::label_percent()
+    ) + 
+    scale_fill_manual(values = charizard, labels = engine_labels) + 
+    scale_color_manual(values = charizard, labels = engine_labels) +
+    theme_bw() + 
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
+    ) + 
+    labs(
+      x = NULL, 
+      y = str_glue(
+        "Lines of code (% of {my_engine})", 
+        my_engine = 
+          case_when(
+            reference_engine == "base"          ~ "base R", 
+            reference_engine == "flowcore"      ~ "flowCore", 
+            reference_engine == "immunocluster" ~ "immunoCluster", 
+            reference_engine == "spectre"       ~ "Spectre", 
+            reference_engine == "cytofkit"      ~ "cytofkit", 
+            TRUE                                ~ "tidytof"
+          )
+      ), 
+      fill = NULL, 
+      color = NULL
+    )
+  
+  return(lines_plot_engine)
 }
-
-```
-
-```{r analyze_relative_lines_flowcore}
-# tibble with reduction column (percent reduction in lines of code in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_flowcore <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "flowcore")) %>% 
-  filter(measure == "lines") %>% 
-  filter(!(analysis %in% c("clustering", "feature extraction"))) %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup()
-
-lines_plot_flowcore <- 
-  plot_tibble_flowcore %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " lines")), 
-    data = filter(plot_tibble_flowcore, engine == "flowcore"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " line", " lines"))), 
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Lines of code (% of flowCore)", 
-    fill = NULL, 
-    color = NULL
-  )
-
-if (print_large) {
-  lines_plot_flowcore
-}
-
 ```
 
 ```{r}
-# tibble with reduction column (percent reduction in lines of code in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_cytofkit <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "cytofkit")) %>% 
-  filter(measure == "lines") %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup() %>% 
-  drop_na()
 
-lines_plot_cytofkit <- 
-  plot_tibble_cytofkit %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " lines")), 
-    data = filter(plot_tibble_cytofkit, engine == "cytofkit"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " line", " lines"))), 
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Lines of code (% of cytofkit)", 
-    fill = NULL, 
-    color = NULL
-  )
+lines_plots <- 
+  unique(code_tibble$engine) %>% 
+  discard(.p = ~ .x == "tidytof") %>% 
+  map(.f = ~make_lines_plot(code_tibble, .x))
+names(lines_plots) <- 
+  unique(code_tibble$engine) %>% 
+  discard(.p = ~ .x == "tidytof")
+
+lines_plots$immunocluster <- 
+  make_lines_plot(code_tibble, "immunocluster", black_text = TRUE)
+
 
 if (print_large) {
-  lines_plot_cytofkit
+  print(lines_plots)
 }
+
 ```
 
 
 
 ```{r save_relative_lines_plots}
-lines_plot_base %>% 
+lines_plots$base %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "lines_plot_base.pdf"), 
@@ -931,7 +1059,7 @@ lines_plot_base %>%
     height = 4
   )
 
-lines_plot_flowcore %>% 
+lines_plots$flowcore %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "lines_plot_flowcore.pdf"), 
@@ -940,7 +1068,7 @@ lines_plot_flowcore %>%
     height = 4
   )
 
-lines_plot_cytofkit %>% 
+lines_plots$cytofkit %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "lines_plot_cytofkit.pdf"), 
@@ -948,6 +1076,26 @@ lines_plot_cytofkit %>%
     width = 6, 
     height = 4
   )
+
+lines_plots$spectre %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "lines_plot_spectre.pdf"), 
+    device = "pdf", 
+    width = 6, 
+    height = 4
+  )
+
+lines_plots$immunocluster %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "lines_plot_immunocluster.pdf"), 
+    device = "pdf", 
+    width = 6, 
+    height = 4
+  )
+
+
 ```
 
 ```{r analyze_raw_variables, message = FALSE, warning = FALSE}
@@ -957,16 +1105,17 @@ variables_plot_raw <-
   ggplot(aes(x = analysis, y = number, fill = engine)) + 
   geom_line(aes(group = engine, color = engine)) + 
   geom_point(shape = 21, size = 3) + 
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
   scale_x_discrete(
-    labels = function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
+    labels = 
+      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
   ) + 
-  scale_fill_manual(values = my_palette) + 
-  scale_color_manual(values = my_palette) + 
+  scale_fill_manual(values = charizard, labels = engine_labels) + 
+  scale_color_manual(values = charizard, labels = engine_labels) + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
   labs(
     x = NULL, 
-    y = "Assigned variables", 
+    y = "Intermediate variable assignments", 
     fill = NULL, 
     color = NULL
   )
@@ -990,235 +1139,139 @@ variables_plot_raw %>%
 
 
 ```{r analyze_relative_variables_base}
-# tibble with reduction column (percent reduction in variable assignments in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_base <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "base")) %>% 
-  filter(measure == "variables") %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup()
+make_variables_plot <- function(code_tibble, reference_engine, black_text = FALSE) {
+  plot_tibble_engine <- 
+    code_tibble %>% 
+    dplyr::filter(engine %in% c("tidytof", reference_engine)) %>% 
+    dplyr::filter(measure == "variables") %>% 
+    group_by(analysis) %>% 
+    mutate(
+      lines = number, 
+      number = number / max(number), 
+      reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
+    ) %>% 
+    ungroup()
+  
+  plot_tibble_engine <- 
+    plot_tibble_engine %>% 
+    drop_na()
+  
+  variables_plot_engine <- 
+    plot_tibble_engine %>% 
+    ggplot(aes(x = analysis, y = number, fill = engine)) + 
+    geom_segment(
+      mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
+      data = dplyr::filter(plot_tibble_engine, engine == "tidytof"), 
+      size = 1.5, 
+      color = "gray60", 
+      arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
+      alpha = 0.9, 
+      linejoin = "mitre", 
+      lineend = "butt"
+    ) + 
+    geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
+    geom_point(shape = 21, size = 4) + 
+    geom_text(
+      mapping = aes(label = reduction), 
+      data = dplyr::filter(plot_tibble_engine, engine == "tidytof"), 
+      nudge_x = 0, 
+      nudge_y = -0.12, 
+      size = 3
+    ) 
+  
+    if (black_text) {
+    # black top text
+    variables_plot_engine <- 
+      variables_plot_engine + 
+      geom_text(
+        aes(label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
+        data = filter(plot_tibble_engine, engine == reference_engine), 
+        color = "black", 
+        nudge_y = 0.06, 
+        show.legend = FALSE, 
+        size = 3
+      )
+    
+  } else { 
+    # colored top text
+    variables_plot_engine <- 
+      variables_plot_engine +
+      geom_text(
+        aes(color = engine, label = paste0(lines, " vars")),
+        data = filter(plot_tibble_engine, engine == reference_engine),
+        nudge_y = 0.06,
+        show.legend = FALSE,
+        size = 3
+      )
+  }
+  
+  variables_plot_engine <- 
+    variables_plot_engine + 
+    geom_text(
+      aes(
+        color = engine, 
+        label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
+      data = filter(plot_tibble_engine, engine == "tidytof"), 
+      nudge_y = -0.06, 
+      show.legend = FALSE, 
+      size = 3
+    ) + 
+    scale_x_discrete(
+      labels = 
+        function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
+    ) + 
+    scale_y_continuous(
+      breaks = c(0, 0.25, 0.5, 0.75, 1), 
+      labels = scales::label_percent()
+    ) +     
+    scale_fill_manual(values = charizard, labels = engine_labels) + 
+    scale_color_manual(values = charizard, labels = engine_labels) +
+    theme_bw() + 
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
+    ) + 
+    labs(
+      x = NULL, 
+      y = str_glue(
+        "Assigned variables (% of {my_engine})",
+        my_engine = 
+          case_when(
+            reference_engine == "base"          ~ "base R", 
+            reference_engine == "flowcore"      ~ "flowCore", 
+            reference_engine == "immunocluster" ~ "immunoCluster", 
+            reference_engine == "spectre"       ~ "Spectre", 
+            reference_engine == "cytofkit"      ~ "cytofkit", 
+            TRUE                                ~ "tidytof"
+          )
+      ), 
+      fill = NULL, 
+      color = NULL
+    )
+  return(variables_plot_engine)
+}
 
-variables_plot_base <- 
-  plot_tibble_base %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " vars")), 
-    data = filter(plot_tibble_base, engine == "base"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
-    data = filter(plot_tibble_base, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Assigned variables (% of base R)", 
-    fill = NULL, 
-    color = NULL
-  )
+variables_plots <- 
+  unique(code_tibble$engine) %>% 
+  discard(.p = ~ .x == "tidytof") %>% 
+  map(.f = ~ make_variables_plot(code_tibble, .x))
+
+names(variables_plots) <- 
+  unique(code_tibble$engine) %>% 
+  discard(.p = ~ .x == "tidytof")
+
+variables_plots$immunocluster <- 
+  make_variables_plot(code_tibble, "immunocluster", black_text = TRUE)
 
 if (print_large) {
-  variables_plot_base
+  variables_plots
 }
 
 ```
 
-```{r analyze_relative_variables_flowcore}
-# tibble with reduction column (percent reduction in variable assignments in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_flowcore <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "flowcore")) %>% 
-  filter(measure == "variables") %>% 
-  filter(!(analysis %in% c("clustering", "feature extraction"))) %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup()
-
-variables_plot_flowcore <- 
-  plot_tibble_flowcore %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " vars")), 
-    data = filter(plot_tibble_flowcore, engine == "flowcore"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
-    data = filter(plot_tibble_flowcore, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Assigned variables (% of flowCore)", 
-    fill = NULL, 
-    color = NULL
-  )
-
-if (print_large) {
-  variables_plot_flowcore
-}
-```
-
-
-```{r analyze_relative_variables_cytofkit}
-# tibble with reduction column (percent reduction in variable assignments in tidytof
-# compared to whatever engine it's being compared to)
-plot_tibble_cytofkit <- 
-  code_tibble %>% 
-  filter(engine %in% c("tidytof", "cytofkit")) %>% 
-  filter(measure == "variables") %>% 
-  group_by(analysis) %>% 
-  mutate(
-    lines = number, 
-    number = number / max(number), 
-    reduction = paste0(" (-", scales::label_percent()(1 - number), ")"), 
-  ) %>% 
-  ungroup() %>% 
-  drop_na()
-
-variables_plot_cytofkit <- 
-  plot_tibble_cytofkit %>% 
-  ggplot(aes(x = analysis, y = number, fill = engine)) + 
-  geom_segment(
-    mapping = aes(x = analysis, y = 1, xend = analysis, yend = number + 0.04),
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    size = 1.5, 
-    color = "gray60", 
-    arrow = arrow(length = unit(0.1, "inches"), type = "closed"), 
-    alpha = 0.9, 
-    linejoin = "mitre", 
-    lineend = "butt"
-  ) + 
-  geom_hline(yintercept = 1, size = 1, color = "black", linetype = "dotted") + 
-  geom_point(shape = 21, size = 4) + 
-  geom_text(
-    mapping = aes(label = reduction), 
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    nudge_x = 0, 
-    nudge_y = -0.12, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, " vars")), 
-    data = filter(plot_tibble_cytofkit, engine == "cytofkit"), 
-    nudge_y = 0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  geom_text(
-    aes(color = engine, label = paste0(lines, if_else(lines == 1, " var", " vars"))), 
-    data = filter(plot_tibble_cytofkit, engine == "tidytof"), 
-    nudge_y = -0.06, 
-    show.legend = FALSE, 
-    size = 3
-  ) + 
-  scale_x_discrete(
-    labels = 
-      function(x) if_else(x %in% c("pca", "tsne", "umap"), str_to_upper(x), str_to_title(x))
-  ) + 
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_fill_manual(values = my_palette, labels = engine_labels) + 
-  scale_color_manual(values = my_palette, labels = engine_labels) +
-  theme_bw() + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)
-  ) + 
-  labs(
-    x = NULL, 
-    y = "Assigned variables (% of cytofkit)", 
-    fill = NULL, 
-    color = NULL
-  )
-
-if (print_large) {
-  variables_plot_cytofkit
-}
-
-```
 
 
 ```{r save_relative_variables_plots}
-variables_plot_base %>% 
+variables_plots$base %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "variables_plot_base.pdf"), 
@@ -1227,7 +1280,7 @@ variables_plot_base %>%
     height = 5
   )
 
-variables_plot_flowcore %>% 
+variables_plots$flowcore %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "variables_plot_flowcore.pdf"), 
@@ -1236,10 +1289,28 @@ variables_plot_flowcore %>%
     height = 5
   )
 
-variables_plot_cytofkit %>% 
+variables_plots$cytofkit %>% 
   ggsave(
     filename = 
       here::here("manuscript", "benchmarking", "variables_plot_cytofkit.pdf"), 
+    device = "pdf", 
+    width = 6.5, 
+    height = 5
+  )
+
+variables_plots$spectre %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "variables_plot_spectre.pdf"), 
+    device = "pdf", 
+    width = 6.5, 
+    height = 5
+  )
+
+variables_plots$immunocluster %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "variables_plot_immunocluster.pdf"), 
     device = "pdf", 
     width = 6.5, 
     height = 5
@@ -1275,9 +1346,16 @@ my_palette <- charizard[which(names(charizard) %in% engines)]
 
 memory_plot <- 
   memory_tibble %>% 
+  filter(engine != "tidytof") %>% 
   ggplot(aes(x = num_cells, y = memory, fill = engine, color = engine)) + 
   geom_line() +
-  geom_point(shape = 21, size = 2, color = "black") + 
+  geom_point(shape = 21, size = 2, color = "black", position = position_dodge(width = 2000)) + 
+  geom_point(
+    shape = 21, 
+    size = 2, 
+    color = "black", 
+    data = filter(memory_tibble, engine == "tidytof")
+  ) + 
   scale_x_continuous(labels = scales::label_scientific(digits = 1)) + 
   scale_fill_manual(values = my_palette, labels = engine_labels) + 
   scale_color_manual(values = my_palette, labels = engine_labels) +
@@ -1300,7 +1378,7 @@ memory_plot %>%
   )
 
 if (print_large) { 
-  memory_plot
+  print(memory_plot)
 }
 
 
@@ -1345,7 +1423,9 @@ total_num_cells <-
 ```
 
 
-To benchmark {tidytof}'s performance against existing tools for high-dimensional cytometry data analysis, we compared {tidytof} functions to their equivalent workflows (where they existed) using base R @baseR or the {flowCore} package @flowcore. Workflows were compared both on the basis of their computational speed on datasets of various sizes (see below for details) and on the basis of their coding burden (i.e. the amount of code needed for each workflow). Specifically, comparisons included one metric for computational speed (total elapsed time for each workflow) and two metrics for coding burden associated with human error when conducting computational analyses (the number of lines of code and the number of intermediate variable assignments needed for the workflow). In addition, {tidytof}'s memory requirements were benchmarked against those of the {flowCore} package's `flowSet` objects, a commonly-used data structure for the analysis of high-dimensional cytometry data. 
+To benchmark {tidytof}'s performance against existing tools for high-dimensional cytometry data analysis, we compared {tidytof} functions to their equivalent workflows (where they existed) using two low-level APIs (base R @baseR and {flowCore} @flowcore) and three high-level APIs ({cytofkit} @cytofkit, {immunoCluster} @immunocluster, and {Spectre} @spectre) with similar capabilities. Workflows were chosen to represent common CyTOF data processings tasks including reading input files, data preprocessing, downsampling, clustering, dimensionality reduction, and sample-level feature extraction (i.e. calculating summary statistics). 
+
+Workflows were compared both on the basis of their computational speed and on the basis of their coding burden (i.e. the amount of code needed for each workflow). Specifically, comparisons included one metric for computational speed (total elapsed time for each workflow) and two metrics for coding burden associated with human error when conducting computational analyses (the number of lines of code and the number of intermediate variable assignments needed for the workflow). In addition, {tidytof}'s memory requirements were benchmarked against those of the {flowCore} package's `flowSet` objects - a commonly-used data structure for the analysis of high-dimensional cytometry data - as well as against {cytofkit} `data.frame`s, {immunoCluster} `SingleCellExperiment`s @sce, and {Spectre} `data.table`s @data.table. 
 
 All benchmarking was performed on a Linux machine running Ubuntu 20.04 with an AMD Threadripper Pro 3995WX processor (64 cores; 2.70 GHz; 256 MB cache) and 256 GB of RAM. All functions used to perform speed, coding burden, and memory benchmarking are available [here](https://github.com/keyes-timothy/tidytof/blob/main/manuscript/benchmarking/benchmarking_functions.R).
 
@@ -1374,11 +1454,19 @@ tibble(`File name` = all_file_names) %>%
 
 For speed benchmarking, each workflow was run on 20 nested datasets derived from the files listed above such that each dataset *i* was comprised of the first *i* files in the list. Thus, the smallest dataset included only 1 file (and `r smallest_num_cells` cells) while the largest dataset included all 20 files (and `r total_num_cells` cells). However, due to the computationally intensive nature of t-stochastic neighborhood embedding (tSNE) and uniform manifold approximation and projection (UMAP), speed benchmarking was performed using 10 subsampled versions of the full dataset (all 20 files) with a smaller number of cells drawn at random: 1K, 2K, 3K, 4K, 5K, 6K, 7K, 8K, 9K, and 10K.
 
-Using these datasets, the `microbenchmark` package @microbenchmark was used to time each workflow independently on each dataset 10 times. The median and interquartile range of each workflow's runtime could then be computed for {tidytof}, base R, and {flowCore}. For dimensionality reduction and clustering analyses, only cluster of differentiation ("CD") markers were used for analysis across all workflows. For downsampling, 200 cells were subsampled from each input FCS or CSV file. Otherwise, {tidytof}'s default behavior was used across all functions used for speed benchmarking.
+Using these datasets, the `microbenchmark` package @microbenchmark was used to time each workflow independently on each dataset 10 times. The median and interquartile range of each workflow's runtime could then be computed for {tidytof} and each alternative tool. For dimensionality reduction and clustering analyses, only cluster of differentiation ("CD") markers were used for analysis. For downsampling, 200 cells were subsampled from each input FCS or CSV file. Otherwise, {tidytof}'s default behavior was used across all benchmarking functions.
 
 ### Memory benchmarking
 
-For memory benchmarking, each nested dataset described above was read into both a `tof_tbl` object using {tidytof}'s `tof_read_data()` function and a `flowSet` object using {flowCore}'s `read.flowSet()` function. The system memory used to store each object was calculated using the {lobstr} package's `obj_size()` function @lobstr. 
+For memory benchmarking, each nested dataset described above was read into each of the following: 
+
+* A `tof_tbl` object using {tidytof}'s `tof_read_data()` function
+* A `flowSet` object using {flowCore}'s `read.flowSet()` function 
+* A `data.frame` using {cytofkit}'s `cytof_exprsMerge()` function 
+* A `SingleCellExperiment` object using {immunoCluster}'s `processFCS()` function 
+* A `data.table` using {Spectre}'s `read.files()` function. 
+
+The system memory used to store each object was then calculated using the `obj_size()` function from the {lobstr} package @lobstr. 
 
 ### Coding burden benchmarking
 
@@ -1410,20 +1498,29 @@ get_assignments <- function(function_object) {
 }
 ```
 
-For both functions above, the input is a function (`function_object`) used to define a {tidytof}, base R, or {flowCore} analysis workflow, and the output is an integer representing the number of lines of code or the number of variable assignments, respectively, contained in the workflow. The functions used to define each workflow are available on GitHub [here](https://github.com/keyes-timothy/tidytof/blob/main/manuscript/benchmarking/benchmarking_functions.R). 
+For both functions above, the input is a function (`function_object`) used to define a {tidytof}, base R, {flowCore}, {cytofkit}, {immunoCluster}, or {Spectre} workflow, and the output is an integer representing the number of lines of code or the number of variable assignments, respectively, contained in that workflow. The functions used to define each workflow are available on GitHub [here](https://github.com/keyes-timothy/tidytof/blob/main/manuscript/benchmarking/benchmarking_functions.R). 
 
 ## Results 
 
 ### Speed benchmarking
 
-Across a wide variety of workflows including FCS and CSV file reading, single-cell data transformation (preprocessing), downsampling, tSNE embedding, FlowSOM clustering, and sample-level feature extraction, 
-{tidytof}'s time efficiency rivals or improves upon alternative approaches (**Supplementary Figure 1**). In the case of PCA and UMAP, {tidytof} incurs a slight performance decrease relative to alternative tools because it uses the `{embed}` package @embed to store a dataset's PCA or UMAP embedding as a `recipe` object (from the {recipes} package) @recipes - which, while costing a small amount of computational overhead, allows users to more easily apply the same embedding to new data points. 
+Across a wide variety of workflows including FCS and CSV file reading, single-cell data transformation (preprocessing), downsampling, FlowSOM clustering, sample-level feature extraction, tSNE embedding, and UMAP embedding, {tidytof}'s time efficiency rivals or improves upon alternative approaches (**Supplementary Figure 1**). In the case of PCA, {tidytof} incurs a slight performance decrease relative to alternative tools because it uses the `{embed}` package @embed to store a dataset's PCA embedding as a `recipe` object (from the {recipes} package) @recipes - which, while costing a small amount of computational overhead, allows users to more easily apply the same embedding to new data points. While {Spectre}'s use of `data.table` makes it slightly faster than {tidytof} for simple arithmetic tasks like data preprocessing (**Supplementary Figure 1C**) and  downsampling (**Supplementary Figure 1D**), {tidytof} requires substantially less cumulative time than competing methods when performing multiple workflows (**Supplementary Figure 1J**).
 
 \newpage
 
 ```{r, message = FALSE}
 make_speed_plots <- 
-  function(speed_plot_list) { 
+  function(speed_plot_list) {
+    num_cells_list <- 
+      map_dbl(
+        .x = speed_plot_list, 
+        .f = ~ max(.x$data$num_cells)
+      )
+    breaks_list <- 
+      map(
+        .x = num_cells_list, 
+        .f = ~ c(0, .x / 2, .x)
+      )
     speed_plot_list <- 
       map(
         .x = speed_plot_list, 
@@ -1431,8 +1528,8 @@ make_speed_plots <-
           scale_fill_manual(values = charizard, labels = engine_labels) + 
           scale_color_manual(values = charizard, labels = engine_labels) + 
           scale_x_continuous(
-            breaks = scales::breaks_pretty(n = 4), 
-            labels = scales::label_scientific()
+            breaks = scales::breaks_pretty(n = 3), 
+            labels = scales::label_scientific(digits = 1)
           )
       )
     result <- 
@@ -1447,11 +1544,12 @@ make_speed_plots <-
 
 ```{r, fig.width = 10, fig.height = 8, warning = FALSE, message = FALSE}
 all_speed_names <- 
-  ls()[str_detect(string = ls(), pattern = "speed_plot(_csv)?$")] %>% 
+  ls()[str_detect(string = ls(), pattern = "speed_plots(_csv)?$")] %>% 
+  discard(.p = ~ .x == "make_speed_plots") %>% 
   factor(levels = 
-           c("io_speed_plot", "io_speed_plot_csv", "preprocess_speed_plot",
-             "downsample_speed_plot", "pca_speed_plot", "tsne_speed_plot", 
-             "umap_speed_plot", "flowsom_speed_plot", "extract_speed_plot")
+           c("io_speed_plots", "io_speed_plots_csv", "preprocess_speed_plots",
+             "downsample_speed_plots", "flowsom_speed_plots", "extract_speed_plots", 
+             "pca_speed_plots", "tsne_speed_plots", "umap_speed_plots")
   ) %>% 
   sort() %>% 
   as.character()
@@ -1459,9 +1557,10 @@ all_speed_names <-
 all_speed_plots <- 
   all_speed_names %>% 
   mget(envir = globalenv()) %>% 
+  map(.f = ~ pluck(.x, "full_plot")) %>% 
   make_speed_plots()
 
-all_speed_plots
+# print(all_speed_plots)
 
 all_speed_plots %>% 
   ggsave(
@@ -1482,7 +1581,62 @@ all_speed_plots %>%
     height = 8
   )
 ```
-**Supplementary Figure 1 - {tidytof}'s computational speed rivals or improves upon equivalent approaches in base R or {flowCore}.** Benchmark plots indicating the elapsed time for (A) reading FCS files, (B) reading CSV files, (C) preprocessing single-cell data, (D) downsampling single-cell data, (E) performing principal component analysis (PCA), (F) performing t-stochastic neighborhood embedding (tSNE), (G) performing uniform manifold approximation and projection (UMAP) embedding), (H) performing FlowSOM clustering, (I) or sample-level feature extraction using {tidytof}, base R, and {flowCore}. Points represent the median runtime for each workflow from 10 independent repetitions; error bars represent the interquartile range of runtimes.
+
+```{r, include = FALSE}
+#**Supplementary Figure 1 - {tidytof}'s computational speed rivals or improves upon equivalent approaches in existing tools.** Benchmark plots indicating the elapsed time for **(A)** reading FCS files, **(B)** reading CSV files, **(C)** preprocessing single-cell data, **(D)** downsampling single-cell data, **(E)** performing FlowSOM clustering, **(F)** sample-level feature extraction, **(G)** performing principal component analysis (PCA), **(H)** performing t-stochastic neighborhood embedding (tSNE), **(I)** or performing uniform manifold approximation and projection (UMAP) embedding using {tidytof}, base R, {flowCore}, {cytofkit}, {immunoCluster}, and {Spectre}. Points represent the median runtime for each workflow from 10 independent repetitions; error bars represent the interquartile range of runtimes.
+```
+
+
+
+```{r, fig.width = 12, fig.height = 7}
+# option 1
+combined_speed_plots <- 
+  total_time_plot + 
+  scale_x_continuous(
+    breaks = scales::pretty_breaks(n = 4), 
+    labels = scales::label_scientific(digits = 2)
+  ) + 
+  all_speed_plots + 
+  plot_layout(guides = "collect", widths = c(3.75, 11.25), tag_level = "keep") + 
+  plot_annotation(tag_levels = "A")
+#print(combined_speed_plots)
+
+new_speed_plots <- all_speed_plots
+for (i in 1:9) { 
+  new_speed_plots[[i]] <- all_speed_plots[[i]] + theme(legend.position = "none")
+}
+
+# option 2
+combined_speed_plots <- 
+  wrap_plots(
+    new_speed_plots, 
+    total_time_plot + 
+      scale_x_continuous(
+        breaks = scales::pretty_breaks(n = 4), 
+        labels = scales::label_scientific(digits = 2)
+      ), #+ 
+      # theme(legend.position = "none"), 
+    guides = "collect",
+    widths = c(11.25, 3.75), 
+    tag_level = "new"
+  ) +
+  plot_annotation(tag_levels = "A") + 
+  theme(plot.tag = element_text(face = "bold"))
+
+print(combined_speed_plots)
+
+
+combined_speed_plots %>% 
+  ggsave(
+    filename = 
+      here::here("manuscript", "benchmarking", "combined_speed_plots.pdf"), 
+    device = "pdf", 
+    width = 12, 
+    height = 6
+  )
+```
+**Supplementary Figure 1 - {tidytof}'s computational speed rivals or improves upon equivalent approaches using existing tools.** Benchmark plots indicating the elapsed time for **(A)** reading FCS files, **(B)** reading CSV files, **(C)** preprocessing single-cell data, **(D)** downsampling single-cell data, **(E)** performing FlowSOM clustering, **(F)** sample-level feature extraction, **(G)** performing principal component analysis (PCA), **(H)** performing t-stochastic neighborhood embedding (tSNE), or **(I)**  performing uniform manifold approximation and projection (UMAP) embedding using {tidytof}, base R, {flowCore}, {cytofkit}, {immunoCluster}, and {Spectre}. Panel **(J)** shows the sum of runtimes from panels A-F for each tool (because panels G-I were run on different datasets, they could not be combined with the other panels). In all panels, points represent the median runtime for each workflow from 10 independent repetitions and error bars represent the interquartile range of runtimes.
+
 
 \newpage 
 
@@ -1493,14 +1647,13 @@ average_increase <-
   ((average_mem_ratio - 1) * 100) %>% 
   round(2) %>% 
   str_c("%")
-
 ```
 
 
-Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects) compared to {flowCore}'s native data structure (the `flowSet`), both data structures require similar amounts of system memory (**Supplementary Figure 2**). Across all datasets, {tidytof} data structures require slightly more memory on average than their {flowCore} counterparts, with an average increase of `r average_increase` across all datasets. 
+Despite the increased simplicity of {tidytof}'s tidy data structures (`tof_tbl` objects) compared to {flowCore}'s native data structure (the `flowSet`), both data structures require similar amounts of system memory (**Supplementary Figure 2**). Furthermore, {tidytof} requires slightly less memory than 
+{Spectre} `data.table`s and substantially less memory than {immunoCluster} `SingleCellExperiment`s and {cytofkit} `data.frame`s across all dataset sizes.
 
 \
-
 
 ```{r}
 memory_plot + 
@@ -1508,18 +1661,16 @@ memory_plot +
 ```
 
 
-**Supplementary Figure 2 - {tidytof}'s tidy data structures require similar system memory to {flowCore} flowSet objects.** The system memory (in Megabytes; MB) required to store {tidytof} and {flowCore} data structures of varying sizes. 
+**Supplementary Figure 2 - {tidytof}'s tidy data structures are memory-efficient compared to existing software tools** The system memory (in Megabytes; MB) required to store {tidytof}, {flowCore}, {cytofkit}, {immunoCluster}, and {Spectre} data structures of varying sizes. Overall, {tidytof} is competitive with {flowCore} and {Spectre} while offering substantial improvements in memory efficiency relative to {cytofkit} and {immunoCluster}.
 
 
 \newpage 
 
 ### Coding burden benchmarking
 
-In addition to its competitive computational speed relative to equivalent base R and {flowCore} workflows, {tidytof} reduces the coding burden of performing CyTOF data analyses significantly compared to alternative frameworks. Across workflows, {tidytof} reduces the lines of code needed to perform an analysis between 70% and 95% compared to base R and between 56% and 96% compared to {flowCore} (**Supplementary Figure 3**). Similarly, {tidytof} reduces the number of variable assignments needed to perform an analysis between 75% to 97% compared to base R and between 75% and 95% compared to {flowCore} (**Supplementary Figure 4**). Because code bases with both more lines of code and more intermediate variables are more prone to human (e.g copy-and-paste) error and reduced readability, these results support {tidytof}'s marked ability to simplify CyTOF data analysis code and increase reproducibility among data analysis pipelines.
+In addition to its competitive computational speed relative to equivalent workflows using other cytometry data analysis software, {tidytof} reduces the coding burden of performing CyTOF data analyses significantly compared to alternative frameworks. Across workflows, {tidytof} reduces the lines of code needed to perform an analysis between 33% and 95% compared to alternative software tools (**Supplementary Figure 3**). Similarly, {tidytof} reduces the number of variable assignments needed to perform an analysis between 67% to 98% compared alternative software tools (**Supplementary Figure 4**). Because code bases with both more lines of code and more intermediate variables are more prone to human (e.g copy-and-paste) error and reduced readability, these results support {tidytof}'s marked ability to simplify CyTOF data analysis code and increase reproducibility among data analysis pipelines.
 
-\ 
-
-\ 
+\newpage
 
 ```{r}
 make_style_plot <- function(raw, base, flowcore, cytofkit) { 
@@ -1548,20 +1699,50 @@ make_style_plot <- function(raw, base, flowcore, cytofkit) {
   return(result)
 }
 
+make_style_plot <- function(raw, base, flowcore, cytofkit, immunocluster, spectre) {
+  base <- base + theme(legend.position = "none")
+  flowcore <- flowcore + theme(legend.position = "none")
+  cytofkit <- cytofkit + theme(legend.position = "none")
+  immunocluster <- immunocluster + theme(legend.position = "none")
+  spectre <- spectre + theme(legend.position = "none")
+  
+  result <- 
+    raw +
+    base + 
+    flowcore + 
+    cytofkit +
+    immunocluster + 
+    spectre + 
+    plot_layout(
+      guides = "collect", 
+      heights = c(6, 6, 6),
+      design = "
+      111222
+      333444
+      555666
+    "
+    ) + 
+    plot_annotation(tag_levels = "A") + 
+    theme(plot.tag = element_text(face = "bold"))
+  return(result)
+}
+
 
 ```
 
 
-```{r, fig.width = 10, fig.height = 10}
+```{r lines_of_code_patchwork, fig.width = 11, fig.height = 12}
 lines_patchwork <- 
   make_style_plot(
     raw = lines_plot_raw, 
-    base = lines_plot_base, 
-    flowcore = lines_plot_flowcore,
-    cytofkit = lines_plot_cytofkit
+    base = lines_plots$base, 
+    flowcore = lines_plots$flowcore,
+    cytofkit = lines_plots$cytofkit, 
+    immunocluster = lines_plots$immunocluster, 
+    spectre = lines_plots$spectre
   )
 
-lines_patchwork
+print(lines_patchwork)
 
 
 lines_patchwork %>% 
@@ -1569,8 +1750,8 @@ lines_patchwork %>%
     filename = 
       here::here("manuscript", "benchmarking", "lines_patchwork.png"), 
     device = "png", 
-    width = 9.8, 
-    height = 10
+    width = 11, 
+    height = 12
   )
 
 
@@ -1579,25 +1760,27 @@ lines_patchwork %>%
     filename = 
       here::here("manuscript", "benchmarking", "lines_patchwork.pdf"), 
     device = "pdf", 
-    width = 9.8, 
-    height = 10
+    width = 11, 
+    height = 12
   )
   
 ```
 
 
-**Supplementary Figure 3 - {tidytof} coding style reduces the number of lines of code needed for CyTOF data analysis pipelines.** (A) Raw lines of code needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) lines of code needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) lines of code needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
+**Supplementary Figure 3 - {tidytof} reduces the number of lines of code needed for CyTOF data analysis pipelines.** **(A)** Raw lines of code needed to perform equivalent analyses using {tidytof} and other open-source single-cell data analysis platforms. **(B-F)** The relative (%) lines of code needed to perform equivalent analyses between {tidytof} and base R (B); between {tidytof} and {flowCore} (C); between {tidytof} and {cytofkit} (D); between {tidytof} and {immunoCluster} (E); and between {tidytof} and {Spectre} (F).
 
 \newpage 
 
 
-```{r, fig.width = 9.5, fig.height = 10}
+```{r, fig.width = 11, fig.height = 12}
 variables_patchwork <- 
   make_style_plot(
     raw = variables_plot_raw, 
-    base = variables_plot_base, 
-    flowcore = variables_plot_flowcore, 
-    cytofkit = variables_plot_cytofkit
+    base = variables_plots$base, 
+    flowcore = variables_plots$flowcore, 
+    cytofkit = variables_plots$cytofkit, 
+    immunocluster = variables_plots$immunocluster, 
+    spectre = variables_plots$spectre
   )
 
 print(variables_patchwork)
@@ -1607,8 +1790,8 @@ variables_patchwork %>%
     filename = 
       here::here("manuscript", "benchmarking", "variables_patchwork.png"), 
     device = "png", 
-    width = 9.2, 
-    height = 10
+    width = 11, 
+    height = 12
   )
 
 variables_patchwork %>% 
@@ -1616,13 +1799,14 @@ variables_patchwork %>%
     filename = 
       here::here("manuscript", "benchmarking", "variables_patchwork.pdf"), 
     device = "pdf", 
-    width = 9.2, 
-    height = 10
+    width = 11, 
+    height = 12
   )
   
 ```
 
 
-**Supplementary Figure 4 - {tidytof} coding style reduces the number of intermediate variable assignments needed in equivalent CyTOF data analyis pipelines.** (A) Raw number of variable assignments needed to perform equivalent analyses using {tidytof}, base R, and {flowCore}. (B) The relative (% of base R) number of variable assignments needed to perform equivalent analyses using {tidytof} and base R. (C) The relative (% of {flowCore}) number of variables assignments needed to perform equivalent analyses using {tidytof} and {flowCore}. Note that {flowCore} does not provide off-the-shelf tools for clustering or feature extraction, so these values are omitted in panels A-C.
+**Supplementary Figure 4 - {tidytof} reduces the number of intermediate variable assignments needed for CyTOF data analyis pipelines.** **(A)** Raw number of intermediate variable assignments needed to perform equivalent analyses using {tidytof} and other open-source single-cell data analysis platforms. **(B-F)** The relative (%) number of intermediate variable assignments needed to perform equivalent analyses between {tidytof} and base R (B); between {tidytof} and {flowCore} (C); between {tidytof} and {cytofkit} (D); between {tidytof} and {immunoCluster} (E); and between {tidytof} and {Spectre} (F).
+
 
 

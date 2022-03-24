@@ -24,6 +24,7 @@ reference:
   - starts_with("tof_downsample")
   - starts_with("tof_reduce")
   - starts_with("tof_cluster")
+  - tof_estimate_density
   - tof_apply_classifier
   - tof_build_classifier
   - tof_classify_cells
@@ -68,6 +69,7 @@ reference:
   - tof_is_numeric
   - tof_find_knn
   - tof_knn_density
+  - tof_spade_density
   - tof_find_emd
   - tof_find_jsd
   - tof_create_recipe

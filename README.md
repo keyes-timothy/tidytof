@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tidytof <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and highly reproducible mass cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -99,9 +99,10 @@ datasets contained in `{tidytof}`:
 
 ``` r
 tidytof_example_data()
-#> [1] "aml"               "ddpr"              "ddpr_metadata.csv"
-#> [4] "mix"               "mix2"              "phenograph"       
-#> [7] "phenograph_csv"    "surgery"
+#>  [1] "aml"                  "ddpr"                 "ddpr_metadata.csv"   
+#>  [4] "mix"                  "mix2"                 "phenograph"          
+#>  [7] "phenograph_csv"       "scaffold"             "statistical_scaffold"
+#> [10] "surgery"
 ```
 
 To obtain the file path for the directory containing each dataset, call
@@ -174,14 +175,14 @@ phenograph %>%
   select(where(is.character)) %>% 
   head()
 #> # A tibble: 6 × 3
-#>   file_name              PhenoGraph Condition
-#>   <chr>                  <chr>      <chr>    
-#> 1 H1_PhenoGraph_cluster1 7          7        
-#> 2 H1_PhenoGraph_cluster1 6          6        
-#> 3 H1_PhenoGraph_cluster1 9          9        
-#> 4 H1_PhenoGraph_cluster1 2          2        
-#> 5 H1_PhenoGraph_cluster1 15         15       
-#> 6 H1_PhenoGraph_cluster1 12         12
+#>   file_name                  PhenoGraph Condition
+#>   <chr>                      <chr>      <chr>    
+#> 1 H1_PhenoGraph_cluster1.fcs 7          7        
+#> 2 H1_PhenoGraph_cluster1.fcs 6          6        
+#> 3 H1_PhenoGraph_cluster1.fcs 9          9        
+#> 4 H1_PhenoGraph_cluster1.fcs 2          2        
+#> 5 H1_PhenoGraph_cluster1.fcs 15         15       
+#> 6 H1_PhenoGraph_cluster1.fcs 12         12
 ```
 
 The `tof_tbl` class is preserved even after these transformations.
@@ -266,12 +267,12 @@ phenograph %>%
 #> # A tibble: 6 × 3
 #>   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`
 #>          <dbl>        <dbl>        <dbl>
-#> 1         5.17        0.199         2.05
-#> 2         5.64        0.390         2.82
-#> 3         5.03        0             1.14
-#> 4         2.89        0.569         2.42
-#> 5         5.88        0.881         2.31
-#> 6         5.19        0.569         1.61
+#> 1         5.17       0.0512         2.03
+#> 2         5.64       0.382          2.81
+#> 3         5.03      -0.0603         1.08
+#> 4         2.88       0.524          2.40
+#> 5         5.88       0.746          2.29
+#> 6         5.19       0.515          1.54
 ```
 
 To alter `tof_preprocess`’s default behavior, change the `channel_cols`
@@ -497,18 +498,18 @@ phenograph_clusters %>%
   select(sample_name, .flowsom_metacluster, everything()) %>% 
   head()
 #> # A tibble: 6 × 26
-#>   sample_name   .flowsom_metaclu… phenograph_clus…  cd19 cd11b  cd34  cd45 cd123
-#>   <chr>         <chr>             <chr>            <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 H1_PhenoGrap… 3                 cluster1         0     2.46  0.733  3.96 0    
-#> 2 H1_PhenoGrap… 3                 cluster1         0.390 0.881 0      4.52 0.569
-#> 3 H1_PhenoGrap… 3                 cluster1         0.569 2.70  1.02   4.77 0    
-#> 4 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  5.15 0.569
-#> 5 H1_PhenoGrap… 3                 cluster1         0.199 2.98  0.199  4.53 0    
-#> 6 H1_PhenoGrap… 3                 cluster1         0.881 3.42  0.390  5.71 0    
-#> # … with 18 more variables: cd33 <dbl>, cd47 <dbl>, cd7 <dbl>, cd44 <dbl>,
-#> #   cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>, pstat3 <dbl>,
-#> #   pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>, pcreb <dbl>,
-#> #   pzap70-syk <dbl>, prb <dbl>, perk1-2 <dbl>
+#>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
+#>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
+#> 1 H1_PhenoGraph_c… 13               cluster1         -0.0336 2.46   0.608   3.96
+#> 2 H1_PhenoGraph_c… 11               cluster1          0.324  0.856 -0.116   4.52
+#> 3 H1_PhenoGraph_c… 13               cluster1          0.532  2.67   0.909   4.76
+#> 4 H1_PhenoGraph_c… 18               cluster1          0.0163 2.97   0.0725  5.15
+#> 5 H1_PhenoGraph_c… 14               cluster1          0.144  2.98   0.128   4.52
+#> 6 H1_PhenoGraph_c… 18               cluster1          0.742  3.41   0.336   5.71
+#> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
+#> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
+#> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
+#> #   pcreb <dbl>, `pzap70-syk` <dbl>, prb <dbl>, `perk1-2` <dbl>
 ```
 
 The output of `tof_cluster` is a `tof_tbl` identical to the input
@@ -525,14 +526,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 5 × 3
-#>   phenograph_cluster .flowsom_metacluster     n
-#>   <chr>              <chr>                <int>
-#> 1 cluster2           1                     1000
-#> 2 cluster3           2                      999
-#> 3 cluster1           3                      996
-#> 4 cluster1           2                        4
-#> 5 cluster3           3                        1
+#> # A tibble: 23 × 3
+#>    phenograph_cluster .flowsom_metacluster     n
+#>    <chr>              <chr>                <int>
+#>  1 cluster2           12                     402
+#>  2 cluster2           5                      331
+#>  3 cluster3           3                      312
+#>  4 cluster3           8                      227
+#>  5 cluster1           14                     212
+#>  6 cluster3           7                      197
+#>  7 cluster2           1                      193
+#>  8 cluster1           18                     155
+#>  9 cluster3           4                      155
+#> 10 cluster1           20                     138
+#> # … with 13 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -543,23 +550,23 @@ To change which clustering algorithm `tof_cluster` uses, alter the
 `method` flag; to change the columns used to compute the clusters,
 change the `cluster_cols` flag. And finally, if you want to return a
 `tibble` that only includes the cluster labels (not the cluster labels
-added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`.
+added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
 
 ``` r
 # will result in a tibble with only 1 column (the cluster labels)
 phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE) %>% 
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) %>% 
   head()
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 2                   
-#> 2 2                   
-#> 3 2                   
-#> 4 2                   
-#> 5 2                   
-#> 6 2
+#> 1 9                   
+#> 2 7                   
+#> 3 10                  
+#> 4 17                  
+#> 5 6                   
+#> 6 17
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -588,19 +595,19 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    14.5 -13.1  
-#> 2    14.8  -6.96 
-#> 3    36.4   5.10 
-#> 4    18.9   0.741
-#> 5    18.1 -13.4  
-#> 6    25.6  -3.50
+#> 1    7.58  -5.78 
+#> 2    5.28  -0.537
+#> 3  -10.8   19.7  
+#> 4   -6.34  -3.97 
+#> 5    4.43  -7.94 
+#> 6   -6.83  -0.626
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
 embeddings to the input `tof_tbl` and return the augmented `tof_tbl`
 (that is, a `tof_tbl` with new columns for each embedding dimension) as
 its result. To return only the features embeddings themselves, set
-`add_cols` to `FALSE` (as in `tof_cluster`).
+`augment` to `FALSE` (as in `tof_cluster`).
 
 Regardless of the method used, reduced-dimension feature embeddings can
 be visualized using `{ggplot2}` (or any graphics package):
@@ -746,11 +753,11 @@ uses a paired design and only has 2 experimental conditions of interest
 daa_result <- 
   citrus_data %>% 
   tof_daa(
-    daa_method = "ttest", 
     cluster_col = population_id, 
     effect_col = stimulation, 
     group_cols = patient, 
-    test_type = "paired"
+    test_type = "paired", 
+    method = "ttest"
   )
 
 daa_result
@@ -800,7 +807,7 @@ plot_data <-
         mean_fc < 1 & significant == "*" ~ "decrease", 
         TRUE ~ NA_character_
       )
-  ) 
+  )
 
 significance_data <- 
   plot_data %>% 
@@ -862,12 +869,12 @@ dea_result <-
   citrus_data %>% 
   tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
   tof_dea(
-    dea_method = "ttest", 
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
     effect_col = stimulation,
     group_cols = patient, 
-    test_type = "paired"
+    test_type = "paired", 
+    method = "ttest"
   )
 
 dea_result %>% 
@@ -875,12 +882,12 @@ dea_result %>%
 #> # A tibble: 6 × 9
 #>   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc
 #>   <chr>         <chr>    <dbl>   <dbl> <chr>       <dbl> <dbl>     <dbl>   <dbl>
-#> 1 1             pS6_Y… 7.98e-8 2.36e-6 *            22.8     7     2.50    3.95 
-#> 2 2             pS6_Y… 1.12e-7 2.36e-6 *            21.7     7     2.09    2.41 
-#> 3 3             pBtk_… 1.47e-7 2.36e-6 *           -20.8     7    -0.459   0.383
-#> 4 7             pBtk_… 1.28e-7 2.36e-6 *           -21.3     7    -0.500   0.374
-#> 5 8             pBtk_… 1.10e-7 2.36e-6 *           -21.7     7    -0.500   0.403
-#> 6 4             pBtk_… 8.24e-7 1.10e-5 *           -16.2     7    -0.447   0.392
+#> 1 1             pS6_Y… 7.58e-8 2.12e-6 *            22.9     7     2.56    4.31 
+#> 2 2             pS6_Y… 1.16e-7 2.12e-6 *            21.6     7     2.13    2.49 
+#> 3 3             pBtk_… 1.32e-7 2.12e-6 *           -21.2     7    -0.475   0.289
+#> 4 7             pBtk_… 1.18e-7 2.12e-6 *           -21.5     7    -0.518   0.286
+#> 5 8             pBtk_… 1.30e-7 2.12e-6 *           -21.2     7    -0.516   0.324
+#> 6 4             pBtk_… 7.85e-7 1.05e-5 *           -16.3     7    -0.462   0.296
 ```
 
 While the output of `tof_dea` also depends on the underlying test being
@@ -913,7 +920,8 @@ volcano_data <-
     pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
   )
 
-volcano_data %>% 
+volcano_plot <- 
+  volcano_data %>% 
   ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
   geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
@@ -933,6 +941,8 @@ volcano_data %>%
     fill = NULL, 
     caption = "Labels indicate the 10 most significant marker-cluster pairs"
   )
+
+volcano_plot
 ```
 
 <img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
@@ -981,8 +991,8 @@ citrus_data %>%
 #> 4 patient2 BCR-XL               0.0101          0.0143           0.358
 #> 5 patient3 Basal                0.0326          0.0830           0.397
 #> 6 patient3 BCR-XL               0.0200          0.0412           0.323
-#> # … with 5 more variables: prop@cluster4 <dbl>, prop@cluster5 <dbl>,
-#> #   prop@cluster6 <dbl>, prop@cluster7 <dbl>, prop@cluster8 <dbl>
+#> # … with 5 more variables: `prop@cluster4` <dbl>, `prop@cluster5` <dbl>,
+#> #   `prop@cluster6` <dbl>, `prop@cluster7` <dbl>, `prop@cluster8` <dbl>
 ```
 
 Like all members of the `tof_extract_*` function family,
@@ -1025,21 +1035,21 @@ citrus_data %>%
   ) %>% 
   head()
 #> # A tibble: 6 × 26
-#>   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…
-#>   <chr>    <chr>                     <dbl>              <dbl>              <dbl>
-#> 1 patient1 Basal                      4.68             0.834                3.72
-#> 2 patient1 BCR-XL                     4.80             0.186                4.11
-#> 3 patient2 Basal                      4.89             0.879                3.55
-#> 4 patient2 BCR-XL                     5.00             0.0379               3.91
-#> 5 patient3 Basal                      4.98             0.818                3.60
-#> 6 patient3 BCR-XL                     5.04             0.0516               3.92
-#> # … with 21 more variables: CD45_In115@cluster2_ct <dbl>,
-#> #   CD4_Nd145@cluster2_ct <dbl>, CD20_Sm147@cluster2_ct <dbl>,
-#> #   CD45_In115@cluster3_ct <dbl>, CD4_Nd145@cluster3_ct <dbl>,
-#> #   CD20_Sm147@cluster3_ct <dbl>, CD45_In115@cluster4_ct <dbl>,
-#> #   CD4_Nd145@cluster4_ct <dbl>, CD20_Sm147@cluster4_ct <dbl>,
-#> #   CD45_In115@cluster5_ct <dbl>, CD4_Nd145@cluster5_ct <dbl>,
-#> #   CD20_Sm147@cluster5_ct <dbl>, CD45_In115@cluster6_ct <dbl>, …
+#>   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`
+#>   <chr>    <chr>                         <dbl>            <dbl>            <dbl>
+#> 1 patient1 Basal                          4.68           0.765              3.72
+#> 2 patient1 BCR-XL                         4.80           0.0967             4.11
+#> 3 patient2 Basal                          4.88           0.808              3.54
+#> 4 patient2 BCR-XL                         5.00          -0.0579             3.90
+#> 5 patient3 Basal                          4.98           0.745              3.59
+#> 6 patient3 BCR-XL                         5.04          -0.0432             3.91
+#> # … with 21 more variables: `CD45_In115@cluster2_ct` <dbl>,
+#> #   `CD4_Nd145@cluster2_ct` <dbl>, `CD20_Sm147@cluster2_ct` <dbl>,
+#> #   `CD45_In115@cluster3_ct` <dbl>, `CD4_Nd145@cluster3_ct` <dbl>,
+#> #   `CD20_Sm147@cluster3_ct` <dbl>, `CD45_In115@cluster4_ct` <dbl>,
+#> #   `CD4_Nd145@cluster4_ct` <dbl>, `CD20_Sm147@cluster4_ct` <dbl>,
+#> #   `CD45_In115@cluster5_ct` <dbl>, `CD4_Nd145@cluster5_ct` <dbl>,
+#> #   `CD20_Sm147@cluster5_ct` <dbl>, `CD45_In115@cluster6_ct` <dbl>, …
 ```
 
 `tof_extract_threshold` is similar to `tof_extract_central_tendency`,
@@ -1056,21 +1066,21 @@ citrus_data %>%
   ) %>% 
   head()
 #> # A tibble: 6 × 26
-#>   patient  stimulation `CD45_In115@cluste… `CD4_Nd145@cluste… `CD20_Sm147@clust…
-#>   <chr>    <chr>                     <dbl>              <dbl>              <dbl>
-#> 1 patient1 Basal                     0.365                  0             0.0769
-#> 2 patient1 BCR-XL                    0.516                  0             0.0968
-#> 3 patient2 Basal                     0.452                  0             0.0323
-#> 4 patient2 BCR-XL                    0.554                  0             0.101 
-#> 5 patient3 Basal                     0.549                  0             0.0552
-#> 6 patient3 BCR-XL                    0.547                  0             0.0816
-#> # … with 21 more variables: CD45_In115@cluster2_threshold <dbl>,
-#> #   CD4_Nd145@cluster2_threshold <dbl>, CD20_Sm147@cluster2_threshold <dbl>,
-#> #   CD45_In115@cluster3_threshold <dbl>, CD4_Nd145@cluster3_threshold <dbl>,
-#> #   CD20_Sm147@cluster3_threshold <dbl>, CD45_In115@cluster4_threshold <dbl>,
-#> #   CD4_Nd145@cluster4_threshold <dbl>, CD20_Sm147@cluster4_threshold <dbl>,
-#> #   CD45_In115@cluster5_threshold <dbl>, CD4_Nd145@cluster5_threshold <dbl>,
-#> #   CD20_Sm147@cluster5_threshold <dbl>, CD45_In115@cluster6_threshold <dbl>, …
+#>   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`
+#>   <chr>    <chr>                         <dbl>            <dbl>            <dbl>
+#> 1 patient1 Basal                         0.365                0           0.0769
+#> 2 patient1 BCR-XL                        0.516                0           0.0968
+#> 3 patient2 Basal                         0.452                0           0.0323
+#> 4 patient2 BCR-XL                        0.554                0           0.101 
+#> 5 patient3 Basal                         0.549                0           0.0552
+#> 6 patient3 BCR-XL                        0.547                0           0.0816
+#> # … with 21 more variables: `CD45_In115@cluster2_threshold` <dbl>,
+#> #   `CD4_Nd145@cluster2_threshold` <dbl>,
+#> #   `CD20_Sm147@cluster2_threshold` <dbl>,
+#> #   `CD45_In115@cluster3_threshold` <dbl>,
+#> #   `CD4_Nd145@cluster3_threshold` <dbl>,
+#> #   `CD20_Sm147@cluster3_threshold` <dbl>,
+#> #   `CD45_In115@cluster4_threshold` <dbl>, …
 ```
 
 The two final members of the `tof_extract_*` function family –
@@ -1095,26 +1105,26 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient, 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    emd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 #> # A tibble: 6 × 25
-#>   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…
-#>   <chr>                <dbl>             <dbl>            <dbl>            <dbl>
-#> 1 patient1             0.870              2.48            12.5             1.45 
-#> 2 patient2             1.11               7.02            10.9             0.730
-#> 3 patient3             0.756              6.19            10.5             0.639
-#> 4 patient4             2.64               6.78             9.47            3.27 
-#> 5 patient5             0.593              7.49             7.70            0.781
-#> 6 patient6             0.656              4.74             8.72            1.57 
-#> # … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_emd <dbl>,
-#> #   BCR-XL_CD20_Sm147@cluster7_emd <dbl>, BCR-XL_CD45_In115@cluster4_emd <dbl>,
-#> #   BCR-XL_CD4_Nd145@cluster4_emd <dbl>, BCR-XL_CD20_Sm147@cluster4_emd <dbl>,
-#> #   BCR-XL_CD45_In115@cluster2_emd <dbl>, BCR-XL_CD4_Nd145@cluster2_emd <dbl>,
-#> #   BCR-XL_CD20_Sm147@cluster2_emd <dbl>, BCR-XL_CD45_In115@cluster6_emd <dbl>,
-#> #   BCR-XL_CD4_Nd145@cluster6_emd <dbl>, BCR-XL_CD20_Sm147@cluster6_emd <dbl>,
-#> #   BCR-XL_CD45_In115@cluster8_emd <dbl>, …
+#>   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`
+#>   <chr>                 <dbl>            <dbl>            <dbl>            <dbl>
+#> 1 patient1              0.864             2.47            13.0             1.45 
+#> 2 patient2              1.11              7.05            10.8             0.726
+#> 3 patient3              0.670             6.23            10.5             0.640
+#> 4 patient4              2.64              5.86             9.90            3.27 
+#> 5 patient5              0.594             7.56             8.13            0.788
+#> 6 patient6              0.661             4.77             7.97            1.59 
+#> # … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_emd` <dbl>,
+#> #   `BCR-XL_CD20_Sm147@cluster7_emd` <dbl>,
+#> #   `BCR-XL_CD45_In115@cluster4_emd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster4_emd` <dbl>,
+#> #   `BCR-XL_CD20_Sm147@cluster4_emd` <dbl>,
+#> #   `BCR-XL_CD45_In115@cluster2_emd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster2_emd` <dbl>, …
 ```
 
 ``` r
@@ -1124,26 +1134,26 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient,  
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    jsd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 #> # A tibble: 6 × 25
-#>   patient  `BCR-XL_CD45_In1… `BCR-XL_CD4_Nd14… `BCR-XL_CD20_Sm… `BCR-XL_CD45_In…
-#>   <chr>                <dbl>             <dbl>            <dbl>            <dbl>
-#> 1 patient1           0.0331             0.0479            0.348           0.0580
-#> 2 patient2           0.00805            0.168             0.402           0.0159
-#> 3 patient3           0.0114             0.113             0.358           0.0205
-#> 4 patient4           0.0303             0.136             0.205           0.0390
-#> 5 patient5           0.00908            0.0782            0.283           0.0261
-#> 6 patient6           0.00919            0.0341            0.222           0.0450
-#> # … with 20 more variables: BCR-XL_CD4_Nd145@cluster7_jsd <dbl>,
-#> #   BCR-XL_CD20_Sm147@cluster7_jsd <dbl>, BCR-XL_CD45_In115@cluster4_jsd <dbl>,
-#> #   BCR-XL_CD4_Nd145@cluster4_jsd <dbl>, BCR-XL_CD20_Sm147@cluster4_jsd <dbl>,
-#> #   BCR-XL_CD45_In115@cluster2_jsd <dbl>, BCR-XL_CD4_Nd145@cluster2_jsd <dbl>,
-#> #   BCR-XL_CD20_Sm147@cluster2_jsd <dbl>, BCR-XL_CD45_In115@cluster6_jsd <dbl>,
-#> #   BCR-XL_CD4_Nd145@cluster6_jsd <dbl>, BCR-XL_CD20_Sm147@cluster6_jsd <dbl>,
-#> #   BCR-XL_CD45_In115@cluster8_jsd <dbl>, …
+#>   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`
+#>   <chr>                 <dbl>            <dbl>            <dbl>            <dbl>
+#> 1 patient1            0.0367            0.0513            0.347           0.0538
+#> 2 patient2            0.00831           0.168             0.401           0.0170
+#> 3 patient3            0.0104            0.115             0.357           0.0197
+#> 4 patient4            0.0301            0.135             0.205           0.0398
+#> 5 patient5            0.00911           0.0789            0.274           0.0251
+#> 6 patient6            0.00972           0.0346            0.214           0.0480
+#> # … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_jsd` <dbl>,
+#> #   `BCR-XL_CD20_Sm147@cluster7_jsd` <dbl>,
+#> #   `BCR-XL_CD45_In115@cluster4_jsd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster4_jsd` <dbl>,
+#> #   `BCR-XL_CD20_Sm147@cluster4_jsd` <dbl>,
+#> #   `BCR-XL_CD45_In115@cluster2_jsd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster2_jsd` <dbl>, …
 ```
 
 Finally, the `tof_extract_features` verb provides a wrapper to each of
@@ -1333,12 +1343,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
-#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
-#> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
+#> 1 UPN1-Rx        0.0395    0.618     0.0634    0.572       2.93     0.944
+#> 2 UPN2           0.139     0.0662    0.0221    0.0825      2.25     0.454
+#> 3 UPN3           0.633     0.0234    0.0165    0.0327      2.25     0.226
+#> 4 UPN7           0.474     0.966     0.124     1.24        2.59     0.243
+#> 5 UPN8           0.951     0.958     0.161     0.556       3.18     0.556
+#> 6 UPN9          15.6       0.446     0.0445    0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1353,12 +1363,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN6          5.62       0.550    0.00374     0.622      2.86     0.342
-#> 2 UPN8          0.951      0.958    0.161       0.556      3.18     0.556
-#> 3 UPN10-Rx      0.00240    0.167    0.203       0.802      2.57     0.822
-#> 4 UPN11         0.332      0.488    0.0146      0.598      2.16     0.320
-#> 5 UPN22-Rx      0.0643     1.68     0.0804      1.56       3.06     0.529
-#> 6 UPN28         0.0208     0.0675   0.00544     0.106      2.18     0.533
+#> 1 UPN1          3.06        0.583  0.00449      0.164      1.94     0.416
+#> 2 UPN6          5.62        0.550  0.00374      0.622      2.86     0.342
+#> 3 UPN10         0.00374     0.761  0.000696     0.829      3.19     0.886
+#> 4 UPN18         0.405       0.258  0.0287       0.851      2.48     0.253
+#> 5 UPN22-Rx      0.0643      1.68   0.0804       1.56       3.06     0.529
+#> 6 UPN27         0.563       1.07   0.00276      0.712      2.40     0.411
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1603,9 +1613,21 @@ survival_mod <-
   )
 
 print(survival_mod)
-#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e+00 
-#> # A tibble: 0 × 2
-#> # … with 2 variables: feature <chr>, coefficient <dbl>
+#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 
+#> # A tibble: 29 × 2
+#>    feature              coefficient
+#>    <chr>                      <dbl>
+#>  1 pErk_dP_TSLP_Pop2          -8.14
+#>  2 TdT_Pop2                    3.77
+#>  3 pPLCg1_2_dP_IL7_Pop2        3.36
+#>  4 CD38_Pop2                   3.30
+#>  5 CD43_Pop2                   3.22
+#>  6 p4EBP1_dP_IL7_Pop2         -2.60
+#>  7 Ki67_Pop2                  -2.57
+#>  8 p4EBP1_FC_IL7_Pop2          2.49
+#>  9 pCreb_dP_TSLP_Pop2         -2.46
+#> 10 pCreb_dP_PVO4_Pop2         -2.05
+#> # … with 19 more rows
 ```
 
 Making predictions using the survival model
@@ -1614,20 +1636,20 @@ Making predictions using the survival model
 survival_mod %>% 
   tof_predict(new_data = ddpr_validation, prediction_type = "response")
 #> # A tibble: 12 × 1
-#>    .pred
-#>    <dbl>
-#>  1     1
-#>  2     1
-#>  3     1
-#>  4     1
-#>  5     1
-#>  6     1
-#>  7     1
-#>  8     1
-#>  9     1
-#> 10     1
-#> 11     1
-#> 12     1
+#>       .pred
+#>       <dbl>
+#>  1 2.17e+47
+#>  2 9.12e+ 6
+#>  3 1.86e- 3
+#>  4 1.95e- 6
+#>  5 6.29e+ 0
+#>  6 5.30e- 1
+#>  7 1.81e+ 3
+#>  8 3.36e- 3
+#>  9 6.14e- 2
+#> 10 5.34e- 1
+#> 11 1.91e- 4
+#> 12 1.94e+ 2
 ```
 
 Assessing the survival model
@@ -1640,10 +1662,10 @@ survival_assessment <-
 survival_assessment
 #> $model_metrics
 #> # A tibble: 2 × 2
-#>   metric                     value
-#>   <chr>                      <dbl>
-#> 1 neg_log_partial_likelihood  19.6
-#> 2 concordance_index            0.5
+#>   metric                        value
+#>   <chr>                         <dbl>
+#> 1 neg_log_partial_likelihood 1309.   
+#> 2 concordance_index             0.548
 #> 
 #> $survival_curves
 #> # A tibble: 12 × 2
@@ -1779,10 +1801,10 @@ input_path %>%
   # step 5
   tof_reduce_dimensions(method = "tsne") %>% 
   # step 6
-  tof_plot_cells_dr(
-    dr_cols = contains("tsne"),
+  tof_plot_cells_embedding(
+    embedding_cols = contains("tsne"),
     color_col = .flowsom_metacluster, 
-    dr_method = "tsne"
+    embedding_method = "tsne"
   )
 ```
 

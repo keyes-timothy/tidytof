@@ -1,6 +1,8 @@
 ---
 title: "Getting Started with {tidytof}"
 output: 
+  pdf_document: 
+    fig_caption: false
   officedown::rdocx_document:
     mapstyles:
       Normal: ['First Paragraph']
@@ -33,19 +35,22 @@ library(dplyr)
 Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published at a rapid rate. Accordingly, when new tools are shared with the scientific community, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. Furthermore, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
 
 
-![**Figure legend -** Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the single-cell level, you may be interested in individual cells' marker expression profiles. At the cluster level, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the whole-sample level, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.](../man/figures/tidytof_figure_1a.jpg)
+![](../man/figures/tidytof_figure_1a.jpg)
+**Figure caption:** *Researchers are often interested in biological questions that manifest at multiple levels of single-cell data processing. At the single-cell level, you may be interested in individual cells' marker expression profiles. At the cluster level, you may be interested in how cells organize into subpopulations with shared phenotypic characteristics of varying size and similarity. And at the whole-sample level, you may be interested in how individual cells' and clusters' characteristics manifest in disease, treatment response, or a variety of other clinical or experimental variables.*
 
-To address both of these challenges for [mass cytometry (CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing CyTOF data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to CyTOF datasets.
+\
+
+To address both of these challenges for [mass cytometry (CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/) @cytof, `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing CyTOF data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to CyTOF datasets.
 
 ### Prerequisites
 
-`{tidytof}` makes heavy use of two concepts that may be unfamiliar to R beginners. The first is the `{magrittr}` pipe (`%>%`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). Most `{tidytof}` users will also benefit from a relatively in-depth understanding of the dplyr package, which has a wonderful introductory vignette here:
+`{tidytof}` makes heavy use of two concepts that may be unfamiliar to R beginners. The first is the `{magrittr}` pipe (`%>%`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). Most `{tidytof}` users will also benefit from a relatively in-depth understanding of the dplyr package, which has an introductory vignette here @dplyr:
 
 ```{r, eval = FALSE}
 vignette("dplyr")
 ```
 
-Everything else should be self-explanatory for both beginner and advanced R users, though if you have *zero* background in running R code, you should read [this chapter](https://r4ds.had.co.nz/workflow-basics.html) of [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham.
+Everything else should be self-explanatory for both beginner and advanced R users, though if you have *zero* background in running R code, you should read [this chapter](https://r4ds.had.co.nz/workflow-basics.html) of [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham @r4ds.
 
 ### Workflow basics
 
@@ -72,6 +77,7 @@ Broadly speaking, `{tidytof}`'s functionality is organized to support the 3 leve
     -   `tof_daa()` performs differential abundance analysis (DAA) for clusters or metaclusters across experimental groups
     -   `tof_dea()` performs differential expression analysis (DEA) for clusters' or metaclusters' marker expression levels across experimental groups
     -   `tof_extract_features()` computes summary statistics (such as mean marker expression) for each cluster. Also (optionally) pivots these summary statistics into a sample-level tidy data frame in which each row represents a sample and each column represents a cluster-level summary statistic.
+    -   `tof_upsample()` assigns new cells to previously-computed clusters based on the similarity between each new cell and the cells in each cluster. 
 
 -   Sample-level data:
 
@@ -86,7 +92,7 @@ Broadly speaking, `{tidytof}`'s functionality is organized to support the 3 leve
 With very few exceptions, `{tidytof}` functions follow a specific, shared syntax that involves 3 types of arguments that always occur in the same order. These argument types are as follows:
 
 1.  For almost all `{tidytof}` functions, the first argument is a data frame (or tibble). This enables the use of the pipe (`%>%`) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). This also means that most `{tidytof}` functions are so-called ["single-table verbs,"](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html) with the exception of `tof_cluster_ddpr`, which is a "two-table verb" (for details about how to use `tof_cluster_ddpr`, see the "clustering-and-metaclustering" vignette).
-2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html).
+2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html) @tidyselect.
 3.  Finally, the third group of arguments for each `{tidytof}` verb are called *method specifications*, and they're comprised of every argument that isn't an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the `tof_cluster_phenograph()` function requires the method specification `num_neighbors`, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm's k-nearest-neighbor graph. In most cases, `{tidytof}` sets reasonable defaults for each verb's particular method specifications, but your workflows are can also be customized by experimenting with non-default values.
 
 The following code demonstrates how `{tidytof}` verb syntax looks in practice, with column and method specifications explicitly pointed out:
@@ -136,8 +142,9 @@ ddpr_data %>%
   tof_cluster(
     cluster_cols = starts_with("cd"), 
     method = "flowsom", 
+    num_metaclusters = 5L, 
     seed = 2020L
-  ) %>% 
+  ) %>%
   # step 3
   tof_downsample(
     group_cols = .flowsom_metacluster, 
@@ -147,8 +154,8 @@ ddpr_data %>%
   # step 4
   tof_reduce_dimensions(method = "tsne") %>% 
   # step 5
-  tof_plot_cells_dr(
-    dr_cols = contains("tsne"),
+  tof_plot_cells_embedding(
+    embedding_cols = contains("tsne"),
     color_col = .flowsom_metacluster 
   )
 ```

@@ -837,7 +837,7 @@ tof_daa_glmm <-
           .f = as.factor
           ),
       ) %>%
-      dplyr::count(metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) %>%
+      dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) %>%
       tidyr::separate(
         col = .data$metadata,
         into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
@@ -1181,7 +1181,7 @@ tof_dea_lmm <-
           .f = as.factor
         ),
       ) %>%
-      dplyr::count(metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) %>%
+      dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) %>%
       tidyr::separate(
         col = .data$metadata,
         into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),

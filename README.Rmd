@@ -329,13 +329,13 @@ phenograph_clusters %>%
 
 Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).
 
-To change which clustering algorithm `tof_cluster` uses, alter the `method` flag; to change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a `tibble` that only includes the cluster labels (not the cluster labels added as a new column to the input `tof_tbl`), set `add_col` to `FALSE`.
+To change which clustering algorithm `tof_cluster` uses, alter the `method` flag; to change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a `tibble` that only includes the cluster labels (not the cluster labels added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
 
 ```{r}
 # will result in a tibble with only 1 column (the cluster labels)
 phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), add_col = FALSE) %>% 
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) %>% 
   head()
 ```
 
@@ -357,7 +357,7 @@ phenograph_tsne %>%
   head()
 ```
 
-By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `add_cols` to `FALSE` (as in `tof_cluster`).
+By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `augment` to `FALSE` (as in `tof_cluster`).
 
 Regardless of the method used, reduced-dimension feature embeddings can be visualized using `{ggplot2}` (or any graphics package):
 
@@ -545,49 +545,16 @@ dea_result %>%
   head()
 ```
 
-While the output of `tof_dea` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.
+While the output of `tof_dea()` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa()`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.
 
 This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs:
 
 ```{r}
-volcano_data <- 
-  dea_result %>% 
-  mutate(
-    log2_fc = log(mean_fc, base = 2), 
-    log_p = -log(p_adj), 
-    significance = 
-      case_when(
-        p_adj < 0.05 & mean_fc > 1 ~ "increased", 
-        p_adj < 0.05 & mean_fc < 1 ~ "decreased",
-        TRUE ~ NA_character_
-      ), 
-    marker = 
-      str_extract(marker, ".+_") %>% 
-      str_remove("_"), 
-    pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
-  )
-
 volcano_plot <- 
-  volcano_data %>% 
-  ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
-  geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
-  geom_point(shape = 21, size = 2) + 
-  ggrepel::geom_text_repel(
-    aes(label = pair), 
-    data = slice_head(volcano_data, n = 10L), 
-    size = 2
-  ) + 
-  scale_fill_manual(
-    values = c("decreased" = "#cd5241", "increased" = "#207394"), 
-    na.value = "#cdcdcd"
-  ) + 
-  labs(
-    x = "log2(Fold-change)", 
-    y = "-log10(p-value)", 
-    fill = NULL, 
-    caption = "Labels indicate the 10 most significant marker-cluster pairs"
-  )
+  dea_result %>% 
+  tof_plot_cluster_volcano(
+    use_ggrepel = TRUE
+  ) 
 
 volcano_plot
 ```
@@ -619,7 +586,7 @@ citrus_data %>%
   head()
 ```
 
-Like all members of the `tof_extract_*` function family, `tof_extract_proportion` returns one row for each sample (defined as a unique combination of values of the `group_cols`) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in `citrus_data`). These values can also be returned in "long" format by changing the `format` argument:
+Like all members of the `tof_extract_*` function family, `tof_extract_proportion()` returns one row for each sample (defined as a unique combination of values of the `group_cols`) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in `citrus_data`). These values can also be returned in "long" format by changing the `format` argument:
 
 ```{r}
 citrus_data %>% 
@@ -666,8 +633,8 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient, 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    emd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 ```
@@ -679,8 +646,8 @@ citrus_data %>%
     cluster_col = cluster, 
     group_cols = patient,  
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    stimulation_col = stimulation, 
-    basal_level = "Basal"
+    jsd_col = stimulation, 
+    reference_level = "Basal"
   ) %>% 
   head()
 ```
@@ -1053,10 +1020,10 @@ input_path %>%
   # step 5
   tof_reduce_dimensions(method = "tsne") %>% 
   # step 6
-  tof_plot_cells_dr(
-    dr_cols = contains("tsne"),
+  tof_plot_cells_embedding(
+    embedding_cols = contains("tsne"),
     color_col = .flowsom_metacluster, 
-    dr_method = "tsne"
+    embedding_method = "tsne"
   )
 ```
 
