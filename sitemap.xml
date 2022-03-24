@@ -178,6 +178,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_downsample_prop.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_estimate_density.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_extract_central_tendency.html</loc>
   </url>
   <url>
@@ -262,13 +265,31 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_metacluster_phenograph.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cells_density.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cells_embedding.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cells_layout.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cluster_abundance.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cluster_heatmap.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cluster_mst.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cluster_volcano.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_sample_heatmap.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_postprocess.html</loc>
@@ -308,6 +329,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_set_panel.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_spade_density.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_split_data.html</loc>

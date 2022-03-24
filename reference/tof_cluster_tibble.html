@@ -69,7 +69,7 @@ of tof_cluster and shouldn't be called directly by users.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_cluster_tibble</span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="va">...</span>, add_col <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">method</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_cluster_tibble</span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="va">...</span>, augment <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">method</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,7 +79,7 @@ of tof_cluster and shouldn't be called directly by users.</p>
 <dt>...</dt>
 <dd><p>Additional arguments to pass to the `tof_cluster_*`
 function family member corresponding to the chosen method.</p></dd>
-<dt>add_col</dt>
+<dt>augment</dt>
 <dd><p>A boolean value indicating if the output should column-bind the
 cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 a single-column tibble including only the cluster ids should be returned (FALSE).</p></dd>
@@ -89,8 +89,8 @@ values include "flowsom", "phenograph", "kmeans", "ddpr", and "xshift".</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
-the cluster ids for each cell in `tof_tibble`. If add_col = TRUE, it will have
+    <p>A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
+the cluster ids for each cell in `tof_tibble`. If augment = TRUE, it will have
 ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.</p>
     </div>

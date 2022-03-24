@@ -230,6 +230,11 @@ from a flowFrame (read from a .fcs file.)</dd>
         <dd>Cluster (ungrouped) CyTOF data.</dd>
       </dl><dl><dt>
           
+          <code><a href="tof_estimate_density.html">tof_estimate_density()</a></code> 
+        </dt>
+        <dd>Estimate the local densities for all cells in a CyTOF dataset.</dd>
+      </dl><dl><dt>
+          
           <code><a href="tof_apply_classifier.html">tof_apply_classifier()</a></code> 
         </dt>
         <dd>Perform developmental clustering on CyTOF data using a pre-fit classifier</dd>
@@ -485,19 +490,49 @@ similar healthy developmental subpopulation.</dd>
 
       <dl><dt>
           
+          <code><a href="tof_plot_cells_density.html">tof_plot_cells_density()</a></code> 
+        </dt>
+        <dd>Plot marker expression density plots</dd>
+      </dl><dl><dt>
+          
           <code><a href="tof_plot_cells_embedding.html">tof_plot_cells_embedding()</a></code> 
         </dt>
-        <dd>Title</dd>
+        <dd>Plot scatterplots of single-cell data using low-dimensional feature embeddings</dd>
       </dl><dl><dt>
           
           <code><a href="tof_plot_cells_layout.html">tof_plot_cells_layout()</a></code> 
         </dt>
+        <dd>Plot force-directed layouts of single-cell data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_cluster_abundance.html">tof_plot_cluster_abundance()</a></code> 
+        </dt>
         <dd>Title</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_cluster_heatmap.html">tof_plot_cluster_heatmap()</a></code> 
+        </dt>
+        <dd>Make a heatmap summarizing cluster marker expression patterns in CyTOF data</dd>
       </dl><dl><dt>
           
           <code><a href="tof_plot_cluster_mst.html">tof_plot_cluster_mst()</a></code> 
         </dt>
-        <dd>Visualize clusters using a minimum spanning tree (MST).</dd>
+        <dd>Visualize clusters in CyTOF data using a minimum spanning tree (MST).</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_cluster_volcano.html">tof_plot_cluster_volcano()</a></code> 
+        </dt>
+        <dd>Create a volcano plot from differential expression analysis results</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_heatmap.html">tof_plot_heatmap()</a></code> 
+        </dt>
+        <dd>Make a heatmap summarizing group marker expression patterns in CyTOF data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_sample_heatmap.html">tof_plot_sample_heatmap()</a></code> 
+        </dt>
+        <dd>Make a heatmap summarizing sample marker expression patterns in CyTOF data</dd>
       </dl></div><div class="section level2">
       <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
       
@@ -565,7 +600,12 @@ matrix and a numeric vector.</dd>
           
           <code><a href="tof_knn_density.html">tof_knn_density()</a></code> 
         </dt>
-        <dd>Find the KNN density estimate for each cell in a CyTOF dataset.</dd>
+        <dd>Estimate cells' local densities using K-nearest-neighbor density estimation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_spade_density.html">tof_spade_density()</a></code> 
+        </dt>
+        <dd>Estimate cells' local densities as done in Spanning-tree Progression Analysis of Density-normalized Events (SPADE)</dd>
       </dl><dl><dt>
           
           <code><a href="tof_find_emd.html">tof_find_emd()</a></code> 

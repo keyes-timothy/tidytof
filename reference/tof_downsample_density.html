@@ -73,10 +73,12 @@ density-dependent downsampling algorithm described in
   <span class="va">tof_tibble</span>,
   group_cols <span class="op">=</span> <span class="cn">NULL</span>,
   density_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
+  <span class="va">target_num_cells</span>,
+  <span class="va">target_prop_cells</span>,
+  target_percentile <span class="op">=</span> <span class="fl">0.03</span>,
   outlier_percentile <span class="op">=</span> <span class="fl">0.01</span>,
-  target_percentile <span class="op">=</span> <span class="fl">0.1</span>,
-  num_neighbors <span class="op">=</span> <span class="fl">15</span>,
-  knn_distance_function <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"euclidean"</span>, <span class="st">"cosine"</span><span class="op">)</span>,
+  distance_function <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"euclidean"</span>, <span class="st">"cosine"</span><span class="op">)</span>,
+  density_estimation_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean_distance"</span>, <span class="st">"sum_distance"</span>, <span class="st">"spade"</span><span class="op">)</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -92,27 +94,45 @@ Supports tidyselect helpers. Defaults to `NULL` (no grouping).</p></dd>
 <dt>density_cols</dt>
 <dd><p>Unquoted names of the columns in `tof_tibble` to use in the
 density estimation for each cell. Defaults to all numeric columns in `tof_tibble`.</p></dd>
-<dt>outlier_percentile</dt>
-<dd><p>The local density percentile (i.e. a value between 0 and 1)
-below which cells should be considered outliers (and discarded). Cells with a local
-density below `outlier_percentile` will never be selected during the downsampling
-proceure. Defaults to 0.01 (cells below the 1st local density percentile will be removed).</p></dd>
+<dt>target_num_cells</dt>
+<dd><p>An approximate constant number of cells (between 0 and 1)
+that should be sampled from each group defined by `group_cols`. Slightly more
+or fewer cells may be returned due to how the density calculation is performed.</p></dd>
+<dt>target_prop_cells</dt>
+<dd><p>An approximate proportion of cells (between 0 and 1)
+that should be sampled from each group defined by `group_cols`. Slightly more
+or fewer cells may be returned due to how the density calculation is performed.
+Ignored if `target_num_cells` is specified.</p></dd>
 <dt>target_percentile</dt>
 <dd><p>The local density percentile (i.e. a value between 0 and 1) to which the downsampling
 procedure should adjust all cells. In short, the algorithm will continue to remove
 cells from the input `tof_tibble` until the local densities of all remaining cells
 is equal to `target_percentile`. Lower values will result in more cells being removed.
 See <a href="https://pubmed.ncbi.nlm.nih.gov/21964415/" class="external-link">Qiu et al., (2011)</a>
-for details. Defaults to 0.1 (the 10th percentile of local densities).</p></dd>
-<dt>num_neighbors</dt>
-<dd><p>An integer indicating the number of neighbors to use
-in the k-nearest neighbor local density estimation. Defaults to 15.</p></dd>
-<dt>knn_distance_function</dt>
-<dd><p>A character vector indicating which
-distance function should be used to compute the k-nearest neighbors of each
-input cell in `tof_tibble`. Valid options are "euclidean" (the default) and "cosine".</p></dd>
+for details. Defaults to 0.1 (the 10th percentile of local densities). Ignored
+if either `target_num_cells` or `target_prop_cells` are specified.</p></dd>
+<dt>outlier_percentile</dt>
+<dd><p>The local density percentile (i.e. a value between 0 and 1)
+below which cells should be considered outliers (and discarded). Cells with a local
+density below `outlier_percentile` will never be selected during the downsampling
+procedure. Defaults to 0.01 (cells below the 1st local density percentile will be removed).</p></dd>
+<dt>distance_function</dt>
+<dd><p>A string indicating which distance function to use
+for the cell-to-cell distance calculations. Options include "euclidean"
+(the default) and "cosine" distances.</p></dd>
+<dt>density_estimation_method</dt>
+<dd><p>A string indicating which algorithm should be
+used to calculate the local density estimate for each cell. Options include
+k-nearest neighbor density estimation using the mean distance to a cell's
+k-nearest neighbors ("mean_distance"; the default), k-nearest neighbor density
+estimation using the summed distance to a cell's k nearest neighbors
+("sum_distance") and counting the number of neighboring cells within a
+spherical radius around each cell as described in Qiu et al., 2011  ("spade").
+While "spade" often produces the best results, it is slower than
+knn-density estimation methods.</p></dd>
 <dt>...</dt>
-<dd><p>Optional additional arguments to pass to <code><a href="https://rdrr.io/pkg/RANN/man/nn2.html" class="external-link">nn2</a></code>.</p></dd>
+<dd><p>Optional additional arguments to pass to
+<code><a href="tof_knn_density.html">tof_knn_density</a></code> or <code><a href="tof_spade_density.html">tof_spade_density</a></code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>

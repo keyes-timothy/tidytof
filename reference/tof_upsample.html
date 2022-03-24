@@ -87,7 +87,7 @@ sorting cells into the cluster corresponding to their closest centroid.</p>
   <span class="va">reference_cluster_col</span>,
   <span class="va">upsample_cols</span>,
   <span class="va">...</span>,
-  add_col <span class="op">=</span> <span class="cn">TRUE</span>,
+  augment <span class="op">=</span> <span class="cn">TRUE</span>,
   method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"distance"</span>, <span class="st">"neighbor"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -111,7 +111,7 @@ in `tof_tibble`. Supports tidyselect helpers.</p></dd>
 <dt>...</dt>
 <dd><p>Additional arguments to pass to the `tof_upsample_*`
 function family member corresponding to the chosen method.</p></dd>
-<dt>add_col</dt>
+<dt>augment</dt>
 <dd><p>A boolean value indicating if the output should column-bind the
 cluster ids of each cell as a new column in `tof_tibble` (TRUE, the default) or if
 a single-column tibble including only the cluster ids should be returned (FALSE).</p></dd>
@@ -121,9 +121,9 @@ values include "distance" (default) and "neighbor".</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A `tof_tbl` or `tibble` If add_col = FALSE, it will have a single column encoding
+    <p>A `tof_tbl` or `tibble` If augment = FALSE, it will have a single column encoding
 the upsampled cluster ids for each cell in `tof_tibble`.
-If add_col = TRUE, it will have
+If augment = TRUE, it will have
 ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.</p>
     </div>

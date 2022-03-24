@@ -81,7 +81,7 @@ between sample types are detected after multiple-hypothesis correction.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_dea_ttest</span><span class="op">(</span>
   <span class="va">tof_tibble</span>,
   <span class="va">cluster_col</span>,
-  <span class="va">marker_cols</span>,
+  marker_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
   <span class="va">effect_col</span>,
   <span class="va">group_cols</span>,
   test_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unpaired"</span>, <span class="st">"paired"</span><span class="op">)</span>,

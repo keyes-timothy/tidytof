@@ -72,7 +72,7 @@ It performs dimensionality reduction on CyTOF data using a user-specified method
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_reduce_dimensions</span><span class="op">(</span>
   <span class="va">tof_tibble</span>,
   <span class="va">...</span>,
-  add_cols <span class="op">=</span> <span class="cn">TRUE</span>,
+  augment <span class="op">=</span> <span class="cn">TRUE</span>,
   method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pca"</span>, <span class="st">"tsne"</span>, <span class="st">"umap"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -85,7 +85,7 @@ It performs dimensionality reduction on CyTOF data using a user-specified method
 <dd><p>Arguments to be passed to the tof_reduce_* function corresponding to
 the embedding method. See <code><a href="tof_reduce_pca.html">tof_reduce_pca</a></code>, <code><a href="tof_reduce_tsne.html">tof_reduce_tsne</a></code>, and
 <code><a href="tof_reduce_umap.html">tof_reduce_umap</a></code>.</p></dd>
-<dt>add_cols</dt>
+<dt>augment</dt>
 <dd><p>A boolean value indicating if the output should column-bind the
 dimensionality-reduced embedding vectors of each cell as a new column in `tof_tibble`
 (TRUE, the default) or if a tibble including only the low-dimensionality

@@ -80,7 +80,7 @@
       <img src="" class="logo" alt=""><h1>Preprocessing</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-03-04</h4>
+            <h4 data-toc-skip class="date">2022-03-24</h4>
       
       
       <div class="d-none name"><code>preprocessing.Rmd</code></div>
@@ -118,12 +118,12 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="co">#&gt;    cd45  cd34  cd38</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  3.96 0.733 0.390</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  4.52 0     1.61 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  4.77 1.02  0.390</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  5.15 0.199 1.75 </span>
+<span class="co">#&gt;    cd45    cd34  cd38</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  3.96  0.608  0.298</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  4.52 -<span style="color: #BB0000;">0.116</span>  1.56 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  4.76  0.909  0.360</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  5.15  0.072<span style="text-decoration: underline;">5</span> 1.70 </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more rows</span></span></code></pre></div>
 <p>To alter <code>tof_preprocess</code>’s default behavior, change the <code>channel_cols</code> argument to specify which columns of <code>tof_tibble</code> should be transformed. Alter the <code>transform_fun</code> argument to specify a vector-valued function that should be used to transform each of the <code>channel_cols</code>. For example, suppose we want to center and scale each of our numeric columns instead of arcsinh-transforming them:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -136,10 +136,10 @@
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
 <span class="co">#&gt;   cd45[,1] cd34[,1] cd38[,1]</span>
 <span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   -<span style="color: #BB0000;">1.40</span>     1.13   -<span style="color: #BB0000;">0.437</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   -<span style="color: #BB0000;">1.16</span>    -<span style="color: #BB0000;">0.837</span>   0.035<span style="text-decoration: underline;">9</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   -<span style="color: #BB0000;">0.999</span>    2.12   -<span style="color: #BB0000;">0.437</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">0.661</span>   -<span style="color: #BB0000;">0.345</span>   0.131 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   -<span style="color: #BB0000;">1.40</span>     1.01   -<span style="color: #BB0000;">0.437</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   -<span style="color: #BB0000;">1.15</span>    -<span style="color: #BB0000;">0.911</span>   0.031<span style="text-decoration: underline;">6</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   -<span style="color: #BB0000;">0.999</span>    2.00   -<span style="color: #BB0000;">0.422</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">0.661</span>   -<span style="color: #BB0000;">0.436</span>   0.120 </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more rows</span></span></code></pre></div>
 <p>To keep the gaussian noise added by Fluidigm software (or if you are working with a dataset that does not have this noise), set the <code>undo_noise</code> argument to <code>FALSE</code>.</p>
 </div>
@@ -179,12 +179,12 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="co">#&gt;    cd45   cd34  cd38</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  131.  3.08   1.77</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  230. -<span style="color: #BB0000;">0.535</span> 11.6 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  294.  5.79   1.01</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  432.  0.939 14.0 </span>
+<span class="co">#&gt;    cd45   cd34   cd38</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  2.41   0.616</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  229. -<span style="color: #BB0000;">0.767</span> 11.2  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  4.29   1.42 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431.  0.299 12.7  </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more rows</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

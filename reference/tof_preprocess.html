@@ -72,7 +72,7 @@ standard pre-processing steps before CyTOF data analysis.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_preprocess</span><span class="op">(</span>
   tof_tibble <span class="op">=</span> <span class="cn">NULL</span>,
   channel_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
-  undo_noise <span class="op">=</span> <span class="cn">TRUE</span>,
+  undo_noise <span class="op">=</span> <span class="cn">FALSE</span>,
   transform_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></span><span class="op">(</span><span class="va">x</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -89,7 +89,7 @@ If nothing is specified, the default is to transform all numeric columns.</p></d
 <dd><p>A boolean value indicating whether to remove the uniform noise that
 Fluidigm software adds to each CyTOF measurement for aesthetic
 and visualization purposes. See <a href="https://pubmed.ncbi.nlm.nih.gov/30277658/" class="external-link">this paper</a>.
-Defaults to TRUE.</p></dd>
+Defaults to FALSE.</p></dd>
 <dt>transform_fun</dt>
 <dd><p>A vectorized function to apply to each protein value for
 variance stabilization. Defaults to <code><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></code> transformation
