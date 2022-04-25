@@ -74,6 +74,7 @@ or bootstrapping, and multiple preprocessing options are available.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_train_model</span><span class="op">(</span>
   <span class="va">split_data</span>,
+  <span class="va">unsplit_data</span>,
   <span class="va">predictor_cols</span>,
   response_col <span class="op">=</span> <span class="cn">NULL</span>,
   time_col <span class="op">=</span> <span class="cn">NULL</span>,
@@ -93,7 +94,13 @@ or bootstrapping, and multiple preprocessing options are available.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>split_data</dt>
 <dd><p>An `rsplit` or `rset` object from the <code><a href="https://rsample.tidymodels.org/reference/rsample.html" class="external-link">rsample</a></code>
-package. The easiest way to generate this is to use <code><a href="tof_split_data.html">tof_split_data</a></code></p></dd>
+package containing the sample-level data to use for modeling.
+The easiest way to generate this is to use <code><a href="tof_split_data.html">tof_split_data</a></code>.</p></dd>
+<dt>unsplit_data</dt>
+<dd><p>A tibble containing sample-level data to use for modeling
+without resampling. While using a resampling method is advised, this argument
+provides an interface to fit a model without using cross-validation or
+bootstrap resampling. Ignored if split_data is provided.</p></dd>
 <dt>predictor_cols</dt>
 <dd><p>Unquoted column names indicating which columns in the
 data contained in `split_data` should be used as predictors in the elastic net model.
@@ -128,7 +135,8 @@ the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamt
 should be used during model tuning. Generate this grid using <code><a href="tof_create_grid.html">tof_create_grid</a></code>.</p></dd>
 <dt>standardize_predictors</dt>
 <dd><p>A logical value indicating if numeric predictor columns
-should be standardized (centered and scaled) before model fitting. Defaults to TRUE.</p></dd>
+should be standardized (centered and scaled) before model fitting, as is
+standard practice during elastic net regularization. Defaults to TRUE.</p></dd>
 <dt>remove_zv_predictors</dt>
 <dd><p>A logical value indicating if predictor columns
 with near-zero variance should be removed before model fitting using
@@ -143,7 +151,7 @@ should have missing values imputed using k-nearest neighbors before model fittin
 should be used for hyperparameter selection during model tuning. Valid values
 depend on the model_type.</p>
 <ul><li><p>For "linear" models, choices are "mse" (the mean squared error
-of the predictions; the default) and "mae" (the mean absolute error of the predcitions).</p></li>
+of the predictions; the default) and "mae" (the mean absolute error of the predictions).</p></li>
 <li><p>For "two-class" models, choices are "roc_auc" (the area under the Receiver-Operating
 Curve for the classification; the default), "misclassification error" (the proportion of
 misclassified observations), "binomial_deviance" (see <code><a href="https://glmnet.stanford.edu/reference/deviance.glmnet.html" class="external-link">deviance.glmnet</a></code>),
@@ -173,7 +181,9 @@ to be observed unless many large models are being fit.</p></dd>
 the best performance (assessed via cross-validation, bootstrapping, or simple splitting
 depending on `split_data`) across all tested hyperparameter value combinations. `tof_models`
 store the following information:</p><dl><dt>model</dt>
-<dd><p>The final elastic net ("glmnet") model</p></dd>
+<dd><p>The final elastic net ("glmnet") model, which is chosen by selecting
+the elastic net hyperparameters with the best `optimization_metric` performance
+on the validation sets of each resample used to train the model (on average)</p></dd>
 
 <dt>recipe</dt>
 <dd><p>The <code><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></code> used for data preprocessing</p></dd>
@@ -192,6 +202,22 @@ store the following information:</p><dl><dt>model</dt>
 
 <dt>training_data</dt>
 <dd><p>A tibble containing the (not preprocessed) data used to train the model</p></dd>
+
+<dt>tuning_metrics</dt>
+<dd><p>A tibble containing the validation set performance metrics
+(and model predictions) during for each resample fold during model tuning.</p></dd>
+
+<dt>log_rank_thresholds</dt>
+<dd><p>For survival models only, a tibble containing information about the relative-risk
+thresholds that can be used to split the training data into 2 risk groups (low-
+and high-risk) based on the final model's predictions. For each relative-risk
+threshold, the log-rank test p-value and an indicator of which threshold gives
+the most significant separation is provided.</p></dd>
+
+<dt>best_log_rank_threshold</dt>
+<dd><p>For survival models only, a numeric value
+representing the relative-risk threshold that yields the most significant
+log-rank test when separating the training data into low- and high-risk groups.</p></dd>
 
 
 </dl></div>
@@ -213,7 +239,7 @@ store the following information:</p><dl><dt>model</dt>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

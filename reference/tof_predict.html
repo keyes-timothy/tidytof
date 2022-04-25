@@ -66,7 +66,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_predict</span><span class="op">(</span>
   <span class="va">tof_model</span>,
   <span class="va">new_data</span>,
-  prediction_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"class"</span>, <span class="st">"link"</span><span class="op">)</span>
+  prediction_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"class"</span>, <span class="st">"link"</span>, <span class="st">"survival curve"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -87,7 +87,7 @@ for each observation. For "two-class" and "multiclass" models, the fitted
 probabilities of each class for each observation. For "survival" models, the fitted relative-risk
 for each observation.</p></dd>
 
-<dt>"class</dt>
+<dt>"class"</dt>
 <dd><p>Only applies to "two-class" and "multiclass" models. For both,
 the class label corresponding to the class with the maximum fitted probability.</p></dd>
 
@@ -95,14 +95,24 @@ the class label corresponding to the class with the maximum fitted probability.<
 <dd><p>The linear predictions of the model
 (the output of the link function for each model family.)</p></dd>
 
+<dt>"survival curve"</dt>
+<dd><p>Only applies to "survival" models. Returns a tibble
+indicating each patient's probability of survival (1 - probability(event))
+at each timepoint in the dataset. Obtained using the
+<code><a href="https://rdrr.io/pkg/survival/man/survfit.html" class="external-link">survfit</a></code> function.</p></dd>
+
 
 </dl></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>link[tibble]{tibble}</code> with a single column (`.pred`) containing
-the predictions. Each row in the output corresponds to a row in `new_data` (
-or, if `new_data` is not provided, to a row in the `tof_model`'s training data.</p>
+    <p>A <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></code> with a single column (`.pred`) containing
+the predictions or, for multiclass models with `prediction_type` == "response",
+a tibble with one column for each class. Each row in the output corresponds to a row in `new_data` (
+or, if `new_data` is not provided, to a row in the `tof_model`'s training data).
+In the latter case, be sure to check `tof_model$training_data` to confirm the
+order of observations, as the resampling procedure can change their ordering
+relative to the original input data.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -122,7 +132,7 @@ or, if `new_data` is not provided, to a row in the `tof_model`'s training data.<
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

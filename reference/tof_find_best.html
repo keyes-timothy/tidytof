@@ -69,15 +69,20 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>performance_metrics</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>A tibble of performance metrics for an elastic
+net model (in wide format)</p></dd>
 <dt>model_type</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>A string indicating which type of glmnet model was trained.</p></dd>
 <dt>optimization_metric</dt>
-<dd><p>TO DO</p></dd>
+<dd><p>A string indicating which performance metric should
+be used to select the optimal model.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>TO DO</p>
+    <p>A tibble with 3 columns: "mixture", "penalty", and a column containing
+the chosen optimization metric. If the returned tibble has more than 1 column,
+it means that more than 1 mixture/penalty combination yielded the optimal
+result (i.e. the tuning procedure resulted in a tie).</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -89,7 +94,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

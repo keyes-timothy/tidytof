@@ -100,6 +100,12 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_model.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_model_new_data.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_model_tuning.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_build_classifier.html</loc>
   </url>
   <url>
@@ -131,6 +137,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_cluster_tibble.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_compute_km_curve.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_cosine_dist.html</loc>
@@ -202,6 +211,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_best.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_cv_predictions.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_emd.html</loc>
   </url>
   <url>
@@ -209,6 +221,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_knn.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_log_rank_threshold.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_find_panel_info.html</loc>
@@ -245,6 +260,12 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_knn_density.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_log_rank_test.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_make_roc_curve.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_metacluster.html</loc>
@@ -287,6 +308,24 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_heatmap.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_model.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_model_linear.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_model_logistic.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_model_multinomial.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_model_survival.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_sample_features.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_sample_heatmap.html</loc>

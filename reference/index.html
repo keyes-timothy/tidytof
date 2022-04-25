@@ -401,7 +401,7 @@ similar healthy developmental subpopulation.</dd>
           
           <code><a href="tof_check_model_args.html">tof_check_model_args()</a></code> 
         </dt>
-        <dd>TO DO</dd>
+        <dd>Check argument specifications for a glmnet model.</dd>
       </dl><dl><dt>
           
           <code><a href="tof_predict.html">tof_predict()</a></code> 
@@ -411,12 +411,22 @@ similar healthy developmental subpopulation.</dd>
           
           <code><a href="tof_assess_model.html">tof_assess_model()</a></code> 
         </dt>
-        <dd>Assess a trained elastic net model when applied to new data</dd>
+        <dd>Assess a trained elastic net model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_assess_model_new_data.html">tof_assess_model_new_data()</a></code> 
+        </dt>
+        <dd>Compute a trained elastic net model's performance metrics using new_data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_assess_model_tuning.html">tof_assess_model_tuning()</a></code> 
+        </dt>
+        <dd>Access a trained elastic net model's performance metrics using its tuning data.</dd>
       </dl><dl><dt>
           
           <code><a href="tof_clean_metric_names.html">tof_clean_metric_names()</a></code> 
         </dt>
-        <dd>Title</dd>
+        <dd>Rename glmnet's default model evaluation metrics to make them more interpretable</dd>
       </dl><dl><dt>
           
           <code><a href="tof_create_grid.html">tof_create_grid()</a></code> 
@@ -471,7 +481,7 @@ similar healthy developmental subpopulation.</dd>
           
           <code><a href="tof_tune_glmnet.html">tof_tune_glmnet()</a></code> 
         </dt>
-        <dd>Tune an elastic net model's hyperparameters over multiple resamples of a training dataset</dd>
+        <dd>Tune an elastic net model's hyperparameters over multiple resamples</dd>
       </dl><dl><dt>
           
           <code><a href="tof_find_best.html">tof_find_best()</a></code> 
@@ -528,6 +538,36 @@ similar healthy developmental subpopulation.</dd>
           <code><a href="tof_plot_heatmap.html">tof_plot_heatmap()</a></code> 
         </dt>
         <dd>Make a heatmap summarizing group marker expression patterns in CyTOF data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_model.html">tof_plot_model()</a></code> 
+        </dt>
+        <dd>Plot the results of a glmnet model fit on sample-level data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_model_linear.html">tof_plot_model_linear()</a></code> 
+        </dt>
+        <dd>Plot the results of a linear glmnet model fit on sample-level data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_model_logistic.html">tof_plot_model_logistic()</a></code> 
+        </dt>
+        <dd>Plot the results of a two-class glmnet model fit on sample-level data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_model_multinomial.html">tof_plot_model_multinomial()</a></code> 
+        </dt>
+        <dd>Plot the results of a multiclass glmnet model fit on sample-level data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_model_survival.html">tof_plot_model_survival()</a></code> 
+        </dt>
+        <dd>Plot the results of a survival glmnet model fit on sample-level data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_plot_sample_features.html">tof_plot_sample_features()</a></code> 
+        </dt>
+        <dd>Make a heatmap summarizing sample marker expression patterns in CyTOF data</dd>
       </dl><dl><dt>
           
           <code><a href="tof_plot_sample_heatmap.html">tof_plot_sample_heatmap()</a></code> 
@@ -620,12 +660,41 @@ matrix and a numeric vector.</dd>
           
           <code><a href="tof_create_recipe.html">tof_create_recipe()</a></code> 
         </dt>
-        <dd>Create a recipe for preprocessing sample-level CyTOF data for an elastic net model</dd>
+        <dd>Create a recipe for preprocessing sample-level cytometry data for an elastic net model</dd>
       </dl><dl><dt>
           
           <code><a href="tof_prep_recipe.html">tof_prep_recipe()</a></code> 
         </dt>
-        <dd>Title</dd>
+        <dd>Train a recipe or list of recipes for preprocessing sample-level cytometry data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_compute_km_curve.html">tof_compute_km_curve()</a></code> 
+        </dt>
+        <dd>Compute a Kaplan-Meier curve from sample-level survival data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_find_cv_predictions.html">tof_find_cv_predictions()</a></code> 
+        </dt>
+        <dd>Calculate and store the predicted outcomes for each validation set observation during model tuning</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_find_log_rank_threshold.html">tof_find_log_rank_threshold()</a></code> 
+        </dt>
+        <dd>Compute the log-rank test p-value for the difference between the two survival
+curves obtained by splitting a dataset into a "low" and "high" risk group
+using all possible relative-risk thresholds.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_log_rank_test.html">tof_log_rank_test()</a></code> 
+        </dt>
+        <dd>Compute the log-rank test p-value for the difference between the two survival
+curves obtained by splitting a dataset into a "low" and "high" risk group
+using a given relative-risk threshold.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tof_make_roc_curve.html">tof_make_roc_curve()</a></code> 
+        </dt>
+        <dd>Compute a receiver-operating curve (ROC) for a two-class or multiclass dataset</dd>
       </dl></div><div class="section level2">
       <h2 id="built-in-data">Built-in data<a class="anchor" aria-label="anchor" href="#built-in-data"></a></h2>
       
@@ -669,7 +738,7 @@ Lymphoblastic Leukemia (BCP-ALL) patient.</dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>
