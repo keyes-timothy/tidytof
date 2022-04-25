@@ -441,7 +441,7 @@ test_that("clustering output is identical for all methods", {
   )
 
   expect_equal(
-    tof_cluster_phenograph(clust_data),
+    tof_cluster_phenograph(clust_data, seed = 20),
     tof_cluster(clust_data, method = "phenograph", augment = FALSE, seed = 20)
   )
 

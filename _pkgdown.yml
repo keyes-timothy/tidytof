@@ -44,6 +44,8 @@ reference:
   - tof_check_model_args
   - tof_predict
   - tof_assess_model
+  - tof_assess_model_new_data
+  - tof_assess_model_tuning
   - tof_clean_metric_names
   - tof_create_grid
   - new_tof_model
@@ -74,6 +76,11 @@ reference:
   - tof_find_jsd
   - tof_create_recipe
   - tof_prep_recipe
+  - tof_compute_km_curve
+  - tof_find_cv_predictions
+  - tof_find_log_rank_threshold
+  - tof_log_rank_test
+  - tof_make_roc_curve
 - title: "Built-in data"
   desc: "Example CyTOF datasets built into {tidytof}"
   contents:
