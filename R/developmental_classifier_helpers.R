@@ -159,7 +159,7 @@ tof_classify_cells <-
 
     colnames(classifications) <- as.character(classifier_fit$population)
     if (distance_function == "pearson") {
-      classifications <- tibble::as_tibble(as.matrix(classifications))
+      classifications <- dplyr::as_tibble(as.matrix(classifications))
     }
 
     population_names <-
@@ -324,7 +324,7 @@ tof_apply_classifier <- function(
 
     # unnest final classification data and return it
     classification_data <-
-      tibble::tibble(
+      dplyr::tibble(
         classification_data = classification_data,
         ..cell_ids = cancer_tibble$..cell_ids
       ) %>%

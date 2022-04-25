@@ -21,7 +21,7 @@ tof_plot_heatmap(
 \item{y_col}{An unquoted column name indicating which column in `tof_tibble`
 stores the ids for the group to which each cell belongs.}
 
-\item{marker_cols}{Unquoted column names indicating which columsn in `tof_tibble`
+\item{marker_cols}{Unquoted column names indicating which column in `tof_tibble`
 should be interpreted as markers to be plotted along the x-axis of the heatmap.
 Supports tidyselect helpers.}
 
@@ -49,6 +49,6 @@ A ggplot object.
 \description{
 This function makes a heatmap of group-to-group marker expression patterns
 in single-cell data. Markers are plotted along the horizontal (x-) axis of
-the heatmap and cluster IDs are plotted along the vertical (y-) axis of the
+the heatmap and groups are plotted along the vertical (y-) axis of the
 heatmap.
 }

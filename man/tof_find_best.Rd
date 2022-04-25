@@ -7,14 +7,19 @@
 tof_find_best(performance_metrics, model_type, optimization_metric)
 }
 \arguments{
-\item{performance_metrics}{TO DO}
+\item{performance_metrics}{A tibble of performance metrics for an elastic
+net model (in wide format)}
 
-\item{model_type}{TO DO}
+\item{model_type}{A string indicating which type of glmnet model was trained.}
 
-\item{optimization_metric}{TO DO}
+\item{optimization_metric}{A string indicating which performance metric should
+be used to select the optimal model.}
 }
 \value{
-TO DO
+A tibble with 3 columns: "mixture", "penalty", and a column containing
+the chosen optimization metric. If the returned tibble has more than 1 column,
+it means that more than 1 mixture/penalty combination yielded the optimal
+result (i.e. the tuning procedure resulted in a tie).
 }
 \description{
 Find the optimal hyperparameters for an elastic net model from candidate performance metrics

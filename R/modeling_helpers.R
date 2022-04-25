@@ -4,8 +4,7 @@
 # modeling on tibble containing aggregated single-cell data.
 
 
-
-#' Create a recipe for preprocessing sample-level CyTOF data for an elastic net model
+#' Create a recipe for preprocessing sample-level cytometry data for an elastic net model
 #'
 #' @param feature_tibble A tibble in which each row represents a sample- or patient-
 #' level observation, such as those produced by \code{tof_extract_features}.
@@ -30,9 +29,12 @@
 #' \code{\link[recipes]{step_impute_knn}}). Imputation is performed using an observation's
 #' 5 nearest-neighbors. Defaults to FALSE.
 #'
+#' @return A \code{\link[recipes]{recipe}} object.
+#'
 #' @importFrom rlang arg_match
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
+#'
 #' @importFrom recipes recipe
 #' @importFrom recipes step_dummy
 #' @importFrom recipes step_nzv
@@ -106,19 +108,27 @@ tof_create_recipe <-
 
 
 
-
-
-#' Title
+#' Train a recipe or list of recipes for preprocessing sample-level cytometry data
 #'
-#' @param split_data TO DO
+#' @param split_data An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
+#' package containing the sample-level data to use for modeling.
+#' The easiest way to generate this is to use \code{\link{tof_split_data}}.
+#' Alternatively, an unsplit tbl_df, though this is not recommended.
 #'
-#' @param unprepped_recipe TO DO
+#' @param unprepped_recipe A \code{\link[recipes]{recipe}} object (if `split_data`
+#' is an `rsplit` object or a `tbl_df`) or list of recipes
+#' (if `split_data` is an `rset` object).
 #'
-#' @return TO DO
+#' @return If split_data is an "rsplit" or "tbl_df" object, will return a single
+#' prepped recipe. If split_data is an "rset" object, will return a list of prepped
+#' recipes specific for each fold of the resampling procedure.
 #'
 #' @importFrom purrr map
+#'
 #' @importFrom recipes prepper
 #' @importFrom recipes prep
+#'
+#' @importFrom rsample training
 #'
 #'
 #' @export
@@ -149,22 +159,26 @@ tof_prep_recipe <-
         recipes::prep(training = split_data, retain = FALSE)
 
     } else {
-      stop("split_data must be a tibble or an rset or rsplit object")
+      stop("split_data must be a tibble, an rset, or an rsplit object")
     }
 
     return(result)
 
   }
 
-#' Tune an elastic net model's hyperparameters over multiple resamples of a training dataset
+#' Tune an elastic net model's hyperparameters over multiple resamples
 #'
 #' @param split_data An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
-#' package. The easiest way to generate this is to use \code{\link{tof_split_data}}
+#' package. The easiest way to generate this is to use \code{\link{tof_split_data}}.
+#' Alternatively, an unsplit tbl_df can be provided, though this is not recommended.
 #'
-#' @param prepped_recipe TO DO
+#' @param prepped_recipe Either a single \code{\link[recipes]{recipe}} object
+#' (if `split_data` is an `rsplit` object or a `tbl_df`) or list of recipes
+#' (if `split_data` is an `rset` object) such that each entry in the list
+#' corresponds to a resample in `split_data`.
 #'
 #' @param hyperparameter_grid A hyperparameter grid indicating which values of
-#' the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamters
+#' the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparameters
 #' should be used during model tuning. Generate this grid using \code{\link{tof_create_grid}}.
 #'
 #' @param model_type A string indicating which kind of elastic net model to build.
@@ -174,7 +188,10 @@ tof_prep_recipe <-
 #' levels is being predicted, use "multiclass" for multinomial regression; and if
 #' a time-to-event outcome is being predicted, use "survival" for Cox regression.
 #'
-#' @param outcome_cols TO DO
+#' @param outcome_cols Unquoted column name(s) indicating which column(s) in the data
+#' contained in `split_data` should be used as the outcome in the elastic net model.
+#' For survival models, two columns should be selected; for all others, only one
+#' column should be selected.
 #'
 #' @param optimization_metric A string indicating which optimization metric
 #' should be used for hyperparameter selection during model tuning. Valid values
@@ -185,13 +202,33 @@ tof_prep_recipe <-
 #' models across multiple cores can be high, so significant speedup is unlikely
 #' to be observed unless many large models are being fit.
 #'
-#' @return TO DO
+#' @return A tibble containing a summary of the model's performance in each
+#' resampling iteration across all hyperparameter combinations. Will contain
+#' 3 columns: "splits" (a list-col containing each resampling iteration's
+#' `rsplit` object), "id" (the name of the resampling iteration), and
+#' "performance_metrics" (a list-col containing the performance metrics for each
+#' resampling iteration. Each row of "performance_metrics" is a tibble with
+#' the columns "mixture" and "penalty" and several additional columns containing the
+#' performance metrics of the model for each mixture/penalty combination).
+#' See \code{\link{tof_fit_split}} for additional details.
+#'
+#' @importFrom doParallel registerDoParallel
+#'
+#' @importFrom foreach %dopar%
+#' @importFrom foreach foreach
+#'
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#'
+#' @importFrom purrr map2
+#'
+#' @importFrom rlang enquo
 #'
 #' @importFrom rsample training
-#' @importFrom parallel makeCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom parallel stopCluster
-#' @importFrom foreach %dopar%
+#'
+#' @importFrom tidyselect eval_select
+#'
+#'
 #'
 tof_tune_glmnet <-
   function(
@@ -204,6 +241,7 @@ tof_tune_glmnet <-
     num_cores = 1
   ) {
 
+    # if the input data is a single training/test split
     if (inherits(split_data, "rsplit")) {
       # extract output column names
       outcome_colnames <-
@@ -211,6 +249,7 @@ tof_tune_glmnet <-
         tidyselect::eval_select(data = rsample::training(split_data)) %>%
         names()
 
+      # compute performance metrics for single split
       performance_metrics <-
         tof_fit_split(
           split_data,
@@ -220,6 +259,7 @@ tof_tune_glmnet <-
           outcome_colnames
         )
 
+      # if the input data is multiple training/test splits
     } else if (inherits(split_data, "rset")) {
 
       # extract output column names
@@ -228,6 +268,7 @@ tof_tune_glmnet <-
         tidyselect::eval_select(data = rsample::training(split_data$splits[[1]])) %>%
         names()
 
+      # compute performance metrics
       if (num_cores == 1) {
         performance_metrics <-
           purrr::map2(
@@ -270,26 +311,36 @@ tof_tune_glmnet <-
       }
 
       performance_metrics <-
-        tibble::tibble(
+        split_data %>%
+        dplyr::mutate(
           performance_metrics = performance_metrics
-        ) %>%
-        tidyr::unnest(cols = performance_metrics) %>%
-        dplyr::group_by(.data$mixture, .data$penalty) %>%
-        dplyr::summarize(
-          dplyr::across(
-            dplyr::everything(),
-            .fns = mean,
-            )
-        ) %>%
-        dplyr::ungroup()
+        )
 
+    # if input data is an unsplit tbl_df
+    } else if (inherits(split_data, "tbl_df")) {
+      # extract output column names
+      outcome_colnames <-
+        rlang::enquo(outcome_cols) %>%
+        tidyselect::eval_select(data = split_data) %>%
+        names()
+
+      # compute performance metrics
+      performance_metrics <-
+        tof_fit_split(
+          split_data,
+          prepped_recipe,
+          hyperparameter_grid,
+          model_type,
+          outcome_colnames
+        )
     } else {
-      stop("split_data must be an rsplit or rset object.")
+      stop("split_data must be an rsplit object, an rset object, or a tbl_df.")
     }
 
     return(performance_metrics)
 
   }
+
 
 #' Fit a glmnet model and calculate performance metrics using a single rsplit object
 #'
@@ -298,11 +349,17 @@ tof_tune_glmnet <-
 #' at all combinations of the mixture and
 #' penalty hyperparameters provided in a hyperparameter grid.
 #'
-#' @param rsplit_data An rsplit object produced by the \code{\link[rsample]{rsample}} package
+#' @param rsplit_data An `rsplit` object from the \code{\link[rsample]{rsample}}
+#' package.
+#' Alternatively, an unsplit tbl_df can be provided, though this is not recommended.
+#'
 #' @param prepped_recipe A trained \code{\link[recipes]{recipe}}
+#'
 #' @param hyperparameter_grid A tibble containing the hyperparameter values to tune.
 #' Can be created using \code{\link{tof_create_grid}}
+#'
 #' @param model_type A string representing the type of glmnet model being fit.
+#'
 #' @param outcome_colnames Quoted column names indicating which columns in the data
 #' being fit represent the outcome variables (with all others assumed to be predictors).
 #'
@@ -325,12 +382,32 @@ tof_tune_glmnet <-
 #'
 #' @references Harrel Jr, F. E. and Lee, K. L. and Mark, D. B. (1996) Tutorial in biostatistics: multivariable prognostic models: issues in developing models, evaluating assumptions and adequacy, and measuring and reducing error, Statistics in Medicine, 15, pages 361–387.
 #'
-#' @importFrom recipes bake
-#' @importFrom rsample training
-#' @importFrom rsample testing
-#' @importFrom survival Surv
+#' @importFrom dplyr any_of
+#' @importFrom dplyr arrange
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr left_join
+#' @importFrom dplyr mutate
+#' @importFrom dplyr pull
+#' @importFrom dplyr relocate
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
 #' @importFrom glmnet glmnet
 #' @importFrom glmnet assess.glmnet
+#'
+#' @importFrom purrr map
+#' @importFrom purrr map2
+#' @importFrom purrr map_dbl
+#'
+#' @importFrom recipes bake
+#'
+#' @importFrom rsample training
+#' @importFrom rsample testing
+#'
+#' @importFrom survival Surv
+#'
+#' @importFrom tidyr unnest
+#'
 #' @importFrom yardstick roc_auc
 #'
 #'
@@ -343,12 +420,21 @@ tof_fit_split <-
     outcome_colnames
   ) {
 
-    # extract training set
+    # extract training and validation set
+    if (inherits(rsplit_data, "rsplit")) {
+      training_data <- rsample::training(rsplit_data)
+      validation_data <- rsample::testing(rsplit_data)
+
+    } else if (inherits(rsplit_data, "tbl_df")) {
+      training_data <- rsplit_data
+      validation_data <- rsplit_data
+    }
+
     training_data <-
-      recipes::bake(
-        object = prepped_recipe,
-        new_data = rsample::training(rsplit_data)
-      )
+      recipes::bake(object = prepped_recipe, new_data = training_data)
+
+    validation_data <-
+      recipes::bake(object = prepped_recipe, new_data = validation_data)
 
     # separate training and testing x and y (as needed by glmnet)
     training_x <-
@@ -359,13 +445,6 @@ tof_fit_split <-
     training_y <-
       training_data %>%
       dplyr::select(dplyr::any_of(outcome_colnames))
-
-    # extract test set
-    validation_data <-
-      recipes::bake(
-        object = prepped_recipe,
-        new_data = rsample::testing(rsplit_data)
-      )
 
     validation_x <-
       validation_data %>%
@@ -435,7 +514,7 @@ tof_fit_split <-
           x = training_x,
           y = training_y,
           alpha = .x,
-          lambda = lambdas, # decide if this should be specified or automatic via glmnet
+          lambda = lambdas,
           family = glmnet_family,
           standardize = FALSE
         )
@@ -455,13 +534,13 @@ tof_fit_split <-
           newy = validation_y,
           s = lambdas
         )  %>%
-          tibble::as_tibble() %>%
+          dplyr::as_tibble() %>%
           dplyr::mutate(penalty = lambdas)
       )
 
     # tidy model metrics for each alpha and lambda value used to fit a model
     result <-
-      tibble::tibble(
+      dplyr::tibble(
         mixture = alphas,
         model_metrics = model_metrics
       ) %>%
@@ -485,7 +564,7 @@ tof_fit_split <-
             purrr::map2(
               .x = sort(rep(1:length(alphas), times = length(lambdas))),
               .y = rep(1:length(lambdas), times = length(alphas)),
-              .f = ~ tibble::as_tibble(prediction_matrices[[.x]][,,.y])
+              .f = ~ dplyr::as_tibble(prediction_matrices[[.x]][,,.y])
             ),
           roc_auc =
             purrr::map_dbl(
@@ -513,18 +592,265 @@ tof_fit_split <-
       result %>%
       tof_clean_metric_names(model_type = model_type)
 
+    attr(result, which = "models") <-
+      dplyr::tibble(
+        mixture = alphas,
+        model = glmnet_models
+      )
+
     return(result)
 
   }
 
-#' Title
+
+#' Calculate and store the predicted outcomes for each validation set observation during model tuning
 #'
-#' TO DO
+#' @param rsplit_data An `rsplit` object from the \code{\link[rsample]{rsample}}
+#' package.
+#' Alternatively, an unsplit tbl_df can be provided, though this is not recommended.
 #'
-#' @param metric_tibble TO DO
-#' @param model_type TO DO
+#' @param prepped_recipe A trained \code{\link[recipes]{recipe}}
 #'
-#' @return TO DO
+#' @param lambda A single numeric value indicating which penalty (lambda) value
+#' should be used to make the predictions
+#'
+#' @param alpha A single numeric value indicating which mixture (alpha) value
+#' should be used to make the predictions
+#'
+#' @param model_type A string indicating which kind of elastic net model to build.
+#' If a continuous response is being predicted, use "linear" for linear regression;
+#' if a categorical response with only 2 classes is being predicted, use
+#' "two-class" for logistic regression; if a categorical response with more than 2
+#' levels is being predicted, use "multiclass" for multinomial regression; and if
+#' a time-to-event outcome is being predicted, use "survival" for Cox regression.
+#'
+#' @param outcome_colnames Quoted column names indicating which columns in the data
+#' being fit represent the outcome variables (with all others assumed to be predictors).
+#'
+#' @return A tibble containing the predicted and true values for the outcome
+#' for each of the validation observations in `rsplit_data`.
+#'
+#' @importFrom dplyr any_of
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr left_join
+#' @importFrom dplyr mutate
+#' @importFrom dplyr rename
+#' @importFrom dplyr rename_with
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
+#' @importFrom glmnet glmnet
+#'
+#' @importFrom recipes bake
+#'
+#' @importFrom rsample testing
+#' @importFrom rsample training
+#'
+#' @importFrom stats C
+#' @importFrom stats deviance
+#' @importFrom stats predict
+#'
+#' @importFrom survival Surv
+#' @importFrom survival survfit
+#'
+#' @importFrom tidyr nest
+#' @importFrom tidyr pivot_longer
+#'
+tof_find_cv_predictions <-
+  function(
+    rsplit_data,
+    prepped_recipe,
+    lambda,
+    alpha,
+    model_type,
+    outcome_colnames
+  ) {
+
+    # extract training set
+    training_data <-
+      recipes::bake(
+        object = prepped_recipe,
+        new_data = rsample::training(rsplit_data)
+      )
+
+    # separate training and testing x and y (as needed by glmnet)
+    training_x <-
+      training_data %>%
+      dplyr::select(-dplyr::any_of(outcome_colnames)) %>%
+      as.matrix()
+
+    training_y <-
+      training_data %>%
+      dplyr::select(dplyr::any_of(outcome_colnames))
+
+    # extract test set
+    validation_data <-
+      recipes::bake(
+        object = prepped_recipe,
+        new_data = rsample::testing(rsplit_data)
+      )
+
+    validation_x <-
+      validation_data %>%
+      dplyr::select(-dplyr::any_of(outcome_colnames)) %>%
+      as.matrix()
+
+    validation_y <-
+      validation_data %>%
+      dplyr::select(dplyr::any_of(outcome_colnames))
+
+    # convert outcome into the form glmnet needs it
+    if (model_type == "survival") {
+      training_y <-
+        survival::Surv(
+          time = training_y[[1]],
+          event = training_y[[2]]
+        )
+
+      validation_y <-
+        survival::Surv(
+          time = validation_y[[1]],
+          event = validation_y[[2]]
+        )
+
+    } else {
+      training_y <-
+        training_y[[outcome_colnames]]
+
+      validation_y <-
+        validation_y[[outcome_colnames]]
+    }
+
+    # convert model type into a glmnet family
+    glmnet_family <-
+      switch(
+        model_type,
+        "linear" = "gaussian",
+        "two-class" = "binomial",
+        "multiclass" = "multinomial",
+        "survival" = "cox"
+      )
+
+    glmnet_model <-
+      glmnet::glmnet(
+          x = training_x,
+          y = training_y,
+          alpha = alpha,
+          family = glmnet_family,
+          standardize = FALSE
+        )
+
+    response <-
+      stats::predict(
+        object = glmnet_model,
+        newx = validation_x,
+        s = lambda,
+        type = "response"
+      )
+
+    if (model_type %in% c("linear", "two-class")) {
+      predictions <-
+        dplyr::tibble(
+          response = as.numeric(response),
+          truth = validation_y
+        )
+
+      if (model_type == "two-class") {
+        predictions <-
+          # FOR DEBUGGING
+          predictions #%>%
+          #dplyr::mutate(truth = as.character(.data$truth))
+
+        outcome_levels <- levels(predictions$truth)
+      }
+
+    } else if (model_type == "multiclass") {
+      outcome_levels <- levels(validation_y)
+
+      predictions <-
+        (response[, , 1]) %>%
+        as.matrix() %>%
+        dplyr::as_tibble() %>%
+        dplyr::rename_with(.fn = ~paste0("prob_", .x)) %>%
+        dplyr::mutate(truth = validation_y)
+        #dplyr::mutate(truth = as.character(validation_y))
+
+
+    } else {
+      predictions <-
+        dplyr::tibble(
+          response = as.numeric(response),
+          true_time_to_event = as.matrix(validation_y)[, 1],
+          true_event = as.matrix(validation_y)[, 2]
+        )
+    }
+
+    if (model_type %in% c("multiclass", "two-class")) {
+      class <-
+        stats::predict(
+          object = glmnet_model,
+          newx = validation_x,
+          s = lambda,
+          type = "class"
+          # FOR DEBUGGING
+        ) %>%
+        factor(levels = outcome_levels)
+
+      predictions <-
+        predictions %>%
+        dplyr::mutate(class = class)
+    }
+
+    if (model_type == "survival") {
+      survfit_result <-
+        survival::survfit(
+          glmnet_model,
+          s = lambda,
+          x = training_x,
+          y = training_y,
+          newx = validation_x
+        )
+
+      times <-
+        dplyr::tibble(
+          time = survfit_result$time,
+          .timepoint_index = 1:length(survfit_result$time)
+        )
+
+      survival_curves <-
+        survfit_result$surv %>%
+        dplyr::as_tibble() %>%
+        dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+        tidyr::pivot_longer(
+          cols = -.data$.timepoint_index,
+          names_to = "row_index",
+          values_to = "probability"
+        ) %>%
+        dplyr::left_join(times, by = ".timepoint_index") %>%
+        dplyr::select(-.data$.timepoint_index) %>%
+        tidyr::nest(survival_curve = -.data$row_index)
+
+      predictions <-
+        predictions %>%
+        dplyr::mutate(survival_curve = survival_curves$survival_curve) %>%
+        dplyr::rename(relative_risk = .data$response)
+    }
+
+    return(predictions)
+
+  }
+
+#' Rename glmnet's default model evaluation metrics to make them more interpretable
+#'
+#' @param metric_tibble A tibble in which each column represents a glmnet
+#' model evaluation metric with its default name.
+#'
+#' @param model_type A string indicating which type of glmnet model was trained.
+#'
+#' @return A tibble in which each column represents a glmnet
+#' model evaluation metric with its "cleaned" name.
+#'
+#' @importFrom dplyr rename
 #'
 #'
 tof_clean_metric_names <- function(metric_tibble, model_type) {
@@ -546,7 +872,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
         binomial_deviance = .data$deviance,
         misclassification_error = .data$class,
         roc_auc = .data$auc
-      )
+      ) %>%
+      dplyr::mutate(accuracy = 1 - .data$misclassification_error)
 
   } else if (model_type == "multiclass") {
     # multinomial_deviance = deviance
@@ -558,7 +885,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
       dplyr::rename(
         multinomial_deviance = .data$deviance,
         misclassification_error = .data$class
-      )
+      ) %>%
+      dplyr::mutate(accuracy = 1 - .data$misclassification_error)
 
   } else if (model_type == "survival") {
     # partial_likelihood deviance = deviance
@@ -581,17 +909,29 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
 
 #' Find the optimal hyperparameters for an elastic net model from candidate performance metrics
 #'
-#' @param performance_metrics TO DO
-#' @param model_type TO DO
-#' @param optimization_metric TO DO
+#' @param performance_metrics A tibble of performance metrics for an elastic
+#' net model (in wide format)
 #'
-#' @return TO DO
+#' @param model_type A string indicating which type of glmnet model was trained.
+#'
+#' @param optimization_metric A string indicating which performance metric should
+#' be used to select the optimal model.
+#'
+#' @return A tibble with 3 columns: "mixture", "penalty", and a column containing
+#' the chosen optimization metric. If the returned tibble has more than 1 column,
+#' it means that more than 1 mixture/penalty combination yielded the optimal
+#' result (i.e. the tuning procedure resulted in a tie).
+#'
+#' @importFrom dplyr any_of
+#' @importFrom dplyr select
+#' @importFrom dplyr slice_max
+#' @importFrom dplyr slice_min
 #'
 #' @importFrom rlang arg_match0
 #'
 tof_find_best <- function(performance_metrics, model_type, optimization_metric) {
 
-  # of optimization metric is default, give it tidytof's automatic preference
+  # if optimization metric is default, give it tidytof's automatic preference
   # based on the model type
   if (optimization_metric == "tidytof_default") {
     optimization_metric <-
@@ -788,10 +1128,11 @@ tof_setup_glmnet_xy <-
     return(list(x = x, y = y))
   }
 
-#' TO DO
+#' Check argument specifications for a glmnet model.
 #'
 #' @param split_data An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
-#' package. The easiest way to generate this is to use \code{\link{tof_split_data}}
+#' package containing the sample-level data to use for modeling. Alternatively,
+#' an unsplit tbl_df can be provided, though this is not recommended.
 #'
 #' @param model_type A string indicating which kind of elastic net model to build.
 #' If a continuous response is being predicted, use "linear" for linear regression;
@@ -819,7 +1160,8 @@ tof_setup_glmnet_xy <-
 #' adverse event). Ignored if `model_type` is "two-class", "multiclass",
 #' or "linear".
 #'
-#' @return TO DO
+#' @return A tibble. If arguments are specified correctly, this tibble can be
+#' used to create a recipe for preprocessing.
 #'
 #' @export
 #'
@@ -842,6 +1184,8 @@ tof_check_model_args <-
       feature_tibble <-
         split_data$splits[[1]] %>%
         rsample::training()
+    } else if (inherits(split_data, "tbl_df")) {
+      feature_tibble <- split_data
     } else {
       stop("split_data must be either an rsplit or an rset object.")
     }
@@ -895,6 +1239,7 @@ tof_check_model_args <-
     return(feature_tibble)
   }
 
+# Create a tibble containing only unique observations from an rset or rsplit object.
 tof_all_data <- function(split_data) {
 
   if (inherits(split_data, "rsplit")) {
@@ -902,17 +1247,28 @@ tof_all_data <- function(split_data) {
       rsample::training(split_data) %>%
       dplyr::bind_rows(rsample::testing(split_data))
 
+    if (inherits(split_data, "bootstraps")) {
+      feature_tibble <- dplyr::distinct(feature_tibble)
+    }
+
   } else if (inherits(split_data, "rset")) {
     feature_tibble <-
       rsample::training(split_data$splits[[1]]) %>%
       dplyr::bind_rows(rsample::testing(split_data$splits[[1]]))
 
+    if (inherits(split_data, "bootstraps")) {
+      feature_tibble <- dplyr::distinct(feature_tibble)
+    }
+
+  } else if (inherits(split_data, "tbl_df")) {
+    feature_tibble <- split_data
   } else {
-    stop("split_data must be either an rsplit or an rset object.")
+    stop("split_data must be either an rsplit or an rset object (or a tbl_df).")
   }
+  return(feature_tibble)
 }
 
-# new_tof_model ----------------------------------------------------------------
+# tof_model utilities ----------------------------------------------------------
 
 #' Constructor for a tof_model.
 #'
@@ -981,7 +1337,7 @@ print.tof_model <- function(x, ...) {
       x$model %>%
       glmnet::coef.glmnet(s = penalty) %>%
       as.matrix() %>%
-      tibble::as_tibble(rownames = "feature")
+      dplyr::as_tibble(rownames = "feature")
 
     colnames(coefficients) <- c("feature", "coefficient")
 
@@ -997,7 +1353,7 @@ print.tof_model <- function(x, ...) {
         .f = function(x) {
           result <- x %>%
             as.matrix() %>%
-            tibble::as_tibble(rownames = "feature")
+            dplyr::as_tibble(rownames = "feature")
 
           colnames(result) <- c("feature", "coefficient")
 
@@ -1130,3 +1486,655 @@ tof_get_model_y <-
     return(xy$y)
   }
 
+
+#' Access a trained elastic net model's performance metrics using its tuning data.
+#'
+#' @param tof_model A `tof_model` trained using \code{\link{tof_train_model}}
+#'
+#' @return A list of performance metrics whose components depend on the model type.
+#'
+#' @importFrom dplyr any_of
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr count
+#' @importFrom dplyr everything
+#' @importFrom dplyr if_else
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#' @importFrom dplyr transmute
+#'
+#' @importFrom glmnet assess.glmnet
+#' @importFrom glmnet confusion.glmnet
+#' @importFrom glmnet roc.glmnet
+#'
+#' @importFrom purrr discard
+#'
+#' @importFrom survival Surv
+#' @importFrom survival survfit
+#'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr nest
+#' @importFrom tidyr unnest
+#'
+tof_assess_model_tuning <-
+  function(tof_model) {
+
+    model_type <- tof_model$model_type
+
+    tuning_data <-
+      tof_model$tuning_metrics %>%
+      dplyr::select(.data$.predictions) %>%
+      tidyr::unnest(cols = .data$.predictions)
+
+    if(model_type %in% c("linear", "two-class", "survival")) {
+
+      if (model_type %in% c("linear", "two-class")) {
+        prediction_matrix <- as.matrix(tuning_data$response)
+      } else {
+
+        # remove infinite estimations of relative risk, which glmnet
+        # can compute sometimes and that always cause bugs
+        max_non_infinite <-
+          max(purrr::discard(.x = tuning_data$relative_risk, .p = is.infinite))
+        tuning_data$relative_risk <-
+          dplyr::if_else(
+            is.infinite(tuning_data$relative_risk),
+            true = max_non_infinite,
+            false = tuning_data$relative_risk
+          )
+        prediction_matrix <- as.matrix(tuning_data$relative_risk)
+      }
+
+      if (model_type != "survival") {
+        new_y <- tuning_data$truth
+      } else {
+        new_y <-
+          survival::Surv(
+            time = tuning_data$true_time_to_event,
+            event = tuning_data$true_event
+          )
+      }
+
+      # if model_type is "multiclass"
+    } else {
+      prediction_matrix <-
+        tuning_data %>%
+        dplyr::select(-.data$truth, -.data$class) %>%
+        as.matrix()
+
+      col_names <-
+        tuning_data %>%
+        dplyr::select(-.data$truth, -.data$class) %>%
+        colnames()
+
+      prediction_matrix <-
+        array(
+          data = prediction_matrix,
+          dim = c(
+            dim(prediction_matrix)[[1]],
+            dim(prediction_matrix)[[2]],
+            1L
+          )
+        )
+
+      predicted_outcome <- tuning_data$class
+
+      new_y <- tuning_data$truth
+
+      outcome_levels <- unique(tuning_data$truth)
+      confusion_matrix <-
+        tuning_data %>%
+        dplyr::mutate(
+          truth = factor(.data$truth, levels = outcome_levels),
+          class = factor(.data$class, levels = outcome_levels)
+        ) %>%
+        dplyr::count(.data$truth, .data$class, .drop = FALSE) %>%
+        dplyr::transmute(
+          true_outcome = as.character(.data$truth),
+          predicted_outcome = as.character(.data$class),
+          num_observations = n
+        )
+
+    }
+
+    model_metrics <-
+      glmnet::assess.glmnet(
+        object = prediction_matrix,
+        newy = new_y,
+        family = tof_find_glmnet_family(model_type)
+      ) %>%
+      dplyr::as_tibble() %>%
+      tof_clean_metric_names(model_type = model_type) %>%
+      tidyr::pivot_longer(
+        cols = dplyr::everything(),
+        names_to = "metric",
+        values_to = "value"
+      )
+
+    if (model_type == "two-class") {
+
+      outcome_levels <-
+        tuning_data %>%
+        dplyr::group_by(.data$class) %>%
+        dplyr::summarize(mean_prob = mean(.data$response)) %>%
+        dplyr::arrange(.data$mean_prob) %>%
+        dplyr::pull(.data$class)
+
+      roc_curve <-
+        tuning_data %>%
+        dplyr::mutate(truth = factor(.data$truth, levels = outcome_levels)) %>%
+        tof_make_roc_curve(
+          truth_col = .data$truth,
+          prob_cols = .data$response
+        )
+
+      confusion_matrix <-
+        tuning_data %>%
+        dplyr::mutate(
+          truth = factor(.data$truth, levels = outcome_levels),
+          class = factor(.data$class, levels = outcome_levels)
+        ) %>%
+        dplyr::count(.data$truth, .data$class, .drop = FALSE) %>%
+        dplyr::transmute(
+          true_outcome = as.character(.data$truth),
+          predicted_outcome = as.character(.data$class),
+          num_observations = .data$n
+        )
+
+    } else if (model_type == "multiclass") {
+
+      outcome_levels <- unique(tuning_data$truth)
+
+      prediction_colnames <- paste0("prob_", outcome_levels)
+
+      roc_auc <-
+        tuning_data %>%
+        dplyr::mutate(truth = as.factor(.data$truth)) %>%
+        yardstick::roc_auc(
+          truth = .data$truth,
+          dplyr::any_of(prediction_colnames)
+        )
+
+      roc_auc_tibble <-
+        dplyr::tibble(metric = "roc_auc", value = roc_auc$.estimate)
+
+      model_metrics <-
+        model_metrics %>%
+        dplyr::bind_rows(roc_auc_tibble)
+
+      roc_curve <-
+        tuning_data %>%
+        dplyr::rename_with(
+          cols = dplyr::everything(),
+          .fn = ~ gsub(pattern = "prob_", x = .x, replacement = "")
+        ) %>%
+        tof_make_roc_curve(
+          truth_col = .data$truth,
+          prob_cols = dplyr::any_of(outcome_levels)
+        )
+
+    } else {
+      roc_curve <- NULL
+      if (model_type %in% c("linear", "survival")) {
+        confusion_matrix <- NULL
+      }
+    }
+
+    if (model_type == "survival") {
+
+      survival_curves <-
+        tuning_data %>%
+        dplyr::mutate(
+          risk_group =
+            dplyr::if_else(
+              .data$relative_risk > tof_model$best_log_rank_threshold,
+              "high",
+              "low"
+            )
+        )
+
+      lrt_result <-
+        tof_log_rank_test(
+        input_data = survival_curves,
+        relative_risk_col = .data$relative_risk,
+        time_col = .data$true_time_to_event,
+        event_col = .data$true_event,
+        threshold = tof_model$best_log_rank_threshold
+      )
+
+      lrt_tibble <-
+        dplyr::tibble(metric = "log_rank_p_value", value = lrt_result)
+
+      model_metrics <-
+        model_metrics %>%
+        dplyr::bind_rows(lrt_tibble)
+
+      survival_curves <-
+        survival_curves %>%
+        dplyr::select(
+          .data$survival_curve,
+          .data$relative_risk,
+          time_to_event = .data$true_time_to_event,
+          event = .data$true_event,
+          .data$risk_group
+        )
+
+    } else {
+      survival_curves <- NULL
+    }
+
+    result <-
+      list(
+        model_metrics = model_metrics,
+        roc_curve = roc_curve,
+        confusion_matrix = confusion_matrix,
+        survival_curves = survival_curves
+      )
+
+    return(result)
+  }
+
+
+#' Compute a trained elastic net model's performance metrics using new_data.
+#'
+#' @param tof_model A `tof_model` trained using \code{\link{tof_train_model}}
+#'
+#' @param new_data A tibble of new observations that should be used to evaluate
+#' the `tof_model`'s performance.
+#'
+#' @return A list of performance metrics whose components depend on the model type.
+#'
+#' @importFrom dplyr any_of
+#' @importFrom dplyr as_tibble
+#' @importFrom dplyr everything
+#' @importFrom dplyr tibble
+#'
+#' @importFrom glmnet assess.glmnet
+#' @importFrom glmnet confusion.glmnet
+#' @importFrom glmnet roc.glmnet
+#'
+#' @importFrom survival survfit
+#'
+#' @importFrom stats pchisq
+#'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr nest
+#'
+#'
+tof_assess_model_new_data <-
+  function(tof_model, new_data) {
+    # set up
+    # extract the recipe and the glmnet model
+    model <- tof_model$model
+    recipe <- tof_model$recipe
+    lambda <- tof_model$penalty
+
+    # extract the model type and outcome colnames
+    model_type <- tof_get_model_type(tof_model)
+    outcome_colnames <- tof_get_model_outcomes(tof_model)
+
+    # preprocess the new data ------------------------------------------------
+    new_xy <-
+      new_data %>%
+      tof_setup_glmnet_xy(
+        recipe = recipe,
+        outcome_cols = dplyr::any_of(outcome_colnames),
+        model_type = model_type
+      )
+
+    # calculate metrics ------------------------------------------------------
+    model_metrics <-
+      glmnet::assess.glmnet(
+        object = model,
+        newx = new_xy$x,
+        newy = new_xy$y,
+        family = tof_find_glmnet_family(model_type),
+        s = lambda
+      ) %>%
+      dplyr::as_tibble() %>%
+      tof_clean_metric_names(model_type = model_type) %>%
+      tidyr::pivot_longer(
+        cols = dplyr::everything(),
+        names_to = "metric",
+        values_to = "value"
+      )
+
+    if (model_type == "two-class") {
+
+      predictions <-
+        tof_predict(
+          tof_model = tof_model,
+          new_data = new_data,
+          prediction_type = "response"
+        )
+
+      roc_tibble <-
+        dplyr::tibble(
+          truth = new_data[[outcome_colnames]],
+          response = predictions$.pred
+        )
+
+      roc_curve <-
+        tof_make_roc_curve(
+          input_data = roc_tibble,
+          truth_col = .data$truth,
+          prob_cols = .data$response
+        )
+
+    } else if (model_type == "multiclass") {
+      predictions <-
+        tof_predict(
+          tof_model = tof_model,
+          new_data = new_data,
+          prediction_type = "response"
+        ) %>%
+        dplyr::rename_with(
+          cols = dplyr::everything(),
+          .fn = ~ gsub(pattern = ".pred_", x = .x, replacement = "")
+        )
+      prediction_colnames <- colnames(predictions)
+
+      roc_auc <-
+        predictions %>%
+        dplyr::mutate(truth = new_data[[tof_model$outcome_colnames]]) %>%
+        yardstick::roc_auc(
+          truth = .data$truth,
+          dplyr::any_of(prediction_colnames)
+        )
+
+      roc_auc_tibble <-
+        dplyr::tibble(metric = "roc_auc", value = roc_auc$.estimate)
+
+      model_metrics <-
+        model_metrics %>%
+        dplyr::bind_rows(roc_auc_tibble)
+
+      roc_tibble <-
+        dplyr::tibble(
+          truth = new_data[[outcome_colnames]]
+        ) %>%
+        dplyr::bind_cols(predictions)
+
+      outcome_levels <- unique(new_data[[outcome_colnames]])
+
+      roc_curve <-
+        tof_make_roc_curve(
+          input_data = roc_tibble,
+          truth_col = .data$truth,
+          prob_cols = dplyr::any_of(outcome_levels)
+        )
+
+    } else {
+      roc_curve <- NULL
+    }
+
+    if (model_type %in% c("two-class", "multiclass")) {
+      confusion_matrix <-
+        glmnet::confusion.glmnet(
+          object = model,
+          newx = new_xy$x,
+          newy = new_xy$y,
+          family = tof_find_glmnet_family(model_type),
+          s = lambda
+        ) %>%
+        dplyr::as_tibble() %>%
+        dplyr::transmute(
+          true_outcome = .data$True,
+          predicted_outcome = .data$Predicted,
+          num_observations = .data$n
+        )
+
+    } else {
+      confusion_matrix <- NULL
+    }
+
+    if (model_type == "survival") {
+
+      survival_curves <-
+        tof_model_plot_survival_curves(tof_model, new_x = new_xy$x)
+
+      predictions <-
+        tof_predict(
+          tof_model = tof_model,
+          new_data = new_data,
+          prediction_type = "response"
+        )
+
+      survival_curves <-
+        survival_curves %>%
+        dplyr::mutate(
+          relative_risk = predictions$.pred,
+          time_to_event = new_xy$y[,1],
+          event = new_xy$y[,2],
+          risk_group =
+            dplyr::if_else(
+              .data$relative_risk > tof_model$best_log_rank_threshold,
+              "high",
+              "low"
+            )
+        )
+
+      lrt_result <-
+        tof_log_rank_test(
+          input_data = survival_curves,
+          relative_risk_col = .data$relative_risk,
+          time_col = .data$time_to_event,
+          event_col = .data$event,
+          threshold = tof_model$best_log_rank_threshold
+        )
+
+      lrt_tibble <-
+        dplyr::tibble(metric = "log_rank_p_value", value = lrt_result)
+
+      model_metrics <-
+        model_metrics %>%
+        dplyr::bind_rows(lrt_tibble)
+
+      # survival_curves <-
+      #   survival_curves %>%
+      #   dplyr::select(.data$row_index, .data$survival_curve, .data$risk_group)
+
+    } else {
+      survival_curves <- NULL
+    }
+
+    result <-
+      list(
+        model_metrics = model_metrics,
+        roc_curve = roc_curve,
+        confusion_matrix = confusion_matrix,
+        survival_curves = survival_curves
+      )
+
+    return(result)
+
+  }
+
+#' Compute a receiver-operating curve (ROC) for a two-class or multiclass dataset
+#'
+#' @param input_data A tof_tbl, tbl_df, or data.frame in which each row is an
+#' observation.
+#' @param truth_col An unquoted column name indicating which column in `input_data`
+#' contains the true class labels for each observation. Must be a factor.
+#' @param prob_cols Unquoted column names indicating which columns in `input_data`
+#' contain the probability estimates for each class in `truth_col`. These columns
+#' must be specified in the same order as the factor levels in `truth_col`.
+#'
+#' @return A tibble that can be used to plot the ROC for a classification task.
+#' For each candidate probability threshold, the following are reported:
+#' specificity, sensitivity, true-positive rate (tpr), and false-positive rate
+#' (fpr).
+#'
+#' @export
+#'
+#' @importFrom dplyr pull
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
+#' @importFrom yardstick roc_curve
+#'
+tof_make_roc_curve <- function(input_data, truth_col, prob_cols) {
+  outcome_levels <-
+    input_data %>%
+    dplyr::pull({{truth_col}}) %>%
+    as.character() %>%
+    unique()
+
+  num_prob_cols <-
+    input_data %>%
+    dplyr::select({{prob_cols}}) %>%
+    ncol()
+
+  if (length(outcome_levels) >= 2) {
+    roc_curve <-
+      input_data %>%
+      dplyr::mutate(
+        # FOR DEBUGGING
+        truth = dplyr::pull(input_data, {{truth_col}})
+        #truth = factor(.data$truth, levels = outcome_levels)
+      ) %>%
+      yardstick::roc_curve({{prob_cols}}, truth = .data$truth, event_level = "second") %>%
+      dplyr::mutate(
+        tpr = .data$sensitivity,
+        fpr = 1 - .data$specificity
+      )
+
+  } else {
+    warning("When only one outcome level is present in new_data, an ROC cannot be computed. Returning an empty roc_curve.")
+    roc_curve <- dplyr::tibble()
+  }
+}
+
+
+#' Compute the log-rank test p-value for the difference between the two survival
+#' curves obtained by splitting a dataset into a "low" and "high" risk group
+#' using a given relative-risk threshold.
+#'
+#' @param input_data A tbl_df or data.frame in which each observation is a row.
+#'
+#' @param relative_risk_col An unquote column name indicating which column contains
+#' the relative-risk estimates for each observation.
+#'
+#' @param time_col An unquoted column name indicating which column contains the
+#' true time-to-event information for each observation.
+#'
+#' @param event_col An unquoted column name indicating which column contains the
+#' outcome (event or censorship). Must be a binary column - all values should be
+#'  either 0 or 1 (with 1 indicating the adverse event and 0 indicating
+#'  censorship) or FALSE and TRUE (with TRUE indicating the
+#' adverse event and FALSE indicating censorship).
+#'
+#' @param threshold A numeric value indicating the relative-risk threshold that
+#' should be used to split observations into low- and high-risk groups.
+#'
+#' @return A numeric value <1, the p-value of the log-rank test.
+#'
+#' @export
+#'
+#' @importFrom dplyr if_else
+#' @importFrom dplyr transmute
+#'
+#' @importFrom survival Surv
+#' @importFrom survival survdiff
+#'
+#' @importFrom stats pchisq
+#'
+tof_log_rank_test <-
+  function(
+    input_data,
+    relative_risk_col,
+    time_col,
+    event_col,
+    threshold
+  ) {
+
+    survival_df <-
+      input_data %>%
+      dplyr::transmute(
+        relative_risk = {{relative_risk_col}},
+        time = {{time_col}},
+        event = {{event_col}},
+        strata = dplyr::if_else(.data$relative_risk > threshold, "high", "low")
+      )
+
+    if (all(survival_df$strata == "high") | all(survival_df$strata == "low")) {
+      p_val <- 1
+
+    } else {
+
+      log_rank_result <-
+        survival::survdiff(survival::Surv(time, event) ~ strata, data = survival_df)
+
+      df <- sum(1 * log_rank_result$exp > 0) - 1
+      chi_sq <- log_rank_result$chisq
+      p_val <- stats::pchisq(chi_sq, df = df, lower.tail = FALSE)
+    }
+    return(p_val)
+  }
+
+#' Compute the log-rank test p-value for the difference between the two survival
+#' curves obtained by splitting a dataset into a "low" and "high" risk group
+#' using all possible relative-risk thresholds.
+#'
+#' @param input_data A tbl_df or data.frame in which each observation is a row.
+#'
+#' @param relative_risk_col An unquote column name indicating which column contains
+#' the relative-risk estimates for each observation.
+#'
+#' @param time_col An unquoted column name indicating which column contains the
+#' true time-to-event information for each observation.
+#'
+#' @param event_col An unquoted column name indicating which column contains the
+#' outcome (event or censorship). Must be a binary column - all values should be
+#'  either 0 or 1 (with 1 indicating the adverse event and 0 indicating
+#'  censorship) or FALSE and TRUE (with TRUE indicating the
+#' adverse event and FALSE indicating censorship).
+#'
+#' @return A tibble with 3 columns: "candidate_thresholds" (the relative-risk threshold
+#' used for the log-rank test), "log_rank_p_val" (the p-values of the log-rank
+#' tests) and "is_best" (a logical value indicating which candidate threshold gave
+#' the optimal, i.e. smallest, p-value).
+#'
+#' @export
+#'
+#' @importFrom dplyr pull
+#' @importFrom dplyr tibble
+#'
+#' @importFrom purrr map_dbl
+#'
+tof_find_log_rank_threshold <-
+  function(
+    input_data,
+    relative_risk_col,
+    time_col,
+    event_col
+  ) {
+    candidate_thresholds <-
+      input_data %>%
+      dplyr::pull({{relative_risk_col}}) %>%
+      sort()
+
+    p_values <-
+      purrr::map_dbl(
+        .x = candidate_thresholds,
+        .f = ~tof_log_rank_test(
+          input_data = input_data,
+          relative_risk_col = {{relative_risk_col}},
+          time_col = {{time_col}},
+          event_col = {{event_col}},
+          threshold = .x
+        )
+      )
+
+    threshold_index <- which.min(p_values)
+    best_threshold <- candidate_thresholds[[threshold_index]]
+
+    result <-
+      dplyr::tibble(
+        candidate_thresholds = candidate_thresholds,
+        log_rank_p_val = p_values,
+        is_best = candidate_thresholds == best_threshold
+      )
+    return(result)
+  }

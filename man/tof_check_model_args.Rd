@@ -2,7 +2,7 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_check_model_args}
 \alias{tof_check_model_args}
-\title{TO DO}
+\title{Check argument specifications for a glmnet model.}
 \usage{
 tof_check_model_args(
   split_data,
@@ -15,7 +15,8 @@ tof_check_model_args(
 }
 \arguments{
 \item{split_data}{An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
-package. The easiest way to generate this is to use \code{\link{tof_split_data}}}
+package containing the sample-level data to use for modeling. Alternatively,
+an unsplit tbl_df can be provided, though this is not recommended.}
 
 \item{model_type}{A string indicating which kind of elastic net model to build.
 If a continuous response is being predicted, use "linear" for linear regression;
@@ -44,8 +45,9 @@ adverse event). Ignored if `model_type` is "two-class", "multiclass",
 or "linear".}
 }
 \value{
-TO DO
+A tibble. If arguments are specified correctly, this tibble can be
+used to create a recipe for preprocessing.
 }
 \description{
-TO DO
+Check argument specifications for a glmnet model.
 }

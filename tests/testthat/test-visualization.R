@@ -462,7 +462,137 @@ test_that("tof_plot_cluster_abundance runs and returns ggplot objects", {
   )
 })
 
+# tof_plot_sample_model --------------------------------------------------------
 
+feature_tibble <-
+  dplyr::tibble(
+    sample = as.character(1:100),
+    cd45 = runif(n = 100),
+    pstat5 = runif(n = 100),
+    cd34 = runif(n = 100),
+    outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+    class =
+      if_else(outcome > median(outcome), "class1", "class2") %>%
+      as.factor(),
+    multiclass =
+      if_else(class == "class1", "class1", sample(c("class2", "class3"), size = 100, replace = TRUE)) %>%
+      as.factor(),
+       # as.factor(c(rep("class1", 30), rep("class2", 30), rep("class3", 40))),
+    event = c(rep(0, times = 50), rep(1, times = 50)),
+    time_to_event =
+      if_else(
+        outcome > median(outcome),
+        rnorm(n = 100, mean = 8, sd = 2),
+        rnorm(n = 100, mean = 14, sd = 2)
+      )
+  )
+
+# permute all columns to get "new" data
+new_data <-
+  feature_tibble %>%
+  mutate(across(everything(), ~ sample(x = .x, size = length(.x), replace = FALSE)))
+
+linear_tof_model <-
+  feature_tibble %>%
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  tof_train_model(
+    predictor_cols = c(cd45, pstat5, cd34),
+    response_col = outcome,
+    model_type = "linear"
+  )
+
+logistic_tof_model <-
+  feature_tibble %>%
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  tof_train_model(
+    predictor_cols = c(cd45, pstat5, cd34),
+    response_col = class,
+    model_type = "two-class"
+  )
+
+multinomial_tof_model <-
+  feature_tibble %>%
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  tof_train_model(
+    predictor_cols = c(cd45, pstat5, cd34),
+    response_col = multiclass,
+    model_type = "multiclass"
+  )
+
+survival_tof_model <-
+  feature_tibble %>%
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  tof_train_model(
+    predictor_cols = c(cd45, pstat5, cd34),
+    event_col = event,
+    time_col = time_to_event,
+    model_type = "survival"
+  )
+
+linear_plot <-
+  linear_tof_model %>%
+  tof_plot_model()
+
+linear_plot_new <-
+  linear_tof_model %>%
+  tof_plot_model(new_data = new_data)
+
+linear_plot_tuning <-
+  linear_tof_model %>%
+  tof_plot_model(new_data = "tuning")
+
+logistic_plot <-
+  logistic_tof_model %>%
+  tof_plot_model()
+
+logistic_plot_new <-
+  logistic_tof_model %>%
+  tof_plot_model(new_data = new_data)
+
+logistic_plot_tuning <-
+  logistic_tof_model %>%
+  tof_plot_model(new_data = "tuning")
+
+multinomial_plot <-
+  multinomial_tof_model %>%
+  tof_plot_model()
+
+multinomial_plot_new <-
+  multinomial_tof_model %>%
+  tof_plot_model(new_data = new_data)
+
+multinomial_plot_tuning <-
+  multinomial_tof_model %>%
+  tof_plot_model(new_data = "tuning")
+
+survival_plot <-
+  survival_tof_model %>%
+  tof_plot_model()
+
+survival_plot_new <-
+  survival_tof_model %>%
+  tof_plot_model(new_data = new_data)
+
+survival_plot_tuning <-
+  survival_tof_model %>%
+  tof_plot_model(new_data = "tuning")
+
+test_that("all results are ggplot objects", {
+  expect_s3_class(linear_plot, "ggplot")
+  expect_s3_class(logistic_plot, "ggplot")
+  expect_s3_class(multinomial_plot, "ggplot")
+  expect_s3_class(survival_plot, "ggplot")
+
+  expect_s3_class(linear_plot_new, "ggplot")
+  expect_s3_class(logistic_plot_new, "ggplot")
+  expect_s3_class(multinomial_plot_new, "ggplot")
+  expect_s3_class(survival_plot_new, "ggplot")
+
+  expect_s3_class(linear_plot_tuning, "ggplot")
+  expect_s3_class(logistic_plot_tuning, "ggplot")
+  expect_s3_class(multinomial_plot_tuning, "ggplot")
+  expect_s3_class(survival_plot_tuning, "ggplot")
+})
 
 
 

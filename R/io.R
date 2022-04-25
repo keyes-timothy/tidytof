@@ -320,7 +320,7 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #'
 #' @importFrom stringr str_remove_all
 #'
-tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble()) {
+tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) {
 
   # if path gives multiple paths to multiple files
   if (length(path) > 1) {
@@ -354,7 +354,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = tibble::tibble())
 
   # read files into a nested tibble
   tof_tibble <-
-    tibble::tibble(
+    dplyr::tibble(
       file_name = file_names,
       data =
         purrr::map(

@@ -2,7 +2,7 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_tune_glmnet}
 \alias{tof_tune_glmnet}
-\title{Tune an elastic net model's hyperparameters over multiple resamples of a training dataset}
+\title{Tune an elastic net model's hyperparameters over multiple resamples}
 \usage{
 tof_tune_glmnet(
   split_data,
@@ -16,12 +16,16 @@ tof_tune_glmnet(
 }
 \arguments{
 \item{split_data}{An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
-package. The easiest way to generate this is to use \code{\link{tof_split_data}}}
+package. The easiest way to generate this is to use \code{\link{tof_split_data}}.
+Alternatively, an unsplit tbl_df can be provided, though this is not recommended.}
 
-\item{prepped_recipe}{TO DO}
+\item{prepped_recipe}{Either a single \code{\link[recipes]{recipe}} object
+(if `split_data` is an `rsplit` object or a `tbl_df`) or list of recipes
+(if `split_data` is an `rset` object) such that each entry in the list
+corresponds to a resample in `split_data`.}
 
 \item{hyperparameter_grid}{A hyperparameter grid indicating which values of
-the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamters
+the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparameters
 should be used during model tuning. Generate this grid using \code{\link{tof_create_grid}}.}
 
 \item{model_type}{A string indicating which kind of elastic net model to build.
@@ -31,7 +35,10 @@ if a categorical response with only 2 classes is being predicted, use
 levels is being predicted, use "multiclass" for multinomial regression; and if
 a time-to-event outcome is being predicted, use "survival" for Cox regression.}
 
-\item{outcome_cols}{TO DO}
+\item{outcome_cols}{Unquoted column name(s) indicating which column(s) in the data
+contained in `split_data` should be used as the outcome in the elastic net model.
+For survival models, two columns should be selected; for all others, only one
+column should be selected.}
 
 \item{optimization_metric}{A string indicating which optimization metric
 should be used for hyperparameter selection during model tuning. Valid values
@@ -43,8 +50,16 @@ models across multiple cores can be high, so significant speedup is unlikely
 to be observed unless many large models are being fit.}
 }
 \value{
-TO DO
+A tibble containing a summary of the model's performance in each
+resampling iteration across all hyperparameter combinations. Will contain
+3 columns: "splits" (a list-col containing each resampling iteration's
+`rsplit` object), "id" (the name of the resampling iteration), and
+"performance_metrics" (a list-col containing the performance metrics for each
+resampling iteration. Each row of "performance_metrics" is a tibble with
+the columns "mixture" and "penalty" and several additional columns containing the
+performance metrics of the model for each mixture/penalty combination).
+See \code{\link{tof_fit_split}} for additional details.
 }
 \description{
-Tune an elastic net model's hyperparameters over multiple resamples of a training dataset
+Tune an elastic net model's hyperparameters over multiple resamples
 }

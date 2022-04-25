@@ -2,18 +2,25 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_prep_recipe}
 \alias{tof_prep_recipe}
-\title{Title}
+\title{Train a recipe or list of recipes for preprocessing sample-level cytometry data}
 \usage{
 tof_prep_recipe(split_data, unprepped_recipe)
 }
 \arguments{
-\item{split_data}{TO DO}
+\item{split_data}{An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
+package containing the sample-level data to use for modeling.
+The easiest way to generate this is to use \code{\link{tof_split_data}}.
+Alternatively, an unsplit tbl_df, though this is not recommended.}
 
-\item{unprepped_recipe}{TO DO}
+\item{unprepped_recipe}{A \code{\link[recipes]{recipe}} object (if `split_data`
+is an `rsplit` object or a `tbl_df`) or list of recipes
+(if `split_data` is an `rset` object).}
 }
 \value{
-TO DO
+If split_data is an "rsplit" or "tbl_df" object, will return a single
+prepped recipe. If split_data is an "rset" object, will return a list of prepped
+recipes specific for each fold of the resampling procedure.
 }
 \description{
-Title
+Train a recipe or list of recipes for preprocessing sample-level cytometry data
 }

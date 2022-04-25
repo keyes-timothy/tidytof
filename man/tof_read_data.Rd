@@ -4,7 +4,7 @@
 \alias{tof_read_data}
 \title{Read data from an .fcs/.csv file or a directory of .fcs/.csv files.}
 \usage{
-tof_read_data(path = NULL, sep = "|", panel_info = tibble::tibble())
+tof_read_data(path = NULL, sep = "|", panel_info = dplyr::tibble())
 }
 \arguments{
 \item{path}{A file path to a single file or to a directory of files.

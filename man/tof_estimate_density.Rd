@@ -18,7 +18,7 @@ tof_estimate_density(
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{distance_cols}{Unquoted names of the columns in `tof_tibble` to use in
-calculating cell-to-cell distances duringthe local density estimation for
+calculating cell-to-cell distances during the local density estimation for
 each cell. Defaults to all numeric columns in `tof_tibble`.}
 
 \item{distance_function}{A string indicating which distance function to use
@@ -33,7 +33,7 @@ member corresponding to the chosen `method`.}
 
 \item{augment}{A boolean value indicating if the output should column-bind the
 local density estimates of each cell as a new column in `tof_tibble` (TRUE; the default) or if
-a single-column tibble including only thelocal density estimates should be returned (FALSE).}
+a single-column tibble including only the local density estimates should be returned (FALSE).}
 
 \item{method}{A string indicating which local density estimation method should be used.
 Valid values include "mean_distance", "sum_distance", and "spade".}

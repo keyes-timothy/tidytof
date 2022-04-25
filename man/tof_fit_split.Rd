@@ -13,7 +13,9 @@ tof_fit_split(
 )
 }
 \arguments{
-\item{rsplit_data}{An rsplit object produced by the \code{\link[rsample]{rsample}} package}
+\item{rsplit_data}{An `rsplit` object from the \code{\link[rsample]{rsample}}
+package.
+Alternatively, an unsplit tbl_df can be provided, though this is not recommended.}
 
 \item{prepped_recipe}{A trained \code{\link[recipes]{recipe}}}
 

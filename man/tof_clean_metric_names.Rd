@@ -2,18 +2,20 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_clean_metric_names}
 \alias{tof_clean_metric_names}
-\title{Title}
+\title{Rename glmnet's default model evaluation metrics to make them more interpretable}
 \usage{
 tof_clean_metric_names(metric_tibble, model_type)
 }
 \arguments{
-\item{metric_tibble}{TO DO}
+\item{metric_tibble}{A tibble in which each column represents a glmnet
+model evaluation metric with its default name.}
 
-\item{model_type}{TO DO}
+\item{model_type}{A string indicating which type of glmnet model was trained.}
 }
 \value{
-TO DO
+A tibble in which each column represents a glmnet
+model evaluation metric with its "cleaned" name.
 }
 \description{
-TO DO
+Rename glmnet's default model evaluation metrics to make them more interpretable
 }

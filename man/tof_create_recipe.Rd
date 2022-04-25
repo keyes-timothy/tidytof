@@ -2,7 +2,7 @@
 % Please edit documentation in R/modeling_helpers.R
 \name{tof_create_recipe}
 \alias{tof_create_recipe}
-\title{Create a recipe for preprocessing sample-level CyTOF data for an elastic net model}
+\title{Create a recipe for preprocessing sample-level cytometry data for an elastic net model}
 \usage{
 tof_create_recipe(
   feature_tibble,
@@ -37,6 +37,9 @@ should have missing values imputed using k-nearest neighbors before model fittin
 \code{\link[recipes]{step_impute_knn}}). Imputation is performed using an observation's
 5 nearest-neighbors. Defaults to FALSE.}
 }
+\value{
+A \code{\link[recipes]{recipe}} object.
+}
 \description{
-Create a recipe for preprocessing sample-level CyTOF data for an elastic net model
+Create a recipe for preprocessing sample-level cytometry data for an elastic net model
 }

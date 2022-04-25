@@ -4,7 +4,7 @@
 \alias{new_tof_tibble}
 \title{Constructor for a tof_tibble.}
 \usage{
-new_tof_tibble(x = tibble::tibble(), panel = tibble::tibble())
+new_tof_tibble(x = dplyr::tibble(), panel = dplyr::tibble())
 }
 \arguments{
 \item{x}{A data.frame or tibble containing single-cell mass cytometry data

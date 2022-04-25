@@ -10,7 +10,7 @@ tof_split_data(
   split_col,
   simple_prop = 3/4,
   num_cv_folds = 10,
-  num_cv_repeats = 1,
+  num_cv_repeats = 1L,
   num_bootstraps = 10,
   strata = NULL,
   ...
@@ -26,7 +26,7 @@ the split. If a string, valid options include k-fold cross validation
 a single binary split ("simple"). If a logical vector, it should contain one entry
 for each row in `feature_tibble` indicating if that row should be included in the
 training set (TRUE) or excluded for the validation/test set (FALSE).
-Ignored if `split_col` is specified.}
+Ignored entirely if `split_col` is specified.}
 
 \item{split_col}{The unquoted column name of the logical column in `feature_tibble`
 indicating if each row should be included in the

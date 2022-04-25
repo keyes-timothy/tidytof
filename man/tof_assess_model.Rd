@@ -2,23 +2,65 @@
 % Please edit documentation in R/patient-level_modeling.R
 \name{tof_assess_model}
 \alias{tof_assess_model}
-\title{Assess a trained elastic net model when applied to new data}
+\title{Assess a trained elastic net model}
 \usage{
 tof_assess_model(tof_model, new_data)
 }
 \arguments{
 \item{tof_model}{A `tof_model` trained using \code{\link{tof_train_model}}}
 
-\item{new_data}{A tibble of new observations that should be used to evaluate `tof_model`.
+\item{new_data}{A tibble of new observations that should be used to evaluate
+the `tof_model`'s performance.
 If new_data isn't provided, model evaluation will will be performed using the
-training data used to fit the model.}
+training data used to fit the model. Alternatively, the string "tuning" can be
+provided to access the model's performance metrics during the (resampled)
+model tuning process.}
 }
 \value{
-A list of performance metrics that depends on the model type.
+A list of performance metrics whose components depend on the model type:
+
+\describe{
+\item{"model_metrics"}{A tibble with two columns ("metric" and "value")
+containing standard performance metrics for each model type. For linear models,
+the "mse" (the mean squared error
+of the predictions) and "mae" (the mean absolute error of the predictions).
+For two-class models, "roc_auc" (the area under the Receiver-Operating
+Curve for the classification), "misclassification error" (the proportion of
+misclassified observations), "binomial_deviance" (see
+\code{\link[glmnet]{deviance.glmnet}}),
+"mse" (the mean squared error of the logit function), and "mae"
+(the mean absolute error of the logit function). For multiclass models,
+"roc_auc" (the area under the Receiver-Operating
+Curve for the classification using the Hand-Till generalization of the
+ROC AUC for multiclass models in \code{\link[yardstick]{roc_auc}}),
+"misclassification error" (the proportion of misclassified observations),
+"multinomial_deviance" (see \code{\link[glmnet]{deviance.glmnet}}),
+and "mse" and "mae" as above. For survival models, "concordance_index"
+(Harrel's C index;
+see \code{\link[glmnet]{deviance.glmnet}}) and "partial_likelihood_deviance"
+(see \code{\link[glmnet]{deviance.glmnet}}).
+}
+\item{"roc_curve"}{Reported only for "two-class" and "multiclass" models. For both,
+ a tibble is provided reporting the true-positive rate (tpr) and false-positive
+ rate (fpr) at each threshold for classification for use in plotting a
+ receiver-operating curve. For "multiclass" models, the ".level" column
+ allows for separating the values in roc_curve such that one ROC can be plotted
+ for each class.}
+\item{"confusion_matrix"}{Reported only for "two-class" and "multiclass" models.
+For both, a tibble is provided reporting the "confusion matrix" of the
+classification in long-format.}
+\item{"survival_curves"}{Reported only for "survival" models.
+A tibble indicating each patient's probability of survival (1 - probability(event))
+at each timepoint in the dataset and whether each sample was placed in the
+"high" or "low" risk group according to its predicted relative risk (and
+the tof_model's optimal relative_risk cutoff in the training dataset).
+}
+}
 }
 \description{
 This function assesses a trained `tof_model`'s performance on new data by
-computing model type-specific performance measurements.
+computing model type-specific performance measurements. If new data isn't
+provided, performance metrics for the training data will be provided.
 }
 \seealso{
 Other modeling functions: 

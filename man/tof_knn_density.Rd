@@ -18,7 +18,7 @@ tof_knn_density(
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
 \item{distance_cols}{Unquoted names of the columns in `tof_tibble` to use in
-calculating cell-to-cell distances duringthe local density estimation for
+calculating cell-to-cell distances during the local density estimation for
 each cell. Defaults to all numeric columns in `tof_tibble`.}
 
 \item{num_neighbors}{An integer indicating the number of nearest neighbors

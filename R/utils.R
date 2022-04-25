@@ -705,7 +705,7 @@ tof_nested_cv <-
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
-#' calculating cell-to-cell distances duringthe local density estimation for
+#' calculating cell-to-cell distances during the local density estimation for
 #' each cell. Defaults to all numeric columns in `tof_tibble`.
 #'
 #' @param distance_function A string indicating which distance function to use
@@ -720,7 +720,7 @@ tof_nested_cv <-
 #'
 #' @param augment A boolean value indicating if the output should column-bind the
 #' local density estimates of each cell as a new column in `tof_tibble` (TRUE; the default) or if
-#' a single-column tibble including only thelocal density estimates should be returned (FALSE).
+#' a single-column tibble including only the local density estimates should be returned (FALSE).
 #'
 #' @param method  A string indicating which local density estimation method should be used.
 #' Valid values include "mean_distance", "sum_distance", and "spade".
@@ -791,7 +791,7 @@ tof_estimate_density <-
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
-#' calculating cell-to-cell distances duringthe local density estimation for
+#' calculating cell-to-cell distances during the local density estimation for
 #' each cell. Defaults to all numeric columns in `tof_tibble`.
 #'
 #' @param distance_function A string indicating which distance function to use
@@ -900,7 +900,7 @@ tof_spade_density <-
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param distance_cols Unquoted names of the columns in `tof_tibble` to use in
-#' calculating cell-to-cell distances duringthe local density estimation for
+#' calculating cell-to-cell distances during the local density estimation for
 #' each cell. Defaults to all numeric columns in `tof_tibble`.
 #'
 #' @param num_neighbors An integer indicating the number of nearest neighbors
@@ -1102,7 +1102,7 @@ tof_make_knn_graph <-
 
       knn_dists <-
         knn_dists %>%
-        tibble::as_tibble() %>%
+        dplyr::as_tibble() %>%
         dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
         tidyr::pivot_longer(
           cols = -.data$from,
@@ -1172,7 +1172,7 @@ tof_rescale <-
 #'
 #' This function makes a heatmap of group-to-group marker expression patterns
 #' in single-cell data. Markers are plotted along the horizontal (x-) axis of
-#' the heatmap and cluster IDs are plotted along the vertical (y-) axis of the
+#' the heatmap and groups are plotted along the vertical (y-) axis of the
 #' heatmap.
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
@@ -1180,7 +1180,7 @@ tof_rescale <-
 #' @param y_col An unquoted column name indicating which column in `tof_tibble`
 #' stores the ids for the group to which each cell belongs.
 #'
-#' @param marker_cols Unquoted column names indicating which columsn in `tof_tibble`
+#' @param marker_cols Unquoted column names indicating which column in `tof_tibble`
 #' should be interpreted as markers to be plotted along the x-axis of the heatmap.
 #' Supports tidyselect helpers.
 #'
@@ -1328,3 +1328,165 @@ tof_plot_heatmap <-
     return(heatmap + theme)
 
   }
+
+
+flatten_model_predictions <- function(model_prediction, lambdas) {
+  num_lambdas <- length(lambdas)
+  prediction_list <- list()
+  for (i in 1:num_lambdas) {
+    lambda <- lambdas[[i]]
+    prediction <- model_prediction[,,i]
+
+    prediction_list[[i]] <- dplyr::as_tibble(prediction)
+  }
+
+  result <- dplyr::tibble(
+    lambda = lambdas,
+    predictions = prediction_list
+  )
+
+  return(result)
+}
+
+tof_model_plot_survival_curves <- function(tof_model, new_x) {
+  cox_model <- tof_model$model
+  lambda <- tof_model$penalty
+
+  if(missing(new_x)) {
+    new_x <-
+      tof_setup_glmnet_xy(
+        feature_tibble = tof_get_model_training_data(tof_model),
+        recipe = tof_model$recipe,
+        outcome_cols = dplyr::any_of(tof_model$outcome_colnames),
+        model_type = tof_model$model_type
+      )$x
+  }
+
+  survfit_result <-
+    survival::survfit(
+      cox_model,
+      s = lambda,
+      x = tof_get_model_x(tof_model),
+      y = tof_get_model_y(tof_model),
+      newx = new_x
+    )
+
+  times <-
+    dplyr::tibble(
+      time = survfit_result$time,
+      .timepoint_index = 1:length(survfit_result$time)
+    )
+
+  survival_curves <-
+    survfit_result$surv %>%
+    dplyr::as_tibble() %>%
+    dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+    tidyr::pivot_longer(
+      cols = -.data$.timepoint_index,
+      names_to = "row_index",
+      values_to = "probability"
+    ) %>%
+    dplyr::left_join(times, by = ".timepoint_index") %>%
+    dplyr::select(-.data$.timepoint_index) %>%
+    tidyr::nest(survival_curve = -.data$row_index)
+
+  return(survival_curves)
+}
+
+tof_plot_survival_curves <-
+  function(cox_model, lambda, recipe, train_x, train_y, new_x) {
+
+    survfit_result <-
+      survival::survfit(
+        cox_model,
+        s = lambda,
+        x = train_x,
+        y = train_y,
+        newx = new_x
+      )
+
+    times <-
+      dplyr::tibble(
+        time = survfit_result$time,
+        .timepoint_index = 1:length(survfit_result$time)
+      )
+
+    survival_curves <-
+      survfit_result$surv %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+      tidyr::pivot_longer(
+        cols = -.data$.timepoint_index,
+        names_to = "row_index",
+        values_to = "probability"
+      ) %>%
+      dplyr::left_join(times, by = ".timepoint_index") %>%
+      dplyr::select(-.data$.timepoint_index) %>%
+      tidyr::nest(survival_curve = -.data$row_index)
+
+    return(survival_curves)
+  }
+
+#' Compute a Kaplan-Meier curve from sample-level survival data
+#'
+#' @param survival_curves A tibble from which the Kaplan-Meier curve will be
+#' computed. Each row must represent an observation and must have two
+#' columns named "time_to_event" and "event".
+#'
+#' @return A tibble with 3 columns: time_to_event, survival_probability, and
+#' is_censored (whether or not an event was censored at that timepoint).
+#'
+#' @importFrom dplyr add_row
+#' @importFrom dplyr arrange
+#' @importFrom dplyr lag
+#' @importFrom dplyr mutate
+#' @importFrom dplyr n
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
+tof_compute_km_curve <- function(survival_curves) {
+
+  if (!is.factor(survival_curves$event)) {
+    survival_curves$event <- factor(survival_curves$event, levels = c(0, 1))
+  }
+
+  censor_level <- levels(survival_curves$event)[1]
+  death_level <- levels(survival_curves$event)[2]
+
+  km_curve <-
+    survival_curves %>%
+    dplyr::select(.data$time_to_event, .data$event) %>%
+    dplyr::arrange(.data$time_to_event) %>%
+    dplyr::mutate(
+      num_current_deaths = as.character(.data$event) == death_level,
+      num_deaths = cumsum(.data$num_current_deaths),
+      num_current_censored = as.character(.data$event) == censor_level,
+      num_censored = cumsum(.data$num_current_censored)
+    ) %>%
+    dplyr::add_row(
+      dplyr::tibble(
+        time_to_event = 0,
+        num_current_deaths = 0,
+        num_deaths = 0,
+        num_current_censored = 0,
+        num_censored = 0
+      ),
+      .before = 1L
+    ) %>%
+    dplyr::mutate(
+      num_at_risk = dplyr::n() - (.data$num_deaths + .data$num_censored + 1),
+      num_at_risk = dplyr::lag(.data$num_at_risk, default = dplyr::n() - 1),
+      multiplier = (.data$num_at_risk - .data$num_current_deaths) / .data$num_at_risk,
+      survival_probability = 1,
+      survival_probability = cumprod(.data$multiplier),
+      is_censored = (.data$num_current_censored == 1)
+    ) %>%
+   dplyr::select(
+     .data$time_to_event,
+     .data$survival_probability,
+     .data$is_censored
+   )
+
+  return(km_curve)
+}
+

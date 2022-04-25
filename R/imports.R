@@ -1,4 +1,4 @@
-#' @import dplyr
+# #' @import dplyr
 #'
 #' @importFrom methods as
 #'
@@ -29,9 +29,9 @@ dplyr::`%>%`
 #' @export
 rlang::`:=`
 
-#' @importFrom rlang `:=`
+#' @importFrom rlang `.data`
 #' @export
-rlang::.data
+rlang::`.data`
 
 # tidyselect reexports ---------------------------------------------------------
 

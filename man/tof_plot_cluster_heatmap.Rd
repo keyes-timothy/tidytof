@@ -23,7 +23,7 @@ stores the cluster ids for the cluster to which each cell belongs.
 Cluster labels can be produced via any method the user chooses - including manual gating,
 any of the functions in the `tof_cluster_*` function family, or any other method.}
 
-\item{marker_cols}{Unquoted column names indicating which columsn in `tof_tibble`
+\item{marker_cols}{Unquoted column names indicating which column in `tof_tibble`
 should be interpreted as markers to be plotted along the x-axis of the heatmap.
 Supports tidyselect helpers.}
 

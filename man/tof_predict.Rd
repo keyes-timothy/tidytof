@@ -7,7 +7,7 @@
 tof_predict(
   tof_model,
   new_data,
-  prediction_type = c("response", "class", "link")
+  prediction_type = c("response", "class", "link", "survival curve")
 )
 }
 \arguments{
@@ -25,16 +25,24 @@ provided by the model:
 for each observation. For "two-class" and "multiclass" models, the fitted
 probabilities of each class for each observation. For "survival" models, the fitted relative-risk
 for each observation.}
-\item{"class}{Only applies to "two-class" and "multiclass" models. For both,
+\item{"class"}{Only applies to "two-class" and "multiclass" models. For both,
 the class label corresponding to the class with the maximum fitted probability.}
 \item{"link"}{The linear predictions of the model
 (the output of the link function for each model family.)}
+\item{"survival curve"}{Only applies to "survival" models. Returns a tibble
+indicating each patient's probability of survival (1 - probability(event))
+at each timepoint in the dataset. Obtained using the
+\code{\link[survival]{survfit}} function.}
 }}
 }
 \value{
-A \code{link[tibble]{tibble}} with a single column (`.pred`) containing
-the predictions. Each row in the output corresponds to a row in `new_data` (
-or, if `new_data` is not provided, to a row in the `tof_model`'s training data.
+A \code{\link[dplyr]{tibble}} with a single column (`.pred`) containing
+the predictions or, for multiclass models with `prediction_type` == "response",
+a tibble with one column for each class. Each row in the output corresponds to a row in `new_data` (
+or, if `new_data` is not provided, to a row in the `tof_model`'s training data).
+In the latter case, be sure to check `tof_model$training_data` to confirm the
+order of observations, as the resampling procedure can change their ordering
+relative to the original input data.
 }
 \description{
 This function uses a trained `tof_model` to make predictions on new data.

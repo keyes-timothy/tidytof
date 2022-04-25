@@ -14,10 +14,10 @@
 #'
 #' @family tof_tbl utilities
 #'
-new_tof_tibble <- function(x = tibble::tibble(), panel = tibble::tibble()) {
+new_tof_tibble <- function(x = dplyr::tibble(), panel = dplyr::tibble()) {
 
-  stopifnot(tibble::is_tibble(x))
-  stopifnot(tibble::is_tibble(panel))
+  stopifnot(inherits(x, "tbl_df"))
+  stopifnot(inherits(panel, "tbl_df"))
 
   if("grouped_df" %in% class(x)) {
     subclasses <- c("grouped_tof_tbl", "grouped_df", "tof_tbl")
@@ -110,10 +110,13 @@ pivot_wider.tof_tbl <- function(data, ...) {
 }
 
 #' @export
-group_by.tof_tbl <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)) {
-  panel <- tof_get_panel(.data)
-  return(new_tof_tibble(x = NextMethod(), panel = panel))
-}
+#'
+#' @importFrom dplyr group_by_drop_default
+group_by.tof_tbl <-
+  function(.data, ..., .add = FALSE, .drop = dplyr::group_by_drop_default(.data)) {
+    panel <- tof_get_panel(.data)
+    return(new_tof_tibble(x = NextMethod(), panel = panel))
+  }
 
 
 ## dplyr methods

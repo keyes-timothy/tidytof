@@ -6,6 +6,7 @@
 \usage{
 tof_train_model(
   split_data,
+  unsplit_data,
   predictor_cols,
   response_col = NULL,
   time_col = NULL,
@@ -22,7 +23,13 @@ tof_train_model(
 }
 \arguments{
 \item{split_data}{An `rsplit` or `rset` object from the \code{\link[rsample]{rsample}}
-package. The easiest way to generate this is to use \code{\link{tof_split_data}}}
+package containing the sample-level data to use for modeling.
+The easiest way to generate this is to use \code{\link{tof_split_data}}.}
+
+\item{unsplit_data}{A tibble containing sample-level data to use for modeling
+without resampling. While using a resampling method is advised, this argument
+provides an interface to fit a model without using cross-validation or
+bootstrap resampling. Ignored if split_data is provided.}
 
 \item{predictor_cols}{Unquoted column names indicating which columns in the
 data contained in `split_data` should be used as predictors in the elastic net model.
@@ -57,7 +64,8 @@ the elastic net penalty (lambda) and the elastic net mixture (alpha) hyperparamt
 should be used during model tuning. Generate this grid using \code{\link{tof_create_grid}}.}
 
 \item{standardize_predictors}{A logical value indicating if numeric predictor columns
-should be standardized (centered and scaled) before model fitting. Defaults to TRUE.}
+should be standardized (centered and scaled) before model fitting, as is
+standard practice during elastic net regularization. Defaults to TRUE.}
 
 \item{remove_zv_predictors}{A logical value indicating if predictor columns
 with near-zero variance should be removed before model fitting using
@@ -74,7 +82,7 @@ depend on the model_type.
 
 \itemize{
 \item For "linear" models, choices are "mse" (the mean squared error
-of the predictions; the default) and "mae" (the mean absolute error of the predcitions).
+of the predictions; the default) and "mae" (the mean absolute error of the predictions).
 \item For "two-class" models, choices are "roc_auc" (the area under the Receiver-Operating
 Curve for the classification; the default), "misclassification error" (the proportion of
 misclassified observations), "binomial_deviance" (see \code{\link[glmnet]{deviance.glmnet}}),
@@ -105,13 +113,25 @@ depending on `split_data`) across all tested hyperparameter value combinations. 
 store the following information:
 
 \describe{
-\item{model}{The final elastic net ("glmnet") model}
+\item{model}{The final elastic net ("glmnet") model, which is chosen by selecting
+the elastic net hyperparameters with the best `optimization_metric` performance
+on the validation sets of each resample used to train the model (on average)}
 \item{recipe}{The \code{\link[recipes]{recipe}} used for data preprocessing}
 \item{mixture}{The optimal mixture hyperparameter (alpha) for the glmnet model}
 \item{penalty}{The optimal penalty hyperparameter (lambda) for the glmnet model}
 \item{model_type}{A string indicating which type of glmnet model was fit}
 \item{outcome_colnames}{A character vector representing the names of the columns in the training data modeled as outcome variables}
 \item{training_data}{A tibble containing the (not preprocessed) data used to train the model}
+\item{tuning_metrics}{A tibble containing the validation set performance metrics
+(and model predictions) during for each resample fold during model tuning.}
+\item{log_rank_thresholds}{For survival models only, a tibble containing information about the relative-risk
+thresholds that can be used to split the training data into 2 risk groups (low-
+and high-risk) based on the final model's predictions. For each relative-risk
+threshold, the log-rank test p-value and an indicator of which threshold gives
+the most significant separation is provided.}
+\item{best_log_rank_threshold}{For survival models only, a numeric value
+representing the relative-risk threshold that yields the most significant
+log-rank test when separating the training data into low- and high-risk groups.}
 }
 }
 \description{
