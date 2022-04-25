@@ -429,9 +429,14 @@ tof_cluster_ddpr <-
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
 #'
+#' @param cluster_cols Unquoted column names indicating which columns in `tof_tibble` to
+#' use in computing the clusters. Defaults to all numeric columns
+#' in `tof_tibble`. Supports tidyselect helpers.
+#'
 #' @param group_cols Optional. An unquoted column name indicating which columns
 #' should be used to group cells before clustering. Clustering is then performed
 #' on each group independently.
+#'
 #'
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
@@ -459,6 +464,7 @@ tof_cluster_ddpr <-
 tof_cluster <-
   function(
     tof_tibble,
+    cluster_cols = where(tof_is_numeric),
     group_cols = NULL,
     ...,
     augment = TRUE,
@@ -477,6 +483,7 @@ tof_cluster <-
         tof_cluster_grouped(
           tof_tibble = tof_tibble,
           group_cols = {{group_cols}},
+          cluster_cols = {{cluster_cols}},
           ...,
           augment = augment,
           method = method
@@ -487,6 +494,7 @@ tof_cluster <-
       result <-
         tof_cluster_tibble(
           tof_tibble = tof_tibble,
+          cluster_cols = {{cluster_cols}},
           ...,
           augment = augment,
           method = method

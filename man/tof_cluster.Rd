@@ -4,10 +4,21 @@
 \alias{tof_cluster}
 \title{Cluster CyTOF data.}
 \usage{
-tof_cluster(tof_tibble, group_cols = NULL, ..., augment = TRUE, method)
+tof_cluster(
+  tof_tibble,
+  cluster_cols = where(tof_is_numeric),
+  group_cols = NULL,
+  ...,
+  augment = TRUE,
+  method
+)
 }
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or `tibble`.}
+
+\item{cluster_cols}{Unquoted column names indicating which columns in `tof_tibble` to
+use in computing the clusters. Defaults to all numeric columns
+in `tof_tibble`. Supports tidyselect helpers.}
 
 \item{group_cols}{Optional. An unquoted column name indicating which columns
 should be used to group cells before clustering. Clustering is then performed
