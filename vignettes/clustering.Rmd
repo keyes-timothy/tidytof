@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
 ```{r setup, message = FALSE, warning = FALSE}
 library(tidytof)
 library(dplyr)
-library(FlowSOM)
 ```
 
 Often, clustering single-cell data to identify communities of cells with shared characteristics is a major goal of CyTOF data analysis.
@@ -39,41 +38,60 @@ Each of these methods are wrapped by `tof_cluster()`.
 
 ## Clustering with `tof_cluster()`
 
-To demonstrate, we can apply the FlowSOM clustering algorithm to `{tidytof}`'s built-in `phenograph_data`. Note that `phenograph_data` contains 3000 total cells (1000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)).
+To demonstrate, we can apply the PhenoGraph clustering algorithm to `{tidytof}`'s built-in `phenograph_data`. Note that `phenograph_data` contains 3000 total cells (1000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)). For demonstration purposes, we also metacluster our PhenoGraph clusters using k-means clustering.
 
 ```{r}
 phenograph_clusters <- 
   phenograph_data %>% 
   tof_preprocess() %>% 
-  tof_cluster(cluster_cols = contains("cd"), method = "flowsom")
+  tof_cluster(
+    cluster_cols = starts_with("cd"), 
+    num_neighbors = 50L, 
+    distance_function = "cosine", 
+    seed = 203L,
+    method = "phenograph"
+  ) %>% 
+  tof_metacluster(
+    cluster_col = .phenograph_cluster,
+    metacluster_cols = starts_with("cd"),
+    num_metaclusters = 3L,
+    method = "kmeans"
+  )
 
-phenograph_clusters %>% 
-  select(sample_name, .flowsom_metacluster, everything()) %>% 
+phenograph_clusters %>%
+  dplyr::select(sample_name, .phenograph_cluster, .kmeans_metacluster) %>%
   head()
 ```
 
-The output of `tof_cluster` is a `tof_tbl` identical to the input tibble, but now with the addition of an additional column (in this case, ".flowsom_metacluster") that encodes the cluster id for each cell in the input `tof_tbl`. Note that all output columns added to a tibble or `tof_tbl` by `{tidytof}` begin with a full-stop (".") to reduce the likelihood of collisions with existing column names.
+The outputs of both `tof_cluster()` and `tof_metacluster()` are a `tof_tbl` identical to the input tibble, but now with the addition of an additional column (in this case, ".phenograph_cluster" and ".kmeans_metacluster") that encodes the cluster id for each cell in the input `tof_tbl`. Note that all output columns added to a tibble or `tof_tbl` by `{tidytof}` begin with a full-stop (".") to reduce the likelihood of collisions with existing column names.
 
-Because the output of `tof_cluster` is a `tof_tbl`, we can use `dplyr`'s `count` method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.
+Because the output of `tof_cluster` is a `tof_tbl`, we can use `dplyr`'s `count` method to assess the accuracy of our clustering procedure compared to the original clustering from the PhenoGraph paper.
 
 ```{r}
 phenograph_clusters %>% 
-  count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
+  dplyr::count(phenograph_cluster, .kmeans_metacluster, sort = TRUE)
 ```
 
-Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).
+Here, we can see that our clustering procedure groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).
 
 To change which clustering algorithm `tof_cluster` uses, alter the `method` flag.
 
-```{r}
-# use the phenograph algorithm 
+```{r, eval = FALSE}
+# use the kmeans algorithm 
 phenograph_data %>% 
   tof_preprocess() %>% 
   tof_cluster(
     cluster_cols = contains("cd"),
-    method = "phenograph"
-  ) %>% 
-  head()
+    method = "kmeans"
+  )
+
+# use the flowsom algorithm 
+phenograph_data %>% 
+  tof_preprocess() %>% 
+  tof_cluster(
+    cluster_cols = contains("cd"),
+    method = "flowsom"
+  )
 ```
 
 To change the columns used to compute the clusters, change the `cluster_cols` flag. And finally, if you want to return a one-column `tibble` that only includes the cluster labels (as opposed to the cluster labels added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
@@ -87,9 +105,8 @@ phenograph_data %>%
     method = "kmeans", 
     augment = FALSE
   ) %>% 
-  head()
+  head() 
 ```
 
-## Metaclustering with `tof_metacluster()`
 
-[Under Construction...]
+
