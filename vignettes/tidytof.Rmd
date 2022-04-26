@@ -92,17 +92,21 @@ ddpr_data %>%
   tof_preprocess() %>%
   tof_cluster(
     cluster_cols = starts_with("cd"), # column specification
-    method = "flowsom", # method specification, 
-    num_metaclusters = 4L # method specification
+    method = "phenograph", # method specification, 
+  ) %>% 
+  tof_metacluster(
+    cluster_col = .phenograph_cluster, # column specification
+    num_metaclusters = 4, # method specification
+    method = "kmeans" # method specification
   ) %>% 
   tof_downsample(
-    group_cols = .flowsom_metacluster, # column specification
-    method = "constant", # method specification
-    num_cells = 200 # method specification
+    group_cols = .kmeans_metacluster, # column specification
+    num_cells = 200, # method specification
+    method = "constant" # method specification
   ) %>%
   tof_plot_cells_layout(
     knn_cols = starts_with("cd"), # column specification
-    color_col = .flowsom_metacluster, # column specification
+    color_col = .kmeans_metacluster, # column specification
     num_neighbors = 7L, # method specification
     node_size = 2L # method specification
   )
@@ -129,23 +133,24 @@ ddpr_data %>%
   # step 2
   tof_cluster(
     cluster_cols = starts_with("cd"), 
-    method = "flowsom", 
-    num_metaclusters = 4L, 
+    method = "phenograph", 
+    #num_metaclusters = 4L, 
     seed = 2020L
   ) %>%
   # step 3
   tof_downsample(
-    group_cols = .flowsom_metacluster, 
+    group_cols = .phenograph_cluster, 
     method = "constant", 
-    num_cells = 350
+    num_cells = 400
   ) %>% 
   # step 4
   tof_reduce_dimensions(method = "tsne") %>% 
   # step 5
   tof_plot_cells_embedding(
     embedding_cols = contains("tsne"),
-    color_col = .flowsom_metacluster 
-  )
+    color_col = .phenograph_cluster 
+  ) + 
+  theme(legend.position = "none")
 ```
 
 
