@@ -90,8 +90,7 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">FlowSOM</a></span><span class="op">)</span></code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></code></pre></div>
 <p>Often, clustering single-cell data to identify communities of cells with shared characteristics is a major goal of CyTOF data analysis.</p>
 <p>To do this, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> provides the <code><a href="../reference/tof_cluster.html">tof_cluster()</a></code> verb. Several clustering methods are implemented in <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>, including the following:</p>
 <ul>
@@ -105,72 +104,67 @@
 <div class="section level2">
 <h2 id="clustering-with-tof_cluster">Clustering with <code>tof_cluster()</code><a class="anchor" aria-label="anchor" href="#clustering-with-tof_cluster"></a>
 </h2>
-<p>To demonstrate, we can apply the FlowSOM clustering algorithm to <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in <code>phenograph_data</code>. Note that <code>phenograph_data</code> contains 3000 total cells (1000 each from 3 clusters identified in the <a href="https://pubmed.ncbi.nlm.nih.gov/26095251/" class="external-link">original PhenoGraph publication</a>).</p>
+<p>To demonstrate, we can apply the PhenoGraph clustering algorithm to <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in <code>phenograph_data</code>. Note that <code>phenograph_data</code> contains 3000 total cells (1000 each from 3 clusters identified in the <a href="https://pubmed.ncbi.nlm.nih.gov/26095251/" class="external-link">original PhenoGraph publication</a>). For demonstration purposes, we also metacluster our PhenoGraph clusters using k-means clustering.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op">&lt;-</span> 
   <span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"flowsom"</span><span class="op">)</span>
+  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
+    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, 
+    num_neighbors <span class="op">=</span> <span class="fl">50L</span>, 
+    distance_function <span class="op">=</span> <span class="st">"cosine"</span>, 
+    seed <span class="op">=</span> <span class="fl">203L</span>,
+    method <span class="op">=</span> <span class="st">"phenograph"</span>
+  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/tof_metacluster.html">tof_metacluster</a></span><span class="op">(</span>
+    cluster_col <span class="op">=</span> <span class="va">.phenograph_cluster</span>,
+    metacluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,
+    num_metaclusters <span class="op">=</span> <span class="fl">3L</span>,
+    method <span class="op">=</span> <span class="st">"kmeans"</span>
+  <span class="op">)</span>
 
-<span class="va">phenograph_clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.flowsom_metacluster</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+<span class="va">phenograph_clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="va">.phenograph_cluster</span>, <span class="va">.kmeans_metacluster</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph_c… 8                cluster1         -<span style="color: #BB0000;">0.033</span><span style="color: #BB0000; text-decoration: underline;">6</span> 2.46   0.608   3.96</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph_c… 3                cluster1          0.324  0.856 -<span style="color: #BB0000;">0.116</span>   4.52</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph_c… 7                cluster1          0.532  2.67   0.909   4.76</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph_c… 6                cluster1          0.016<span style="text-decoration: underline;">3</span> 2.97   0.072<span style="text-decoration: underline;">5</span>  5.15</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGraph_c… 7                cluster1          0.144  2.98   0.128   4.52</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGraph_c… 6                cluster1          0.742  3.41   0.336   5.71</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 19 more variables: cd123 &lt;dbl&gt;, cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   pcreb &lt;dbl&gt;, `pzap70-syk` &lt;dbl&gt;, prb &lt;dbl&gt;, `perk1-2` &lt;dbl&gt;</span></span></code></pre></div>
-<p>The output of <code>tof_cluster</code> is a <code>tof_tbl</code> identical to the input tibble, but now with the addition of an additional column (in this case, “.flowsom_metacluster”) that encodes the cluster id for each cell in the input <code>tof_tbl</code>. Note that all output columns added to a tibble or <code>tof_tbl</code> by <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> begin with a full-stop (“.”) to reduce the likelihood of collisions with existing column names.</p>
-<p>Because the output of <code>tof_cluster</code> is a <code>tof_tbl</code>, we can use <code>dplyr</code>’s <code>count</code> method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.</p>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
+<span class="co">#&gt;   sample_name            .phenograph_cluster .kmeans_metacluster</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGraph_cluster1 5                   2                  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGraph_cluster1 5                   2                  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGraph_cluster1 5                   2                  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGraph_cluster1 5                   2                  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGraph_cluster1 5                   2                  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGraph_cluster1 5                   2</span></code></pre></div>
+<p>The outputs of both <code><a href="../reference/tof_cluster.html">tof_cluster()</a></code> and <code><a href="../reference/tof_metacluster.html">tof_metacluster()</a></code> are a <code>tof_tbl</code> identical to the input tibble, but now with the addition of an additional column (in this case, “.phenograph_cluster” and “.kmeans_metacluster”) that encodes the cluster id for each cell in the input <code>tof_tbl</code>. Note that all output columns added to a tibble or <code>tof_tbl</code> by <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> begin with a full-stop (“.”) to reduce the likelihood of collisions with existing column names.</p>
+<p>Because the output of <code>tof_cluster</code> is a <code>tof_tbl</code>, we can use <code>dplyr</code>’s <code>count</code> method to assess the accuracy of our clustering procedure compared to the original clustering from the PhenoGraph paper.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">.flowsom_metacluster</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 23 × 3</span></span>
-<span class="co">#&gt;    phenograph_cluster .flowsom_metacluster     n</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> cluster2           18                     373</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> cluster2           19                     301</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> cluster1           6                      271</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> cluster1           7                      259</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> cluster3           10                     253</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> cluster3           5                      208</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> cluster2           20                     201</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> cluster3           11                     175</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> cluster3           12                     174</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> cluster1           1                      152</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 13 more rows</span></span></code></pre></div>
-<p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).</p>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">.kmeans_metacluster</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span>
+<span class="co">#&gt;   phenograph_cluster .kmeans_metacluster     n</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> cluster1           2                    <span style="text-decoration: underline;">1</span>000</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> cluster3           2                    <span style="text-decoration: underline;">1</span>000</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> cluster2           3                     517</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cluster2           1                     483</span></code></pre></div>
+<p>Here, we can see that our clustering procedure groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># use the phenograph algorithm </span>
+<code class="sourceCode R"><span class="co"># use the kmeans algorithm </span>
 <span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
     cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,
-    method <span class="op">=</span> <span class="st">"phenograph"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   sample_name  phenograph_clus…    cd19 cd11b    cd34  cd45   cd123   cd33  cd47</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H1_PhenoGra… cluster1         -<span style="color: #BB0000;">0.033</span><span style="color: #BB0000; text-decoration: underline;">6</span> 2.46   0.608   3.96 -<span style="color: #BB0000;">0.121</span>   0.240  1.68</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> H1_PhenoGra… cluster1          0.324  0.856 -<span style="color: #BB0000;">0.116</span>   4.52  0.486  -<span style="color: #BB0000;">0.101</span>  1.68</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> H1_PhenoGra… cluster1          0.532  2.67   0.909   4.76 -<span style="color: #BB0000;">0.052</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.680  2.39</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> H1_PhenoGra… cluster1          0.016<span style="text-decoration: underline;">3</span> 2.97   0.072<span style="text-decoration: underline;">5</span>  5.15  0.397   1.39   2.80</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> H1_PhenoGra… cluster1          0.144  2.98   0.128   4.52 -<span style="color: #BB0000;">0.090</span><span style="color: #BB0000; text-decoration: underline;">7</span>  0.452  2.79</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> H1_PhenoGra… cluster1          0.742  3.41   0.336   5.71 -<span style="color: #BB0000;">0.043</span><span style="color: #BB0000; text-decoration: underline;">1</span>  1.25   2.15</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 17 more variables: cd7 &lt;dbl&gt;, cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;, pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;, `pzap70-syk` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   prb &lt;dbl&gt;, `perk1-2` &lt;dbl&gt;, .phenograph_cluster &lt;chr&gt;</span></span></code></pre></div>
+    method <span class="op">=</span> <span class="st">"kmeans"</span>
+  <span class="op">)</span>
+
+<span class="co"># use the flowsom algorithm </span>
+<span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
+    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,
+    method <span class="op">=</span> <span class="st">"flowsom"</span>
+  <span class="op">)</span></code></pre></div>
 <p>To change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a one-column <code>tibble</code> that only includes the cluster labels (as opposed to the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>augment</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># will result in a tibble with only 1 column (the cluster labels)</span>
@@ -181,21 +175,16 @@
     method <span class="op">=</span> <span class="st">"kmeans"</span>, 
     augment <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> 
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1</span></span>
 <span class="co">#&gt;   .kmeans_cluster</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 3              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 19             </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 9              </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 19</span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="metaclustering-with-tof_metacluster">Metaclustering with <code>tof_metacluster()</code><a class="anchor" aria-label="anchor" href="#metaclustering-with-tof_metacluster"></a>
-</h2>
-<p>[Under Construction…]</p>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 4              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 18             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 4              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 14             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 4              </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 15</span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
