@@ -177,21 +177,24 @@
   <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
     cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span>
-    method <span class="op">=</span> <span class="st">"flowsom"</span>, <span class="co"># method specification, </span>
-    num_metaclusters <span class="op">=</span> <span class="fl">4L</span> <span class="co"># method specification</span>
+    method <span class="op">=</span> <span class="st">"phenograph"</span>, <span class="co"># method specification, </span>
+  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/tof_metacluster.html">tof_metacluster</a></span><span class="op">(</span>
+    cluster_col <span class="op">=</span> <span class="va">.phenograph_cluster</span>, <span class="co"># column specification</span>
+    num_metaclusters <span class="op">=</span> <span class="fl">4</span>, <span class="co"># method specification</span>
+    method <span class="op">=</span> <span class="st">"kmeans"</span> <span class="co"># method specification</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
-    group_cols <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, <span class="co"># column specification</span>
-    method <span class="op">=</span> <span class="st">"constant"</span>, <span class="co"># method specification</span>
-    num_cells <span class="op">=</span> <span class="fl">200</span> <span class="co"># method specification</span>
+    group_cols <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span>
+    num_cells <span class="op">=</span> <span class="fl">200</span>, <span class="co"># method specification</span>
+    method <span class="op">=</span> <span class="st">"constant"</span> <span class="co"># method specification</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="../reference/tof_plot_cells_layout.html">tof_plot_cells_layout</a></span><span class="op">(</span>
     knn_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span>
-    color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, <span class="co"># column specification</span>
+    color_col <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span>
     num_neighbors <span class="op">=</span> <span class="fl">7L</span>, <span class="co"># method specification</span>
     node_size <span class="op">=</span> <span class="fl">2L</span> <span class="co"># method specification</span>
-  <span class="op">)</span>
-<span class="co">#&gt; Loading required namespace: FlowSOM</span></code></pre></div>
+  <span class="op">)</span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -212,23 +215,25 @@
   <span class="co"># step 2</span>
   <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span>
     cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, 
-    method <span class="op">=</span> <span class="st">"flowsom"</span>, 
-    num_metaclusters <span class="op">=</span> <span class="fl">4L</span>, 
+    method <span class="op">=</span> <span class="st">"phenograph"</span>, 
+    <span class="co">#num_metaclusters = 4L, </span>
     seed <span class="op">=</span> <span class="fl">2020L</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># step 3</span>
   <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span>
-    group_cols <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, 
+    group_cols <span class="op">=</span> <span class="va">.phenograph_cluster</span>, 
     method <span class="op">=</span> <span class="st">"constant"</span>, 
-    num_cells <span class="op">=</span> <span class="fl">350</span>
+    num_cells <span class="op">=</span> <span class="fl">400</span>
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># step 4</span>
   <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># step 5</span>
   <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>
     embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,
-    color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span> 
-  <span class="op">)</span></code></pre></div>
+    color_col <span class="op">=</span> <span class="va">.phenograph_cluster</span> 
+  <span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span>
+<span class="co">#&gt; Loading required namespace: Rtsne</span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
 <div class="section level2">
