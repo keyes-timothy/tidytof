@@ -327,8 +327,8 @@ test_that("clustering output is identical for all methods", {
   )
 
   expect_equal(
-    tof_cluster_phenograph(clust_data),
-    tof_cluster_tibble(clust_data, method = "phenograph", augment = FALSE, seed = 20)
+    tof_cluster_phenograph(clust_data, seed = 20),
+    tof_cluster_tibble(clust_data, augment = FALSE, seed = 20, method = "phenograph")
   )
 
   expect_equal(
@@ -459,7 +459,7 @@ test_that("clustering output is identical for all methods", {
   # expect_equal(
   #   tof_cluster_phenograph(synth_data, seed = 20),
   #   tof_cluster_phenograph(synth_data, seed = 20)
-  #   #tof_cluster_phenograph(synth_data, method = "phenograph", augment = FALSE, seed = 20)
+  #   #tof_cluster_phenograph(synth_data, augment = FALSE, seed = 20, method = "phenograph")
   # )
 
   expect_equal(
