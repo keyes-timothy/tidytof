@@ -13,6 +13,22 @@ clust_data <-
   slice_sample(n = 100) %>%
   ungroup()
 
+synth_data <-
+  dplyr::tibble(
+    x = c(
+      runif(n = 1000, min = 0, max = 1),
+      runif(n = 1000, min = 1.5, max = 3)
+    ),
+    y = c(
+      runif(n = 1000, min = -4, max = -3),
+      runif(n = 1000, min = -5.5, max = -5)
+    ),
+    z = c(
+      rnorm(n = 1000, mean = 1, sd = 0.5),
+      rnorm(n = 1000, mean = 3, sd = 1)
+    )
+  )
+
 
 # tof_cluster_flowsom ----------------------------------------------------------
 
@@ -441,8 +457,8 @@ test_that("clustering output is identical for all methods", {
   )
 
   expect_equal(
-    tof_cluster_phenograph(clust_data, seed = 20),
-    tof_cluster(clust_data, method = "phenograph", augment = FALSE, seed = 20)
+    tof_cluster_phenograph(synth_data, seed = 20),
+    tof_cluster(synth_data, method = "phenograph", augment = FALSE, seed = 20)
   )
 
   expect_equal(
