@@ -907,23 +907,28 @@ By using the appropriate `{tidytof}` verbs for each step of our analysis, we can
 ```{r}
 input_path <- tidytof_example_data("phenograph")
 
+set.seed(0012)
+
 input_path %>% 
   # step 1
   tof_read_data() %>% 
   # step 2
   tof_preprocess() %>% 
   # step 3
-  tof_cluster(method = "flowsom") %>% 
+  tof_cluster(method = "phenograph") %>%
   # step 4
-  tof_downsample(group_cols = .flowsom_metacluster, method = "constant", num_cells = 50) %>% 
+  tof_downsample(
+    group_cols = .phenograph_cluster, 
+    num_cells = 100,
+    method = "constant" 
+  ) %>% 
   # step 5
-  tof_reduce_dimensions(method = "tsne") %>% 
+  tof_reduce_dimensions(perplexity = 50, method = "tsne") %>% 
   # step 6
   tof_plot_cells_embedding(
-    embedding_cols = contains("tsne"),
-    color_col = .flowsom_metacluster, 
-    embedding_method = "tsne"
-  )
+    embedding_cols = starts_with(".tsne"),
+    color_col = .phenograph_cluster
+  ) 
 ```
 
 As shown above, stringing together `{tidytof}` verbs creates a pipeline that can be read easily from left-to-right and top-to-bottom -- this means that it will be relatively easy for you to return to this code later (to modify it, or to write a methods section for your next high-impact manuscript!) or, perhaps more importantly, for one of your colleagues to return to it later when they want to recreate your analysis. 

@@ -500,12 +500,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
 #>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
-#> 1 H1_PhenoGraph_c… 9                cluster1         -0.0336 2.46   0.608   3.96
-#> 2 H1_PhenoGraph_c… 2                cluster1          0.324  0.856 -0.116   4.52
-#> 3 H1_PhenoGraph_c… 10               cluster1          0.532  2.67   0.909   4.76
-#> 4 H1_PhenoGraph_c… 4                cluster1          0.0163 2.97   0.0725  5.15
-#> 5 H1_PhenoGraph_c… 3                cluster1          0.144  2.98   0.128   4.52
-#> 6 H1_PhenoGraph_c… 11               cluster1          0.742  3.41   0.336   5.71
+#> 1 H1_PhenoGraph_c… 15               cluster1         -0.0336 2.46   0.608   3.96
+#> 2 H1_PhenoGraph_c… 20               cluster1          0.324  0.856 -0.116   4.52
+#> 3 H1_PhenoGraph_c… 15               cluster1          0.532  2.67   0.909   4.76
+#> 4 H1_PhenoGraph_c… 5                cluster1          0.0163 2.97   0.0725  5.15
+#> 5 H1_PhenoGraph_c… 12               cluster1          0.144  2.98   0.128   4.52
+#> 6 H1_PhenoGraph_c… 5                cluster1          0.742  3.41   0.336   5.71
 #> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -526,20 +526,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 24 × 3
+#> # A tibble: 23 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster1           4                      326
-#>  2 cluster3           7                      321
-#>  3 cluster3           5                      309
-#>  4 cluster3           1                      287
-#>  5 cluster2           17                     268
-#>  6 cluster2           15                     210
-#>  7 cluster2           18                     195
-#>  8 cluster1           3                      189
-#>  9 cluster2           19                     183
-#> 10 cluster1           11                     164
-#> # … with 14 more rows
+#>  1 cluster3           17                     328
+#>  2 cluster1           5                      304
+#>  3 cluster2           7                      249
+#>  4 cluster3           19                     237
+#>  5 cluster1           12                     233
+#>  6 cluster2           8                      233
+#>  7 cluster3           18                     219
+#>  8 cluster3           16                     194
+#>  9 cluster1           10                     177
+#> 10 cluster2           1                      135
+#> # … with 13 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -562,11 +562,11 @@ phenograph_data %>%
 #>   .flowsom_metacluster
 #>   <chr>               
 #> 1 7                   
-#> 2 7                   
-#> 3 3                   
-#> 4 5                   
+#> 2 10                  
+#> 3 7                   
+#> 4 4                   
 #> 5 7                   
-#> 6 5
+#> 6 3
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -595,12 +595,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    8.45    1.50
-#> 2   12.4    -2.21
-#> 3   21.0   -23.2 
-#> 4   24.2    -1.62
-#> 5   10.2    -1.04
-#> 6   17.2   -13.6
+#> 1    8.93   0.677
+#> 2   14.3   -2.80 
+#> 3   39.1   -1.62 
+#> 4   24.1   -2.81 
+#> 5   11.6   -2.18 
+#> 6   23.7   -8.92
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1311,11 +1311,11 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
-#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 1 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
+#> 2 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 3 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 4 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 5 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
 #> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
@@ -1331,12 +1331,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 2 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
-#> 3 UPN12          0.0565    0.185    0.0115     0.142       2.49     0.254
-#> 4 UPN15          0.0516    1.37     0.00610    0.915       2.55     0.236
-#> 5 UPN16          0.156     0.193    0.00407    0.951       2.87     0.254
-#> 6 UPN22          3.29      1.63     0.128      0.525       3.38     0.688
+#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 3 UPN17          1.40      1.52     0.0128     0.284       3.46     0.656
+#> 4 UPN25          0.0181    0.0266   0.00152    0.108       2.73     0.386
+#> 5 UPN26          0.390     0.650    0.00157    0.622       2.81     0.684
+#> 6 UPN28          0.0208    0.0675   0.00544    0.106       2.18     0.533
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1379,7 +1379,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1620,23 +1620,28 @@ corresponds to exactly one step of our pipeline:
 ``` r
 input_path <- tidytof_example_data("phenograph")
 
+set.seed(0012)
+
 input_path %>% 
   # step 1
   tof_read_data() %>% 
   # step 2
   tof_preprocess() %>% 
   # step 3
-  tof_cluster(method = "flowsom") %>% 
+  tof_cluster(method = "phenograph") %>%
   # step 4
-  tof_downsample(group_cols = .flowsom_metacluster, method = "constant", num_cells = 50) %>% 
+  tof_downsample(
+    group_cols = .phenograph_cluster, 
+    num_cells = 100,
+    method = "constant" 
+  ) %>% 
   # step 5
-  tof_reduce_dimensions(method = "tsne") %>% 
+  tof_reduce_dimensions(perplexity = 50, method = "tsne") %>% 
   # step 6
   tof_plot_cells_embedding(
-    embedding_cols = contains("tsne"),
-    color_col = .flowsom_metacluster, 
-    embedding_method = "tsne"
-  )
+    embedding_cols = starts_with(".tsne"),
+    color_col = .phenograph_cluster
+  ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-57-1.png" width="100%" />
