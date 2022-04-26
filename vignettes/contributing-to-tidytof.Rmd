@@ -1,9 +1,11 @@
 ---
 title: "How to contribute code"
 output: rmarkdown::html_vignette
+description: > 
+  Read this vignette to learn how to contribute code of your own to {tidytof}.
 vignette: >
-  %\VignetteIndexEntry{contributing_to_tidytof}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{How to contribute code}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
