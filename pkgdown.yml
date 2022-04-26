@@ -3,6 +3,7 @@ pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
   clustering: clustering.html
+  contributing-to-tidytof: contributing-to-tidytof.html
   differential-discovery-analysis: differential-discovery-analysis.html
   dimensionality-reduction: dimensionality-reduction.html
   downsampling: downsampling.html
@@ -11,7 +12,7 @@ articles:
   preprocessing: preprocessing.html
   reading-and-writing-data: reading-and-writing-data.html
   tidytof: tidytof.html
-last_built: 2022-04-26T04:33Z
+last_built: 2022-04-26T05:30Z
 urls:
   reference: https://keyes-timothy.github.io/tidytof/reference
   article: https://keyes-timothy.github.io/tidytof/articles
