@@ -88,15 +88,13 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span></code></pre></div>
 <p>Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.</p>
 <p>To address both of these challenges for <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/" class="external-link">mass cytometry (CyTOF)</a>, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements a concise, integrated “grammar” of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> provides an easy-to-use pipeline for analyzing CyTOF data by automating many common data-processing tasks under a common <a href="https://r4ds.had.co.nz/tidy-data.html" class="external-link">“tidy data”</a> interface. This vignette introduces you to the tidytof’s high-level API and shows quick examples of how they can be applied to CyTOF datasets.</p>
 <div class="section level2">
 <h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h2>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> makes heavy use of two concepts that may be unfamiliar to R beginners. The first is the <a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a> pipe (<code>%&gt;%</code>), which you can read about <a href="https://r4ds.had.co.nz/pipes.html" class="external-link">here</a>. The second is “grouping” data in a <code>data.frame</code> or <code>tibble</code> using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by</a></code>, which you can read about <a href="https://dplyr.tidyverse.org/articles/grouping.html" class="external-link">here</a>. Most <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> users will also benefit from a relatively in-depth understanding of the dplyr package, which has a wonderful introductory vignette here:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"dplyr"</span><span class="op">)</span></code></pre></div>
 <p>Everything else should be self-explanatory for both beginner and advanced R users, though if you have <em>zero</em> background in running R code, you should read <a href="https://r4ds.had.co.nz/workflow-basics.html" class="external-link">this chapter</a> of <a href="https://r4ds.had.co.nz/index.html" class="external-link">R for Data Science</a> by Hadley Wickham.</p>
 </div>
@@ -172,7 +170,7 @@
 <li>Finally, the third group of arguments for each <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb are called <em>method specifications</em>, and they’re comprised of every argument that isn’t an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the <code><a href="../reference/tof_cluster_phenograph.html">tof_cluster_phenograph()</a></code> function requires the method specification <code>num_neighbors</code>, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm’s k-nearest-neighbor graph. In most cases, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> sets reasonable defaults for each verb’s particular method specifications, but your workflows are can also be customized by experimenting with non-default values.</li>
 </ol>
 <p>The following code demonstrates how <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb syntax looks in practice, with column and method specifications explicitly pointed out:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">777L</span><span class="op">)</span>
 
 <span class="va">ddpr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -207,7 +205,7 @@
 <li><p>Perform dimensionality reduction on the downsampled dataset using tSNE</p></li>
 <li><p>Visualize the clusters using a low-dimensional tSNE embedding</p></li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ddpr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="co"># step 1</span>
   <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 

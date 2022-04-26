@@ -400,12 +400,12 @@
 <span class="co">#&gt; # A tibble: 6 × 26</span>
 <span class="co">#&gt;   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45</span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 H1_PhenoGraph_c… 13               cluster1         -0.0336 2.46   0.608   3.96</span>
-<span class="co">#&gt; 2 H1_PhenoGraph_c… 11               cluster1          0.324  0.856 -0.116   4.52</span>
-<span class="co">#&gt; 3 H1_PhenoGraph_c… 13               cluster1          0.532  2.67   0.909   4.76</span>
-<span class="co">#&gt; 4 H1_PhenoGraph_c… 18               cluster1          0.0163 2.97   0.0725  5.15</span>
-<span class="co">#&gt; 5 H1_PhenoGraph_c… 14               cluster1          0.144  2.98   0.128   4.52</span>
-<span class="co">#&gt; 6 H1_PhenoGraph_c… 18               cluster1          0.742  3.41   0.336   5.71</span>
+<span class="co">#&gt; 1 H1_PhenoGraph_c… 9                cluster1         -0.0336 2.46   0.608   3.96</span>
+<span class="co">#&gt; 2 H1_PhenoGraph_c… 2                cluster1          0.324  0.856 -0.116   4.52</span>
+<span class="co">#&gt; 3 H1_PhenoGraph_c… 10               cluster1          0.532  2.67   0.909   4.76</span>
+<span class="co">#&gt; 4 H1_PhenoGraph_c… 4                cluster1          0.0163 2.97   0.0725  5.15</span>
+<span class="co">#&gt; 5 H1_PhenoGraph_c… 3                cluster1          0.144  2.98   0.128   4.52</span>
+<span class="co">#&gt; 6 H1_PhenoGraph_c… 11               cluster1          0.742  3.41   0.336   5.71</span>
 <span class="co">#&gt; # … with 19 more variables: cd123 &lt;dbl&gt;, cd33 &lt;dbl&gt;, cd47 &lt;dbl&gt;, cd7 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cd44 &lt;dbl&gt;, cd38 &lt;dbl&gt;, cd3 &lt;dbl&gt;, cd117 &lt;dbl&gt;, cd64 &lt;dbl&gt;, cd41 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   pstat3 &lt;dbl&gt;, pstat5 &lt;dbl&gt;, pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;,</span>
@@ -415,20 +415,20 @@
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">phenograph_clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">count</span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">.flowsom_metacluster</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 23 × 3</span>
+<span class="co">#&gt; # A tibble: 24 × 3</span>
 <span class="co">#&gt;    phenograph_cluster .flowsom_metacluster     n</span>
 <span class="co">#&gt;    &lt;chr&gt;              &lt;chr&gt;                &lt;int&gt;</span>
-<span class="co">#&gt;  1 cluster2           12                     402</span>
-<span class="co">#&gt;  2 cluster2           5                      331</span>
-<span class="co">#&gt;  3 cluster3           3                      312</span>
-<span class="co">#&gt;  4 cluster3           8                      227</span>
-<span class="co">#&gt;  5 cluster1           14                     212</span>
-<span class="co">#&gt;  6 cluster3           7                      197</span>
-<span class="co">#&gt;  7 cluster2           1                      193</span>
-<span class="co">#&gt;  8 cluster1           18                     155</span>
-<span class="co">#&gt;  9 cluster3           4                      155</span>
-<span class="co">#&gt; 10 cluster1           20                     138</span>
-<span class="co">#&gt; # … with 13 more rows</span></code></pre></div>
+<span class="co">#&gt;  1 cluster1           4                      326</span>
+<span class="co">#&gt;  2 cluster3           7                      321</span>
+<span class="co">#&gt;  3 cluster3           5                      309</span>
+<span class="co">#&gt;  4 cluster3           1                      287</span>
+<span class="co">#&gt;  5 cluster2           17                     268</span>
+<span class="co">#&gt;  6 cluster2           15                     210</span>
+<span class="co">#&gt;  7 cluster2           18                     195</span>
+<span class="co">#&gt;  8 cluster1           3                      189</span>
+<span class="co">#&gt;  9 cluster2           19                     183</span>
+<span class="co">#&gt; 10 cluster1           11                     164</span>
+<span class="co">#&gt; # … with 14 more rows</span></code></pre></div>
 <p>Here, we can see that the FlowSOM algorithm groups most cells from the same PhenoGraph cluster with one another (with a small number of mistakes per PhenoGraph cluster).</p>
 <p>To change which clustering algorithm <code>tof_cluster</code> uses, alter the <code>method</code> flag; to change the columns used to compute the clusters, change the <code>cluster_cols</code> flag. And finally, if you want to return a <code>tibble</code> that only includes the cluster labels (not the cluster labels added as a new column to the input <code>tof_tbl</code>), set <code>augment</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -440,12 +440,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1</span>
 <span class="co">#&gt;   .flowsom_metacluster</span>
 <span class="co">#&gt;   &lt;chr&gt;               </span>
-<span class="co">#&gt; 1 9                   </span>
+<span class="co">#&gt; 1 7                   </span>
 <span class="co">#&gt; 2 7                   </span>
-<span class="co">#&gt; 3 10                  </span>
-<span class="co">#&gt; 4 17                  </span>
-<span class="co">#&gt; 5 6                   </span>
-<span class="co">#&gt; 6 17</span></code></pre></div>
+<span class="co">#&gt; 3 3                   </span>
+<span class="co">#&gt; 4 5                   </span>
+<span class="co">#&gt; 5 7                   </span>
+<span class="co">#&gt; 6 5</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="dimensionality-reduction-with-tof_reduce_dimensions">Dimensionality reduction with <code>tof_reduce_dimensions()</code>
@@ -466,12 +466,12 @@
 <span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   .tsne_1 .tsne_2</span>
 <span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1    7.58  -5.78 </span>
-<span class="co">#&gt; 2    5.28  -0.537</span>
-<span class="co">#&gt; 3  -10.8   19.7  </span>
-<span class="co">#&gt; 4   -6.34  -3.97 </span>
-<span class="co">#&gt; 5    4.43  -7.94 </span>
-<span class="co">#&gt; 6   -6.83  -0.626</span></code></pre></div>
+<span class="co">#&gt; 1    8.45    1.50</span>
+<span class="co">#&gt; 2   12.4    -2.21</span>
+<span class="co">#&gt; 3   21.0   -23.2 </span>
+<span class="co">#&gt; 4   24.2    -1.62</span>
+<span class="co">#&gt; 5   10.2    -1.04</span>
+<span class="co">#&gt; 6   17.2   -13.6</span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add reduced-dimension feature embeddings to the input <code>tof_tbl</code> and return the augmented <code>tof_tbl</code> (that is, a <code>tof_tbl</code> with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set <code>augment</code> to <code>FALSE</code> (as in <code>tof_cluster</code>).</p>
 <p>Regardless of the method used, reduced-dimension feature embeddings can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics package):</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -483,7 +483,8 @@
   <span class="fu">labs</span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-25-1.png" width="100%"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># plot the tsne embeddings using color to represent CD11b expression</span>
+<code class="sourceCode R">
+<span class="co"># plot the tsne embeddings using color to represent CD11b expression</span>
 <span class="va">phenograph_tsne</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.tsne_1</span>, y <span class="op">=</span> <span class="va">.tsne_2</span>, fill <span class="op">=</span> <span class="va">cd11b</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">+</span> 
@@ -664,47 +665,14 @@
 <span class="co">#&gt; 4 7             pBtk_… 1.18e-7 2.12e-6 *           -21.5     7    -0.518   0.286</span>
 <span class="co">#&gt; 5 8             pBtk_… 1.30e-7 2.12e-6 *           -21.2     7    -0.516   0.324</span>
 <span class="co">#&gt; 6 4             pBtk_… 7.85e-7 1.05e-5 *           -16.3     7    -0.462   0.296</span></code></pre></div>
-<p>While the output of <code>tof_dea</code> also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from <code>tof_daa</code>. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.</p>
+<p>While the output of <code><a href="reference/tof_dea.html">tof_dea()</a></code> also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from <code><a href="reference/tof_daa.html">tof_daa()</a></code>. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.</p>
 <p>This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">volcano_data</span> <span class="op">&lt;-</span> 
+<code class="sourceCode R"><span class="va">volcano_plot</span> <span class="op">&lt;-</span> 
   <span class="va">dea_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">mutate</span><span class="op">(</span>
-    log2_fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean_fc</span>, base <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, 
-    log_p <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">p_adj</span><span class="op">)</span>, 
-    significance <span class="op">=</span> 
-      <span class="fu">case_when</span><span class="op">(</span>
-        <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"increased"</span>, 
-        <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"decreased"</span>,
-        <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span>
-      <span class="op">)</span>, 
-    marker <span class="op">=</span> 
-      <span class="fu">str_extract</span><span class="op">(</span><span class="va">marker</span>, <span class="st">".+_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-      <span class="fu">str_remove</span><span class="op">(</span><span class="st">"_"</span><span class="op">)</span>, 
-    pair <span class="op">=</span> <span class="fu">str_c</span><span class="op">(</span><span class="va">marker</span>, <span class="fu">str_c</span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">population_id</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"@"</span><span class="op">)</span>
-  <span class="op">)</span>
-
-<span class="va">volcano_plot</span> <span class="op">&lt;-</span> 
-  <span class="va">volcano_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">log2_fc</span>, y <span class="op">=</span> <span class="va">log_p</span>, fill <span class="op">=</span> <span class="va">significance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"gray50"</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">geom_point</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">ggrepel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggrepel/man/geom_text_repel.html" class="external-link">geom_text_repel</a></span><span class="op">(</span>
-    <span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">pair</span><span class="op">)</span>, 
-    data <span class="op">=</span> <span class="fu">slice_head</span><span class="op">(</span><span class="va">volcano_data</span>, n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, 
-    size <span class="op">=</span> <span class="fl">2</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">scale_fill_manual</span><span class="op">(</span>
-    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"decreased"</span> <span class="op">=</span> <span class="st">"#cd5241"</span>, <span class="st">"increased"</span> <span class="op">=</span> <span class="st">"#207394"</span><span class="op">)</span>, 
-    na.value <span class="op">=</span> <span class="st">"#cdcdcd"</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">labs</span><span class="op">(</span>
-    x <span class="op">=</span> <span class="st">"log2(Fold-change)"</span>, 
-    y <span class="op">=</span> <span class="st">"-log10(p-value)"</span>, 
-    fill <span class="op">=</span> <span class="cn">NULL</span>, 
-    caption <span class="op">=</span> <span class="st">"Labels indicate the 10 most significant marker-cluster pairs"</span>
-  <span class="op">)</span>
+  <span class="fu"><a href="reference/tof_plot_cluster_volcano.html">tof_plot_cluster_volcano</a></span><span class="op">(</span>
+    use_ggrepel <span class="op">=</span> <span class="cn">TRUE</span>
+  <span class="op">)</span> 
 
 <span class="va">volcano_plot</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-33-1.png" width="100%"></p>
@@ -745,7 +713,7 @@
 <span class="co">#&gt; 6 patient3 BCR-XL               0.0200          0.0412           0.323</span>
 <span class="co">#&gt; # … with 5 more variables: `prop@cluster4` &lt;dbl&gt;, `prop@cluster5` &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   `prop@cluster6` &lt;dbl&gt;, `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;</span></code></pre></div>
-<p>Like all members of the <code>tof_extract_*</code> function family, <code>tof_extract_proportion</code> returns one row for each sample (defined as a unique combination of values of the <code>group_cols</code>) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in <code>citrus_data</code>). These values can also be returned in “long” format by changing the <code>format</code> argument:</p>
+<p>Like all members of the <code>tof_extract_*</code> function family, <code><a href="reference/tof_extract_proportion.html">tof_extract_proportion()</a></code> returns one row for each sample (defined as a unique combination of values of the <code>group_cols</code>) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in <code>citrus_data</code>). These values can also be returned in “long” format by changing the <code>format</code> argument:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span>
@@ -1005,12 +973,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1-Rx        0.0395    0.618     0.0634    0.572       2.93     0.944</span>
-<span class="co">#&gt; 2 UPN2           0.139     0.0662    0.0221    0.0825      2.25     0.454</span>
-<span class="co">#&gt; 3 UPN3           0.633     0.0234    0.0165    0.0327      2.25     0.226</span>
-<span class="co">#&gt; 4 UPN7           0.474     0.966     0.124     1.24        2.59     0.243</span>
-<span class="co">#&gt; 5 UPN8           0.951     0.958     0.161     0.556       3.18     0.556</span>
-<span class="co">#&gt; 6 UPN9          15.6       0.446     0.0445    0.163       2.86     0.434</span>
+<span class="co">#&gt; 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416</span>
+<span class="co">#&gt; 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944</span>
+<span class="co">#&gt; 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454</span>
+<span class="co">#&gt; 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342</span>
+<span class="co">#&gt; 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243</span>
+<span class="co">#&gt; 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1025,12 +993,12 @@
 <span class="co">#&gt; # A tibble: 6 × 1,854</span>
 <span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 UPN1          3.06        0.583  0.00449      0.164      1.94     0.416</span>
-<span class="co">#&gt; 2 UPN6          5.62        0.550  0.00374      0.622      2.86     0.342</span>
-<span class="co">#&gt; 3 UPN10         0.00374     0.761  0.000696     0.829      3.19     0.886</span>
-<span class="co">#&gt; 4 UPN18         0.405       0.258  0.0287       0.851      2.48     0.253</span>
-<span class="co">#&gt; 5 UPN22-Rx      0.0643      1.68   0.0804       1.56       3.06     0.529</span>
-<span class="co">#&gt; 6 UPN27         0.563       1.07   0.00276      0.712      2.40     0.411</span>
+<span class="co">#&gt; 1 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226</span>
+<span class="co">#&gt; 2 UPN8           0.951     0.958    0.161      0.556       3.18     0.556</span>
+<span class="co">#&gt; 3 UPN12          0.0565    0.185    0.0115     0.142       2.49     0.254</span>
+<span class="co">#&gt; 4 UPN15          0.0516    1.37     0.00610    0.915       2.55     0.236</span>
+<span class="co">#&gt; 5 UPN16          0.156     0.193    0.00407    0.951       2.87     0.254</span>
+<span class="co">#&gt; 6 UPN22          3.29      1.63     0.128      0.525       3.38     0.688</span>
 <span class="co">#&gt; # … with 1,847 more variables: CD127_Pop1 &lt;dbl&gt;, CD179a_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD179b_Pop1 &lt;dbl&gt;, IgMi_Pop1 &lt;dbl&gt;, IgMs_Pop1 &lt;dbl&gt;, TdT_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CD22_Pop1 &lt;dbl&gt;, tIkaros_Pop1 &lt;dbl&gt;, CD79b_Pop1 &lt;dbl&gt;, Ki67_Pop1 &lt;dbl&gt;,</span>
@@ -1038,7 +1006,7 @@
 <span class="co">#&gt; #   CD10_Pop1 &lt;dbl&gt;, Pax5_Pop1 &lt;dbl&gt;, CD43_Pop1 &lt;dbl&gt;, CD58_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   HLADR_Pop1 &lt;dbl&gt;, p4EBP1_FC_Basal_Pop1 &lt;dbl&gt;, pSTAT5_FC_Basal_Pop1 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   pPLCg1_2_FC_Basal_Pop1 &lt;dbl&gt;, pAkt_FC_Basal_Pop1 &lt;dbl&gt;, …</span></code></pre></div>
-<p>From here, we can feed <code>training_split</code> into the <code>tof_train_model</code> function to <a href="https://www.tmwr.org/tuning.html" class="external-link">tune</a> a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the <code>tof_create_grid</code> documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model).</p>
+<p>From here, we can feed <code>training_split</code> into the <code>tof_train_model</code> function to <a href="https://www.tmwr.org/tuning.html" class="external-link">tune</a> a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the <code>tof_create_grid</code> documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model). Also note that for demonstration purposes, we include only the features that come from one cell population (“Population 2”) in the original dataset, which means that we probably shouldn’t expect our model to perform as well as the one in the original paper (which select from many more features).</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">class_mod</span> <span class="op">&lt;-</span> 
   <span class="va">training_split</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -1053,7 +1021,7 @@
 <p>The output of <code>tof_train_model</code> is a <code>tof_model</code>, an object containing information about the trained model (and that can be passed to the <code>tof_predict</code> and <code>tof_assess_model</code> verbs). When a <code>tof_model</code> is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">class_mod</span><span class="op">)</span>
-<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 </span>
+<span class="co">#&gt; A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 </span>
 <span class="co">#&gt; # A tibble: 25 × 2</span>
 <span class="co">#&gt;    feature             coefficient</span>
 <span class="co">#&gt;    &lt;chr&gt;                     &lt;dbl&gt;</span>
@@ -1074,38 +1042,37 @@
   <span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_predict.html">tof_predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span>, prediction_type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span>
 
-<span class="va">ddpr_validation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">class_predictions</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">relapse_status</span>, <span class="va">.pred</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 × 3</span>
-<span class="co">#&gt;   relapse_status .pred     n</span>
-<span class="co">#&gt;   &lt;fct&gt;          &lt;chr&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1 No             No        5</span>
-<span class="co">#&gt; 2 No             Yes       1</span>
-<span class="co">#&gt; 3 Yes            No        4</span>
-<span class="co">#&gt; 4 Yes            Yes       2</span>
-
-<span class="va">accuracy</span> <span class="op">&lt;-</span> 
-  <span class="va">ddpr_validation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">class_predictions</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">mutate</span><span class="op">(</span>.pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.pred</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">relapse_status</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">pull</span><span class="op">(</span><span class="va">.estimate</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
-<p>So we can see that our accuracy is about 0.583.</p>
+<span class="va">class_predictions</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>
+    truth <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">$</span><span class="va">relapse_status</span>
+  <span class="op">)</span>
+<span class="co">#&gt; # A tibble: 12 × 2</span>
+<span class="co">#&gt;    .pred truth</span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;fct&gt;</span>
+<span class="co">#&gt;  1 Yes   No   </span>
+<span class="co">#&gt;  2 No    No   </span>
+<span class="co">#&gt;  3 No    Yes  </span>
+<span class="co">#&gt;  4 No    No   </span>
+<span class="co">#&gt;  5 No    No   </span>
+<span class="co">#&gt;  6 Yes   Yes  </span>
+<span class="co">#&gt;  7 Yes   Yes  </span>
+<span class="co">#&gt;  8 No    No   </span>
+<span class="co">#&gt;  9 No    No   </span>
+<span class="co">#&gt; 10 No    Yes  </span>
+<span class="co">#&gt; 11 No    Yes  </span>
+<span class="co">#&gt; 12 No    Yes</span></code></pre></div>
+<p>And we can see that our model gets some (but not all!) predictions correct in the validation set we set aside.</p>
 <p>We can also assess the model directly using <code>tof_assess_model</code></p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># calling the function with no new_data gives us the assessment on </span>
-<span class="co"># the training data</span>
+<code class="sourceCode R"><span class="co"># calling the function with no new_data evaluates the</span>
+<span class="co"># the nodel using its training data</span>
 <span class="va">training_assessment</span> <span class="op">&lt;-</span> 
   <span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">training_assessment</span>
 <span class="co">#&gt; $model_metrics</span>
-<span class="co">#&gt; # A tibble: 5 × 2</span>
+<span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   metric                    value</span>
 <span class="co">#&gt;   &lt;chr&gt;                     &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 binomial_deviance       0.0291 </span>
@@ -1113,22 +1080,23 @@
 <span class="co">#&gt; 3 roc_auc                 1      </span>
 <span class="co">#&gt; 4 mse                     0.00119</span>
 <span class="co">#&gt; 5 mae                     0.0285 </span>
+<span class="co">#&gt; 6 accuracy                1      </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $roc_curve</span>
-<span class="co">#&gt; # A tibble: 49 × 2</span>
-<span class="co">#&gt;      FPR    TPR</span>
-<span class="co">#&gt;    &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt;  1     0 0.0556</span>
-<span class="co">#&gt;  2     0 0.111 </span>
-<span class="co">#&gt;  3     0 0.167 </span>
-<span class="co">#&gt;  4     0 0.222 </span>
-<span class="co">#&gt;  5     0 0.278 </span>
-<span class="co">#&gt;  6     0 0.333 </span>
-<span class="co">#&gt;  7     0 0.389 </span>
-<span class="co">#&gt;  8     0 0.444 </span>
-<span class="co">#&gt;  9     0 0.5   </span>
-<span class="co">#&gt; 10     0 0.556 </span>
-<span class="co">#&gt; # … with 39 more rows</span>
+<span class="co">#&gt; # A tibble: 51 × 5</span>
+<span class="co">#&gt;       .threshold specificity sensitivity   tpr   fpr</span>
+<span class="co">#&gt;            &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 -Inf               0                1     1 1    </span>
+<span class="co">#&gt;  2    0.00000114      0                1     1 1    </span>
+<span class="co">#&gt;  3    0.0000955       0.0323           1     1 0.968</span>
+<span class="co">#&gt;  4    0.000160        0.0645           1     1 0.935</span>
+<span class="co">#&gt;  5    0.000190        0.0968           1     1 0.903</span>
+<span class="co">#&gt;  6    0.000612        0.129            1     1 0.871</span>
+<span class="co">#&gt;  7    0.000896        0.161            1     1 0.839</span>
+<span class="co">#&gt;  8    0.00135         0.194            1     1 0.806</span>
+<span class="co">#&gt;  9    0.00142         0.226            1     1 0.774</span>
+<span class="co">#&gt; 10    0.00194         0.258            1     1 0.742</span>
+<span class="co">#&gt; # … with 41 more rows</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $confusion_matrix</span>
 <span class="co">#&gt; # A tibble: 4 × 3</span>
@@ -1140,27 +1108,11 @@
 <span class="co">#&gt; 4 Yes          Yes                             18</span></code></pre></div>
 <p>And we can make an ROC curve using our metrics:</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">auc</span> <span class="op">&lt;-</span> 
-  <span class="va">training_assessment</span><span class="op">$</span><span class="va">model_metrics</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"roc_auc"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>
-
-<span class="va">training_assessment</span><span class="op">$</span><span class="va">roc_curve</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">FPR</span>, y <span class="op">=</span> <span class="va">TPR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_abline</span><span class="op">(</span>
-    slope <span class="op">=</span> <span class="fl">1</span>, 
-    intercept <span class="op">=</span> <span class="fl">0</span>, 
-    linetype <span class="op">=</span> <span class="st">"dotted"</span>, 
-    color <span class="op">=</span> <span class="st">"gray60"</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">labs</span><span class="op">(</span>
-    subtitle <span class="op">=</span> <span class="st">"Training performance"</span>, 
-    caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="va">auc</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">labs</span><span class="op">(</span>subtitle <span class="op">=</span> <span class="st">"ROC Curve (Training data)"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-53-1.png" width="100%"></p>
-<p>We can then assess the model on the validation data</p>
+<p>We can then assess the model on the validation data…</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">validation_assessment</span> <span class="op">&lt;-</span> 
   <span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -1168,7 +1120,7 @@
 
 <span class="va">validation_assessment</span>
 <span class="co">#&gt; $model_metrics</span>
-<span class="co">#&gt; # A tibble: 5 × 2</span>
+<span class="co">#&gt; # A tibble: 6 × 2</span>
 <span class="co">#&gt;   metric                  value</span>
 <span class="co">#&gt;   &lt;chr&gt;                   &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 binomial_deviance       4.75 </span>
@@ -1176,23 +1128,26 @@
 <span class="co">#&gt; 3 roc_auc                 0.639</span>
 <span class="co">#&gt; 4 mse                     0.759</span>
 <span class="co">#&gt; 5 mae                     0.879</span>
+<span class="co">#&gt; 6 accuracy                0.583</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $roc_curve</span>
-<span class="co">#&gt; # A tibble: 12 × 2</span>
-<span class="co">#&gt;      FPR   TPR</span>
-<span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 0.167 0    </span>
-<span class="co">#&gt;  2 0.167 0.167</span>
-<span class="co">#&gt;  3 0.167 0.333</span>
-<span class="co">#&gt;  4 0.333 0.333</span>
-<span class="co">#&gt;  5 0.333 0.5  </span>
-<span class="co">#&gt;  6 0.333 0.667</span>
-<span class="co">#&gt;  7 0.333 0.833</span>
-<span class="co">#&gt;  8 0.5   0.833</span>
-<span class="co">#&gt;  9 0.667 0.833</span>
-<span class="co">#&gt; 10 0.833 0.833</span>
-<span class="co">#&gt; 11 0.833 1    </span>
-<span class="co">#&gt; 12 1     1    </span>
+<span class="co">#&gt; # A tibble: 14 × 5</span>
+<span class="co">#&gt;     .threshold specificity sensitivity   tpr   fpr</span>
+<span class="co">#&gt;          &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 -Inf              0           1     1     1    </span>
+<span class="co">#&gt;  2    0.000240       0           1     1     1    </span>
+<span class="co">#&gt;  3    0.00105        0.167       1     1     0.833</span>
+<span class="co">#&gt;  4    0.00195        0.167       0.833 0.833 0.833</span>
+<span class="co">#&gt;  5    0.00230        0.333       0.833 0.833 0.667</span>
+<span class="co">#&gt;  6    0.00472        0.5         0.833 0.833 0.5  </span>
+<span class="co">#&gt;  7    0.00618        0.667       0.833 0.833 0.333</span>
+<span class="co">#&gt;  8    0.0464         0.667       0.667 0.667 0.333</span>
+<span class="co">#&gt;  9    0.273          0.667       0.5   0.5   0.333</span>
+<span class="co">#&gt; 10    0.286          0.667       0.333 0.333 0.333</span>
+<span class="co">#&gt; 11    0.844          0.833       0.333 0.333 0.167</span>
+<span class="co">#&gt; 12    0.852          0.833       0.167 0.167 0.167</span>
+<span class="co">#&gt; 13    1.00           0.833       0     0     0.167</span>
+<span class="co">#&gt; 14  Inf              1           0     0     0    </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $confusion_matrix</span>
 <span class="co">#&gt; # A tibble: 4 × 3</span>
@@ -1203,125 +1158,10 @@
 <span class="co">#&gt; 3 Yes          No                               4</span>
 <span class="co">#&gt; 4 Yes          Yes                              2</span></code></pre></div>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">auc</span> <span class="op">&lt;-</span> 
-  <span class="va">validation_assessment</span><span class="op">$</span><span class="va">model_metrics</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"roc_auc"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>
-
-<span class="va">validation_assessment</span><span class="op">$</span><span class="va">roc_curve</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">FPR</span>, y <span class="op">=</span> <span class="va">TPR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_abline</span><span class="op">(</span>
-    slope <span class="op">=</span> <span class="fl">1</span>, 
-    intercept <span class="op">=</span> <span class="fl">0</span>, 
-    linetype <span class="op">=</span> <span class="st">"dotted"</span>, 
-    color <span class="op">=</span> <span class="st">"gray60"</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">labs</span><span class="op">(</span>
-    subtitle <span class="op">=</span> <span class="st">"Validation performance"</span>, 
-    caption <span class="op">=</span> <span class="fu">str_glue</span><span class="op">(</span><span class="st">"AUC = {auc}"</span>, auc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">auc</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">labs</span><span class="op">(</span>subtitle <span class="op">=</span> <span class="st">"ROC Curve (Validation data)"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-55-1.png" width="100%"></p>
-<p>We can also fit a survival model</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survival_mod</span> <span class="op">&lt;-</span> 
-  <span class="va">training_split</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span>
-    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span>, 
-    time_col <span class="op">=</span> <span class="va">time_to_event</span>, 
-    event_col <span class="op">=</span> <span class="va">event</span>, 
-    model_type <span class="op">=</span> <span class="st">"survival"</span>, 
-    hyperparameter_grid <span class="op">=</span> <span class="fu"><a href="reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span>mixture_values <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, 
-    impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>, 
-    remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span>
-  <span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survival_mod</span><span class="op">)</span>
-<span class="co">#&gt; A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span>
-<span class="co">#&gt; # A tibble: 29 × 2</span>
-<span class="co">#&gt;    feature              coefficient</span>
-<span class="co">#&gt;    &lt;chr&gt;                      &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 pErk_dP_TSLP_Pop2          -8.14</span>
-<span class="co">#&gt;  2 TdT_Pop2                    3.77</span>
-<span class="co">#&gt;  3 pPLCg1_2_dP_IL7_Pop2        3.36</span>
-<span class="co">#&gt;  4 CD38_Pop2                   3.30</span>
-<span class="co">#&gt;  5 CD43_Pop2                   3.22</span>
-<span class="co">#&gt;  6 p4EBP1_dP_IL7_Pop2         -2.60</span>
-<span class="co">#&gt;  7 Ki67_Pop2                  -2.57</span>
-<span class="co">#&gt;  8 p4EBP1_FC_IL7_Pop2          2.49</span>
-<span class="co">#&gt;  9 pCreb_dP_TSLP_Pop2         -2.46</span>
-<span class="co">#&gt; 10 pCreb_dP_PVO4_Pop2         -2.05</span>
-<span class="co">#&gt; # … with 19 more rows</span></code></pre></div>
-<p>Making predictions using the survival model</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="reference/tof_predict.html">tof_predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span>, prediction_type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 12 × 1</span>
-<span class="co">#&gt;       .pred</span>
-<span class="co">#&gt;       &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 2.17e+47</span>
-<span class="co">#&gt;  2 9.12e+ 6</span>
-<span class="co">#&gt;  3 1.86e- 3</span>
-<span class="co">#&gt;  4 1.95e- 6</span>
-<span class="co">#&gt;  5 6.29e+ 0</span>
-<span class="co">#&gt;  6 5.30e- 1</span>
-<span class="co">#&gt;  7 1.81e+ 3</span>
-<span class="co">#&gt;  8 3.36e- 3</span>
-<span class="co">#&gt;  9 6.14e- 2</span>
-<span class="co">#&gt; 10 5.34e- 1</span>
-<span class="co">#&gt; 11 1.91e- 4</span>
-<span class="co">#&gt; 12 1.94e+ 2</span></code></pre></div>
-<p>Assessing the survival model</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survival_assessment</span> <span class="op">&lt;-</span> 
-  <span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">)</span>
-
-<span class="va">survival_assessment</span>
-<span class="co">#&gt; $model_metrics</span>
-<span class="co">#&gt; # A tibble: 2 × 2</span>
-<span class="co">#&gt;   metric                        value</span>
-<span class="co">#&gt;   &lt;chr&gt;                         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 neg_log_partial_likelihood 1309.   </span>
-<span class="co">#&gt; 2 concordance_index             0.548</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $survival_curves</span>
-<span class="co">#&gt; # A tibble: 12 × 2</span>
-<span class="co">#&gt;    row_index survival_curve   </span>
-<span class="co">#&gt;    &lt;chr&gt;     &lt;list&gt;           </span>
-<span class="co">#&gt;  1 1         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  2 2         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  3 3         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  4 4         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  5 5         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  6 6         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  7 7         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  8 8         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt;  9 9         &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt; 10 10        &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt; 11 11        &lt;tibble [44 × 2]&gt;</span>
-<span class="co">#&gt; 12 12        &lt;tibble [44 × 2]&gt;</span></code></pre></div>
-<p>And we can use some of these values to make a survival curve for each patient</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survival_assessment</span><span class="op">$</span><span class="va">survival_curves</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">survival_curve</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">left_join</span><span class="op">(</span>
-    y <span class="op">=</span> 
-      <span class="fu">tibble</span><span class="op">(</span>
-        ddpr_risk <span class="op">=</span> <span class="va">ddpr_validation</span><span class="op">$</span><span class="va">ddpr_risk</span>, 
-        row_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ddpr_validation</span><span class="op">)</span><span class="op">)</span>
-      <span class="op">)</span>, 
-    by <span class="op">=</span> <span class="st">"row_index"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="co"># something is weird about the first patient</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">row_index</span> <span class="op">!=</span> <span class="st">"1"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">ddpr_risk</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>probability <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">probability</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">probability</span>, color <span class="op">=</span> <span class="va">ddpr_risk</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> </code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-59-1.png" width="100%"></p>
 </div>
 </div>
 </div>
@@ -1343,17 +1183,17 @@
 </h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions are optimized for working with “tidy” data in the form of <code>tibbles</code> or <code>data.frames</code>. This means that most <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions share some basic design principles in terms of how their arguments work. The most important of these principles is illustrated by the following picture:</p>
 <p>[some picture]</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="kw">tof_extract_features</span>(</span>
-<span id="cb59-2"><a href="#cb59-2"></a>  <span class="dt">tof_tibble =</span> ___, </span>
-<span id="cb59-3"><a href="#cb59-3"></a>  <span class="dt">cluster_col =</span> ___, </span>
-<span id="cb59-4"><a href="#cb59-4"></a>  <span class="dt">group_cols =</span> ___,</span>
-<span id="cb59-5"><a href="#cb59-5"></a>  <span class="dt">stimulation_col =</span> ___,</span>
-<span id="cb59-6"><a href="#cb59-6"></a>  <span class="dt">lineage_cols =</span> ___,</span>
-<span id="cb59-7"><a href="#cb59-7"></a>  <span class="dt">signaling_cols =</span> ___,</span>
-<span id="cb59-8"><a href="#cb59-8"></a>  <span class="dt">central_tendency_function =</span> ___,</span>
-<span id="cb59-9"><a href="#cb59-9"></a>  <span class="dt">signaling_method =</span> ___,</span>
-<span id="cb59-10"><a href="#cb59-10"></a>  <span class="dt">basal_level =</span> ___,</span>
-<span id="cb59-11"><a href="#cb59-11"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a><span class="kw">tof_extract_features</span>(</span>
+<span id="cb55-2"><a href="#cb55-2"></a>  <span class="dt">tof_tibble =</span> ___, </span>
+<span id="cb55-3"><a href="#cb55-3"></a>  <span class="dt">cluster_col =</span> ___, </span>
+<span id="cb55-4"><a href="#cb55-4"></a>  <span class="dt">group_cols =</span> ___,</span>
+<span id="cb55-5"><a href="#cb55-5"></a>  <span class="dt">stimulation_col =</span> ___,</span>
+<span id="cb55-6"><a href="#cb55-6"></a>  <span class="dt">lineage_cols =</span> ___,</span>
+<span id="cb55-7"><a href="#cb55-7"></a>  <span class="dt">signaling_cols =</span> ___,</span>
+<span id="cb55-8"><a href="#cb55-8"></a>  <span class="dt">central_tendency_function =</span> ___,</span>
+<span id="cb55-9"><a href="#cb55-9"></a>  <span class="dt">signaling_method =</span> ___,</span>
+<span id="cb55-10"><a href="#cb55-10"></a>  <span class="dt">basal_level =</span> ___,</span>
+<span id="cb55-11"><a href="#cb55-11"></a>)</span></code></pre></div>
 <p>[Under construction]</p>
 </div>
 <div class="section level3">
@@ -1369,7 +1209,7 @@
 <li>Visualize the clusters using the low-dimensional tSNE embedding</li>
 </ol>
 <p>By using the appropriate <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs for each step of our analysis, we can easily write code in which each function call corresponds to exactly one step of our pipeline:</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">input_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span>
 
 <span class="va">input_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -1389,7 +1229,7 @@
     color_col <span class="op">=</span> <span class="va">.flowsom_metacluster</span>, 
     embedding_method <span class="op">=</span> <span class="st">"tsne"</span>
   <span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-61-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-57-1.png" width="100%"></p>
 <p>As shown above, stringing together <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs creates a pipeline that can be read easily from left-to-right and top-to-bottom – this means that it will be relatively easy for you to return to this code later (to modify it, or to write a methods section for your next high-impact manuscript!) or, perhaps more importantly, for one of your colleagues to return to it later when they want to recreate your analysis.</p>
 </div>
 <div class="section level3">
@@ -1397,7 +1237,7 @@
 </h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> is built on top of the <code>tidyverse</code> family of R packages. As a result, most users of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> will benefit substantially from spending a few hours with the <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a>, <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, and <a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a> package vignettes to learn about some of the many useful functions these packages provide.</p>
 <p>To access our recommended list of package vignettes, run the following lines of R code in the console:</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># dplyr</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>topic <span class="op">=</span> <span class="st">"dplyr"</span>, package <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span>topic <span class="op">=</span> <span class="st">"grouping"</span>, package <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span>
