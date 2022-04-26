@@ -150,7 +150,7 @@ ddpr_data %>%
     embedding_cols = contains("tsne"),
     color_col = .phenograph_cluster 
   ) + 
-  theme(legend.position = "none")
+  ggplot2::theme(legend.position = "none")
 ```
 
 
