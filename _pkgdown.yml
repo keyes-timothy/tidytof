@@ -89,6 +89,10 @@ reference:
   - phenograph_data
   - metal_masterlist
 articles:
+- title: "Contributing"
+  navbar: "Extending {tidytof}"
+  contents:
+  - contributing-to-tidytof
 - title: "Single-cell"
   navbar: "Cell-level operations"
   contents:

@@ -1,0 +1,73 @@
+---
+title: "How to contribute code"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{contributing_to_tidytof}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+In addition to implementing its own built-in functions, `{tidytof}` proposes a general framework for analyzing single-cell data using a tidy interface. Users may wish to extend `{tidytof}`'s existing functionality by writing functions that implements additional tidy interfaces to new algorithms or data analysis methods not currently included in `{tidytof}`. 
+
+If you're interested in contributing new functions to `{tidytof}`, this vignette provides some details about how to do so. 
+
+# General Guidelines 
+
+To extend `{tidytof}` to include a new algorithm - for example, one that you've just developed - you can take 1 of 2 general strategies (and in some cases, you may take both!). The first is to write a `{tidytof}`-style verb for your algorithm that can be included in your own standalone package. In this case, the benefit of writing a `{tidytof}`-style verb for your algorithm is that taking advantage of `{tidytof}`'s design schema will make your algorithm easy for users to access without learning much (if any) new syntax while still allowing you to maintain your code base independently of our team. 
+
+The second approach is to write a `{tidytof}`-style function that you'd like our team to add to `{tidytof}` itself in its next release. In this case, the code review process will take a bit of time, but it will also allow our teams to collaborate and provide a greater degree of critical feedback to one another as well as to share the burden of code maintenance in the future.
+
+In either case, you're welcome to contact the `{tidytof}` team to review your code via a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) and/or an [issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues) on the `{tidytof}` GitHub page. [This tutorial](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) may be helpful if you don't have a lot of experience collaborating with other programmers via GitHub. 
+
+After you open your request, you can submit code to our team to be reviewed. Whether you want your method to be incorporated into `{tidytof}` or if you're simply looking for external code review/feedback from our team, please mention this in your request.
+
+# Code style
+
+`{tidytof}` uses the [tidyverse style guide](https://style.tidyverse.org/index.html). Adhering to tidyverse style is something our team will expect for any code being incorporated into `{tidytof}`, and it's also something we encourage for any functions you write for your own analysis packages. In our experience, the best code is written not just to be executed, but also to be read by other humans! There are also many tools you can use to lint or automatically style your R code, such as the [`{lintr}`](https://github.com/r-lib/lintr) and [`{styler}`](https://www.tidyverse.org/blog/2017/12/styler-1.0.0/) packages. 
+
+# Testing 
+
+In addition to written well-styled code, we encourage you to write unit tests for every function you write. This is common practice in the software engineering world, but not as common as it probably should be(!) in the bioinformatics community. The `{tidytof}` team uses the [`{testthat}`](https://testthat.r-lib.org/) package for all of its unit tests, and there's a great tutorial for doing so [here](https://r-pkgs.org/tests.html). 
+
+# How to contribute
+
+## Contributing a new method to an existing `{tidytof}` verb
+
+TO DO 
+
+For example, if I wanted to write a `{tidytof}`-style interface for my new clustering algorithm "supercluster", I might write something like this: 
+
+```{r, eval = FALSE}
+tof_cluster_supercluster <- 
+  function(tof_tibble, cluster_cols, ...) { 
+    cluster_data <- dplyr::select(tof_tibble, {{cluster_cols}})
+    
+    result <- 
+      cluster_data %>% 
+      do_something(...) %>% 
+      do_something_else(...)
+  }
+```
+
+
+## Creating a new `{tidytof}` verb
+
+It's possible that your algorithm doesn't...
+
+## A note about modeling functions
+
+At this point in its development, we don't recommend extending `{tidytof}`'s modeling functionality, as it is likely to be abstracted into its own standalone package (with an emphasis on interoperability with the `tidymodels` ecosystem) at some point in the future. 
+
+# Contact us 
+
+For general questions/comments/concerns about `{tidytof}`, feel free to reach out to our team on GitHub [here](https://github.com/kara-davis-lab). 
+
+
