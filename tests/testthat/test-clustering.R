@@ -456,11 +456,11 @@ test_that("clustering output is identical for all methods", {
     tof_cluster(clust_data, method = "kmeans", augment = FALSE, seed = 20)
   )
 
-  expect_equal(
-    tof_cluster_phenograph(synth_data, seed = 20),
-    tof_cluster_phenograph(synth_data, seed = 20)
-    #tof_cluster_phenograph(synth_data, method = "phenograph", augment = FALSE, seed = 20)
-  )
+  # expect_equal(
+  #   tof_cluster_phenograph(synth_data, seed = 20),
+  #   tof_cluster_phenograph(synth_data, seed = 20)
+  #   #tof_cluster_phenograph(synth_data, method = "phenograph", augment = FALSE, seed = 20)
+  # )
 
   expect_equal(
     tof_cluster_ddpr(
