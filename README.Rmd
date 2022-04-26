@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  dpi = 150,
+  dpi = 100,
   warning = FALSE,
   message = FALSE
 )
@@ -782,7 +782,7 @@ my_resample %>%
   head()
 ```
 
-From here, we can feed  `training_split` into the `tof_train_model` function to [tune](https://www.tmwr.org/tuning.html) a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the `tof_create_grid` documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model).
+From here, we can feed  `training_split` into the `tof_train_model` function to [tune](https://www.tmwr.org/tuning.html) a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the `tof_create_grid` documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model). Also note that for demonstration purposes, we include only the features that come from one cell population ("Population 2") in the original dataset, which means that we probably shouldn't expect our model to perform as well as the one in the original paper (which select from many more features). 
 
 ```{r, warning = FALSE}
 class_mod <- 
@@ -811,28 +811,19 @@ class_predictions <-
   class_mod %>% 
   tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-ddpr_validation %>% 
-  dplyr::select(relapse_status) %>% 
-  bind_cols(class_predictions) %>% 
-  dplyr::count(relapse_status, .pred)
+class_predictions %>% 
+  dplyr::mutate(
+    truth = ddpr_validation$relapse_status
+  )
 
-accuracy <- 
-  ddpr_validation %>% 
-  dplyr::select(relapse_status) %>% 
-  bind_cols(class_predictions) %>% 
-  mutate(.pred = factor(.pred, levels = levels(relapse_status))) %>% 
-  yardstick::accuracy(truth = relapse_status, estimate = .pred) %>% 
-  pull(.estimate) %>% 
-  round(3)
 ```
-
-So we can see that our accuracy is about `r accuracy`.
+And we can see that our model gets some (but not all!) predictions correct in the validation set we set aside. 
 
 We can also assess the model directly using `tof_assess_model`
 
 ```{r}
-# calling the function with no new_data gives us the assessment on 
-# the training data
+# calling the function with no new_data evaluates the
+# the nodel using its training data
 training_assessment <- 
   class_mod %>% 
   tof_assess_model()
@@ -843,29 +834,12 @@ training_assessment
 And we can make an ROC curve using our metrics: 
 
 ```{r}
-auc <- 
-  training_assessment$model_metrics %>% 
-  dplyr::filter(metric == "roc_auc") %>% 
-  dplyr::pull(value)
-
-training_assessment$roc_curve %>% 
-  ggplot(aes(x = FPR, y = TPR)) + 
-  geom_line() + 
-  geom_abline(
-    slope = 1, 
-    intercept = 0, 
-    linetype = "dotted", 
-    color = "gray60"
-  ) + 
-  labs(
-    subtitle = "Training performance", 
-    caption = str_glue("AUC = {auc}", auc = auc)
-  ) + 
-  theme_bw()
-
+class_mod %>% 
+  tof_plot_model() + 
+  labs(subtitle = "ROC Curve (Training data)")
 ```
 
-We can then assess the model on the validation data 
+We can then assess the model on the validation data...
 
 ```{r}
 validation_assessment <- 
@@ -877,84 +851,9 @@ validation_assessment
 
 
 ```{r}
-auc <- 
-  validation_assessment$model_metrics %>% 
-  dplyr::filter(metric == "roc_auc") %>% 
-  dplyr::pull(value)
-
-validation_assessment$roc_curve %>% 
-  ggplot(aes(x = FPR, y = TPR)) + 
-  geom_line() + 
-  geom_abline(
-    slope = 1, 
-    intercept = 0, 
-    linetype = "dotted", 
-    color = "gray60"
-  ) + 
-  labs(
-    subtitle = "Validation performance", 
-    caption = str_glue("AUC = {auc}", auc = round(auc, 3))
-  ) + 
-  theme_bw()
-
-```
-
-
-We can also fit a survival model 
-
-```{r, warning = FALSE}
-survival_mod <- 
-  training_split %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    time_col = time_to_event, 
-    event_col = event, 
-    model_type = "survival", 
-    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE # often a smart decision
-  )
-
-print(survival_mod)
-```
-
-Making predictions using the survival model
-
-```{r}
-survival_mod %>% 
-  tof_predict(new_data = ddpr_validation, prediction_type = "response")
-```
-
-Assessing the survival model 
-
-```{r}
-survival_assessment <- 
-  survival_mod %>% 
-  tof_assess_model(new_data = ddpr_validation)
-
-survival_assessment
-```
-
-And we can use some of these values to make a survival curve for each patient 
-
-```{r}
-survival_assessment$survival_curves %>% 
-  tidyr::unnest(cols = survival_curve) %>% 
-  left_join(
-    y = 
-      tibble(
-        ddpr_risk = ddpr_validation$ddpr_risk, 
-        row_index = as.character(1:nrow(ddpr_validation))
-      ), 
-    by = "row_index"
-  ) %>% 
-  # something is weird about the first patient
-  dplyr::filter(row_index != "1") %>% 
-  dplyr::group_by(time, ddpr_risk) %>% 
-  dplyr::summarize(probability = mean(probability)) %>% 
-  ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
-  geom_path() +
-  theme_bw() 
+class_mod %>% 
+  tof_plot_model(new_data = ddpr_validation) + 
+  labs(subtitle = "ROC Curve (Validation data)")
 ```
 
 

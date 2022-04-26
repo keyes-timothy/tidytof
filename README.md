@@ -152,7 +152,7 @@ A few notes about `tof_tbl`s:
     column (to provide the data in its “tidy” format).
 -   `tof_read_data` adds an additional column to the output `tof_tbl`
     encoding the name of the file from which each cell was read (the
-    “file\_name” column).
+    “file_name” column).
 -   Because `tof_tbl`s inherit from the `tbl_df` class, all methods
     available to tibbles are also available to `tof_tbl`s. For example,
     `{dplyr}`’s useful `mutate` method can be applied to our `tof_tbl`
@@ -456,12 +456,12 @@ phenograph_data %>%
 This will write 6 files with the following names (derived from the
 values in `phenograph_cluster` and `expression_group`).
 
--   cluster1\_low.fcs
--   cluster1\_high.fcs
--   cluster2\_low.fcs
--   cluster2\_high.fcs
--   cluster3\_low.fcs
--   cluster3\_high.fcs
+-   cluster1_low.fcs
+-   cluster1_high.fcs
+-   cluster2_low.fcs
+-   cluster2_high.fcs
+-   cluster3_low.fcs
+-   cluster3_high.fcs
 
 A useful feature of `tof_write_data` is that it will automatically
 concatenate cells into single .fcs or .csv files based on the specified
@@ -500,12 +500,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
 #>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
-#> 1 H1_PhenoGraph_c… 13               cluster1         -0.0336 2.46   0.608   3.96
-#> 2 H1_PhenoGraph_c… 11               cluster1          0.324  0.856 -0.116   4.52
-#> 3 H1_PhenoGraph_c… 13               cluster1          0.532  2.67   0.909   4.76
-#> 4 H1_PhenoGraph_c… 18               cluster1          0.0163 2.97   0.0725  5.15
-#> 5 H1_PhenoGraph_c… 14               cluster1          0.144  2.98   0.128   4.52
-#> 6 H1_PhenoGraph_c… 18               cluster1          0.742  3.41   0.336   5.71
+#> 1 H1_PhenoGraph_c… 9                cluster1         -0.0336 2.46   0.608   3.96
+#> 2 H1_PhenoGraph_c… 2                cluster1          0.324  0.856 -0.116   4.52
+#> 3 H1_PhenoGraph_c… 10               cluster1          0.532  2.67   0.909   4.76
+#> 4 H1_PhenoGraph_c… 4                cluster1          0.0163 2.97   0.0725  5.15
+#> 5 H1_PhenoGraph_c… 3                cluster1          0.144  2.98   0.128   4.52
+#> 6 H1_PhenoGraph_c… 11               cluster1          0.742  3.41   0.336   5.71
 #> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -514,7 +514,7 @@ phenograph_clusters %>%
 
 The output of `tof_cluster` is a `tof_tbl` identical to the input
 tibble, now with the addition of an additional column
-(“.flowsom\_metacluster”) that encodes the cluster id for each cell in
+(“.flowsom_metacluster”) that encodes the cluster id for each cell in
 the input `tof_tbl`. Note that all output columns added to a tibble or
 `tof_tbl` by `{tidytof}` begin with a full-stop (“.”) to reduce the
 likelihood of collisions with existing column names.
@@ -526,20 +526,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 23 × 3
+#> # A tibble: 24 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster2           12                     402
-#>  2 cluster2           5                      331
-#>  3 cluster3           3                      312
-#>  4 cluster3           8                      227
-#>  5 cluster1           14                     212
-#>  6 cluster3           7                      197
-#>  7 cluster2           1                      193
-#>  8 cluster1           18                     155
-#>  9 cluster3           4                      155
-#> 10 cluster1           20                     138
-#> # … with 13 more rows
+#>  1 cluster1           4                      326
+#>  2 cluster3           7                      321
+#>  3 cluster3           5                      309
+#>  4 cluster3           1                      287
+#>  5 cluster2           17                     268
+#>  6 cluster2           15                     210
+#>  7 cluster2           18                     195
+#>  8 cluster1           3                      189
+#>  9 cluster2           19                     183
+#> 10 cluster1           11                     164
+#> # … with 14 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -561,12 +561,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 9                   
+#> 1 7                   
 #> 2 7                   
-#> 3 10                  
-#> 4 17                  
-#> 5 6                   
-#> 6 17
+#> 3 3                   
+#> 4 5                   
+#> 5 7                   
+#> 6 5
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -595,12 +595,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    7.58  -5.78 
-#> 2    5.28  -0.537
-#> 3  -10.8   19.7  
-#> 4   -6.34  -3.97 
-#> 5    4.43  -7.94 
-#> 6   -6.83  -0.626
+#> 1    8.45    1.50
+#> 2   12.4    -2.21
+#> 3   21.0   -23.2 
+#> 4   24.2    -1.62
+#> 5   10.2    -1.04
+#> 6   17.2   -13.6
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -624,6 +624,7 @@ phenograph_tsne %>%
 <img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 ``` r
+
 # plot the tsne embeddings using color to represent CD11b expression
 phenograph_tsne %>% 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
@@ -890,10 +891,10 @@ dea_result %>%
 #> 6 4             pBtk_… 7.85e-7 1.05e-5 *           -16.3     7    -0.462   0.296
 ```
 
-While the output of `tof_dea` also depends on the underlying test being
-used, we can see that the result above looks relatively similar to the
-output from `tof_daa`. Above, the output is a tibble in which each row
-represents the differential expression results from a single
+While the output of `tof_dea()` also depends on the underlying test
+being used, we can see that the result above looks relatively similar to
+the output from `tof_daa()`. Above, the output is a tibble in which each
+row represents the differential expression results from a single
 cluster-marker pair - for example, the first row represents the
 difference in expression of pS6 in cluster 1 between the BCR-XL and
 Basal conditions. Each row includes the raw p-value and
@@ -903,44 +904,11 @@ This result can be used to make a volcano plot to visualize the results
 for all cluster-marker pairs:
 
 ``` r
-volcano_data <- 
-  dea_result %>% 
-  mutate(
-    log2_fc = log(mean_fc, base = 2), 
-    log_p = -log(p_adj), 
-    significance = 
-      case_when(
-        p_adj < 0.05 & mean_fc > 1 ~ "increased", 
-        p_adj < 0.05 & mean_fc < 1 ~ "decreased",
-        TRUE ~ NA_character_
-      ), 
-    marker = 
-      str_extract(marker, ".+_") %>% 
-      str_remove("_"), 
-    pair = str_c(marker, str_c("cluster ", population_id), sep = "@")
-  )
-
 volcano_plot <- 
-  volcano_data %>% 
-  ggplot(aes(x = log2_fc, y = log_p, fill = significance)) + 
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") + 
-  geom_hline(yintercept = -log(0.05), linetype = "dashed", color = "red") +
-  geom_point(shape = 21, size = 2) + 
-  ggrepel::geom_text_repel(
-    aes(label = pair), 
-    data = slice_head(volcano_data, n = 10L), 
-    size = 2
-  ) + 
-  scale_fill_manual(
-    values = c("decreased" = "#cd5241", "increased" = "#207394"), 
-    na.value = "#cdcdcd"
-  ) + 
-  labs(
-    x = "log2(Fold-change)", 
-    y = "-log10(p-value)", 
-    fill = NULL, 
-    caption = "Labels indicate the 10 most significant marker-cluster pairs"
-  )
+  dea_result %>% 
+  tof_plot_cluster_volcano(
+    use_ggrepel = TRUE
+  ) 
 
 volcano_plot
 ```
@@ -996,7 +964,7 @@ citrus_data %>%
 ```
 
 Like all members of the `tof_extract_*` function family,
-`tof_extract_proportion` returns one row for each sample (defined as a
+`tof_extract_proportion()` returns one row for each sample (defined as a
 unique combination of values of the `group_cols`) and one column for
 each extracted feature (above, one column for the proportion of each of
 the 8 clusters in `citrus_data`). These values can also be returned in
@@ -1343,12 +1311,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1-Rx        0.0395    0.618     0.0634    0.572       2.93     0.944
-#> 2 UPN2           0.139     0.0662    0.0221    0.0825      2.25     0.454
-#> 3 UPN3           0.633     0.0234    0.0165    0.0327      2.25     0.226
-#> 4 UPN7           0.474     0.966     0.124     1.24        2.59     0.243
-#> 5 UPN8           0.951     0.958     0.161     0.556       3.18     0.556
-#> 6 UPN9          15.6       0.446     0.0445    0.163       2.86     0.434
+#> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
+#> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
+#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1363,12 +1331,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1          3.06        0.583  0.00449      0.164      1.94     0.416
-#> 2 UPN6          5.62        0.550  0.00374      0.622      2.86     0.342
-#> 3 UPN10         0.00374     0.761  0.000696     0.829      3.19     0.886
-#> 4 UPN18         0.405       0.258  0.0287       0.851      2.48     0.253
-#> 5 UPN22-Rx      0.0643      1.68   0.0804       1.56       3.06     0.529
-#> 6 UPN27         0.563       1.07   0.00276      0.712      2.40     0.411
+#> 1 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 2 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 3 UPN12          0.0565    0.185    0.0115     0.142       2.49     0.254
+#> 4 UPN15          0.0516    1.37     0.00610    0.915       2.55     0.236
+#> 5 UPN16          0.156     0.193    0.00407    0.951       2.87     0.254
+#> 6 UPN22          3.29      1.63     0.128      0.525       3.38     0.688
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1380,11 +1348,15 @@ my_resample %>%
 
 From here, we can feed `training_split` into the `tof_train_model`
 function to [tune](https://www.tmwr.org/tuning.html) a logistic
-regression model that predicts the relapse\_status of a leukemia
-patient. Be sure to check out the `tof_create_grid` documentation to
-learn how to make a hyperparameter search grid for model tuning (in this
-case, we limit the mixture parameter to a value of 1, which fits a
-sparse lasso model).
+regression model that predicts the relapse_status of a leukemia patient.
+Be sure to check out the `tof_create_grid` documentation to learn how to
+make a hyperparameter search grid for model tuning (in this case, we
+limit the mixture parameter to a value of 1, which fits a sparse lasso
+model). Also note that for demonstration purposes, we include only the
+features that come from one cell population (“Population 2”) in the
+original dataset, which means that we probably shouldn’t expect our
+model to perform as well as the one in the original paper (which select
+from many more features).
 
 ``` r
 class_mod <- 
@@ -1407,7 +1379,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1432,42 +1404,42 @@ class_predictions <-
   class_mod %>% 
   tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-ddpr_validation %>% 
-  dplyr::select(relapse_status) %>% 
-  bind_cols(class_predictions) %>% 
-  dplyr::count(relapse_status, .pred)
-#> # A tibble: 4 × 3
-#>   relapse_status .pred     n
-#>   <fct>          <chr> <int>
-#> 1 No             No        5
-#> 2 No             Yes       1
-#> 3 Yes            No        4
-#> 4 Yes            Yes       2
-
-accuracy <- 
-  ddpr_validation %>% 
-  dplyr::select(relapse_status) %>% 
-  bind_cols(class_predictions) %>% 
-  mutate(.pred = factor(.pred, levels = levels(relapse_status))) %>% 
-  yardstick::accuracy(truth = relapse_status, estimate = .pred) %>% 
-  pull(.estimate) %>% 
-  round(3)
+class_predictions %>% 
+  dplyr::mutate(
+    truth = ddpr_validation$relapse_status
+  )
+#> # A tibble: 12 × 2
+#>    .pred truth
+#>    <chr> <fct>
+#>  1 Yes   No   
+#>  2 No    No   
+#>  3 No    Yes  
+#>  4 No    No   
+#>  5 No    No   
+#>  6 Yes   Yes  
+#>  7 Yes   Yes  
+#>  8 No    No   
+#>  9 No    No   
+#> 10 No    Yes  
+#> 11 No    Yes  
+#> 12 No    Yes
 ```
 
-So we can see that our accuracy is about 0.583.
+And we can see that our model gets some (but not all!) predictions
+correct in the validation set we set aside.
 
 We can also assess the model directly using `tof_assess_model`
 
 ``` r
-# calling the function with no new_data gives us the assessment on 
-# the training data
+# calling the function with no new_data evaluates the
+# the nodel using its training data
 training_assessment <- 
   class_mod %>% 
   tof_assess_model()
 
 training_assessment
 #> $model_metrics
-#> # A tibble: 5 × 2
+#> # A tibble: 6 × 2
 #>   metric                    value
 #>   <chr>                     <dbl>
 #> 1 binomial_deviance       0.0291 
@@ -1475,22 +1447,23 @@ training_assessment
 #> 3 roc_auc                 1      
 #> 4 mse                     0.00119
 #> 5 mae                     0.0285 
+#> 6 accuracy                1      
 #> 
 #> $roc_curve
-#> # A tibble: 49 × 2
-#>      FPR    TPR
-#>    <dbl>  <dbl>
-#>  1     0 0.0556
-#>  2     0 0.111 
-#>  3     0 0.167 
-#>  4     0 0.222 
-#>  5     0 0.278 
-#>  6     0 0.333 
-#>  7     0 0.389 
-#>  8     0 0.444 
-#>  9     0 0.5   
-#> 10     0 0.556 
-#> # … with 39 more rows
+#> # A tibble: 51 × 5
+#>       .threshold specificity sensitivity   tpr   fpr
+#>            <dbl>       <dbl>       <dbl> <dbl> <dbl>
+#>  1 -Inf               0                1     1 1    
+#>  2    0.00000114      0                1     1 1    
+#>  3    0.0000955       0.0323           1     1 0.968
+#>  4    0.000160        0.0645           1     1 0.935
+#>  5    0.000190        0.0968           1     1 0.903
+#>  6    0.000612        0.129            1     1 0.871
+#>  7    0.000896        0.161            1     1 0.839
+#>  8    0.00135         0.194            1     1 0.806
+#>  9    0.00142         0.226            1     1 0.774
+#> 10    0.00194         0.258            1     1 0.742
+#> # … with 41 more rows
 #> 
 #> $confusion_matrix
 #> # A tibble: 4 × 3
@@ -1505,30 +1478,14 @@ training_assessment
 And we can make an ROC curve using our metrics:
 
 ``` r
-auc <- 
-  training_assessment$model_metrics %>% 
-  dplyr::filter(metric == "roc_auc") %>% 
-  dplyr::pull(value)
-
-training_assessment$roc_curve %>% 
-  ggplot(aes(x = FPR, y = TPR)) + 
-  geom_line() + 
-  geom_abline(
-    slope = 1, 
-    intercept = 0, 
-    linetype = "dotted", 
-    color = "gray60"
-  ) + 
-  labs(
-    subtitle = "Training performance", 
-    caption = str_glue("AUC = {auc}", auc = auc)
-  ) + 
-  theme_bw()
+class_mod %>% 
+  tof_plot_model() + 
+  labs(subtitle = "ROC Curve (Training data)")
 ```
 
 <img src="man/figures/README-unnamed-chunk-53-1.png" width="100%" />
 
-We can then assess the model on the validation data
+We can then assess the model on the validation data…
 
 ``` r
 validation_assessment <- 
@@ -1537,7 +1494,7 @@ validation_assessment <-
 
 validation_assessment
 #> $model_metrics
-#> # A tibble: 5 × 2
+#> # A tibble: 6 × 2
 #>   metric                  value
 #>   <chr>                   <dbl>
 #> 1 binomial_deviance       4.75 
@@ -1545,23 +1502,26 @@ validation_assessment
 #> 3 roc_auc                 0.639
 #> 4 mse                     0.759
 #> 5 mae                     0.879
+#> 6 accuracy                0.583
 #> 
 #> $roc_curve
-#> # A tibble: 12 × 2
-#>      FPR   TPR
-#>    <dbl> <dbl>
-#>  1 0.167 0    
-#>  2 0.167 0.167
-#>  3 0.167 0.333
-#>  4 0.333 0.333
-#>  5 0.333 0.5  
-#>  6 0.333 0.667
-#>  7 0.333 0.833
-#>  8 0.5   0.833
-#>  9 0.667 0.833
-#> 10 0.833 0.833
-#> 11 0.833 1    
-#> 12 1     1    
+#> # A tibble: 14 × 5
+#>     .threshold specificity sensitivity   tpr   fpr
+#>          <dbl>       <dbl>       <dbl> <dbl> <dbl>
+#>  1 -Inf              0           1     1     1    
+#>  2    0.000240       0           1     1     1    
+#>  3    0.00105        0.167       1     1     0.833
+#>  4    0.00195        0.167       0.833 0.833 0.833
+#>  5    0.00230        0.333       0.833 0.833 0.667
+#>  6    0.00472        0.5         0.833 0.833 0.5  
+#>  7    0.00618        0.667       0.833 0.833 0.333
+#>  8    0.0464         0.667       0.667 0.667 0.333
+#>  9    0.273          0.667       0.5   0.5   0.333
+#> 10    0.286          0.667       0.333 0.333 0.333
+#> 11    0.844          0.833       0.333 0.333 0.167
+#> 12    0.852          0.833       0.167 0.167 0.167
+#> 13    1.00           0.833       0     0     0.167
+#> 14  Inf              1           0     0     0    
 #> 
 #> $confusion_matrix
 #> # A tibble: 4 × 3
@@ -1574,141 +1534,12 @@ validation_assessment
 ```
 
 ``` r
-auc <- 
-  validation_assessment$model_metrics %>% 
-  dplyr::filter(metric == "roc_auc") %>% 
-  dplyr::pull(value)
-
-validation_assessment$roc_curve %>% 
-  ggplot(aes(x = FPR, y = TPR)) + 
-  geom_line() + 
-  geom_abline(
-    slope = 1, 
-    intercept = 0, 
-    linetype = "dotted", 
-    color = "gray60"
-  ) + 
-  labs(
-    subtitle = "Validation performance", 
-    caption = str_glue("AUC = {auc}", auc = round(auc, 3))
-  ) + 
-  theme_bw()
+class_mod %>% 
+  tof_plot_model(new_data = ddpr_validation) + 
+  labs(subtitle = "ROC Curve (Validation data)")
 ```
 
 <img src="man/figures/README-unnamed-chunk-55-1.png" width="100%" />
-
-We can also fit a survival model
-
-``` r
-survival_mod <- 
-  training_split %>% 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    time_col = time_to_event, 
-    event_col = event, 
-    model_type = "survival", 
-    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE # often a smart decision
-  )
-
-print(survival_mod)
-#> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 
-#> # A tibble: 29 × 2
-#>    feature              coefficient
-#>    <chr>                      <dbl>
-#>  1 pErk_dP_TSLP_Pop2          -8.14
-#>  2 TdT_Pop2                    3.77
-#>  3 pPLCg1_2_dP_IL7_Pop2        3.36
-#>  4 CD38_Pop2                   3.30
-#>  5 CD43_Pop2                   3.22
-#>  6 p4EBP1_dP_IL7_Pop2         -2.60
-#>  7 Ki67_Pop2                  -2.57
-#>  8 p4EBP1_FC_IL7_Pop2          2.49
-#>  9 pCreb_dP_TSLP_Pop2         -2.46
-#> 10 pCreb_dP_PVO4_Pop2         -2.05
-#> # … with 19 more rows
-```
-
-Making predictions using the survival model
-
-``` r
-survival_mod %>% 
-  tof_predict(new_data = ddpr_validation, prediction_type = "response")
-#> # A tibble: 12 × 1
-#>       .pred
-#>       <dbl>
-#>  1 2.17e+47
-#>  2 9.12e+ 6
-#>  3 1.86e- 3
-#>  4 1.95e- 6
-#>  5 6.29e+ 0
-#>  6 5.30e- 1
-#>  7 1.81e+ 3
-#>  8 3.36e- 3
-#>  9 6.14e- 2
-#> 10 5.34e- 1
-#> 11 1.91e- 4
-#> 12 1.94e+ 2
-```
-
-Assessing the survival model
-
-``` r
-survival_assessment <- 
-  survival_mod %>% 
-  tof_assess_model(new_data = ddpr_validation)
-
-survival_assessment
-#> $model_metrics
-#> # A tibble: 2 × 2
-#>   metric                        value
-#>   <chr>                         <dbl>
-#> 1 neg_log_partial_likelihood 1309.   
-#> 2 concordance_index             0.548
-#> 
-#> $survival_curves
-#> # A tibble: 12 × 2
-#>    row_index survival_curve   
-#>    <chr>     <list>           
-#>  1 1         <tibble [44 × 2]>
-#>  2 2         <tibble [44 × 2]>
-#>  3 3         <tibble [44 × 2]>
-#>  4 4         <tibble [44 × 2]>
-#>  5 5         <tibble [44 × 2]>
-#>  6 6         <tibble [44 × 2]>
-#>  7 7         <tibble [44 × 2]>
-#>  8 8         <tibble [44 × 2]>
-#>  9 9         <tibble [44 × 2]>
-#> 10 10        <tibble [44 × 2]>
-#> 11 11        <tibble [44 × 2]>
-#> 12 12        <tibble [44 × 2]>
-```
-
-And we can use some of these values to make a survival curve for each
-patient
-
-``` r
-survival_assessment$survival_curves %>% 
-  tidyr::unnest(cols = survival_curve) %>% 
-  left_join(
-    y = 
-      tibble(
-        ddpr_risk = ddpr_validation$ddpr_risk, 
-        row_index = as.character(1:nrow(ddpr_validation))
-      ), 
-    by = "row_index"
-  ) %>% 
-  # something is weird about the first patient
-  dplyr::filter(row_index != "1") %>% 
-  dplyr::group_by(time, ddpr_risk) %>% 
-  dplyr::summarize(probability = mean(probability)) %>% 
-  ggplot(aes(x = time, y = probability, color = ddpr_risk)) + 
-  geom_path() +
-  theme_bw() 
-```
-
-<img src="man/figures/README-unnamed-chunk-59-1.png" width="100%" />
 
 ## `{tidytof}`’s Design Principles (and some tips)
 
@@ -1808,7 +1639,7 @@ input_path %>%
   )
 ```
 
-<img src="man/figures/README-unnamed-chunk-61-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-57-1.png" width="100%" />
 
 As shown above, stringing together `{tidytof}` verbs creates a pipeline
 that can be read easily from left-to-right and top-to-bottom – this
