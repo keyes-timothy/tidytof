@@ -2,7 +2,7 @@
 % Please edit documentation in R/dimensionality_reduction.R
 \name{tof_reduce_dimensions}
 \alias{tof_reduce_dimensions}
-\title{Apply dimensionality reduction to a CyTOF dataset.}
+\title{Apply dimensionality reduction to a single-cell dataset.}
 \usage{
 tof_reduce_dimensions(
   tof_tibble,
@@ -33,7 +33,7 @@ in the calculated embedding space.
 }
 \description{
 This function is a wrapper around {tidytof}'s tof_reduce_* function family.
-It performs dimensionality reduction on CyTOF data using a user-specified method
+It performs dimensionality reduction on single-cell data using a user-specified method
 (of 3 choices) and each method's corresponding input parameters
 }
 \examples{

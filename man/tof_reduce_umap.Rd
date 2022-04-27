@@ -2,7 +2,7 @@
 % Please edit documentation in R/dimensionality_reduction.R
 \name{tof_reduce_umap}
 \alias{tof_reduce_umap}
-\title{Perform uniform manifold approzimation and projection on CyTOF data}
+\title{Apply uniform manifold approximation and projection (UMAP) to single-cell data}
 \usage{
 tof_reduce_umap(
   tof_tibble,

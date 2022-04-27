@@ -2,7 +2,7 @@
 % Please edit documentation in R/dimensionality_reduction.R
 \name{tof_reduce_pca}
 \alias{tof_reduce_pca}
-\title{Perform principal component analysis on CyTOF data}
+\title{Perform principal component analysis on single-cell data}
 \usage{
 tof_reduce_pca(
   tof_tibble,

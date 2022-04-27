@@ -2,7 +2,7 @@
 % Please edit documentation in R/dimensionality_reduction.R
 \name{tof_reduce_tsne}
 \alias{tof_reduce_tsne}
-\title{Perform t-distributed stochastic neighborhood embedding on CyTOF data}
+\title{Perform t-distributed stochastic neighborhood embedding on single-cell data}
 \usage{
 tof_reduce_tsne(
   tof_tibble,

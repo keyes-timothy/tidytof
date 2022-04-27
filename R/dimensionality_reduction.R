@@ -1,10 +1,10 @@
 # dimensionality_reduction.R
 # This file contains functions relevant to performing dimensionality reduction
-# on tof_tibble objects containing CyTOF data.
+# on tof_tibble objects containing single-cell data.
 
 # tof_reduce_pca ---------------------------------------------------------------
 #
-#' Perform principal component analysis on CyTOF data
+#' Perform principal component analysis on single-cell data
 #'
 #' This function calculates principal components using single-cell data from a `tof_tibble`.
 #'
@@ -116,7 +116,7 @@ tof_reduce_pca <-
 
 # tof_reduce_tsne --------------------------------------------------------------
 
-#' Perform t-distributed stochastic neighborhood embedding on CyTOF data
+#' Perform t-distributed stochastic neighborhood embedding on single-cell data
 #'
 #' This function calculates a tSNE embedding using single-cell data from a `tof_tibble`.
 #'
@@ -221,7 +221,7 @@ tof_reduce_tsne <-
 
 # tof_reduce_umap --------------------------------------------------------------
 
-#' Perform uniform manifold approzimation and projection on CyTOF data
+#' Apply uniform manifold approximation and projection (UMAP) to single-cell data
 #'
 #' This function calculates a UMAP embedding from single-cell data in a `tof_tibble`.
 #'
@@ -355,10 +355,10 @@ tof_reduce_umap <-
 
 # tof_reduce_dimensions --------------------------------------------------------
 
-#' Apply dimensionality reduction to a CyTOF dataset.
+#' Apply dimensionality reduction to a single-cell dataset.
 #'
 #' This function is a wrapper around {tidytof}'s tof_reduce_* function family.
-#' It performs dimensionality reduction on CyTOF data using a user-specified method
+#' It performs dimensionality reduction on single-cell data using a user-specified method
 #' (of 3 choices) and each method's corresponding input parameters
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
