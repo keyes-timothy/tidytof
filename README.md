@@ -6,18 +6,18 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
-[![Codecov test
-coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
+[![R-CMD-check-bioc](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check-bioc](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
 <!-- badges: end -->
 
 `{tidytof}` is an R package that implements an open-source, integrated
 “grammar” of single-cell data analysis for high-dimensional cytometry
 data (i.e. [mass
 cytometry](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/),
-full-spectrum flow cytometry, and sequence-based cytometry.
+full-spectrum flow cytometry, and sequence-based cytometry).
 Specifically, `{tidytof}` provides an easy-to-use pipeline for handling
 high-dimensional cytometry data at multiple levels of observation - the
 single-cell level, the cell subpopulation (or cluster) level, and the
@@ -512,12 +512,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
 #>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
-#> 1 H1_PhenoGraph_c… 8                cluster1         -0.0336 2.46   0.608   3.96
-#> 2 H1_PhenoGraph_c… 6                cluster1          0.324  0.856 -0.116   4.52
-#> 3 H1_PhenoGraph_c… 11               cluster1          0.532  2.67   0.909   4.76
-#> 4 H1_PhenoGraph_c… 19               cluster1          0.0163 2.97   0.0725  5.15
-#> 5 H1_PhenoGraph_c… 5                cluster1          0.144  2.98   0.128   4.52
-#> 6 H1_PhenoGraph_c… 11               cluster1          0.742  3.41   0.336   5.71
+#> 1 H1_PhenoGraph_c… 7                cluster1         -0.0336 2.46   0.608   3.96
+#> 2 H1_PhenoGraph_c… 11               cluster1          0.324  0.856 -0.116   4.52
+#> 3 H1_PhenoGraph_c… 7                cluster1          0.532  2.67   0.909   4.76
+#> 4 H1_PhenoGraph_c… 3                cluster1          0.0163 2.97   0.0725  5.15
+#> 5 H1_PhenoGraph_c… 8                cluster1          0.144  2.98   0.128   4.52
+#> 6 H1_PhenoGraph_c… 3                cluster1          0.742  3.41   0.336   5.71
 #> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -538,20 +538,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 24 × 3
+#> # A tibble: 23 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster3           4                      472
-#>  2 cluster1           11                     256
-#>  3 cluster2           12                     235
-#>  4 cluster2           17                     234
-#>  5 cluster2           15                     232
-#>  6 cluster1           5                      203
-#>  7 cluster3           2                      191
-#>  8 cluster3           3                      172
-#>  9 cluster1           18                     155
-#> 10 cluster3           7                      155
-#> # … with 14 more rows
+#>  1 cluster1           7                      298
+#>  2 cluster3           16                     283
+#>  3 cluster2           6                      271
+#>  4 cluster2           12                     264
+#>  5 cluster1           8                      202
+#>  6 cluster3           17                     196
+#>  7 cluster2           1                      162
+#>  8 cluster3           19                     161
+#>  9 cluster3           15                     159
+#> 10 cluster1           3                      150
+#> # … with 13 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -573,12 +573,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 7                   
-#> 2 12                  
-#> 3 3                   
-#> 4 5                   
-#> 5 7                   
-#> 6 3
+#> 1 12                  
+#> 2 16                  
+#> 3 12                  
+#> 4 17                  
+#> 5 12                  
+#> 6 13
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -607,12 +607,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    5.55    8.86
-#> 2    1.03   12.2 
-#> 3  -17.7    29.2 
-#> 4   -9.47   13.6 
-#> 5    2.19    8.60
-#> 6   -3.36   25.3
+#> 1   -13.8  -11.3 
+#> 2   -10.2   -2.06
+#> 3   -23.1   17.4 
+#> 4   -17.7    3.95
+#> 5   -17.1  -10.4 
+#> 6   -24.0    2.73
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1327,9 +1327,9 @@ my_resample %>%
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
 #> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 5 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
 #> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
@@ -1345,12 +1345,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN2            0.139    0.0662   0.0221     0.0825      2.25     0.454
-#> 2 UPN7            0.474    0.966    0.124      1.24        2.59     0.243
-#> 3 UPN11           0.332    0.488    0.0146     0.598       2.16     0.320
-#> 4 UPN16           0.156    0.193    0.00407    0.951       2.87     0.254
-#> 5 UPN17           1.40     1.52     0.0128     0.284       3.46     0.656
-#> 6 UPN19           2.05     0.780    0.00233    0.298       2.36     0.481
+#> 1 UPN7           0.474     0.966    0.124       1.24       2.59     0.243
+#> 2 UPN8           0.951     0.958    0.161       0.556      3.18     0.556
+#> 3 UPN11          0.332     0.488    0.0146      0.598      2.16     0.320
+#> 4 UPN13          0.0634    0.0300   0.0219      0.109      2.34     0.314
+#> 5 UPN16          0.156     0.193    0.00407     0.951      2.87     0.254
+#> 6 UPN19          2.05      0.780    0.00233     0.298      2.36     0.481
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1393,7 +1393,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>

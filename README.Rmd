@@ -21,12 +21,13 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions) [![Codecov test coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
 [![R-CMD-check-bioc](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
 <!-- badges: end -->
 
-`{tidytof}` is an R package that implements an open-source, integrated "grammar" of single-cell data analysis for high-dimensional cytometry data (i.e. [mass cytometry](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), full-spectrum flow cytometry, and sequence-based cytometry. Specifically, `{tidytof}` provides an easy-to-use pipeline for handling high-dimensional cytometry data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. 
+`{tidytof}` is an R package that implements an open-source, integrated "grammar" of single-cell data analysis for high-dimensional cytometry data (i.e. [mass cytometry](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), full-spectrum flow cytometry, and sequence-based cytometry). Specifically, `{tidytof}` provides an easy-to-use pipeline for handling high-dimensional cytometry data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. 
 
 As an extension of the `tidyverse` ecosystem of data manipulation tools in R, all of `{tidytof}`'s functions have been developed with an internally consistent, human-centered set of design principles. This means that using `{tidytof}` should be equally intuitive among scientists with a wide range of coding experience (including beginners).
 
