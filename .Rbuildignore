@@ -12,3 +12,4 @@
 ^docs$
 ^pkgdown$
 ^man/figures/README-*
+^dev$
