@@ -13,6 +13,7 @@ reference:
   - tidytof_example_data
   - new_tof_tibble
   - as_tof_tbl
+  = as_tof_tbl.flowSet
   - tof_get_panel
   - tof_set_panel
   - tof_find_panel_info
