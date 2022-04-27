@@ -187,6 +187,8 @@ Often, CyTOF experiments collect tens or hundreds or millions of cells in total,
 Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller version of the dataset we read in ourselves above), we can see that the original size of the dataset is 1000 cells per cluster, or 3000 cells in total:
 
 ```{r}
+data(phenograph_data)
+
 phenograph_data %>% 
   count(phenograph_cluster)
 ```
@@ -683,6 +685,8 @@ citrus_data %>%
 
 
 ```{r}
+data(ddpr_metadata)
+
 # link for downloading the sample-level data from the Nature Medicine website
 data_link <- 
   "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"
