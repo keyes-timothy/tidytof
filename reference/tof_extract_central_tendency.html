@@ -169,8 +169,8 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 105</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   patient `cd45@a_ct` `cd38@a_ct` `cd34@a_ct` `cd19@a_ct` `cd45@b_ct`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby         0.284     -<span style="color: #BB0000;">0.235</span>       0.296        0.414       0.154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario        -<span style="color: #BB0000;">0.120</span>      0.020<span style="text-decoration: underline;">0</span>     -<span style="color: #BB0000;">0.076</span><span style="color: #BB0000; text-decoration: underline;">5</span>       0.136       0.356</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby         0.310      -<span style="color: #BB0000;">0.359</span>       0.129      -<span style="color: #BB0000;">0.151</span>       0.714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario         0.226      -<span style="color: #BB0000;">0.246</span>      -<span style="color: #BB0000;">0.185</span>       0.602       0.155</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 99 more variables: `cd38@b_ct` &lt;dbl&gt;, `cd34@b_ct` &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@b_ct` &lt;dbl&gt;, `cd45@c_ct` &lt;dbl&gt;, `cd38@c_ct` &lt;dbl&gt;, `cd34@c_ct` &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@c_ct` &lt;dbl&gt;, `cd45@d_ct` &lt;dbl&gt;, `cd38@d_ct` &lt;dbl&gt;, `cd34@d_ct` &lt;dbl&gt;,</span></span>
@@ -187,18 +187,18 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 <span class="r-in">    format <span class="op">=</span> <span class="st">"long"</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 208 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id channel  values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          cd45     0.284 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   a          cd38    -<span style="color: #BB0000;">0.235</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   a          cd34     0.296 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   a          cd19     0.414 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   b          cd45     0.154 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   b          cd38     0.407 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   b          cd34     0.119 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   b          cd19     0.034<span style="text-decoration: underline;">2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   c          cd45    -<span style="color: #BB0000;">0.094</span><span style="color: #BB0000; text-decoration: underline;">0</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   c          cd38    -<span style="color: #BB0000;">0.163</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id channel   values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          cd45     0.310  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   a          cd38    -<span style="color: #BB0000;">0.359</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   a          cd34     0.129  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   a          cd19    -<span style="color: #BB0000;">0.151</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   b          cd45     0.714  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   b          cd38     0.760  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   b          cd34    -<span style="color: #BB0000;">0.120</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   b          cd19     0.008<span style="text-decoration: underline;">40</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   c          cd45    -<span style="color: #BB0000;">0.334</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   c          cd38    -<span style="color: #BB0000;">0.128</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 198 more rows</span></span>
 <span class="r-in"></span>
 </code></pre></div>
