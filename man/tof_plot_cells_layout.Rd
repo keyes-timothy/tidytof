@@ -79,6 +79,31 @@ a 2-dimensional space representing a k-nearest-neighbor graph constructed
 using cell-to-cell similarities. Each node in the force-directed layout
 represents a single cell colored using a user-specified variable.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+        cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+        cd19 = rnorm(n = 1000),
+        cluster_id = c(rep("a", 500), rep("b", 500))
+    )
+
+# make a layout colored by a marker
+layout_cd38 <-
+    tof_plot_cells_layout(
+        tof_tibble = sim_data,
+        color_col = cd38
+    )
+
+# make a layout colored by cluster id
+layout_cluster <-
+    tof_plot_cells_layout(
+        tof_tibble = sim_data,
+        color_col = cluster_id,
+    )
+
+}
 \seealso{
 Other visualization functions: 
 \code{\link{tof_plot_cells_embedding}()}

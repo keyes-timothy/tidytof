@@ -5,6 +5,8 @@ library(stringr)
 library(tidytof)
 library(testthat)
 
+data(ddpr_data)
+
 # setup
 set.seed(2020)
 dd_data <-

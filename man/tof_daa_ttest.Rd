@@ -91,6 +91,10 @@ specify which columns represent sample, cluster, and effect
 information, and either a paired or unpaired t-test (one per cluster) is used to detect significant
 differences between sample types.
 }
+\examples{
+# For differential discovery examples, please see the package vignettes
+
+}
 \seealso{
 Other differential abundance analysis functions: 
 \code{\link{tof_daa_diffcyt}()},

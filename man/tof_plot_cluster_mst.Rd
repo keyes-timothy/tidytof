@@ -94,3 +94,32 @@ in order to summarize cluster-level characteristics. Each node in the MST
 represents a single cluster colored using a user-specified variable (either
 continuous or discrete).
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+# make a layout colored by a marker
+layout_cd38 <-
+    tof_plot_cluster_mst(
+        tof_tibble = sim_data,
+        cluster_col = cluster_id,
+        color_col = cd38
+    )
+
+ # use the same layout as the plot above to color the same
+ # tree using a different marker
+ layout_cd45 <-
+    tof_plot_cluster_mst(
+        tof_tibble = sim_data,
+        cluster_col = cluster_id,
+        color_col = cd45,
+        graph_layout = layout_cd38
+    )
+
+}

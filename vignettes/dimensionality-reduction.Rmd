@@ -34,6 +34,8 @@ A useful tool for visualizing the phenotypic relationships between single cells 
 Here is an example call to `tof_reduce_dimensions()` in which we use tSNE to visualize data in `{tidytof}`'s built-in `phenograph_data` dataset.
 
 ```{r}
+data(phenograph_data)
+
 # perform the dimensionality reduction
 phenograph_tsne <- 
   phenograph_data %>% 

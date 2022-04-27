@@ -121,6 +121,10 @@
 #' @importFrom purrr map
 #' @importFrom rlang arg_match
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
+#'
+#'
 tof_daa_diffcyt <-
   function(
     tof_tibble,
@@ -470,6 +474,9 @@ tof_daa_diffcyt <-
 #' @importFrom purrr pluck
 #' @importFrom tidyr unite
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
+#'
 tof_dea_diffcyt <-
   function(
     tof_tibble,
@@ -771,6 +778,9 @@ tof_dea_diffcyt <-
 #' @importFrom stringr str_c
 #' @importFrom stats as.formula
 #' @importFrom purrr map
+#'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
 #'
 tof_daa_glmm <-
   function(
@@ -1108,6 +1118,8 @@ tof_daa_glmm <-
 #'
 #' @family differential expression analysis functions
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
 #'
 tof_dea_lmm <-
   function(
@@ -1462,6 +1474,9 @@ tof_dea_lmm <-
 #' @importFrom purrr map2_dbl
 #' @importFrom stats p.adjust
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
+#'
 tof_daa_ttest <-
   function(
     tof_tibble,
@@ -1752,6 +1767,8 @@ tof_daa_ttest <-
 #' @importFrom stats p.adjust
 #' @importFrom stats t.test
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
 #'
 tof_dea_ttest <-
   function(
@@ -1993,6 +2010,9 @@ tof_dea_ttest <-
 #'
 #' @importFrom rlang arg_match
 #'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
+#'
 tof_daa <-
   function(
     tof_tibble,
@@ -2047,6 +2067,9 @@ tof_daa <-
 #' @export
 #'
 #' @importFrom rlang arg_match
+#'
+#' @examples
+#'# For differential discovery examples, please see the package vignettes
 #'
 tof_dea <-
   function(

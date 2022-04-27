@@ -52,3 +52,20 @@ in single-cell data. Markers are plotted along the horizontal (x-) axis of
 the heatmap and sample IDs are plotted along the vertical (y-) axis of the
 heatmap.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        sample_id = sample(paste0("sample", 1:5), size = 1000, replace = TRUE)
+    )
+
+heatmap <-
+    tof_plot_sample_heatmap(
+        tof_tibble = sim_data,
+        sample_col = sample_id
+    )
+
+}

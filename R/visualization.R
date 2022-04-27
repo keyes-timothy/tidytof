@@ -61,6 +61,23 @@
 #'
 #' @importFrom tidyselect everything
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(c("a", "b"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' density_plot <-
+#'     tof_plot_cells_density(
+#'         tof_tibble = sim_data,
+#'         marker_col = cd45,
+#'         group_col = cluster_id
+#'     )
+#'
 #'
 tof_plot_cells_density <-
   function(
@@ -214,6 +231,33 @@ tof_plot_cells_density <-
 #' @importFrom ggplot2 theme_bw
 #' @importFrom ggplot2 vars
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(c("a", "b"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # embed with pca
+#' pca_plot <-
+#'     tof_plot_cells_embedding(
+#'         tof_tibble = sim_data,
+#'         color_col = cd38,
+#'         embedding_method = "pca",
+#'         pca_cols = starts_with("cd")
+#'     )
+#'
+#' # embed with tsne
+#' tsne_plot <-
+#'     tof_plot_cells_embedding(
+#'         tof_tibble = sim_data,
+#'         color_col = cd38,
+#'         embedding_method = "tsne",
+#'         tsne_cols = starts_with("cd")
+#'     )
 #'
 tof_plot_cells_embedding <-
   function(
@@ -378,6 +422,29 @@ tof_plot_cells_embedding <-
 #'
 #' @importFrom tidyr pivot_longer
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = c(rep("a", 500), rep("b", 500))
+#'     )
+#'
+#' # make a layout colored by a marker
+#' layout_cd38 <-
+#'     tof_plot_cells_layout(
+#'         tof_tibble = sim_data,
+#'         color_col = cd38
+#'     )
+#'
+#' # make a layout colored by cluster id
+#' layout_cluster <-
+#'     tof_plot_cells_layout(
+#'         tof_tibble = sim_data,
+#'         color_col = cluster_id,
+#'     )
 #'
 tof_plot_cells_layout <-
   function(
@@ -559,6 +626,34 @@ tof_plot_cells_layout <-
 #' @importFrom tidygraph convert
 #' @importFrom tidygraph to_minimum_spanning_tree
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' # make a layout colored by a marker
+#' layout_cd38 <-
+#'     tof_plot_cluster_mst(
+#'         tof_tibble = sim_data,
+#'         cluster_col = cluster_id,
+#'         color_col = cd38
+#'     )
+#'
+#'  # use the same layout as the plot above to color the same
+#'  # tree using a different marker
+#'  layout_cd45 <-
+#'     tof_plot_cluster_mst(
+#'         tof_tibble = sim_data,
+#'         cluster_col = cluster_id,
+#'         color_col = cd45,
+#'         graph_layout = layout_cd38
+#'     )
+#'
 tof_plot_cluster_mst <-
   function(
     tof_tibble,
@@ -600,9 +695,9 @@ tof_plot_cluster_mst <-
       cluster_tibble <-
         tof_tibble %>%
         dplyr::select(
-          {{cluster_col}},
-          {{color_col}},
-          {{knn_cols}}
+          {{ cluster_col }},
+          {{ color_col }},
+          {{ knn_cols }}
         ) %>%
         # compute one summary statistic for each cluster across all knn_cols
         tof_summarize_clusters(
@@ -835,8 +930,6 @@ tof_plot_cluster_mst <-
   }
 
 
-
-
 #' Create a volcano plot from differential expression analysis results
 #'
 #' This function makes a volcano plot using the results of a differential
@@ -912,6 +1005,24 @@ tof_plot_cluster_mst <-
 #'
 #' @importFrom tidyr drop_na
 #' @importFrom tidyr unnest
+#'
+#' @examples
+#'
+#' # create a mock differential expression analysis result
+#' sim_dea_result <-
+#'     dplyr::tibble(
+#'         cluster_id = rep(letters, 2),
+#'         marker = rep(c("cd45", "cd34"), times = length(letters)),
+#'         p_adj = runif(n = 2 * length(letters), min = 0, max = 0.5),
+#'         mean_fc = runif(n = 2 * length(letters), min = 0.01, max = 10),
+#'         significant = dplyr::if_else(p_adj < 0.05, "*", "")
+#'     )
+#'
+#'  attr(sim_dea_result, which = "dea_method") <- "t_unpaired"
+#'
+#'  # create the volcano plot
+#'  volcano <- tof_plot_cluster_volcano(dea_result = sim_dea_result)
+#'
 #'
 tof_plot_cluster_volcano <-
   function(
@@ -1055,120 +1166,6 @@ tof_plot_cluster_volcano <-
   }
 
 
-
-#' Title
-#'
-#' Description
-#'
-#' @param tof_tibble TO DO
-#' @param daa_result TO DO
-#' @param cluster_col TO DO
-#' @param group_cols TO DO
-#' @param color_col TO DO
-#' @param dodge_width TO DO
-#' @param asterisk_size TO DO
-#' @param theme TO DO
-#'
-#' @return TO DO
-#'
-#' @importFrom dplyr across
-#' @importFrom dplyr count
-#' @importFrom dplyr group_by
-#' @importFrom dplyr mutate
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr select
-#' @importFrom dplyr slice_max
-#'
-#' @importFrom ggplot2 aes
-#' @importFrom ggplot2 geom_boxplot
-#' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 geom_text
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 position_dodge
-#'
-tof_plot_cluster_abundance <-
-  function(
-    tof_tibble,
-    daa_result,
-    cluster_col,
-    group_cols, # columns that should be used to group cells into independent observations
-    color_col,
-    dodge_width = 0.4,
-    asterisk_size = 5,
-    theme = ggplot2::theme_bw()
-  ) {
-
-    # extract cluster_col name
-    cluster_colname <-
-      tof_tibble %>%
-      dplyr::select({{cluster_col}}) %>%
-      colnames()
-
-    if (!(cluster_colname %in% colnames(daa_result))) {
-      stop("The name of the {{cluster_col}} must be the same in tof_tibble and daa_result.")
-    }
-
-    # format daa_result depending on the daa_method
-    plot_tibble <-
-      tof_tibble %>%
-      dplyr::mutate(
-        dplyr::across(
-          c({{cluster_col}}, {{color_col}}, {{group_cols}}),
-          .f = as.factor
-        )
-      )
-
-    plot_tibble <-
-      plot_tibble %>%
-      dplyr::count(
-        dplyr::across({{group_cols}}),
-        {{color_col}},
-        {{cluster_col}},
-        .drop = FALSE
-      ) %>%
-      dplyr::left_join(
-        dplyr::select(daa_result, {{cluster_col}}, .data$significant),
-        by = cluster_colname
-      ) %>%
-      dplyr::group_by(dplyr::across({{group_cols}})) %>%
-      dplyr::mutate(prop = .data$n / sum(.data$n)) %>%
-      dplyr::ungroup()
-
-    sig_tibble <-
-      plot_tibble %>%
-      dplyr::group_by({{cluster_col}}) %>%
-      dplyr::slice_max(.data$prop) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(
-        {{cluster_col}},
-        {{color_col}},
-        .data$prop,
-        .data$significant
-      )
-
-    violin_plot <-
-      plot_tibble %>%
-      ggplot2::ggplot(
-        ggplot2::aes(x = {{cluster_col}}, y = .data$prop, fill = {{color_col}})
-      ) +
-      ggplot2::geom_boxplot(
-        position = ggplot2::position_dodge(width = dodge_width),
-        outlier.shape = NA
-      ) +
-      ggplot2::geom_point(position = ggplot2::position_dodge(width = dodge_width)) +
-      ggplot2::geom_text(
-        ggplot2::aes(label = .data$significant),
-        size = asterisk_size,
-        data = sig_tibble
-      ) +
-      ggplot2::labs(
-        y = "Proportion of cells per group"
-      )
-
-    return(violin_plot + theme)
-
-  }
-
 #' Make a heatmap summarizing cluster marker expression patterns in CyTOF data
 #'
 #' This function makes a heatmap of cluster-to-cluster marker expression patterns
@@ -1213,7 +1210,21 @@ tof_plot_cluster_abundance <-
 #'
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
 #'
+#' heatmap <-
+#'     tof_plot_cluster_heatmap(
+#'         tof_tibble = sim_data,
+#'         cluster_col = cluster_id
+#'     )
 #'
 tof_plot_cluster_heatmap <-
   function(
@@ -1288,7 +1299,21 @@ tof_plot_cluster_heatmap <-
 #'
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         sample_id = sample(paste0("sample", 1:5), size = 1000, replace = TRUE)
+#'     )
 #'
+#' heatmap <-
+#'     tof_plot_sample_heatmap(
+#'         tof_tibble = sim_data,
+#'         sample_col = sample_id
+#'     )
 #'
 tof_plot_sample_heatmap <-
   function(
@@ -1357,6 +1382,30 @@ tof_plot_sample_heatmap <-
 #'
 #' @importFrom rlang quo
 #'
+#' @examples
+#'
+#' # simulate single-cell data
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         sample_id = sample(paste0("sample", 1:5), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract cluster proportions in each simulated patient
+#' feature_data <-
+#'     tof_extract_proportion(
+#'        tof_tibble = sim_data,
+#'        cluster_col = cluster_id,
+#'        group_cols = sample_id
+#'     )
+#'
+#' # plot the heatmap
+#' heatmap <- tof_plot_sample_features(feature_tibble = feature_data)
+#'
 tof_plot_sample_features <-
   function(
     feature_tibble,
@@ -1410,6 +1459,59 @@ tof_plot_sample_features <-
 #'
 #' @importFrom ggplot2 theme_bw
 #'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             )
+#'    )
+#'
+#' new_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:20),
+#'         cd45 = runif(n = 20),
+#'         pstat5 = runif(n = 20),
+#'         cd34 = runif(n = 20),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(20),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             )
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'    )
+#'
+#' # make the plot
+#' plot_1 <- tof_plot_model(tof_model = regression_model, new_data = new_tibble)
+#'
+#' # train a logistic regression classifier
+#' logistic_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = class,
+#'         model_type = "two-class"
+#'     )
+#'
+#' # make the plot
+#'
+#' plot_2 <- tof_plot_model(tof_model = logistic_model, new_data = new_tibble)
 #'
 tof_plot_model <-
   function(
@@ -1485,8 +1587,6 @@ tof_plot_model <-
 #' @return A ggplot object. Specifically, a scatterplot
 #' of the predicted outcome vs. the true outcome will be returned.
 #'
-#' @export
-#'
 #' @importFrom dplyr mutate
 #' @importFrom dplyr tibble
 #'
@@ -1557,8 +1657,6 @@ tof_plot_model_linear <-
 #'
 #' @return A ggplot object. Specifically, an ROC curve..
 #'
-#' @export
-#'
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 coord_equal
 #' @importFrom ggplot2 geom_abline
@@ -1610,7 +1708,18 @@ tof_plot_model_logistic <-
 #' @return A ggplot object. Specifically, a one-versus-all ROC curve
 #' (one for each class).
 #'
-#' @export
+#' @importFrom dplyr filter
+#' @importFrom dplyr pull
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 coord_equal
+#' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 geom_abline
+#' @importFrom ggplot2 geom_path
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme_bw
+#'
 #'
 tof_plot_model_multinomial <-
   function(tof_model, new_data, theme = ggplot2::theme_bw()) {
@@ -1653,8 +1762,6 @@ tof_plot_model_multinomial <-
 #' representing censored values in the Kaplan-Meier curve.
 #'
 #' @return A ggplot object. Specifically, a Kaplan-Meier curve.
-#'
-#' @export
 #'
 #' @importFrom dplyr filter
 #' @importFrom dplyr group_by

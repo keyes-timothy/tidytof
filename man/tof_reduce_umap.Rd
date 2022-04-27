@@ -61,6 +61,37 @@ in the calculated UMAP space.
 \description{
 This function calculates a UMAP embedding from single-cell data in a `tof_tibble`.
 }
+\examples{
+# simulate single-cell data
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200)
+    )
+new_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 50),
+        cd38 = rnorm(n = 50),
+        cd34 = rnorm(n = 50),
+        cd19 = rnorm(n = 50)
+    )
+
+# calculate umap
+tof_reduce_umap(tof_tibble = sim_data)
+
+# calculate umap with only 2 columns
+tof_reduce_tsne(tof_tibble = sim_data, umap_cols = c(cd34, cd38))
+
+# return recipe
+umap_recipe <- tof_reduce_umap(tof_tibble = sim_data, return_recipe = TRUE)
+
+# apply recipe to new data
+recipes::bake(umap_recipe, new_data = new_data)
+
+
+}
 \seealso{
 Other dimensionality reduction functions: 
 \code{\link{tof_reduce_dimensions}()},

@@ -38,7 +38,7 @@ A data frame with 6000 rows and 26 variables:
 \url{https://cytobank.org/nolanlab/reports/Levine2015.html}
 }
 \usage{
-phenograph_data
+data(phenograph_data)
 }
 \description{
 A dataset containing CyTOF measurements from healthy control cells originally studied

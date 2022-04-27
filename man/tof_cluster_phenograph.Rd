@@ -9,7 +9,6 @@ tof_cluster_phenograph(
   cluster_cols = where(tof_is_numeric),
   num_neighbors = 30,
   distance_function = c("euclidean", "cosine"),
-  seed,
   ...
 )
 }
@@ -29,10 +28,6 @@ will add time to the computation). Defaults to 30.}
 for the nearest-neighbor calculation. Options include "euclidean"
 (the default) and "cosine" distances.}
 
-\item{seed}{An integer used to set the random seed for the clustering.
-Setting this argument explicitly can be useful for reproducibility purposes.
-Defaults to a random integer}
-
 \item{...}{Optional additional parameters that can be passed to
 \code{\link{tof_find_knn}}.}
 }
@@ -48,6 +43,18 @@ selection of input variables/CyTOF measurements.
 \details{
 For additional details about the Phenograph algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/26095251/}{this paper}.
+}
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+tof_cluster_phenograph(tof_tibble = sim_data)
+tof_cluster_phenograph(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
+
 }
 \seealso{
 Other clustering functions: 

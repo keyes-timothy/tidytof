@@ -7,6 +7,8 @@ library(testthat)
 
 # setup
 
+data(ddpr_data)
+
 dat <-
   ddpr_data %>%
   group_by(sample_name) %>%

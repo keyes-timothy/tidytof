@@ -62,6 +62,17 @@
 #' @importFrom stats hclust
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster_hierarchical(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 tof_metacluster_hierarchical <-
   function(
@@ -169,6 +180,18 @@ tof_metacluster_hierarchical <-
 #'
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster_kmeans(tof_tibble = sim_data, cluster_col = cluster_id)
+#'
 tof_metacluster_kmeans <-
   function(
     tof_tibble,
@@ -269,6 +292,18 @@ tof_metacluster_kmeans <-
 #' @importFrom dplyr rename
 #'
 #' @importFrom stats median
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster_phenograph(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 tof_metacluster_phenograph <-
   function(
@@ -399,6 +434,18 @@ tof_metacluster_phenograph <-
 #' @importFrom rlang is_installed
 #'
 #' @importFrom stats median
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster_consensus(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 #'
 tof_metacluster_consensus <-
@@ -537,8 +584,6 @@ tof_metacluster_consensus <-
 #' Options are "consensus" (the default), "hierarchical", "kmeans", and "som"
 #' (i.e. self-organizing map; the FlowSOM algorithm itself).
 #'
-#' @param seed Optional. An integer to set a random seed for the metaclustering
-#' procedure..
 #'
 #' @param ... Optional additional arguments to pass to
 #' \code{\link[FlowSOM]{MetaClustering}}.
@@ -559,6 +604,28 @@ tof_metacluster_consensus <-
 #'
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster_flowsom(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     clustering_algorithm = "consensus"
+#' )
+#'
+#' tof_metacluster_flowsom(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     clustering_algorithm = "som"
+#' )
+#'
 #'
 tof_metacluster_flowsom <-
   function(
@@ -568,7 +635,6 @@ tof_metacluster_flowsom <-
     central_tendency_function = stats::median,
     num_metaclusters = 10L,
     clustering_algorithm = c("consensus", "hierarchical", "kmeans", "som"),
-    seed = sample(.Random.seed, size = 1),
     ...
   ) {
     # check that FlowSOM is installed
@@ -616,7 +682,6 @@ tof_metacluster_flowsom <-
         data = data_matrix,
         method = clustering_algorithm,
         max = num_metaclusters,
-        seed = seed,
         ...
       ) %>%
       as.character()
@@ -683,6 +748,28 @@ tof_metacluster_flowsom <-
 #'
 #' @importFrom stats median
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' tof_metacluster(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     clustering_algorithm = "consensus",
+#'     method = "flowsom"
+#' )
+#'
+#' tof_metacluster(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     method = "phenograph"
+#' )
 #'
 tof_metacluster <-
   function(

@@ -81,6 +81,20 @@ the number of desired metaclusters.
 See \code{\link[ConsensusClusterPlus]{ConsensusClusterPlus}} for additional
 details.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+tof_metacluster_consensus(tof_tibble = sim_data, cluster_col = cluster_id)
+
+
+}
 \seealso{
 Other metaclustering functions: 
 \code{\link{tof_metacluster_flowsom}()},

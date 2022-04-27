@@ -35,7 +35,18 @@
 #'
 #' @export
 #'
+#' @examples
 #'
+#' # read in an example .fcs file from tidytof's internal datasets
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#' tof_tibble <- tof_read_data(input_file)
+#'
+#' # preprocess all numeric columns with default behavior
+#' # arcsinh transformation with a cofactor of 5
+#' tof_preprocess(tof_tibble)
+#'
+#' # preprocess all numeric columns using the log base 10 tranformation
+#' tof_preprocess(tof_tibble, transform_fun = log10)
 #'
 tof_preprocess <-
   function(
@@ -91,6 +102,18 @@ tof_preprocess <-
 #'
 #' @export
 #'
+#' @examples
+#'
+#' # read in an example .fcs file from tidytof's internal datasets
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#' tof_tibble <- tof_read_data(input_file)
+#'
+#' # preprocess all numeric columns with default behavior
+#' # arcsinh transformation with a cofactor of 5
+#' preprocessed_tof_tibble <- tof_preprocess(tof_tibble)
+#'
+#' # postprocess all numeric columns to reverse the preprocessing
+#' tof_postprocess(tof_tibble)
 #'
 tof_postprocess <-
   function(

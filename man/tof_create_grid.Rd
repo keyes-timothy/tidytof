@@ -44,6 +44,10 @@ and the lasso/ridge regression mixture term.
 \examples{
 tof_create_grid()
 
+tof_create_grid(num_penalty_values = 10, num_mixture_values = 5)
+
+tof_create_grid(penalty_values = c(0.01, 0.1, 0.5))
+
 }
 \seealso{
 Other modeling functions: 

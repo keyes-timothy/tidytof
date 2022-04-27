@@ -38,9 +38,6 @@
 #' @param num_metaclusters An integer indicating the maximum number of metaclusters
 #' that should be returned after metaclustering. Defaults to 20.
 #'
-#' @param seed An integer used to set the random seed for the clustering.
-#' Setting this argument explicitly can be useful for reproducibility purposes.
-#' Defaults to a random integer
 #'
 #' @param ... Optional additional parameters that can be passed to the \code{\link[FlowSOM]{BuildSOM}}
 #' function.
@@ -54,6 +51,16 @@
 #'
 #' @export
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200)
+#'     )
+#'
+#' tof_cluster_flowsom(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 #'
 tof_cluster_flowsom <-
   function(
@@ -64,7 +71,6 @@ tof_cluster_flowsom <-
     som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
     perform_metaclustering = TRUE,
     num_metaclusters = 20,
-    seed,
     ...
   ) {
 
@@ -78,11 +84,6 @@ tof_cluster_flowsom <-
           }\n
           BiocManager::install(\"FlowSOM\")\n"
       )
-    }
-
-    # set random seed
-    if(!missing(seed)) {
-      set.seed(seed)
     }
 
     som_distance_function <-
@@ -166,9 +167,6 @@ tof_cluster_flowsom <-
 #' for the nearest-neighbor calculation. Options include "euclidean"
 #' (the default) and "cosine" distances.
 #'
-#' @param seed An integer used to set the random seed for the clustering.
-#' Setting this argument explicitly can be useful for reproducibility purposes.
-#' Defaults to a random integer
 #'
 #'
 #' @param ... Optional additional parameters that can be passed to
@@ -182,7 +180,16 @@ tof_cluster_flowsom <-
 #'
 #' @export
 #'
-#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#' tof_cluster_phenograph(tof_tibble = sim_data)
+#' tof_cluster_phenograph(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 #'
 tof_cluster_phenograph <-
   function(
@@ -190,13 +197,8 @@ tof_cluster_phenograph <-
     cluster_cols = where(tof_is_numeric),
     num_neighbors = 30,
     distance_function = c("euclidean", "cosine"),
-    seed,
     ...
   ) {
-    # set random seed
-    if(!missing(seed)) {
-      set.seed(seed)
-    }
 
     result <-
       phenograph_cluster(
@@ -204,7 +206,6 @@ tof_cluster_phenograph <-
         cluster_cols = {{cluster_cols}},
         num_neighbors = num_neighbors,
         distance_function = distance_function,
-        seed = seed,
         ...
       )
 
@@ -229,9 +230,6 @@ tof_cluster_phenograph <-
 #' @param num_clusters An integer indicating the maximum number of clusters
 #' that should be returned. Defaults to 20.
 #'
-#' @param seed An integer used to set the random seed for the clustering.
-#' Setting this argument explicitly can be useful for reproducibility purposes.
-#' Defaults to a random integer
 #'
 #' @param ... Optional additional arguments that can be passed to
 #' \code{\link[stats]{kmeans}}.
@@ -249,20 +247,25 @@ tof_cluster_phenograph <-
 #' @importFrom purrr pluck
 #' @importFrom dplyr tibble
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#' tof_cluster_kmeans(tof_tibble = sim_data)
+#' tof_cluster_kmeans(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
+#'
 #'
 tof_cluster_kmeans <-
   function(
     tof_tibble,
     cluster_cols = where(tof_is_numeric),
     num_clusters = 20,
-    seed,
     ...
   ) {
-
-    # set random seed
-    if(!missing(seed)) {
-      set.seed(seed)
-    }
 
     kmeans_clusters <-
       stats::kmeans(
@@ -348,6 +351,30 @@ tof_cluster_kmeans <-
 #' @importFrom dplyr select
 #' @importFrom dplyr pull
 #' @importFrom dplyr rename_with
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' healthy_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200),
+#'         cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+#'     )
+#'
+#' tof_cluster_ddpr(
+#'     tof_tibble = sim_data,
+#'     healthy_tibble = healthy_data,
+#'     healthy_label_col = cluster_id
+#' )
 #'
 #'
 tof_cluster_ddpr <-
@@ -460,6 +487,18 @@ tof_cluster_ddpr <-
 #' @importFrom dplyr select
 #'
 #' @export
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 500),
+#'         cd38 = rnorm(n = 500),
+#'         cd34 = rnorm(n = 500),
+#'         cd19 = rnorm(n = 500)
+#'     )
+#'
+#' tof_cluster(tof_tibble = sim_data, method = "kmeans")
+#' tof_cluster(tof_tibble = sim_data, method = "phenograph")
 #'
 tof_cluster <-
   function(

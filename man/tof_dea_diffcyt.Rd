@@ -128,6 +128,10 @@ The two methods are based on linear mixed models ("lmm") and
 Both the "lmm" and "limma" methods can model both fixed effects and random
 effects.
 }
+\examples{
+# For differential discovery examples, please see the package vignettes
+
+}
 \seealso{
 Other differential expression analysis functions: 
 \code{\link{tof_dea_lmm}()},

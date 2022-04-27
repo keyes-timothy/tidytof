@@ -10,6 +10,9 @@ where(fn)
 \item{fn}{A function that returns TRUE or FALSE (technically, a predicate function).
 Can also be a purrr-like formula.}
 }
+\value{
+A predicate that can be used to select columns from a data.frame.
+}
 \description{
 This is a copy of \code{\link[tidyselect]{where}}, a selection helper that
 selects the variables for which a predicate function returns TRUE. See

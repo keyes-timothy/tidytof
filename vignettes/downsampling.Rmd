@@ -38,6 +38,8 @@ To do this, `{tidytof}` implements the `tof_downsample()` verb, which allows dow
 Using `{tidytof}`'s built-in dataset `phenograph_data`, we can see that the original size of the dataset is 1000 cells per cluster, or 3000 cells in total:
 
 ```{r}
+data(phenograph_data)
+
 phenograph_data %>% 
   dplyr::count(phenograph_cluster)
 ```

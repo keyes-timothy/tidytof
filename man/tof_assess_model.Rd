@@ -62,6 +62,40 @@ This function assesses a trained `tof_model`'s performance on new data by
 computing model type-specific performance measurements. If new data isn't
 provided, performance metrics for the training data will be provided.
 }
+\examples{
+feature_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:100),
+        cd45 = runif(n = 100),
+        pstat5 = runif(n = 100),
+        cd34 = runif(n = 100),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(100)
+   )
+
+new_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:20),
+        cd45 = runif(n = 20),
+        pstat5 = runif(n = 20),
+        cd34 = runif(n = 20),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(20)
+   )
+
+split_data <- tof_split_data(feature_tibble, split_method = "simple")
+
+# train a regression model
+regression_model <-
+    tof_train_model(
+        split_data = split_data,
+        predictor_cols = c(cd45, pstat5, cd34),
+        response_col = outcome,
+        model_type = "linear"
+   )
+
+# assess the model on new data
+tof_assess_model(tof_model = regression_model, new_data = new_tibble)
+
+}
 \seealso{
 Other modeling functions: 
 \code{\link{tof_create_grid}()},

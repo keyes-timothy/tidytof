@@ -50,6 +50,24 @@ in the calculated tSNE space.
 \description{
 This function calculates a tSNE embedding using single-cell data from a `tof_tibble`.
 }
+\examples{
+# simulate single-cell data
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200)
+    )
+
+# calculate tsne
+tof_reduce_tsne(tof_tibble = sim_data)
+
+# calculate tsne with only 2 columns
+tof_reduce_tsne(tof_tibble = sim_data, tsne_cols = c(cd34, cd38))
+
+
+}
 \seealso{
 Other dimensionality reduction functions: 
 \code{\link{tof_reduce_dimensions}()},

@@ -8,7 +8,6 @@ tof_cluster_kmeans(
   tof_tibble,
   cluster_cols = where(tof_is_numeric),
   num_clusters = 20,
-  seed,
   ...
 )
 }
@@ -22,10 +21,6 @@ in `tof_tibble`. Supports tidyselect helpers.}
 \item{num_clusters}{An integer indicating the maximum number of clusters
 that should be returned. Defaults to 20.}
 
-\item{seed}{An integer used to set the random seed for the clustering.
-Setting this argument explicitly can be useful for reproducibility purposes.
-Defaults to a random integer}
-
 \item{...}{Optional additional arguments that can be passed to
 \code{\link[stats]{kmeans}}.}
 }
@@ -38,6 +33,19 @@ the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assig
 This function performs k-means clustering on CyTOF data using a user-specified
 selection of input variables/CyTOF measurements. It is mostly a convenient
 wrapper around \code{\link[stats]{kmeans}}.
+}
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+tof_cluster_kmeans(tof_tibble = sim_data)
+tof_cluster_kmeans(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
+
+
 }
 \seealso{
 Other clustering functions: 

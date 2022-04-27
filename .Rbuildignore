@@ -3,7 +3,6 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^data-raw$
-^tests-raw$
 ^betas$
 ^notes$
 ^manuscript$

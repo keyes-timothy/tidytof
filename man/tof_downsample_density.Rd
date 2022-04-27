@@ -76,6 +76,38 @@ This function downsamples the number of cells in a `tof_tbl` using the
 density-dependent downsampling algorithm described in
 \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+tof_downsample_density(
+    tof_tibble = sim_data,
+    density_cols = c(cd45, cd34, cd38),
+    target_prop_cells = 0.5,
+    density_estimation_method = "spade"
+)
+
+tof_downsample_density(
+    tof_tibble = sim_data,
+    density_cols = c(cd45, cd34, cd38),
+    target_num_cells = 200L,
+    density_estimation_method = "spade"
+)
+
+tof_downsample_density(
+    tof_tibble = sim_data,
+    density_cols = c(cd45, cd34, cd38),
+    target_num_cells = 200L,
+    density_estimation_method = "mean_distance"
+)
+
+
+}
 \seealso{
 Other downsampling functions: 
 \code{\link{tof_downsample_constant}()},

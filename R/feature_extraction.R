@@ -47,6 +47,32 @@
 #' @importFrom tidyr separate
 #' @importFrom rlang arg_match
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract proportion of each cluster in each patient in wide format
+#' tof_extract_proportion(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient
+#' )
+#'
+#' # extract proportion of each cluster in each patient in long format
+#' tof_extract_proportion(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     format = "long"
+#' )
 #'
 tof_extract_proportion <-
   function(
@@ -192,6 +218,32 @@ tof_extract_proportion <-
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract proportion of each cluster in each patient in wide format
+#' tof_extract_central_tendency(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient
+#' )
+#'
+#' # extract proportion of each cluster in each patient in long format
+#' tof_extract_central_tendency(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     format = "long"
+#' )
 #'
 tof_extract_central_tendency <-
   function(
@@ -308,6 +360,33 @@ tof_extract_central_tendency <-
 #' @importFrom tidyr pivot_wider
 #' @importFrom stringr str_c
 #' @importFrom stringr str_remove
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract proportion of each cluster in each patient in wide format
+#' tof_extract_threshold(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient
+#' )
+#'
+#' # extract proportion of each cluster in each patient in long format
+#' tof_extract_threshold(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     format = "long"
+#' )
 #'
 tof_extract_threshold <-
   function(
@@ -449,6 +528,37 @@ tof_extract_threshold <-
 #' @importFrom rlang arg_match
 #' @importFrom rlang enquo
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract emd of each cluster in each patient (using the "basal" stim
+#' # condition as a reference) in wide format
+#' tof_extract_emd(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     emd_col = stim,
+#'     reference_level = "basal"
+#' )
+#'
+#' # extract emd of each cluster (using the "basal" stim
+#' # condition as a reference) in long format
+#' tof_extract_emd(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     emd_col = stim,
+#'     reference_level = "basal",
+#'     format = "long"
+#' )
 #'
 tof_extract_emd <-
   function(
@@ -645,6 +755,38 @@ tof_extract_emd <-
 #' @importFrom purrr map2_dbl
 #' @importFrom tidyselect all_of
 #' @importFrom stringr str_c
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract jsd of each cluster in each patient (using the "basal" stim
+#' # condition as a reference) in wide format
+#' tof_extract_jsd(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     jsd_col = stim,
+#'     reference_level = "basal"
+#' )
+#'
+#' # extract jsd of each cluster (using the "basal" stim
+#' # condition as a reference) in long format
+#' tof_extract_jsd(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     jsd_col = stim,
+#'     reference_level = "basal",
+#'     format = "long"
+#' )
 #'
 tof_extract_jsd <-
   function(
@@ -849,6 +991,51 @@ tof_extract_jsd <-
 #' @family feature extraction functions
 #'
 #' @export
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE),
+#'         patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+#'         stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+#'     )
+#'
+#' # extract the following features from each cluster in each
+#' # patient/stimulation:
+#' #    - proportion of each cluster
+#' #    - central tendency (median) of cd45 and cd38 in each cluster
+#' #    - the proportion of cells in each cluster with cd34 expression over
+#' #      the default threshold (asinh(10 / 5))
+#' tof_extract_features(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     lineage_cols = c(cd45, cd38),
+#'     signaling_cols = cd34,
+#'     stimulation_col = stim
+#' )
+#'
+#' # extract the following features from each cluster in each
+#' # patient/stimulation:
+#' #    - proportion of each cluster
+#' #    - central tendency (mean) of cd45 and cd38 in each cluster
+#' #    - the earth mover's distance between each cluster's cd34 histogram in
+#' #      the "basal" and "stim" conditions
+#' tof_extract_features(
+#'     tof_tibble = sim_data,
+#'     cluster_col = cluster_id,
+#'     group_cols = patient,
+#'     lineage_cols = c(cd45, cd38),
+#'     signaling_cols = cd34,
+#'     central_tendency_function = mean,
+#'     stimulation_col = stim,
+#'     signaling_method = "emd",
+#'     basal_level = "basal"
+#' )
 #'
 tof_extract_features <-
   function(

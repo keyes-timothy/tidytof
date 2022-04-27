@@ -37,6 +37,20 @@ This function transforms a `tof_tbl` of raw ion counts directly measured on
 a mass cytometer using a user-provided function. It can be used to perform
 standard pre-processing steps before CyTOF data analysis.
 }
+\examples{
+
+# read in an example .fcs file from tidytof's internal datasets
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+tof_tibble <- tof_read_data(input_file)
+
+# preprocess all numeric columns with default behavior
+# arcsinh transformation with a cofactor of 5
+tof_preprocess(tof_tibble)
+
+# preprocess all numeric columns using the log base 10 tranformation
+tof_preprocess(tof_tibble, transform_fun = log10)
+
+}
 \seealso{
 [tof_postprocess()]
 }

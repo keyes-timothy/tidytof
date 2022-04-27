@@ -11,6 +11,8 @@
 #' Nat Med. 2018 May;24(4):474-483. doi: 10.1038/nm.4505. Epub 2018 Mar 5.
 #' PMID: 29505032; PMCID: PMC5953207.
 #'
+#' @usage data(ddpr_data)
+#'
 #'
 #' @format A data frame with 10000 rows and 24 variables:
 #' \describe{
@@ -49,6 +51,8 @@
 #' lymphoblastic leukemia at diagnosis reveals predictors of relapse.
 #' Nat Med. 2018 May;24(4):474-483. doi: 10.1038/nm.4505. Epub 2018 Mar 5.
 #' PMID: 29505032; PMCID: PMC5953207.
+#'
+#' @usage data(ddpr_metadata)
 #'
 #'
 #' @format A data frame with 10000 rows and 12 variables:
@@ -91,6 +95,8 @@
 #' 2000 cells from 3 clusters identified in the original paper have been
 #' sampled.
 #'
+#' @usage data(phenograph_data)
+#'
 #' @format A data frame with 6000 rows and 26 variables:
 #' \describe{
 #'   \item{sample_name}{Name of the sample from which the data was read}
@@ -126,6 +132,8 @@
 #'
 #' A character vector used by `tof_read_fcs` and `tof_read_data` to detect and
 #' parse which CyTOF metals correspond to each channel in an input .fcs file.
+#'
+#' @usage data(metal_masterlist)
 #'
 #' @format A character vector in which each entry is a pattern that tidytof searches
 #' for in every CyTOF channel in input .fcs files. These patterns are an amalgamate

@@ -48,6 +48,32 @@
 #' @importFrom recipes juice
 #' @importFrom recipes step_pca
 #'
+#' @examples
+#' # simulate single-cell data
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200)
+#'     )
+#' new_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 50),
+#'         cd38 = rnorm(n = 50),
+#'         cd34 = rnorm(n = 50),
+#'         cd19 = rnorm(n = 50)
+#'     )
+#'
+#' # calculate pca
+#' tof_reduce_pca(tof_tibble = sim_data, num_comp = 2)
+#'
+#' # return recipe instead of embeddings
+#' pca_recipe <- tof_reduce_pca(tof_tibble = sim_data, return_recipe = TRUE)
+#'
+#' # apply recipe to new data
+#' recipes::bake(pca_recipe, new_data = new_data)
+#'
 #'
 tof_reduce_pca <-
   function(
@@ -131,6 +157,23 @@ tof_reduce_pca <-
 #'
 #' @importFrom dplyr as_tibble
 #' @importFrom purrr pluck
+#'
+#' @examples
+#' # simulate single-cell data
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200)
+#'     )
+#'
+#' # calculate tsne
+#' tof_reduce_tsne(tof_tibble = sim_data)
+#'
+#' # calculate tsne with only 2 columns
+#' tof_reduce_tsne(tof_tibble = sim_data, tsne_cols = c(cd34, cd38))
+#'
 #'
 tof_reduce_tsne <-
   function(
@@ -233,6 +276,35 @@ tof_reduce_tsne <-
 #'
 #' @importFrom embed step_umap
 #'
+#' @examples
+#' # simulate single-cell data
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200)
+#'     )
+#' new_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 50),
+#'         cd38 = rnorm(n = 50),
+#'         cd34 = rnorm(n = 50),
+#'         cd19 = rnorm(n = 50)
+#'     )
+#'
+#' # calculate umap
+#' tof_reduce_umap(tof_tibble = sim_data)
+#'
+#' # calculate umap with only 2 columns
+#' tof_reduce_tsne(tof_tibble = sim_data, umap_cols = c(cd34, cd38))
+#'
+#' # return recipe
+#' umap_recipe <- tof_reduce_umap(tof_tibble = sim_data, return_recipe = TRUE)
+#'
+#' # apply recipe to new data
+#' recipes::bake(umap_recipe, new_data = new_data)
+#'
 #'
 tof_reduce_umap <-
   function(
@@ -312,6 +384,25 @@ tof_reduce_umap <-
 #' @importFrom dplyr bind_cols
 #'
 #' @export
+#'
+#' @examples
+#' # simulate single-cell data
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 100),
+#'         cd38 = rnorm(n = 100),
+#'         cd34 = rnorm(n = 100),
+#'         cd19 = rnorm(n = 100)
+#'     )
+#'
+#' # calculate pca
+#' tof_reduce_dimensions(tof_tibble = sim_data, method = "pca")
+#'
+#' # calculate tsne
+#' tof_reduce_dimensions(tof_tibble = sim_data, method = "tsne")
+#'
+#' # calculate umap
+#' tof_reduce_dimensions(tof_tibble = sim_data, method = "umap")
 #'
 #'
 tof_reduce_dimensions <-

@@ -1,4 +1,4 @@
-# #' @import dplyr
+#' @import Rcpp
 #'
 #' @importFrom methods as
 #'
@@ -49,6 +49,8 @@ rlang::`.data`
 #' @importFrom tidyselect vars_select_helpers
 #'
 #' @export
+#'
+#' @return A predicate that can be used to select columns from a data.frame.
 #'
 #' @references  Lionel Henry and Hadley Wickham (2021). tidyselect:
 #' Select from a Set of Strings. R package version 1.1.1.

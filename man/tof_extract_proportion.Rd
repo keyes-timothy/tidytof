@@ -46,6 +46,34 @@ This feature extraction function allows you to calculate the proportion of
 cells in each cluster in a `tof_tibble` - either overall or when broken down
 into subgroups using `group_cols`.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE),
+        patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+        stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+    )
+
+# extract proportion of each cluster in each patient in wide format
+tof_extract_proportion(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    group_cols = patient
+)
+
+# extract proportion of each cluster in each patient in long format
+tof_extract_proportion(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    group_cols = patient,
+    format = "long"
+)
+
+}
 \seealso{
 Other feature extraction functions: 
 \code{\link{tof_extract_central_tendency}()},

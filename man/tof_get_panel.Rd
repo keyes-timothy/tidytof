@@ -17,6 +17,13 @@ in `tof_tibble`.
 \description{
 Get panel information from a tof_tibble
 }
+\examples{
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+tof_tibble <- tof_read_data(input_file)
+tof_get_panel(tof_tibble)
+
+
+}
 \seealso{
 Other tof_tbl utilities: 
 \code{\link{new_tof_tibble}()},

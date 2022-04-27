@@ -29,6 +29,12 @@ of the .fcs file from which each cell was read.
 \description{
 Read data from an .fcs/.csv file or a directory of .fcs/.csv files.
 }
+\examples{
+
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+tof_read_data(input_file)
+
+}
 \seealso{
 Other input/output functions: 
 \code{\link{tof_write_csv}()},

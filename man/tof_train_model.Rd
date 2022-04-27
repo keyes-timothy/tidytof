@@ -140,6 +140,55 @@ elastic net model using a variety of user-specified details. Tuning can be
 performed using either a simple training vs. test set split, k-fold cross-validation,
 or bootstrapping, and multiple preprocessing options are available.
 }
+\examples{
+feature_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:100),
+        cd45 = runif(n = 100),
+        pstat5 = runif(n = 100),
+        cd34 = runif(n = 100),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+        class =
+            as.factor(
+                dplyr::if_else(outcome > median(outcome), "class1", "class2")
+            ),
+        multiclass =
+            as.factor(
+                c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+            ),
+        event = c(rep(0, times = 30), rep(1, times = 70)),
+        time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+   )
+
+split_data <- tof_split_data(feature_tibble, split_method = "simple")
+
+# train a regression model
+tof_train_model(
+    split_data = split_data,
+    predictor_cols = c(cd45, pstat5, cd34),
+    response_col = outcome,
+    model_type = "linear"
+)
+
+# train a logistic regression classifier
+tof_train_model(
+    split_data = split_data,
+    predictor_cols = c(cd45, pstat5, cd34),
+    response_col = class,
+    model_type = "two-class"
+)
+
+# train a cox regression survival model
+tof_train_model(
+    split_data = split_data,
+    predictor_cols = c(cd45, pstat5, cd34),
+    time_col = time_to_event,
+    event_col = event,
+    model_type = "survival"
+)
+
+
+}
 \seealso{
 Other modeling functions: 
 \code{\link{tof_assess_model}()},

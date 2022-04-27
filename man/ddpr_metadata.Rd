@@ -34,7 +34,7 @@ Nat Med. 2018 May;24(4):474-483. doi: 10.1038/nm.4505. Epub 2018 Mar 5.
 PMID: 29505032; PMCID: PMC5953207. Supplementary Table 1.
 }
 \usage{
-ddpr_metadata
+data(ddpr_metadata)
 }
 \description{
 A dataset containing patient-level clinical metadata for samples originally studied

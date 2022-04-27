@@ -139,6 +139,8 @@ tidytof_example_data("phenograph_csv") %>%
 Users may wish to store CyTOF data as FCS or CSV files after transformation, concatenation, filtering, or other data processing. To write single-cell data from a `tof_tbl` into FCS or CSV files, use `tof_write_data`. To illustrate how to use this verb, we use the `{tidytof}`'s built-in `phenograph_data` dataset.
 
 ```{r}
+data(phenograph_data)
+
 print(phenograph_data)
 ```
 

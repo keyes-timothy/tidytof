@@ -49,6 +49,27 @@ This function is a wrapper around {tidytof}'s tof_*_density() function family.
 It performs local density estimation on CyTOF data using a user-specified
 method (of 3 choices) and each method's corresponding input parameters.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+# perform the density estimation
+tof_estimate_density(tof_tibble = sim_data, method = "spade")
+
+# perform the density estimation with a smaller search radius around
+# each cell
+tof_estimate_density(
+    tof_tibble = sim_data,
+    alpha_multiplier = 2,
+    method = "spade"
+)
+
+}
 \seealso{
 Other local density estimation functions: 
 \code{\link{tof_knn_density}()},

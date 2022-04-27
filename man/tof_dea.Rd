@@ -27,6 +27,10 @@ contained within a `tof_tbl` using one of three methods
 function family: \code{\link{tof_dea_diffcyt}},
 \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}}.
 }
+\examples{
+# For differential discovery examples, please see the package vignettes
+
+}
 \seealso{
 Other differential expression analysis functions: 
 \code{\link{tof_dea_diffcyt}()},

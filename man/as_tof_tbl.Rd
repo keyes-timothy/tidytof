@@ -12,6 +12,17 @@ as_tof_tbl(flow_data, sep = "|")
 \item{sep}{A string indicating which symbol should be used to separate
 antigen names and metal names in the columns of the output tof_tbl.}
 }
+\value{
+A tof_tbl.
+}
 \description{
 Coerce flowFrames or flowSets into tof_tbl's.
+}
+\examples{
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+
+input_flowframe <- flowCore::read.FCS(input_file)
+
+tof_tibble <- as_tof_tbl(input_flowframe)
+
 }

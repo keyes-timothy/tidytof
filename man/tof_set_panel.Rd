@@ -20,6 +20,18 @@ in the input `tof_tibble`. Two columns are required: "metals" and "antigens".
 \description{
 Set panel information from a tof_tibble
 }
+\examples{
+# get current panel from an .fcs file
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+tof_tibble <- tof_read_data(input_file)
+current_panel <- tof_get_panel(tof_tibble)
+
+# create a new panel (remove empty channels)
+new_panel <- dplyr::filter(current_panel, antigens != "empty")
+tof_set_panel(tof_tibble = tof_tibble, panel = new_panel)
+
+
+}
 \seealso{
 Other tof_tbl utilities: 
 \code{\link{new_tof_tibble}()},

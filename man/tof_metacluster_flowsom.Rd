@@ -11,7 +11,6 @@ tof_metacluster_flowsom(
   central_tendency_function = stats::median,
   num_metaclusters = 10L,
   clustering_algorithm = c("consensus", "hierarchical", "kmeans", "som"),
-  seed = sample(.Random.seed, size = 1),
   ...
 )
 }
@@ -46,9 +45,6 @@ detect the optimal number of metaclusters.}
 Options are "consensus" (the default), "hierarchical", "kmeans", and "som"
 (i.e. self-organizing map; the FlowSOM algorithm itself).}
 
-\item{seed}{Optional. An integer to set a random seed for the metaclustering
-procedure..}
-
 \item{...}{Optional additional arguments to pass to
 \code{\link[FlowSOM]{MetaClustering}}.}
 }
@@ -67,6 +63,30 @@ metaclustering, hierarchical metaclustering, k-means metaclustering, or
 metaclustering using the FlowSOM algorithm itself.
 See \code{\link[FlowSOM]{MetaClustering}} for additional
 details.
+}
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+tof_metacluster_flowsom(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    clustering_algorithm = "consensus"
+)
+
+tof_metacluster_flowsom(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    clustering_algorithm = "som"
+)
+
+
 }
 \seealso{
 Other metaclustering functions: 

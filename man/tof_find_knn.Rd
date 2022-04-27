@@ -35,3 +35,28 @@ those two cells according to `distance_function`.
 \description{
 Find the k-nearest neighbors of each cell in a CyTOF dataset.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+# Find the 10 nearest neighbors of each cell in the dataset
+tof_find_knn(
+    .data = sim_data,
+    k = 10,
+    distance_function = "euclidean"
+)
+
+# Find the 10 approximate nearest neighbors (see RANN::nn2)
+tof_find_knn(
+    .data = sim_data,
+    k = 10,
+    distance_function = "euclidean",
+    eps = 0.3
+)
+
+}

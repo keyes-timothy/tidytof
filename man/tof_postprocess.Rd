@@ -36,6 +36,20 @@ This function transforms a `tof_tibble` of transformed ion counts from a mass
 cytometer back into something that looks more like an .fcs file that Fluidigm
 software generates.
 }
+\examples{
+
+# read in an example .fcs file from tidytof's internal datasets
+input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+tof_tibble <- tof_read_data(input_file)
+
+# preprocess all numeric columns with default behavior
+# arcsinh transformation with a cofactor of 5
+preprocessed_tof_tibble <- tof_preprocess(tof_tibble)
+
+# postprocess all numeric columns to reverse the preprocessing
+tof_postprocess(tof_tibble)
+
+}
 \seealso{
 [tof_preprocess()]
 }

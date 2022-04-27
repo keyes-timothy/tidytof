@@ -50,3 +50,22 @@ This function plots marker expression density plots for a user-specified
 column in a tof_tbl. Optionally, cells can be grouped to plot multiple
 vertically-arranged density plots
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(c("a", "b"), size = 1000, replace = TRUE)
+    )
+
+density_plot <-
+    tof_plot_cells_density(
+        tof_tibble = sim_data,
+        marker_col = cd45,
+        group_col = cluster_id
+    )
+
+
+}

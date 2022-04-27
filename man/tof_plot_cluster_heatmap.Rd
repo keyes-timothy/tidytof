@@ -54,3 +54,20 @@ in single-cell data. Markers are plotted along the horizontal (x-) axis of
 the heatmap and cluster IDs are plotted along the vertical (y-) axis of the
 heatmap.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+heatmap <-
+    tof_plot_cluster_heatmap(
+        tof_tibble = sim_data,
+        cluster_col = cluster_id
+    )
+
+}

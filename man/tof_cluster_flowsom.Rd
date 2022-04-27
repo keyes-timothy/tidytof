@@ -12,7 +12,6 @@ tof_cluster_flowsom(
   som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
   perform_metaclustering = TRUE,
   num_metaclusters = 20,
-  seed,
   ...
 )
 }
@@ -42,10 +41,6 @@ Defaults to TRUE.}
 \item{num_metaclusters}{An integer indicating the maximum number of metaclusters
 that should be returned after metaclustering. Defaults to 20.}
 
-\item{seed}{An integer used to set the random seed for the clustering.
-Setting this argument explicitly can be useful for reproducibility purposes.
-Defaults to a random integer}
-
 \item{...}{Optional additional parameters that can be passed to the \code{\link[FlowSOM]{BuildSOM}}
 function.}
 }
@@ -63,6 +58,18 @@ wrapper around \code{\link[FlowSOM]{SOM}} and \code{\link[FlowSOM]{MetaClusterin
 \details{
 For additional details about the FlowSOM algorithm,
 see \href{https://pubmed.ncbi.nlm.nih.gov/25573116/}{this paper}.
+}
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200)
+    )
+
+tof_cluster_flowsom(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
+
 }
 \seealso{
 Other clustering functions: 

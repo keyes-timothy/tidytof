@@ -4,6 +4,8 @@ library(dplyr)
 library(testthat)
 
 # set up
+data(ddpr_data)
+
 reference_tibble <-
   ddpr_data %>%
   slice_sample(prop = 0.1) %>%

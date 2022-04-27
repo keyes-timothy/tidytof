@@ -86,6 +86,8 @@ With very few exceptions, `{tidytof}` functions follow a specific, shared syntax
 The following code demonstrates how `{tidytof}` verb syntax looks in practice, with column and method specifications explicitly pointed out:
 
 ```{r}
+data(ddpr_data)
+
 set.seed(777L)
 
 ddpr_data %>% 

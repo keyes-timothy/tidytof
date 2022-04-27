@@ -26,3 +26,49 @@ specificity, sensitivity, true-positive rate (tpr), and false-positive rate
 \description{
 Compute a receiver-operating curve (ROC) for a two-class or multiclass dataset
 }
+\examples{
+feature_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:100),
+        cd45 = runif(n = 100),
+        pstat5 = runif(n = 100),
+        cd34 = runif(n = 100),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+        class =
+            as.factor(
+                dplyr::if_else(outcome > median(outcome), "class1", "class2")
+            )
+   )
+
+split_data <- tof_split_data(feature_tibble, split_method = "simple")
+
+# train a logistic regression classifier
+log_model <-
+    tof_train_model(
+        split_data = split_data,
+        predictor_cols = c(cd45, pstat5, cd34),
+        response_col = class,
+        model_type = "two-class"
+    )
+
+# make predictions
+predictions <-
+    tof_predict(
+        log_model,
+        new_data = feature_tibble,
+        prediction_type = "response"
+     )
+prediction_tibble <-
+    dplyr::tibble(
+        truth = feature_tibble$class,
+        prediction = predictions$.pred
+    )
+
+# make ROC curve
+tof_make_roc_curve(
+    input_data = prediction_tibble,
+    truth_col = truth,
+    prob_cols = prediction
+ )
+
+}

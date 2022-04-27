@@ -49,3 +49,28 @@ in single-cell data. Markers are plotted along the horizontal (x-) axis of
 the heatmap and sample IDs are plotted along the vertical (y-) axis of the
 heatmap.
 }
+\examples{
+
+# simulate single-cell data
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE),
+        sample_id = sample(paste0("sample", 1:5), size = 1000, replace = TRUE)
+    )
+
+# extract cluster proportions in each simulated patient
+feature_data <-
+    tof_extract_proportion(
+       tof_tibble = sim_data,
+       cluster_col = cluster_id,
+       group_cols = sample_id
+    )
+
+# plot the heatmap
+heatmap <- tof_plot_sample_features(feature_tibble = feature_data)
+
+}

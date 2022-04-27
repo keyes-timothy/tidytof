@@ -45,6 +45,19 @@ This function is a wrapper around {tidytof}'s tof_cluster_* function family.
 It performs clustering on CyTOF data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 500),
+        cd38 = rnorm(n = 500),
+        cd34 = rnorm(n = 500),
+        cd19 = rnorm(n = 500)
+    )
+
+tof_cluster(tof_tibble = sim_data, method = "kmeans")
+tof_cluster(tof_tibble = sim_data, method = "phenograph")
+
+}
 \seealso{
 Other clustering functions: 
 \code{\link{tof_cluster_ddpr}()},

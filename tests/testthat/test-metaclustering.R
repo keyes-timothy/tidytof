@@ -2,6 +2,8 @@ library(dplyr)
 library(tidytof)
 library(testthat)
 
+data(phenograph_data)
+
 # setup
 clust_data <-
   phenograph_data %>%
@@ -247,18 +249,18 @@ test_that("hclust tof_metacluster results are identical to subroutine", {
 })
 
 test_that("kmeans tof_metacluster results are identical to subroutine", {
+  set.seed(2020)
   kmeans_sub <-
     clust_data %>%
     tof_metacluster_kmeans(
-      cluster_col = .kmeans_cluster,
-      seed = 2020L
+      cluster_col = .kmeans_cluster
     )
 
+  set.seed(2020)
   kmeans_wrap <-
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
-      seed = 2020L,
       augment = FALSE,
       method = "kmeans"
     )
@@ -267,18 +269,18 @@ test_that("kmeans tof_metacluster results are identical to subroutine", {
 })
 
 test_that("phenograph tof_metacluster results are identical to subroutine", {
+  set.seed(2020)
   pheno_sub <-
     clust_data %>%
     tof_metacluster_phenograph(
-      cluster_col = .kmeans_cluster,
-      seed = 2020L
+      cluster_col = .kmeans_cluster
     )
 
+  set.seed(2020)
   pheno_wrap <-
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
-      seed = 2020L,
       augment = FALSE,
       method = "phenograph"
     )
@@ -287,18 +289,19 @@ test_that("phenograph tof_metacluster results are identical to subroutine", {
 })
 
 test_that("consensus tof_metacluster results are identical to subroutine", {
+
+  set.seed(2020)
   ccp_sub <-
     clust_data %>%
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
-      seed = 2020L
     )
 
+  set.seed(2020)
   ccp_wrap <-
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
-      seed = 2020L,
       augment = FALSE,
       method = "consensus"
     )
@@ -307,18 +310,18 @@ test_that("consensus tof_metacluster results are identical to subroutine", {
 })
 
 test_that("flowsom tof_metacluster results are identical to subroutine", {
+  set.seed(2020)
   flow_sub <-
     clust_data %>%
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
-      seed = 2020L
     )
 
+  set.seed(2020)
   flow_wrap <-
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
-      seed = 2020L,
       augment = FALSE,
       method = "flowsom"
     )

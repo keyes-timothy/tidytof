@@ -6,6 +6,9 @@ library(stringr)
 library(tidytof)
 library(testthat)
 
+data(ddpr_data)
+data(phenograph_data)
+
 # setup
 clust_data <-
   phenograph_data %>%
@@ -317,18 +320,24 @@ test_that("clustering output is identical for all methods", {
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   expect_equal(
-    tof_cluster_flowsom(clust_data, seed = 20, perform_metaclustering = FALSE),
-    tof_cluster_tibble(clust_data, method = "flowsom", augment = FALSE, seed = 20, perform_metacluster = FALSE)
+    {set.seed(2020)
+    tof_cluster_flowsom(clust_data, perform_metaclustering = FALSE)},
+    {set.seed(2020)
+    tof_cluster_tibble(clust_data, method = "flowsom", augment = FALSE,  perform_metacluster = FALSE)}
   )
 
   expect_equal(
-    tof_cluster_kmeans(clust_data, seed = 20),
-    tof_cluster_tibble(clust_data, method = "kmeans", augment = FALSE, seed = 20)
+    {set.seed(2020)
+    tof_cluster_kmeans(clust_data)},
+    {set.seed(2020)
+    tof_cluster_tibble(clust_data, method = "kmeans", augment = FALSE)}
   )
 
   expect_equal(
-    tof_cluster_phenograph(clust_data, seed = 20),
-    tof_cluster_tibble(clust_data, augment = FALSE, seed = 20, method = "phenograph")
+    {set.seed(2020)
+    tof_cluster_phenograph(clust_data)},
+    {set.seed(2020)
+    tof_cluster_tibble(clust_data, augment = FALSE, method = "phenograph")}
   )
 
   expect_equal(
@@ -447,20 +456,25 @@ test_that("clustering output is identical for all methods", {
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   expect_equal(
-    tof_cluster_flowsom(clust_data, seed = 20, perform_metaclustering = FALSE),
-    tof_cluster(clust_data, method = "flowsom", augment = FALSE, seed = 20, perform_metacluster = FALSE)
+    {set.seed(2020)
+    tof_cluster_flowsom(clust_data, perform_metaclustering = FALSE)},
+    {set.seed(2020)
+    tof_cluster(clust_data, method = "flowsom", augment = FALSE, perform_metacluster = FALSE)}
   )
 
   expect_equal(
-    tof_cluster_kmeans(clust_data, seed = 20),
-    tof_cluster(clust_data, method = "kmeans", augment = FALSE, seed = 20)
+    {set.seed(2020)
+    tof_cluster_kmeans(clust_data)},
+    {set.seed(2020)
+    tof_cluster(clust_data, method = "kmeans", augment = FALSE)}
   )
 
-  # expect_equal(
-  #   tof_cluster_phenograph(synth_data, seed = 20),
-  #   tof_cluster_phenograph(synth_data, seed = 20)
-  #   #tof_cluster_phenograph(synth_data, augment = FALSE, seed = 20, method = "phenograph")
-  # )
+  expect_equal(
+    {set.seed(2020)
+    tof_cluster_phenograph(synth_data)},
+    {set.seed(2020)
+    tof_cluster(synth_data, augment = FALSE,  method = "phenograph")}
+  )
 
   expect_equal(
     tof_cluster_ddpr(

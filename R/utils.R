@@ -43,15 +43,7 @@ tidytof_example_data <-
 #'
 #' @return The the file extension of `filename`
 #'
-#' @examples
-#' \dontrun{
-#' # example file name
-#' my_filename <- "my_file.txt"
 #'
-#' # find and print the extension
-#' my_extension <- getExtension(my_filename)
-#' print(my_extension)
-#' }
 get_extension <- function(filename) {
   ex <- strsplit(basename(filename), split="\\.")[[1]]
   return(ex[[length(ex)]])
@@ -76,6 +68,15 @@ get_extension <- function(filename) {
 #' arcsinh transformation
 #'
 #' @export
+#'
+#' @examples
+#' shift_factor <- 0
+#' scale_factor <- 1/5
+#'
+#' input_value <- 20
+#' asinh_value <- asinh(shift_factor + input_value * scale_factor)
+#'
+#' restored_value <- rev_asinh(asinh_value, shift_factor, scale_factor)
 #'
 #'
 rev_asinh <- function(x, shift_factor, scale_factor) {
@@ -667,6 +668,26 @@ pull_unless_null <- function(tib, uq_colname) {
 #'
 #' @export
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' # perform the density estimation
+#' tof_estimate_density(tof_tibble = sim_data, method = "spade")
+#'
+#' # perform the density estimation with a smaller search radius around
+#' # each cell
+#' tof_estimate_density(
+#'     tof_tibble = sim_data,
+#'     alpha_multiplier = 2,
+#'     method = "spade"
+#' )
+#'
 tof_estimate_density <-
   function(
     tof_tibble,
@@ -761,6 +782,32 @@ tof_estimate_density <-
 #' @family local density estimation functions
 #'
 #' @export
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' # perform the density estimation
+#' tof_spade_density(tof_tibble = sim_data)
+#'
+#' # perform the density estimation using cosine distance
+#' tof_spade_density(
+#'     tof_tibble = sim_data,
+#'     distance_function = "cosine",
+#'     alpha_multiplier = 2
+#' )
+#'
+#' # perform the density estimation with a smaller search radius around
+#' # each cell
+#' tof_spade_density(
+#'     tof_tibble = sim_data,
+#'     alpha_multiplier = 2
+#' )
 #'
 tof_spade_density <-
   function(
@@ -957,6 +1004,29 @@ tof_is_numeric <- function(.vec) {
 #'
 #' @export
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' # Find the 10 nearest neighbors of each cell in the dataset
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean"
+#' )
+#'
+#' # Find the 10 approximate nearest neighbors (see RANN::nn2)
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean",
+#'     eps = 0.3
+#' )
 #'
 tof_find_knn <-
   function(

@@ -33,6 +33,8 @@ To illustrate how they work, first we download some patient-level data from [thi
 
 
 ```{r}
+data(ddpr_metadata)
+
 # link for downloading the sample-level data from the Nature Medicine website
 data_link <- 
   "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"

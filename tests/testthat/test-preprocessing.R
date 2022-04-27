@@ -4,6 +4,8 @@ library(readr)
 library(stringr)
 library(tidytof)
 
+data(ddpr_data)
+
 # tof_preprocess ---------------------------------------------------------------
 
 test_that("Shape of transformed data is the same as the input data", {

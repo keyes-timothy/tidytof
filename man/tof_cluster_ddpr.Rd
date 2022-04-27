@@ -77,6 +77,32 @@ their most phenotypically similar healthy cell subpopulation (passed into the
 function using `healthy_tibble`). For details about
 the algorithm used to perform the clustering, see \href{https://pubmed.ncbi.nlm.nih.gov/29505032/}{this paper}.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+healthy_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200),
+        cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+    )
+
+tof_cluster_ddpr(
+    tof_tibble = sim_data,
+    healthy_tibble = healthy_data,
+    healthy_label_col = cluster_id
+)
+
+
+}
 \seealso{
 Other clustering functions: 
 \code{\link{tof_cluster_flowsom}()},

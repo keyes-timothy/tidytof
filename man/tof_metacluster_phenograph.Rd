@@ -52,6 +52,19 @@ using a user-specified selection of input variables/CyTOF measurements. The numb
 of metaclusters is automatically detected by the PhenoGraph algorithm.
 See \code{\link{tof_cluster_phenograph}}.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+tof_metacluster_phenograph(tof_tibble = sim_data, cluster_col = cluster_id)
+
+}
 \seealso{
 Other metaclustering functions: 
 \code{\link{tof_metacluster_consensus}()},

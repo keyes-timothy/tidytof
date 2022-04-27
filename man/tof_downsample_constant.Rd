@@ -27,6 +27,31 @@ kept.
 This function downsamples the number of cells in a `tof_tbl` by randomly selecting
 `num_cells` cells from each unique combination of values in `group_cols`.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+# sample 500 cells from the input data
+tof_downsample_constant(
+    tof_tibble = sim_data,
+    num_cells = 500L
+)
+
+# sample 20 cells per cluster from the input data
+tof_downsample_constant(
+    tof_tibble = sim_data,
+    group_cols = cluster_id,
+    num_cells = 20L
+)
+
+
+}
 \seealso{
 Other downsampling functions: 
 \code{\link{tof_downsample_density}()},

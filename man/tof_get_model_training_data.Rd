@@ -15,3 +15,37 @@ A tibble of (non-preprocessed) training data used to fit the model
 \description{
 Get a `tof_model`'s training data
 }
+\examples{
+feature_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:100),
+        cd45 = runif(n = 100),
+        pstat5 = runif(n = 100),
+        cd34 = runif(n = 100),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+        class =
+            as.factor(
+                dplyr::if_else(outcome > median(outcome), "class1", "class2")
+            ),
+        multiclass =
+            as.factor(
+                c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+            ),
+        event = c(rep(0, times = 30), rep(1, times = 70)),
+        time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+   )
+
+split_data <- tof_split_data(feature_tibble, split_method = "simple")
+
+# train a regression model
+regression_model <-
+    tof_train_model(
+        split_data = split_data,
+        predictor_cols = c(cd45, pstat5, cd34),
+        response_col = outcome,
+        model_type = "linear"
+    )
+
+tof_get_model_training_data(regression_model)
+
+}

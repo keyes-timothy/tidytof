@@ -97,6 +97,52 @@ These calculations can be performed either
 overall (across all cells in the dataset) or after breaking down the cells into
 subgroups using `group_cols`.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE),
+        patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+        stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+    )
+
+# extract the following features from each cluster in each
+# patient/stimulation:
+#    - proportion of each cluster
+#    - central tendency (median) of cd45 and cd38 in each cluster
+#    - the proportion of cells in each cluster with cd34 expression over
+#      the default threshold (asinh(10 / 5))
+tof_extract_features(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    group_cols = patient,
+    lineage_cols = c(cd45, cd38),
+    signaling_cols = cd34,
+    stimulation_col = stim
+)
+
+# extract the following features from each cluster in each
+# patient/stimulation:
+#    - proportion of each cluster
+#    - central tendency (mean) of cd45 and cd38 in each cluster
+#    - the earth mover's distance between each cluster's cd34 histogram in
+#      the "basal" and "stim" conditions
+tof_extract_features(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    group_cols = patient,
+    lineage_cols = c(cd45, cd38),
+    signaling_cols = cd34,
+    central_tendency_function = mean,
+    stimulation_col = stim,
+    signaling_method = "emd",
+    basal_level = "basal"
+)
+
+}
 \seealso{
 Other feature extraction functions: 
 \code{\link{tof_extract_central_tendency}()},

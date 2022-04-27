@@ -3,6 +3,9 @@ library(testthat)
 
 # setup
 
+data(ddpr_data)
+set.seed(3030)
+
 tt <-
   ddpr_data %>%
   tof_preprocess() %>%
@@ -435,32 +438,6 @@ test_that("tof_plot_cluster_volcano runs and creates ggplot objects", {
 
 })
 
-
-# tof_plot_cluster_abundance ---------------------------------------------------
-
-test_that("tof_plot_cluster_abundance runs and returns ggplot objects", {
-  expect_s3_class(
-    daa_ttest %>%
-      tof_plot_cluster_abundance(
-        tof_tibble = tt,
-        cluster_col = .kmeans_metacluster,
-        group_cols = c(replicate, sample_name),
-        color_col = sample_name
-      ),
-    "ggplot"
-  )
-
-  expect_s3_class(
-    daa_glmm %>%
-      tof_plot_cluster_abundance(
-        tof_tibble = tt,
-        cluster_col = .kmeans_metacluster,
-        group_cols = c(replicate, sample_name),
-        color_col = sample_name
-      ),
-    "ggplot"
-  )
-})
 
 # tof_plot_sample_model --------------------------------------------------------
 

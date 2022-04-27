@@ -36,6 +36,8 @@ To perform standard preprocessing tasks with `{tidytof}`, use `tof_preprocess`. 
 As an example, we can preprocess `{tidytof}`'s built-in `phenograph_data` `tof_tibble` and see how our first few measurements change before and after.
 
 ```{r}
+data(phenograph_data)
+
 # before preprocessing
 phenograph_data %>% 
   select(cd45, cd34, cd38) %>% 

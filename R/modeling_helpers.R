@@ -42,7 +42,6 @@
 #' @importFrom recipes all_numeric_predictors
 #' @importFrom recipes all_predictors
 #'
-#' @export
 #'
 tof_create_recipe <-
   function(
@@ -131,7 +130,6 @@ tof_create_recipe <-
 #' @importFrom rsample training
 #'
 #'
-#' @export
 #'
 tof_prep_recipe <-
   function(
@@ -1163,7 +1161,6 @@ tof_setup_glmnet_xy <-
 #' @return A tibble. If arguments are specified correctly, this tibble can be
 #' used to create a recipe for preprocessing.
 #'
-#' @export
 #'
 tof_check_model_args <-
   function(
@@ -1385,6 +1382,39 @@ print.tof_model <- function(x, ...) {
 #'
 #' @export
 #'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_training_data(regression_model)
+#'
 tof_get_model_training_data <-
   function(tof_model) {
     return(tof_model$training_data)
@@ -1397,6 +1427,39 @@ tof_get_model_training_data <-
 #' @return A numeric value
 #'
 #' @export
+#'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_penalty(regression_model)
 #'
 tof_get_model_penalty <-
   function(tof_model) {
@@ -1411,6 +1474,39 @@ tof_get_model_penalty <-
 #'
 #' @export
 #'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_mixture(regression_model)
+#'
 tof_get_model_mixture <-
   function(tof_model) {
     return(tof_model$mixture)
@@ -1423,6 +1519,39 @@ tof_get_model_mixture <-
 #' @return A string
 #'
 #' @export
+#'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_type(regression_model)
 #'
 tof_get_model_type <-
   function(tof_model) {
@@ -1437,6 +1566,42 @@ tof_get_model_type <-
 #'
 #' @export
 #'
+#' @examples
+#'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_outcomes(regression_model)
+#'
+#'
 tof_get_model_outcomes <-
   function(tof_model) {
     return(tof_model$outcome_colnames)
@@ -1449,6 +1614,39 @@ tof_get_model_outcomes <-
 #' @return An x value formatted for glmnet
 #'
 #' @export
+#'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_x(regression_model)
 #'
 tof_get_model_x <-
   function(tof_model) {
@@ -1472,6 +1670,39 @@ tof_get_model_x <-
 #'
 #' @export
 #'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             ),
+#'         multiclass =
+#'             as.factor(
+#'                 c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+#'             ),
+#'         event = c(rep(0, times = 30), rep(1, times = 70)),
+#'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a regression model
+#' regression_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = outcome,
+#'         model_type = "linear"
+#'     )
+#'
+#' tof_get_model_y(regression_model)
+#'
 tof_get_model_y <-
   function(tof_model) {
     xy <-
@@ -1485,7 +1716,6 @@ tof_get_model_y <-
 
     return(xy$y)
   }
-
 
 #' Access a trained elastic net model's performance metrics using its tuning data.
 #'
@@ -1974,6 +2204,51 @@ tof_assess_model_new_data <-
 #'
 #' @importFrom yardstick roc_curve
 #'
+#' @examples
+#' feature_tibble <-
+#'     dplyr::tibble(
+#'         sample = as.character(1:100),
+#'         cd45 = runif(n = 100),
+#'         pstat5 = runif(n = 100),
+#'         cd34 = runif(n = 100),
+#'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+#'         class =
+#'             as.factor(
+#'                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
+#'             )
+#'    )
+#'
+#' split_data <- tof_split_data(feature_tibble, split_method = "simple")
+#'
+#' # train a logistic regression classifier
+#' log_model <-
+#'     tof_train_model(
+#'         split_data = split_data,
+#'         predictor_cols = c(cd45, pstat5, cd34),
+#'         response_col = class,
+#'         model_type = "two-class"
+#'     )
+#'
+#' # make predictions
+#' predictions <-
+#'     tof_predict(
+#'         log_model,
+#'         new_data = feature_tibble,
+#'         prediction_type = "response"
+#'      )
+#' prediction_tibble <-
+#'     dplyr::tibble(
+#'         truth = feature_tibble$class,
+#'         prediction = predictions$.pred
+#'     )
+#'
+#' # make ROC curve
+#' tof_make_roc_curve(
+#'     input_data = prediction_tibble,
+#'     truth_col = truth,
+#'     prob_cols = prediction
+#'  )
+#'
 tof_make_roc_curve <- function(input_data, truth_col, prob_cols) {
   outcome_levels <-
     input_data %>%
@@ -2096,7 +2371,6 @@ tof_log_rank_test <-
 #' tests) and "is_best" (a logical value indicating which candidate threshold gave
 #' the optimal, i.e. smallest, p-value).
 #'
-#' @export
 #'
 #' @importFrom dplyr pull
 #' @importFrom dplyr tibble

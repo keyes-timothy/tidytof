@@ -36,6 +36,38 @@ randomly sampling a proportion of cells, or performing density-dependent
 downsampling per the algorithm in
 \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)}).
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+# sample 200 cells from the input data
+tof_downsample(
+    tof_tibble = sim_data,
+    num_cells = 200L,
+    method = "constant"
+)
+
+# sample 10\% of all cells from the input data
+tof_downsample(
+    tof_tibble = sim_data,
+    prop_cells = 0.1,
+    method = "prop"
+)
+
+# sample ~10\% of cells from the input data using density dependence
+tof_downsample(
+    tof_tibble = sim_data,
+    target_prop_cells = 0.1,
+    method = "density"
+)
+
+}
 \seealso{
 Other downsampling functions: 
 \code{\link{tof_downsample_constant}()},

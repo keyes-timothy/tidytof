@@ -47,6 +47,11 @@ new_tof_tibble <- function(x = dplyr::tibble(), panel = dplyr::tibble()) {
 #'
 #' @family tof_tbl utilities
 #'
+#' @examples
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#' tof_tibble <- tof_read_data(input_file)
+#' tof_get_panel(tof_tibble)
+#'
 #'
 tof_get_panel <- function(tof_tibble) {
   panel <-
@@ -73,6 +78,16 @@ tof_get_panel <- function(tof_tibble) {
 #' @family tof_tbl utilities
 #'
 #' @export
+#'
+#' @examples
+#' # get current panel from an .fcs file
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#' tof_tibble <- tof_read_data(input_file)
+#' current_panel <- tof_get_panel(tof_tibble)
+#'
+#' # create a new panel (remove empty channels)
+#' new_panel <- dplyr::filter(current_panel, antigens != "empty")
+#' tof_set_panel(tof_tibble = tof_tibble, panel = new_panel)
 #'
 #'
 tof_set_panel <- function(tof_tibble, panel) {
@@ -149,12 +164,23 @@ ungroup.grouped_tof_tbl <- function(x, ...) {
 
 # for interoperability with flowCore -------------------------------------------
 
+#' Convert an object into a tof_tbl
+#'
+#' @param flow_data A FlowSet
+#'
+#' @param sep A string to use to separate the antigen name and its associated
+#' metal in the column names of the output tibble. Defaults to "|".
+#'
 #' @export
 #'
 #' @importFrom flowCore fsApply
 #' @importFrom flowCore exprs
 #'
 #' @importFrom dplyr as_tibble
+#'
+#' @return a `tof_tbl`
+#'
+#'
 as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
   # check if flowset is empty
   if (length(flow_data) < 1) {
@@ -226,8 +252,17 @@ as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
 #' @param sep A string indicating which symbol should be used to separate
 #' antigen names and metal names in the columns of the output tof_tbl.
 #'
-#'
 #' @export
+#'
+#' @return A tof_tbl.
+#'
+#' @examples
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#'
+#' input_flowframe <- flowCore::read.FCS(input_file)
+#'
+#' tof_tibble <- as_tof_tbl(input_flowframe)
+#'
 as_tof_tbl <- function(flow_data, sep = "|") {
   UseMethod("as_tof_tbl")
 }

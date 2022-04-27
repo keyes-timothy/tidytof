@@ -1,11 +1,11 @@
 Type: Package
 Package: tidytof
 Title: Analyze Mass Cytometry Data Using Tidy Data Principles
-Version: 0.0.0.9000
+Version: 0.0.0
 Authors@R: 
     c(person(given = "Timothy",
              family = "Keyes",
-             role = c("aut", "cre"),
+             role = c("cre"),
              email = "tkeyes@stanford.edu", 
              comment = c(ORCID = "0000-0003-0423-9679")),
       person(given = "Kara", 
@@ -16,16 +16,16 @@ Authors@R:
              family = "Nolan", 
              role = c("rth", "own"), 
              email = "gnolan@stanford.edu"))    
-Maintainer: Timothy Keyes <tkeyes@stanford.edu>
-Description: An interactive scientific data analysis pipeline for mass
-    cytometry (CyTOF) data built using tidy data principles.  It is
+Description: An interactive scientific data analysis pipeline for high-dimensional
+    cytometry data built using tidy data principles.  It is
     specifically designed to play well with the tidyverse suite of data
-    cleaning and analysis tools, with functionality for input/output of
-    mass cytometry files, data cleaning, preprocessing, clustering,
-    visualization, modeling, and quality-of-life functions.
+    cleaning and analysis tools, with functionality for reading/writing data
+    files, data cleaning, preprocessing, clustering,
+    visualization, modeling, and other quality-of-life functions. Implements a 
+    "grammar" of single-cell data analysis.
 License: MIT + file LICENSE
 Depends: 
-    R (>= 4.0.0)
+    R (>= 4.1)
 Imports:
     doParallel,
     dplyr,
@@ -50,7 +50,9 @@ Imports:
     tidyselect,
     yardstick,
     Rcpp,
-    tibble
+    tibble,
+    stats,
+    utils
 Suggests:
     ConsensusClusterPlus,
     Biobase,
@@ -77,10 +79,11 @@ Suggests:
     spelling
 Config/testthat/edition: 3
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 RoxygenNote: 7.1.2
 LinkingTo: 
     Rcpp
 URL: https://keyes-timothy.github.io/tidytof
 VignetteBuilder: knitr
 Language: en-US
+biocViews: SingleCellWorkflow

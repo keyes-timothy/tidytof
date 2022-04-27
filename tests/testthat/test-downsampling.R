@@ -2,6 +2,8 @@ library(dplyr)
 library(purrr)
 library(tidytof)
 
+data(phenograph_data)
+
 # tof_downsample_constant ------------------------------------------------------
 
 ### downsampling without grouping

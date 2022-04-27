@@ -36,6 +36,27 @@ This function is a wrapper around {tidytof}'s tof_reduce_* function family.
 It performs dimensionality reduction on CyTOF data using a user-specified method
 (of 3 choices) and each method's corresponding input parameters
 }
+\examples{
+# simulate single-cell data
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 100),
+        cd38 = rnorm(n = 100),
+        cd34 = rnorm(n = 100),
+        cd19 = rnorm(n = 100)
+    )
+
+# calculate pca
+tof_reduce_dimensions(tof_tibble = sim_data, method = "pca")
+
+# calculate tsne
+tof_reduce_dimensions(tof_tibble = sim_data, method = "tsne")
+
+# calculate umap
+tof_reduce_dimensions(tof_tibble = sim_data, method = "umap")
+
+
+}
 \seealso{
 Other dimensionality reduction functions: 
 \code{\link{tof_reduce_pca}()},

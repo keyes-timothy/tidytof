@@ -34,7 +34,6 @@
 #' \strong{centroid} (the centroid vector for that cell population), and
 #' \strong{covariance_matrix} (the covariance matrix for that cell population)
 #'
-#' @export
 #'
 tof_build_classifier <- function(
   healthy_tibble = NULL,
@@ -97,6 +96,9 @@ tof_build_classifier <- function(
 #' be used to calculate the distances between each row of `cancer_data` and the
 #' healthy developmental subpopulations corresponding to each row of `classifier_fit`.
 #'
+#' @return A data.frame in which each column represents the distance between
+#' a cell in the input data and each healthy subpopulation cells are being
+#' classified into.
 #'
 tof_classify_cells <-
   function(

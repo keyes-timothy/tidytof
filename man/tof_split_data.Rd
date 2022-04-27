@@ -61,6 +61,47 @@ for simple splitting, an "rsplit" object. For details, see
 \description{
 Split CyTOF data into a training and test set
 }
+\examples{
+feature_tibble <-
+    dplyr::tibble(
+        sample = as.character(1:100),
+        cd45 = runif(n = 100),
+        pstat5 = runif(n = 100),
+        cd34 = runif(n = 100),
+        outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
+        class =
+            as.factor(
+                dplyr::if_else(outcome > median(outcome), "class1", "class2")
+            ),
+        multiclass =
+            as.factor(
+                c(rep("class1", 30), rep("class2", 30), rep("class3", 40))
+            ),
+        event = c(rep(0, times = 50), rep(1, times = 50)),
+        time_to_event = rnorm(n = 100, mean = 10, sd = 2)
+   )
+
+# split the dataset into 10 CV folds
+tof_split_data(
+    feature_tibble = feature_tibble,
+    split_method = "k-fold"
+)
+
+# split the dataset into 10 bootstrap resamplings
+tof_split_data(
+    feature_tibble = feature_tibble,
+    split_method = "bootstrap"
+)
+
+# split the dataset into a single training/test set
+# stratified by the "class" column
+tof_split_data(
+    feature_tibble = feature_tibble,
+    split_method = "simple",
+    strata = class
+)
+
+}
 \seealso{
 Other modeling functions: 
 \code{\link{tof_assess_model}()},

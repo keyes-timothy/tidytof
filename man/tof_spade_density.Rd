@@ -62,6 +62,33 @@ Briefly, this algorithm involves counting the number of neighboring cells
 within  a sphere of radius alpha surrounding each cell. Here, we do so using
 the \code{\link[RANN]{nn2}} function.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+# perform the density estimation
+tof_spade_density(tof_tibble = sim_data)
+
+# perform the density estimation using cosine distance
+tof_spade_density(
+    tof_tibble = sim_data,
+    distance_function = "cosine",
+    alpha_multiplier = 2
+)
+
+# perform the density estimation with a smaller search radius around
+# each cell
+tof_spade_density(
+    tof_tibble = sim_data,
+    alpha_multiplier = 2
+)
+
+}
 \seealso{
 Other local density estimation functions: 
 \code{\link{tof_estimate_density}()},

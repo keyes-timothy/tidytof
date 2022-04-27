@@ -21,6 +21,11 @@ column corresponds to a measured CyTOF antigen.}
 be used to calculate the distances between each row of `cancer_data` and the
 healthy developmental subpopulations corresponding to each row of `classifier_fit`.}
 }
+\value{
+A data.frame in which each column represents the distance between
+a cell in the input data and each healthy subpopulation cells are being
+classified into.
+}
 \description{
 This function uses a specified distance metric to classify each cell in a data.frame
 or matrix (`cancer_data`) into one of `nrow(classifier_fit)` subpopulations

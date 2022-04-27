@@ -61,6 +61,19 @@ CyTOF data using a user-specified selection of input variables/CyTOF
 measurements and
 the number of desired metaclusters. See \code{\link[stats]{hclust}}.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+tof_metacluster_hierarchical(tof_tibble = sim_data, cluster_col = cluster_id)
+
+}
 \seealso{
 Other metaclustering functions: 
 \code{\link{tof_metacluster_consensus}()},

@@ -34,6 +34,29 @@
 #' @importFrom dplyr n
 #' @importFrom dplyr ungroup
 #'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' # sample 500 cells from the input data
+#' tof_downsample_constant(
+#'     tof_tibble = sim_data,
+#'     num_cells = 500L
+#' )
+#'
+#' # sample 20 cells per cluster from the input data
+#' tof_downsample_constant(
+#'     tof_tibble = sim_data,
+#'     group_cols = cluster_id,
+#'     num_cells = 20L
+#' )
+#'
 #'
 tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 
@@ -83,6 +106,29 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 #' @importFrom dplyr group_by
 #' @importFrom dplyr slice_sample
 #' @importFrom dplyr ungroup
+#'
+#'@examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' # sample 10% of all cells from the input data
+#' tof_downsample_prop(
+#'     tof_tibble = sim_data,
+#'     prop_cells = 0.1
+#' )
+#'
+#' # sample 10% of all cells from each cluster in the input data
+#' tof_downsample_prop(
+#'     tof_tibble = sim_data,
+#'     group_cols = cluster_id,
+#'     prop_cells = 0.1
+#' )
 #'
 tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
   result <-
@@ -186,6 +232,37 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
 #' @importFrom purrr map
 #'
 #' @importFrom stats runif
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' tof_downsample_density(
+#'     tof_tibble = sim_data,
+#'     density_cols = c(cd45, cd34, cd38),
+#'     target_prop_cells = 0.5,
+#'     density_estimation_method = "spade"
+#' )
+#'
+#' tof_downsample_density(
+#'     tof_tibble = sim_data,
+#'     density_cols = c(cd45, cd34, cd38),
+#'     target_num_cells = 200L,
+#'     density_estimation_method = "spade"
+#' )
+#'
+#' tof_downsample_density(
+#'     tof_tibble = sim_data,
+#'     density_cols = c(cd45, cd34, cd38),
+#'     target_num_cells = 200L,
+#'     density_estimation_method = "mean_distance"
+#' )
+#'
 #'
 tof_downsample_density <-
   function(
@@ -405,6 +482,37 @@ tof_downsample_density <-
 #' @export
 #'
 #' @importFrom rlang arg_match
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = sample(letters, size = 1000, replace = TRUE)
+#'     )
+#'
+#' # sample 200 cells from the input data
+#' tof_downsample(
+#'     tof_tibble = sim_data,
+#'     num_cells = 200L,
+#'     method = "constant"
+#' )
+#'
+#' # sample 10% of all cells from the input data
+#' tof_downsample(
+#'     tof_tibble = sim_data,
+#'     prop_cells = 0.1,
+#'     method = "prop"
+#' )
+#'
+#' # sample ~10% of cells from the input data using density dependence
+#' tof_downsample(
+#'     tof_tibble = sim_data,
+#'     target_prop_cells = 0.1,
+#'     method = "density"
+#' )
 #'
 tof_downsample <-
   function(

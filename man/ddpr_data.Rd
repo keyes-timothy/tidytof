@@ -36,7 +36,7 @@ A data frame with 10000 rows and 24 variables:
 \url{https://github.com/kara-davis-lab/DDPR}
 }
 \usage{
-ddpr_data
+data(ddpr_data)
 }
 \description{
 A dataset containing CyTOF measurements from immune cells originally studied

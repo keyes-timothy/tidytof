@@ -17,7 +17,7 @@ of example .fcs files sampled from the studies linked below.
 \url{https://community.cytobank.org/cytobank/projects/609}
 }
 \usage{
-metal_masterlist
+data(metal_masterlist)
 }
 \description{
 A character vector used by `tof_read_fcs` and `tof_read_data` to detect and

@@ -62,6 +62,40 @@
 #'
 #' @export
 #'
+#' @examples
+#' # simulate single-cell data (and reference data with clusters to upsample
+#' # into
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' reference_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200),
+#'         cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+#'     )
+#'
+#' # upsample using mahalanobis distance
+#' tof_upsample_distance(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id
+#' )
+#'
+#' # upsample using cosine distance
+#' tof_upsample_distance(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id,
+#'     distance_function = "cosine"
+#' )
 #'
 tof_upsample_distance <-
   function(
@@ -155,6 +189,42 @@ tof_upsample_distance <-
 #' @importFrom dplyr pull
 #' @importFrom dplyr tibble
 #'
+#' @examples
+#'
+#' # simulate single-cell data (and reference data with clusters to upsample
+#' # into
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' reference_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200),
+#'         cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+#'     )
+#'
+#' # upsample using euclidean distance
+#' tof_upsample_neighbor(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id
+#' )
+#'
+#' # upsample using cosine distance
+#' tof_upsample_neighbor(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id,
+#'     distance_function = "cosine"
+#' )
+#'
 tof_upsample_neighbor <-
   function(
     tof_tibble,
@@ -234,12 +304,48 @@ tof_upsample_neighbor <-
 #'
 #' @importFrom dplyr bind_cols
 #'
+#' @examples
+#' # simulate single-cell data (and reference data with clusters to upsample
+#' # into
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#' reference_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 200),
+#'         cd38 = rnorm(n = 200),
+#'         cd34 = rnorm(n = 200),
+#'         cd19 = rnorm(n = 200),
+#'         cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+#'     )
+#'
+#' # upsample using distance to cluster centroids
+#' tof_upsample(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id,
+#'     method = "distance"
+#' )
+#'
+#' # upsample using distance to nearest neighbor
+#' tof_upsample(
+#'     tof_tibble = sim_data,
+#'     reference_tibble = reference_data,
+#'     reference_cluster_col = cluster_id,
+#'     method = "neighbor"
+#' )
+#'
+#'
 tof_upsample <-
   function(
     tof_tibble,
     reference_tibble,
     reference_cluster_col,
-    upsample_cols,
+    upsample_cols = where(tof_is_numeric),
     ...,
     augment = TRUE,
     method = c("distance", "neighbor")

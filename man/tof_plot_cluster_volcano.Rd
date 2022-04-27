@@ -77,3 +77,22 @@ expression analysis (DEA) produced by one of the `tof_dea_*` verbs. Each
 point in the volcano plot represents a single cluster-marker pair, colored by
 significance level and the direction of the marker expression difference.
 }
+\examples{
+
+# create a mock differential expression analysis result
+sim_dea_result <-
+    dplyr::tibble(
+        cluster_id = rep(letters, 2),
+        marker = rep(c("cd45", "cd34"), times = length(letters)),
+        p_adj = runif(n = 2 * length(letters), min = 0, max = 0.5),
+        mean_fc = runif(n = 2 * length(letters), min = 0.01, max = 10),
+        significant = dplyr::if_else(p_adj < 0.05, "*", "")
+    )
+
+ attr(sim_dea_result, which = "dea_method") <- "t_unpaired"
+
+ # create the volcano plot
+ volcano <- tof_plot_cluster_volcano(dea_result = sim_dea_result)
+
+
+}

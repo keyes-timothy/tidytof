@@ -72,3 +72,39 @@ the distance (either mahalanobis, cosine, or pearson) between each cell in
 `tof_tibble` and the centroid of each cluster in `reference_tibble`, then
 sorting cells into the cluster corresponding to their closest centroid.
 }
+\examples{
+# simulate single-cell data (and reference data with clusters to upsample
+# into
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+
+reference_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200),
+        cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+    )
+
+# upsample using mahalanobis distance
+tof_upsample_distance(
+    tof_tibble = sim_data,
+    reference_tibble = reference_data,
+    reference_cluster_col = cluster_id
+)
+
+# upsample using cosine distance
+tof_upsample_distance(
+    tof_tibble = sim_data,
+    reference_tibble = reference_data,
+    reference_cluster_col = cluster_id,
+    distance_function = "cosine"
+)
+
+}

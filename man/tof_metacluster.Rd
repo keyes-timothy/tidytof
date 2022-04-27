@@ -55,6 +55,30 @@ This function is a wrapper around {tidytof}'s tof_metacluster_* function family.
 It performs metaclustering on CyTOF data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE)
+    )
+
+tof_metacluster(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    clustering_algorithm = "consensus",
+    method = "flowsom"
+)
+
+tof_metacluster(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    method = "phenograph"
+)
+
+}
 \seealso{
 Other metaclustering functions: 
 \code{\link{tof_metacluster_consensus}()},

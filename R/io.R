@@ -320,6 +320,11 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #'
 #' @importFrom stringr str_remove_all
 #'
+#' @examples
+#'
+#' input_file <- dir(tidytof_example_data("aml"), full.names = TRUE)[[1]]
+#' tof_read_data(input_file)
+#'
 tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) {
 
   # if path gives multiple paths to multiple files
@@ -420,9 +425,9 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) 
 # tof_write_csv ----------------------------------------------------------------
 
 #' Write a series of .csv files from a tof_tbl
-  #'
-  #' This function takes a given `tof_tbl` and writes the single-cell data
-  #' it contains into .csv files within the directory located at `out_path`. The
+#'
+#' This function takes a given `tof_tbl` and writes the single-cell data
+#' it contains into .csv files within the directory located at `out_path`. The
 #' `group_cols` argument specifies how the rows of the `tof_tbl` (each cell)
 #' should be broken into separate .csv files
 #'
@@ -441,8 +446,6 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) 
 #' of saving .csv files to `out_path`.
 #'
 #' @family input/output functions
-#'
-#' @export
 #'
 #' @importFrom tidyr nest
 #' @importFrom tidyr unite

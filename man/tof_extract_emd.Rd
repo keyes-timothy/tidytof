@@ -81,6 +81,39 @@ user-specified selection of CyTOF antigens and can be performed either
 overall (across all cells in the dataset) or after breaking down the cells into
 subgroups using `group_cols`.
 }
+\examples{
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000),
+        cluster_id = sample(letters, size = 1000, replace = TRUE),
+        patient = sample(c("kirby", "mario"), size = 1000, replace = TRUE),
+        stim = sample(c("basal", "stim"), size = 1000, replace = TRUE)
+    )
+
+# extract emd of each cluster in each patient (using the "basal" stim
+# condition as a reference) in wide format
+tof_extract_emd(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    group_cols = patient,
+    emd_col = stim,
+    reference_level = "basal"
+)
+
+# extract emd of each cluster (using the "basal" stim
+# condition as a reference) in long format
+tof_extract_emd(
+    tof_tibble = sim_data,
+    cluster_col = cluster_id,
+    emd_col = stim,
+    reference_level = "basal",
+    format = "long"
+)
+
+}
 \seealso{
 Other feature extraction functions: 
 \code{\link{tof_extract_central_tendency}()},

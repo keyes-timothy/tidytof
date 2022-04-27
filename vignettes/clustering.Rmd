@@ -41,6 +41,10 @@ Each of these methods are wrapped by `tof_cluster()`.
 To demonstrate, we can apply the PhenoGraph clustering algorithm to `{tidytof}`'s built-in `phenograph_data`. Note that `phenograph_data` contains 3000 total cells (1000 each from 3 clusters identified in the [original PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)). For demonstration purposes, we also metacluster our PhenoGraph clusters using k-means clustering.
 
 ```{r}
+data(phenograph_data)
+
+set.seed(203L)
+
 phenograph_clusters <- 
   phenograph_data %>% 
   tof_preprocess() %>% 
@@ -48,7 +52,6 @@ phenograph_clusters <-
     cluster_cols = starts_with("cd"), 
     num_neighbors = 50L, 
     distance_function = "cosine", 
-    seed = 203L,
     method = "phenograph"
   ) %>% 
   tof_metacluster(

@@ -49,6 +49,34 @@ in the calculated principal component space.
 \description{
 This function calculates principal components using single-cell data from a `tof_tibble`.
 }
+\examples{
+# simulate single-cell data
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200)
+    )
+new_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 50),
+        cd38 = rnorm(n = 50),
+        cd34 = rnorm(n = 50),
+        cd19 = rnorm(n = 50)
+    )
+
+# calculate pca
+tof_reduce_pca(tof_tibble = sim_data, num_comp = 2)
+
+# return recipe instead of embeddings
+pca_recipe <- tof_reduce_pca(tof_tibble = sim_data, return_recipe = TRUE)
+
+# apply recipe to new data
+recipes::bake(pca_recipe, new_data = new_data)
+
+
+}
 \seealso{
 Other dimensionality reduction functions: 
 \code{\link{tof_reduce_dimensions}()},

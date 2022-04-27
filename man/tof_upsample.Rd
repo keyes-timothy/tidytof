@@ -8,7 +8,7 @@ tof_upsample(
   tof_tibble,
   reference_tibble,
   reference_cluster_col,
-  upsample_cols,
+  upsample_cols = where(tof_is_numeric),
   ...,
   augment = TRUE,
   method = c("distance", "neighbor")
@@ -54,4 +54,41 @@ their most phenotypically similar cell subpopulation in a reference dataset
 the distance (either mahalanobis, cosine, or pearson) between each cell in
 `tof_tibble` and the centroid of each cluster in `reference_tibble`, then
 sorting cells into the cluster corresponding to their closest centroid.
+}
+\examples{
+# simulate single-cell data (and reference data with clusters to upsample
+# into
+sim_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = rnorm(n = 1000),
+        cd34 = rnorm(n = 1000),
+        cd19 = rnorm(n = 1000)
+    )
+reference_data <-
+    dplyr::tibble(
+        cd45 = rnorm(n = 200),
+        cd38 = rnorm(n = 200),
+        cd34 = rnorm(n = 200),
+        cd19 = rnorm(n = 200),
+        cluster_id = c(rep("a", times = 100), rep("b", times = 100))
+    )
+
+# upsample using distance to cluster centroids
+tof_upsample(
+    tof_tibble = sim_data,
+    reference_tibble = reference_data,
+    reference_cluster_col = cluster_id,
+    method = "distance"
+)
+
+# upsample using distance to nearest neighbor
+tof_upsample(
+    tof_tibble = sim_data,
+    reference_tibble = reference_data,
+    reference_cluster_col = cluster_id,
+    method = "neighbor"
+)
+
+
 }
