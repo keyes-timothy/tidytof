@@ -18,7 +18,7 @@ subgroups using `group_cols`."><!-- mathjax --><script src="https://cdnjs.cloudf
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -147,6 +147,62 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 <code><a href="tof_extract_threshold.html">tof_extract_threshold</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">sim_data</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd38 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span class="r-in">        patient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kirby"</span>, <span class="st">"mario"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span class="r-in">        stim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basal"</span>, <span class="st">"stim"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># extract proportion of each cluster in each patient in wide format</span></span>
+<span class="r-in"><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span>
+<span class="r-in">    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
+<span class="r-in">    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
+<span class="r-in">    group_cols <span class="op">=</span> <span class="va">patient</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 105</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   patient `cd45@a_ct` `cd38@a_ct` `cd34@a_ct` `cd19@a_ct` `cd45@b_ct`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby        0.036<span style="text-decoration: underline;">5</span>      -<span style="color: #BB0000;">0.197</span>      -<span style="color: #BB0000;">0.398</span>      0.082<span style="text-decoration: underline;">1</span>      0.077<span style="text-decoration: underline;">6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario        0.567       -<span style="color: #BB0000;">0.499</span>      -<span style="color: #BB0000;">0.186</span>      0.131      -<span style="color: #BB0000;">0.476</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 99 more variables: `cd38@b_ct` &lt;dbl&gt;, `cd34@b_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@b_ct` &lt;dbl&gt;, `cd45@c_ct` &lt;dbl&gt;, `cd38@c_ct` &lt;dbl&gt;, `cd34@c_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@c_ct` &lt;dbl&gt;, `cd45@d_ct` &lt;dbl&gt;, `cd38@d_ct` &lt;dbl&gt;, `cd34@d_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@d_ct` &lt;dbl&gt;, `cd45@e_ct` &lt;dbl&gt;, `cd38@e_ct` &lt;dbl&gt;, `cd34@e_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@e_ct` &lt;dbl&gt;, `cd45@f_ct` &lt;dbl&gt;, `cd38@f_ct` &lt;dbl&gt;, `cd34@f_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@f_ct` &lt;dbl&gt;, `cd45@g_ct` &lt;dbl&gt;, `cd38@g_ct` &lt;dbl&gt;, `cd34@g_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@g_ct` &lt;dbl&gt;, `cd45@h_ct` &lt;dbl&gt;, `cd38@h_ct` &lt;dbl&gt;, …</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># extract proportion of each cluster in each patient in long format</span></span>
+<span class="r-in"><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span>
+<span class="r-in">    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
+<span class="r-in">    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
+<span class="r-in">    group_cols <span class="op">=</span> <span class="va">patient</span>,</span>
+<span class="r-in">    format <span class="op">=</span> <span class="st">"long"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 208 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id channel  values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          cd45     0.036<span style="text-decoration: underline;">5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   a          cd38    -<span style="color: #BB0000;">0.197</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   a          cd34    -<span style="color: #BB0000;">0.398</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   a          cd19     0.082<span style="text-decoration: underline;">1</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   b          cd45     0.077<span style="text-decoration: underline;">6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   b          cd38     0.356 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   b          cd34     0.249 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   b          cd19     0.241 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   c          cd45     0.212 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   c          cd38    -<span style="color: #BB0000;">0.527</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 198 more rows</span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

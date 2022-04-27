@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,59 @@
     <p>A y value formatted for glmnet</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">feature_tibble</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span class="r-in">        sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        pstat5 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        outcome <span class="op">=</span> <span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">cd45</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">4</span> <span class="op">*</span> <span class="va">pstat5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        class <span class="op">=</span></span>
+<span class="r-in">            <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span></span>
+<span class="r-in">                <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">outcome</span><span class="op">)</span>, <span class="st">"class1"</span>, <span class="st">"class2"</span><span class="op">)</span></span>
+<span class="r-in">            <span class="op">)</span>,</span>
+<span class="r-in">        multiclass <span class="op">=</span></span>
+<span class="r-in">            <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span></span>
+<span class="r-in">                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class1"</span>, <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class2"</span>, <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class3"</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">            <span class="op">)</span>,</span>
+<span class="r-in">        event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">70</span><span class="op">)</span><span class="op">)</span>,</span>
+<span class="r-in">        time_to_event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, mean <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in">   <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">split_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="tof_split_data.html">tof_split_data</a></span><span class="op">(</span><span class="va">feature_tibble</span>, split_method <span class="op">=</span> <span class="st">"simple"</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># train a regression model</span></span>
+<span class="r-in"><span class="va">regression_model</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu"><a href="tof_train_model.html">tof_train_model</a></span><span class="op">(</span></span>
+<span class="r-in">        split_data <span class="op">=</span> <span class="va">split_data</span>,</span>
+<span class="r-in">        predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">pstat5</span>, <span class="va">cd34</span><span class="op">)</span>,</span>
+<span class="r-in">        response_col <span class="op">=</span> <span class="va">outcome</span>,</span>
+<span class="r-in">        model_type <span class="op">=</span> <span class="st">"linear"</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="fu">tof_get_model_y</span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]  2.9488759  5.4200458  5.5304443  3.9376256  3.6934821  2.9994376</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  2.3779528  2.6453602  1.5673127  6.0068416  2.9086414  2.1319552</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]  2.6911015  5.4450678  2.9760108  3.7906024  7.5360957  3.5697819</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  2.7151680  4.4764796  4.4726770  2.6499290  3.6846058  4.9403363</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] -0.1584968  1.9677255  3.5093102  4.6360722  4.5807109  1.0682118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  4.2123604  2.6410251  0.6075062  6.1793237  0.9903174  1.2401617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  0.3942008  3.4009495  2.1788527  1.0102603  4.7631086  4.9959019</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]  7.7233821  6.7867699  2.6247909  6.9444896  5.0898866  3.9304726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  4.3373910  5.5047012  3.9135867  2.7569650  4.9416512  3.2876979</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  4.1958127  0.6880593  1.8608297  2.3252393  6.2111703  1.0427522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  5.5517102 -0.2212262  2.5961788  3.4213130  6.9233893  2.6674337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  1.8525975  2.0882499  1.5884436  3.8748692  2.1897032  3.1852151</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  1.6338609  3.8688374  3.9902227  2.4902796  2.5473741  1.9224516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]  5.6261663  0.7498021  4.2502032  4.8937369  4.7245800  2.0251508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85]  2.0183665  3.3539510  5.4904535  3.8163519  1.4843948  4.0788264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  1.9470817  2.0640330  1.0731257  2.6512204  2.5755569  2.3043116</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]  6.5350197  4.0443137  4.2967675  3.7390253</span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

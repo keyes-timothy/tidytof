@@ -14,7 +14,7 @@ shift of `shift_factor`."><!-- mathjax --><script src="https://cdnjs.cloudflare.
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,6 +94,19 @@ transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
 arcsinh transformation</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">shift_factor</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span class="r-in"><span class="va">scale_factor</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">/</span><span class="fl">5</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">input_value</span> <span class="op">&lt;-</span> <span class="fl">20</span></span>
+<span class="r-in"><span class="va">asinh_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></span><span class="op">(</span><span class="va">shift_factor</span> <span class="op">+</span> <span class="va">input_value</span> <span class="op">*</span> <span class="va">scale_factor</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">restored_value</span> <span class="op">&lt;-</span> <span class="fu">rev_asinh</span><span class="op">(</span><span class="va">asinh_value</span>, <span class="va">shift_factor</span>, <span class="va">scale_factor</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
       <img src="" class="logo" alt=""><h1>Preprocessing</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-04-26</h4>
+            <h4 data-toc-skip class="date">2022-04-27</h4>
       
       
       <div class="d-none name"><code>preprocessing.Rmd</code></div>
@@ -101,7 +101,9 @@
 <p>To perform standard preprocessing tasks with <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>, use <code>tof_preprocess</code>. <code>tof_preprocess</code>’s default behavior is to apply the arcsinh transformation (with a cofactor of 5) to each numeric column in the input <code>tof_tibble</code> as well as to remove the gaussian noise that Fluidigm software adds to each ion count (this noise is added for visualization purposes, but for most analyses, removing it is recommended).</p>
 <p>As an example, we can preprocess <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in <code>phenograph_data</code> <code>tof_tibble</code> and see how our first few measurements change before and after.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># before preprocessing</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">phenograph_data</span><span class="op">)</span>
+
+<span class="co"># before preprocessing</span>
 <span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
@@ -182,12 +184,12 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="co">#&gt;    cd45   cd34  cd38</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  131.  3.23   1.39</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  229. -<span style="color: #BB0000;">0.603</span> 11.3 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  4.59   1.12</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431.  0.296 12.5 </span>
+<span class="co">#&gt;    cd45   cd34   cd38</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  2.74   0.794</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  229. -<span style="color: #BB0000;">0.764</span> 10.6  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  4.55   0.987</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.199</span> 12.8  </span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more rows</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

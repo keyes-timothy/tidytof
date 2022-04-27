@@ -14,7 +14,7 @@ method (of 3 choices) and each method's corresponding input parameters."><!-- ma
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,6 +123,57 @@ plus an additional column encoding the local density estimates.</p>
 <code><a href="tof_spade_density.html">tof_spade_density</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">sim_data</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd38 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># perform the density estimation</span></span>
+<span class="r-in"><span class="fu">tof_estimate_density</span><span class="op">(</span>tof_tibble <span class="op">=</span> <span class="va">sim_data</span>, method <span class="op">=</span> <span class="st">"spade"</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      cd45    cd38    cd34    cd19 .spade_density</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  1.04   0.331  -<span style="color: #BB0000;">0.423</span>   1.35                1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.22  -<span style="color: #BB0000;">0.852</span>   0.974   0.083<span style="text-decoration: underline;">5</span>              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  1.12  -<span style="color: #BB0000;">1.85</span>    0.367  -<span style="color: #BB0000;">1.81</span>                1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.930 -<span style="color: #BB0000;">0.065</span><span style="color: #BB0000; text-decoration: underline;">6</span>  0.058<span style="text-decoration: underline;">8</span>  0.062<span style="text-decoration: underline;">1</span>              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.523  0.283  -<span style="color: #BB0000;">1.42</span>    0.639               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.760</span> -<span style="color: #BB0000;">1.12</span>   -<span style="color: #BB0000;">1.67</span>   -<span style="color: #BB0000;">0.293</span>               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  0.120  1.97   -<span style="color: #BB0000;">0.800</span>   0.799               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">0.111</span> -<span style="color: #BB0000;">0.243</span>  -<span style="color: #BB0000;">1.36</span>   -<span style="color: #BB0000;">0.291</span>               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">0.418</span> -<span style="color: #BB0000;">1.30</span>    0.509   0.756               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  1.04  -<span style="color: #BB0000;">1.68</span>    1.24   -<span style="color: #BB0000;">0.349</span>               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 990 more rows</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># perform the density estimation with a smaller search radius around</span></span>
+<span class="r-in"><span class="co"># each cell</span></span>
+<span class="r-in"><span class="fu">tof_estimate_density</span><span class="op">(</span></span>
+<span class="r-in">    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
+<span class="r-in">    alpha_multiplier <span class="op">=</span> <span class="fl">2</span>,</span>
+<span class="r-in">    method <span class="op">=</span> <span class="st">"spade"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      cd45    cd38    cd34    cd19 .spade_density</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  1.04   0.331  -<span style="color: #BB0000;">0.423</span>   1.35              1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.22  -<span style="color: #BB0000;">0.852</span>   0.974   0.083<span style="text-decoration: underline;">5</span>            0.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  1.12  -<span style="color: #BB0000;">1.85</span>    0.367  -<span style="color: #BB0000;">1.81</span>              0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.930 -<span style="color: #BB0000;">0.065</span><span style="color: #BB0000; text-decoration: underline;">6</span>  0.058<span style="text-decoration: underline;">8</span>  0.062<span style="text-decoration: underline;">1</span>            1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.523  0.283  -<span style="color: #BB0000;">1.42</span>    0.639             1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.760</span> -<span style="color: #BB0000;">1.12</span>   -<span style="color: #BB0000;">1.67</span>   -<span style="color: #BB0000;">0.293</span>             0.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  0.120  1.97   -<span style="color: #BB0000;">0.800</span>   0.799             0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">0.111</span> -<span style="color: #BB0000;">0.243</span>  -<span style="color: #BB0000;">1.36</span>   -<span style="color: #BB0000;">0.291</span>             1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">0.418</span> -<span style="color: #BB0000;">1.30</span>    0.509   0.756             1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  1.04  -<span style="color: #BB0000;">1.68</span>    1.24   -<span style="color: #BB0000;">0.349</span>             0.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 990 more rows</span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

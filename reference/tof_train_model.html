@@ -16,7 +16,7 @@ or bootstrapping, and multiple preprocessing options are available."><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -233,6 +233,80 @@ log-rank test when separating the training data into low- and high-risk groups.<
 <code><a href="tof_split_data.html">tof_split_data</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">feature_tibble</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span class="r-in">        sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        pstat5 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        outcome <span class="op">=</span> <span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">cd45</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">4</span> <span class="op">*</span> <span class="va">pstat5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
+<span class="r-in">        class <span class="op">=</span></span>
+<span class="r-in">            <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span></span>
+<span class="r-in">                <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">outcome</span><span class="op">)</span>, <span class="st">"class1"</span>, <span class="st">"class2"</span><span class="op">)</span></span>
+<span class="r-in">            <span class="op">)</span>,</span>
+<span class="r-in">        multiclass <span class="op">=</span></span>
+<span class="r-in">            <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span></span>
+<span class="r-in">                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class1"</span>, <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class2"</span>, <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"class3"</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">            <span class="op">)</span>,</span>
+<span class="r-in">        event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">70</span><span class="op">)</span><span class="op">)</span>,</span>
+<span class="r-in">        time_to_event <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, mean <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in">   <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">split_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="tof_split_data.html">tof_split_data</a></span><span class="op">(</span><span class="va">feature_tibble</span>, split_method <span class="op">=</span> <span class="st">"simple"</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># train a regression model</span></span>
+<span class="r-in"><span class="fu">tof_train_model</span><span class="op">(</span></span>
+<span class="r-in">    split_data <span class="op">=</span> <span class="va">split_data</span>,</span>
+<span class="r-in">    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">pstat5</span>, <span class="va">cd34</span><span class="op">)</span>,</span>
+<span class="r-in">    response_col <span class="op">=</span> <span class="va">outcome</span>,</span>
+<span class="r-in">    model_type <span class="op">=</span> <span class="st">"linear"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A linear `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   feature     coefficient</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> (Intercept)      3.43  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> pstat5           1.01  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd45             0.784 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> cd34            -<span style="color: #BB0000;">0.051</span><span style="color: #BB0000; text-decoration: underline;">1</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># train a logistic regression classifier</span></span>
+<span class="r-in"><span class="fu">tof_train_model</span><span class="op">(</span></span>
+<span class="r-in">    split_data <span class="op">=</span> <span class="va">split_data</span>,</span>
+<span class="r-in">    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">pstat5</span>, <span class="va">cd34</span><span class="op">)</span>,</span>
+<span class="r-in">    response_col <span class="op">=</span> <span class="va">class</span>,</span>
+<span class="r-in">    model_type <span class="op">=</span> <span class="st">"two-class"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A two-class `tof_model` with a mixture parameter (alpha) of 0 and a penalty parameter (lambda) of 1e+00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   feature     coefficient</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> pstat5       -<span style="color: #BB0000;">0.210</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> cd45         -<span style="color: #BB0000;">0.188</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd34          0.022<span style="text-decoration: underline;">1</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> (Intercept)   0.000<span style="text-decoration: underline;">095</span>6</span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># train a cox regression survival model</span></span>
+<span class="r-in"><span class="fu">tof_train_model</span><span class="op">(</span></span>
+<span class="r-in">    split_data <span class="op">=</span> <span class="va">split_data</span>,</span>
+<span class="r-in">    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">pstat5</span>, <span class="va">cd34</span><span class="op">)</span>,</span>
+<span class="r-in">    time_col <span class="op">=</span> <span class="va">time_to_event</span>,</span>
+<span class="r-in">    event_col <span class="op">=</span> <span class="va">event</span>,</span>
+<span class="r-in">    model_type <span class="op">=</span> <span class="st">"survival"</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A survival `tof_model` with a mixture parameter (alpha) of 0 and a penalty parameter (lambda) of 1e+00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   feature coefficient</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> cd34      -<span style="color: #BB0000;">0.095</span><span style="color: #BB0000; text-decoration: underline;">6</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> pstat5    -<span style="color: #BB0000;">0.058</span><span style="color: #BB0000; text-decoration: underline;">7</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd45       0.000<span style="text-decoration: underline;">675</span></span>
+<span class="r-in"></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

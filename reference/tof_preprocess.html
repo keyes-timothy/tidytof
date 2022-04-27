@@ -14,7 +14,7 @@ standard pre-processing steps before CyTOF data analysis."><!-- mathjax --><scri
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,6 +109,62 @@ removed or not removed depending on `undo_noise`).</p>
     <div class="dont-index"><p>[tof_postprocess()]</p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+<span class="r-in"><span class="co"># read in an example .fcs file from tidytof's internal datasets</span></span>
+<span class="r-in"><span class="va">input_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"aml"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span class="r-in"><span class="va">tof_tibble</span> <span class="op">&lt;-</span> <span class="fu"><a href="tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="va">input_file</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># preprocess all numeric columns with default behavior</span></span>
+<span class="r-in"><span class="co"># arcsinh transformation with a cofactor of 5</span></span>
+<span class="r-in"><span class="fu">tof_preprocess</span><span class="op">(</span><span class="va">tof_tibble</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 × 59</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Time Event_length `CD45|Y89` `empty|Pd102` `empty|Pd104` `empty|Pd105`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 15.3          1.88       5.33         0.263         1.70           5.85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 14.9          2.05       5.83         0.731         1.67           5.71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 15.2          1.88       5.70         1.13          0.861          5.54</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 13.7          1.88       5.45         0.129         1.06           5.46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 15.2          1.99       5.73         0.721         1.41           5.55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 14.4          2.05       5.27         0.760         0.708          5.52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 13.9          1.88       5.31         0.645         0.771          5.42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 14.2          1.99       5.42         1.09          1.58           5.64</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 15.6          2.05       6.03         0.586         1.37           5.83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  9.75         1.88       5.38         0.177         1.73           5.78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 90 more rows, and 53 more variables: `empty|Pd106` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `empty|Pd108` &lt;dbl&gt;, `empty|Pd110` &lt;dbl&gt;, `CD61|In113` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD99|In115` &lt;dbl&gt;, `empty|I127` &lt;dbl&gt;, `CD45RA|La139` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD93|Ce140` &lt;dbl&gt;, `CD3_CD19|Pr141` &lt;dbl&gt;, `CCR2|Nd142` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD117|Nd143` &lt;dbl&gt;, `CD123|Nd144` &lt;dbl&gt;, `CD64|Nd145` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD90|Nd146` &lt;dbl&gt;, `CD38|Sm147` &lt;dbl&gt;, `CD34|Nd148` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CEBPa|Sm149` &lt;dbl&gt;, `pSTAT5|Nd150` &lt;dbl&gt;, `CD11c|Eu151` &lt;dbl&gt;, …</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># preprocess all numeric columns using the log base 10 tranformation</span></span>
+<span class="r-in"><span class="fu">tof_preprocess</span><span class="op">(</span><span class="va">tof_tibble</span>, transform_fun <span class="op">=</span> <span class="va">log10</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 × 59</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Time Event_length `CD45|Y89` `empty|Pd102` `empty|Pd104` `empty|Pd105`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  7.04         1.20       2.71        0.125          1.12           2.94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  6.85         1.28       2.93        0.601          1.11           2.88</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  6.99         1.20       2.87        0.843          0.686          2.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  6.36         1.20       2.77       -<span style="color: #BB0000;">0.189</span>          0.800          2.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  6.98         1.26       2.89        0.594          0.984          2.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  6.65         1.28       2.69        0.621          0.584          2.80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  6.44         1.20       2.70        0.539          0.628          2.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  6.57         1.26       2.75        0.821          1.07           2.85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  7.18         1.28       3.02        0.491          0.964          2.93</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  4.63         1.20       2.74       -<span style="color: #BB0000;">0.051</span><span style="color: #BB0000; text-decoration: underline;">5</span>         1.13           2.91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 90 more rows, and 53 more variables: `empty|Pd106` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `empty|Pd108` &lt;dbl&gt;, `empty|Pd110` &lt;dbl&gt;, `CD61|In113` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD99|In115` &lt;dbl&gt;, `empty|I127` &lt;dbl&gt;, `CD45RA|La139` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD93|Ce140` &lt;dbl&gt;, `CD3_CD19|Pr141` &lt;dbl&gt;, `CCR2|Nd142` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD117|Nd143` &lt;dbl&gt;, `CD123|Nd144` &lt;dbl&gt;, `CD64|Nd145` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CD90|Nd146` &lt;dbl&gt;, `CD38|Sm147` &lt;dbl&gt;, `CD34|Nd148` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `CEBPa|Sm149` &lt;dbl&gt;, `pSTAT5|Nd150` &lt;dbl&gt;, `CD11c|Eu151` &lt;dbl&gt;, …</span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

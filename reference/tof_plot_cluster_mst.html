@@ -16,7 +16,7 @@ continuous or discrete)."><!-- mathjax --><script src="https://cdnjs.cloudflare.
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,6 +164,37 @@ Defaults to <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html"
     <p>A ggraph/ggplot object.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">sim_data</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd38 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span class="r-in">        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># make a layout colored by a marker</span></span>
+<span class="r-in"><span class="va">layout_cd38</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">tof_plot_cluster_mst</span><span class="op">(</span></span>
+<span class="r-in">        tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
+<span class="r-in">        cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
+<span class="r-in">        color_col <span class="op">=</span> <span class="va">cd38</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"> <span class="co"># use the same layout as the plot above to color the same</span></span>
+<span class="r-in"> <span class="co"># tree using a different marker</span></span>
+<span class="r-in"> <span class="va">layout_cd45</span> <span class="op">&lt;-</span></span>
+<span class="r-in">    <span class="fu">tof_plot_cluster_mst</span><span class="op">(</span></span>
+<span class="r-in">        tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
+<span class="r-in">        cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
+<span class="r-in">        color_col <span class="op">=</span> <span class="va">cd45</span>,</span>
+<span class="r-in">        graph_layout <span class="op">=</span> <span class="va">layout_cd38</span></span>
+<span class="r-in">    <span class="op">)</span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

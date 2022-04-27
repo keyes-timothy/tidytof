@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
       <img src="" class="logo" alt=""><h1>Building predictive models</h1>
                         <h4 data-toc-skip class="author">Timothy Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-04-26</h4>
+            <h4 data-toc-skip class="date">2022-04-27</h4>
       
       
       <div class="d-none name"><code>modeling.Rmd</code></div>
@@ -100,7 +100,9 @@
 </h2>
 <p>To illustrate how they work, first we download some patient-level data from <a href="https://pubmed.ncbi.nlm.nih.gov/29505032/" class="external-link">this paper</a> and combine it with sample-level clinical annotations in one of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in datasets (<code>ddpr_metadata</code>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># link for downloading the sample-level data from the Nature Medicine website</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span>
+
+<span class="co"># link for downloading the sample-level data from the Nature Medicine website</span>
 <span class="va">data_link</span> <span class="op">&lt;-</span> 
   <span class="st">"https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"</span>
 
