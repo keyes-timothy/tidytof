@@ -289,19 +289,18 @@ test_that("phenograph tof_metacluster results are identical to subroutine", {
 })
 
 test_that("consensus tof_metacluster results are identical to subroutine", {
-
-  set.seed(2020)
   ccp_sub <-
     clust_data %>%
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
+      seed = 2020L
     )
 
-  set.seed(2020)
   ccp_wrap <-
     clust_data %>%
     tof_metacluster(
       cluster_col = .kmeans_cluster,
+      seed = 2020L,
       augment = FALSE,
       method = "consensus"
     )
