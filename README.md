@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tidytof: A user-friendly framework for interactive and highly reproducible mass cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and highly reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -512,12 +512,12 @@ phenograph_clusters %>%
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
 #>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
-#> 1 H1_PhenoGraph_c… 7                cluster1         -0.0336 2.46   0.608   3.96
-#> 2 H1_PhenoGraph_c… 11               cluster1          0.324  0.856 -0.116   4.52
-#> 3 H1_PhenoGraph_c… 7                cluster1          0.532  2.67   0.909   4.76
-#> 4 H1_PhenoGraph_c… 3                cluster1          0.0163 2.97   0.0725  5.15
-#> 5 H1_PhenoGraph_c… 8                cluster1          0.144  2.98   0.128   4.52
-#> 6 H1_PhenoGraph_c… 3                cluster1          0.742  3.41   0.336   5.71
+#> 1 H1_PhenoGraph_c… 3                cluster1         -0.0336 2.46   0.608   3.96
+#> 2 H1_PhenoGraph_c… 7                cluster1          0.324  0.856 -0.116   4.52
+#> 3 H1_PhenoGraph_c… 3                cluster1          0.532  2.67   0.909   4.76
+#> 4 H1_PhenoGraph_c… 4                cluster1          0.0163 2.97   0.0725  5.15
+#> 5 H1_PhenoGraph_c… 2                cluster1          0.144  2.98   0.128   4.52
+#> 6 H1_PhenoGraph_c… 4                cluster1          0.742  3.41   0.336   5.71
 #> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
 #> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
 #> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
@@ -538,20 +538,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters %>% 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 23 × 3
+#> # A tibble: 22 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster1           7                      298
-#>  2 cluster3           16                     283
-#>  3 cluster2           6                      271
-#>  4 cluster2           12                     264
-#>  5 cluster1           8                      202
-#>  6 cluster3           17                     196
-#>  7 cluster2           1                      162
-#>  8 cluster3           19                     161
-#>  9 cluster3           15                     159
-#> 10 cluster1           3                      150
-#> # … with 13 more rows
+#>  1 cluster3           15                     436
+#>  2 cluster1           5                      278
+#>  3 cluster1           4                      260
+#>  4 cluster2           19                     258
+#>  5 cluster2           14                     242
+#>  6 cluster3           8                      241
+#>  7 cluster3           11                     183
+#>  8 cluster1           2                      158
+#>  9 cluster2           16                     157
+#> 10 cluster2           20                     156
+#> # … with 12 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -573,12 +573,12 @@ phenograph_data %>%
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 12                  
-#> 2 16                  
-#> 3 12                  
-#> 4 17                  
-#> 5 12                  
-#> 6 13
+#> 1 4                   
+#> 2 6                   
+#> 3 3                   
+#> 4 2                   
+#> 5 3                   
+#> 6 2
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -607,12 +607,12 @@ phenograph_tsne %>%
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1   -13.8  -11.3 
-#> 2   -10.2   -2.06
-#> 3   -23.1   17.4 
-#> 4   -17.7    3.95
-#> 5   -17.1  -10.4 
-#> 6   -24.0    2.73
+#> 1    8.65  -5.01 
+#> 2   14.3   -2.76 
+#> 3   37.0   13.4  
+#> 4   24.1   -0.176
+#> 5   11.6   -3.47 
+#> 6   22.6    7.79
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -929,7 +929,10 @@ volcano_plot
 
 ### Analyzing data at the patient- and sample-level
 
-\[some kind of preamble\]
+In addition to its verbs that operate on single-cell data directly,
+`{tidytof}` implements functions for aggregating single-cell
+measurements into cluster- and sample-level summary statistics that can
+be analyzed using a variety of statistical models.
 
 #### Feature extraction with `tof_extract_features`
 
@@ -1345,12 +1348,12 @@ my_resample %>%
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN7           0.474     0.966    0.124       1.24       2.59     0.243
-#> 2 UPN8           0.951     0.958    0.161       0.556      3.18     0.556
-#> 3 UPN11          0.332     0.488    0.0146      0.598      2.16     0.320
-#> 4 UPN13          0.0634    0.0300   0.0219      0.109      2.34     0.314
-#> 5 UPN16          0.156     0.193    0.00407     0.951      2.87     0.254
-#> 6 UPN19          2.05      0.780    0.00233     0.298      2.36     0.481
+#> 1 UPN7           0.474      0.966   0.124       1.24       2.59     0.243
+#> 2 UPN8           0.951      0.958   0.161       0.556      3.18     0.556
+#> 3 UPN12          0.0565     0.185   0.0115      0.142      2.49     0.254
+#> 4 UPN24          0.0989     0.196   0.0198      0.210      2.36     0.382
+#> 5 UPN26          0.390      0.650   0.00157     0.622      2.81     0.684
+#> 6 UPN27          0.563      1.07    0.00276     0.712      2.40     0.411
 #> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1393,7 +1396,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-08 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1590,24 +1593,9 @@ compare) related functions with relative ease. (For instance, the
 `{tidytof}` functions are optimized for working with “tidy” data in the
 form of `tibbles` or `data.frames`. This means that most `{tidytof}`
 functions share some basic design principles in terms of how their
-arguments work. The most important of these principles is illustrated by
-the following picture: \[some picture\]
-
-``` r
-tof_extract_features(
-  tof_tibble = ___, 
-  cluster_col = ___, 
-  group_cols = ___,
-  stimulation_col = ___,
-  lineage_cols = ___,
-  signaling_cols = ___,
-  central_tendency_function = ___,
-  signaling_method = ___,
-  basal_level = ___,
-)
-```
-
-\[Under construction\]
+arguments work. For more details about these design principles, check
+out the [Getting Started with `tidytof`
+vignette](https://keyes-timothy.github.io/tidytof/articles/tidytof.html)
 
 ### 3. Use `{tidytof}` to write human-readable pipelines
 
@@ -1656,7 +1644,7 @@ input_path %>%
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-57-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-56-1.png" width="100%" />
 
 As shown above, stringing together `{tidytof}` verbs creates a pipeline
 that can be read easily from left-to-right and top-to-bottom – this

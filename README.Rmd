@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidytof: A user-friendly framework for interactive and highly reproducible mass cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and highly reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 
 <!-- badges: start -->
@@ -571,7 +571,7 @@ volcano_plot
 
 ### Analyzing data at the patient- and sample-level
 
-[some kind of preamble]
+In addition to its verbs that operate on single-cell data directly, `{tidytof}`  implements functions for aggregating single-cell measurements into cluster- and sample-level summary statistics that can be analyzed using a variety of statistical models. 
 
 #### Feature extraction with `tof_extract_features`
 
@@ -883,24 +883,7 @@ In general, `{tidytof}` verbs are organized in such a way that your IDE's code-c
 
 ### 2. `{tidytof}` functions use 2 kinds of arguments
 
-`{tidytof}` functions are optimized for working with "tidy" data in the form of `tibbles` or `data.frames`. This means that most `{tidytof}` functions share some basic design principles in terms of how their arguments work. The most important of these principles is illustrated by the following picture:
-[some picture]
-
-```{r, eval = FALSE}
-tof_extract_features(
-  tof_tibble = ___, 
-  cluster_col = ___, 
-  group_cols = ___,
-  stimulation_col = ___,
-  lineage_cols = ___,
-  signaling_cols = ___,
-  central_tendency_function = ___,
-  signaling_method = ___,
-  basal_level = ___,
-)
-```
-
-[Under construction]
+`{tidytof}` functions are optimized for working with "tidy" data in the form of `tibbles` or `data.frames`. This means that most `{tidytof}` functions share some basic design principles in terms of how their arguments work. For more details about these design principles, check out the [Getting Started with `tidytof` vignette](https://keyes-timothy.github.io/tidytof/articles/tidytof.html)
 
 ### 3. Use `{tidytof}` to write human-readable pipelines
 
