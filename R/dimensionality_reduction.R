@@ -156,6 +156,7 @@ tof_reduce_pca <-
 #'
 #'
 #' @importFrom dplyr as_tibble
+#' @importFrom dplyr select
 #' @importFrom purrr pluck
 #'
 #' @examples
@@ -198,7 +199,7 @@ tof_reduce_tsne <-
 
     result <-
       Rtsne::Rtsne(
-        X = as.matrix(select(tof_tibble, {{tsne_cols}})),
+        X = as.matrix(dplyr::select(tof_tibble, {{tsne_cols}})),
         dims = num_comp,
         perplexity = perplexity,
         theta = theta,
@@ -273,6 +274,7 @@ tof_reduce_tsne <-
 #' @importFrom recipes all_numeric
 #'
 #' @importFrom dplyr rename_with
+#' @importFrom dplyr select
 #'
 #' @importFrom embed step_umap
 #'
@@ -323,7 +325,7 @@ tof_reduce_umap <-
 
     suppressWarnings(
       umap_recipe <-
-        recipes::recipe(~ ., data = select(tof_tibble, {{umap_cols}})) %>%
+        recipes::recipe(~ ., data = dplyr::select(tof_tibble, {{umap_cols}})) %>%
         # remove any variables that have 0 variance
         recipes::step_zv(recipes::all_numeric()) %>%
         embed::step_umap(

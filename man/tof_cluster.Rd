@@ -20,9 +20,9 @@ tof_cluster(
 use in computing the clusters. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
 
-\item{group_cols}{Optional. An unquoted column name indicating which columns
+\item{group_cols}{Optional. Unquoted column names indicating which columns
 should be used to group cells before clustering. Clustering is then performed
-on each group independently.}
+on each group independently. Supports tidyselect helpers.}
 
 \item{...}{Additional arguments to pass to the `tof_cluster_*`
 function family member corresponding to the chosen method.}

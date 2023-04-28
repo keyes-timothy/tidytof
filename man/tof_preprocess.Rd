@@ -2,7 +2,7 @@
 % Please edit documentation in R/preprocessing.R
 \name{tof_preprocess}
 \alias{tof_preprocess}
-\title{Preprocess raw CyTOF data.}
+\title{Preprocess raw high-dimensional cytometry data.}
 \usage{
 tof_preprocess(
   tof_tibble = NULL,
@@ -14,12 +14,12 @@ tof_preprocess(
 \arguments{
 \item{tof_tibble}{A `tof_tbl` or a `tibble`.}
 
-\item{channel_cols}{A vector of non-quoted column names representing columns that contain
+\item{channel_cols}{Unquoted column names representing columns that contain
 single-cell protein measurements. Supports tidyselect helpers.
 If nothing is specified, the default is to transform all numeric columns.}
 
 \item{undo_noise}{A boolean value indicating whether to remove the uniform noise that
-Fluidigm software adds to each CyTOF measurement for aesthetic
+Fluidigm software adds to CyTOF measurements for aesthetic
 and visualization purposes. See \href{https://pubmed.ncbi.nlm.nih.gov/30277658/}{this paper}.
 Defaults to FALSE.}
 
@@ -34,8 +34,9 @@ removed or not removed depending on `undo_noise`).
 }
 \description{
 This function transforms a `tof_tbl` of raw ion counts directly measured on
-a mass cytometer using a user-provided function. It can be used to perform
-standard pre-processing steps before CyTOF data analysis.
+a cytometer using a user-provided function. It can be used to perform
+standard pre-processing steps  (i.e. arcsinh transformation) before cytometry
+data analysis.
 }
 \examples{
 

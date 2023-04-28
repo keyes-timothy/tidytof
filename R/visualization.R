@@ -179,6 +179,152 @@ tof_plot_cells_density <-
     return(result + theme)
   }
 
+
+
+
+#' Plot scatterplots of single-cell data.
+#'
+#' This function makes scatterplots of single-cell data using user-specified
+#' x- and y-axes. Additionally, each point in the scatterplot can be colored
+#' using a user-specified variable.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param x_col An unquoted column name specifying which column in
+#' `tof_tibble` should be used as the x-axis.
+#'
+#' @param y_col An unquoted column name specifying which column in
+#' `tof_tibble` should be used as the y-axis.
+#'
+#' @param color_col An unquoted column name specifying which column in
+#' `tof_tibble` should be used to color each point in the scatterplot.
+#'
+#' @param facet_cols An unquoted column name specifying which column in
+#' `tof_tibble` should be used to break the scatterplot into facets using
+#' \code{\link[ggplot2]{facet_wrap}}.
+#'
+#' @param theme A ggplot2 theme to apply to the scatterplot. Defaults to
+#' \code{\link[ggplot2]{theme_bw}}.
+#'
+#' @param ... Optional additional arguments to pass to \code{\link[ggplot2]{geom_point}}
+#' if \code{method = "ggplot2"} or \code{\link[scattermore]{geom_scattermore}} if
+#' \code{method = "scattermore"}.
+#'
+#' @param method A string indicating which plotting engine should be used. Valid
+#' values include "ggplot2" (the default) and "scattermore" (recommended if more than
+#' 100K cells are being plotted). Note that \code{method = "scattermore"} requires the
+#' scattermore package to be installed.
+#'
+#' @return A ggplot object.
+#'
+#' @family visualization functions
+#'
+#' @export
+#'
+#' @importFrom dplyr select
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 vars
+#'
+#' @importFrom rlang arg_match
+#' @importFrom rlang check_installed
+#' @importFrom rlang is_installed
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = c(rep("a", 500), rep("b", 500))
+#'     )
+#'
+#'
+#'
+tof_plot_cells_scatter <-
+  function(
+    tof_tibble,
+    x_col,
+    y_col,
+    color_col,
+    facet_cols,
+    theme = ggplot2::theme_bw(),
+    ...,# other arguments to ggplot2::geom_point() or scattermore::geom_scattermore()
+    method = c("ggplot2", "scattermore")
+  ) {
+    # check arguments
+    method <- rlang::arg_match(method)
+
+    if (missing(x_col) | missing(y_col)) {
+      stop("Both x_col and y_col are required.")
+    }
+
+    # create plot tibble for memory efficiency
+    if (!missing(facet_cols)) {
+      plot_tibble <-
+        tof_tibble |>
+        dplyr::select({{x_col}}, {{y_col}}, {{color_col}}, {{facet_cols}})
+    } else {
+      plot_tibble <-
+        tof_tibble |>
+        dplyr::select({{x_col}}, {{y_col}}, {{color_col}})
+    }
+
+    # set shape of points for scatterplot
+    if (missing(color_col)) {
+      shape = 16
+    } else {
+      shape = 21
+    }
+
+    # create point geom
+    if (method == "ggplot2") {
+      cell_geom <- ggplot2::geom_point(shape = shape, ...)
+    } else if (method == "scattermore") {
+
+      # check for scattermore package
+      rlang::check_installed(pkg = "scattermore")
+
+      if (!rlang::is_installed(pkg = "scattermore")) {
+        stop("`method = scattermore` requires the scattermore package to be installed.")
+      }
+
+      cell_geom <-
+        scattermore::geom_scattermore(aes(color = {{color_col}}), ...)
+    } else {
+      stop("Method must be ggplot2 or scattermore.")
+    }
+
+    # create plot
+    result <-
+      plot_tibble %>%
+      ggplot2::ggplot(
+        ggplot2::aes(x = {{x_col}}, y = {{y_col}}, fill = {{color_col}})
+      ) +
+      cell_geom +
+      ggplot2::labs(
+        x = colnames(dplyr::select(plot_tibble, {{x_col}}))[[1]],
+        y = colnames(dplyr::select(plot_tibble, {{y_col}}))[[1]]
+      )
+
+    if (!missing(facet_cols)) {
+      result <-
+        result +
+        ggplot2::facet_wrap(facets = ggplot2::vars({{facet_cols}}))
+    }
+
+    # return result
+    return(result + theme)
+
+  }
+
+
+
 #' Plot scatterplots of single-cell data using low-dimensional feature embeddings
 #'
 #' This function makes scatterplots using single-cell data embedded in a
@@ -220,7 +366,6 @@ tof_plot_cells_density <-
 #'
 #' @family visualization functions
 #'
-#' @export
 #'
 #' @importFrom dplyr select
 #'
@@ -238,7 +383,7 @@ tof_plot_cells_density <-
 #'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
 #'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
 #'         cd19 = rnorm(n = 1000),
-#'         cluster_id = sample(c("a", "b"), size = 1000, replace = TRUE)
+#'         cluster_id = c(rep("a", 500), rep("b", 500))
 #'     )
 #'
 #' # embed with pca
@@ -259,7 +404,7 @@ tof_plot_cells_density <-
 #'         tsne_cols = starts_with("cd")
 #'     )
 #'
-tof_plot_cells_embedding <-
+tof_plot_cells_embedding_deprecated <-
   function(
     tof_tibble,
     embedding_cols,
@@ -268,10 +413,11 @@ tof_plot_cells_embedding <-
     embedding_method = c("pca", "tsne", "umap"),
     point_alpha = 1,
     theme = ggplot2::theme_bw(),
-    ...# optional additional arguments to the specified tof_reduce_* family function
+    ...,# optional additional arguments to the specified tof_reduce_* family function
+    method = c("ggplot2", "scattermore")
   ) {
 
-    # if no dr_cols are specified, use the embedding_method to compute them
+    # if no embedding_cols are specified, use the embedding_method to compute them
     if (missing(embedding_cols)) {
       # if there's no embedding_method specified, just use PCA (for speed)
       if (identical(embedding_method, c("pca", "tsne", "umap"))) {
@@ -336,6 +482,196 @@ tof_plot_cells_embedding <-
     }
     return(result + theme)
   }
+
+
+
+
+#' Plot scatterplots of single-cell data using low-dimensional feature embeddings
+#'
+#' This function makes scatterplots using single-cell data embedded in a
+#' low-dimensional space (such as that generated by
+#' \code{\link{tof_reduce_dimensions}}, with each point colored using a
+#' user-specified variable.
+#'
+#' @param tof_tibble A `tof_tbl` or a `tibble`.
+#'
+#' @param embedding_cols  Unquoted column names indicating which columns in
+#' `tof_tibble` should be used as the x and y axes of the scatterplot. Supports
+#' tidyselect helpers. Must select exactly 2 columns. If not provided, a
+#' feature embedding can be computed from scratch using the method provided
+#' using the `embedding_method` argument and the
+#' \code{\link{tof_reduce_dimensions}} arguments passed to `embedding_args`.
+#'
+#' @param color_col An unquoted column name specifying which column in
+#' `tof_tibble` should be used to color each point in the scatterplot.
+#'
+#' @param facet_cols An unquoted column name specifying which column in
+#' `tof_tibble` should be used to break the scatterplot into facets using
+#' \code{\link[ggplot2]{facet_wrap}}.
+#'
+#' @param compute_embedding_cols Unquoted column names indicating which columns
+#' in 'tof_tibble' to use for computing the embeddings with the method specified
+#' by `embedding_method`. Defaults to all numeric columns in 'tof_tibble'.
+#' Supports tidyselect helpers.
+#'
+#' @param embedding_method A string indicating which method should be used for
+#' the feature embedding (if `embedding_cols` are not provided). Options
+#' (which are passed to \code{\link{tof_reduce_dimensions}}) are "pca" (the default),
+#' "tsne", and "umap".
+#'
+#' @param embedding_args Optional additional arguments to pass to
+#' \code{\link{tof_reduce_dimensions}}. For example, for `method = "tsne"`, these
+#' might include `num_comp`, `perplexity`, and `theta`.
+#'
+#' @param theme A ggplot2 theme to apply to the scatterplot. Defaults to
+#' \code{\link[ggplot2]{theme_bw}}.
+#'
+#' @param ... Optional additional arguments to pass to
+#' \code{\link{tof_plot_cells_scatter}}.
+#'
+#' @param method A string indicating which plotting engine should be used. Valid
+#' values include "ggplot2" (the default) and "scattermore" (recommended if more than
+#' 100K cells are being plotted). Note that \code{method = "scattermore"} requires the
+#' scattermore package to be installed.
+#'
+#' @return A ggplot object.
+#'
+#' @family visualization functions
+#'
+#' @export
+#'
+#' @importFrom dplyr select
+#'
+#' @importFrom ggplot2 theme_bw
+#'
+#' @importFrom rlang arg_match
+#' @importFrom rlang sym
+#'
+#' @examples
+#'
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = c(rep("a", 500), rep("b", 500))
+#'     )
+#'
+#' # embed with pca
+#' pca_plot <-
+#'     tof_plot_cells_embedding(
+#'         tof_tibble = sim_data,
+#'         color_col = cd38,
+#'         embedding_method = "pca",
+#'         compute_embedding_cols = starts_with("cd")
+#'     )
+#'
+#' # embed with tsne
+#' tsne_plot <-
+#'     tof_plot_cells_embedding(
+#'         tof_tibble = sim_data,
+#'         color_col = cluster_id,
+#'         embedding_method = "tsne",
+#'         compute_embedding_cols = starts_with("cd")
+#'     )
+#'
+tof_plot_cells_embedding <-
+  function(
+    tof_tibble,
+    embedding_cols,
+    color_col,
+    facet_cols,
+    compute_embedding_cols = where(tof_is_numeric),
+    embedding_method = c("pca", "tsne", "umap"),
+    embedding_args = list(), # list of arguments for embedding function
+    theme = ggplot2::theme_bw(),
+    ...,
+    method = c("ggplot2", "scattermore")
+  ) {
+
+    # if no embedding_cols are specified, use the embedding_method to compute them
+    if (missing(embedding_cols)) {
+      # if there's no embedding_method specified, just use PCA (for speed)
+      if (identical(embedding_method, c("pca", "tsne", "umap"))) {
+        message("No embedding_cols were specified, and no embedding_method was specified.
+                Performing PCA as the default dimensionality reduction method.")
+      }
+      # check embedding_method columns
+      embedding_method <- rlang::arg_match(embedding_method)
+
+      # compute de novo embedding if needed
+      embed_tibble <-
+        do.call(
+          what = tof_reduce_dimensions,
+          args =
+            c(
+              list(
+                tof_tibble = dplyr::select(tof_tibble, {{compute_embedding_cols}}),
+                augment = FALSE,
+                method = embedding_method),
+              embedding_args
+            )
+        )
+
+      # if there are embedding_cols specified, just use those
+    } else {
+      # check embedding_cols - there should only be two
+      embed_tibble <-
+        tof_tibble %>%
+        dplyr::select({{embedding_cols}})
+
+      num_embed_cols <-
+        embed_tibble %>%
+        ncol()
+
+      if (num_embed_cols != 2) {
+        stop("2 embedding columns must be selected.")
+      }
+    }
+
+    # remove any shared columns between tof_tibble and embed_tibble
+    cols_to_remove <- intersect(colnames(embed_tibble), colnames(tof_tibble))
+    tof_tibble <-
+      tof_tibble |>
+      dplyr::select(-any_of(cols_to_remove))
+
+    x_col <- rlang::sym(colnames(embed_tibble)[[1]])
+    y_col <- rlang::sym(colnames(embed_tibble)[[2]])
+
+    embed_tibble <- dplyr::bind_cols(embed_tibble, tof_tibble)
+
+    # make plot
+    if (!missing(facet_cols)) {
+      result <-
+        tof_plot_cells_scatter(
+          tof_tibble = embed_tibble,
+          x_col = {{x_col}},
+          y_col = {{y_col}},
+          color_col = {{color_col}},
+          facet_cols = {{facet_cols}},
+          theme = theme,
+          ...,
+          method = method
+        )
+    } else {
+      result <-
+        tof_plot_cells_scatter(
+          tof_tibble = embed_tibble,
+          x_col = {{x_col}},
+          y_col = {{y_col}},
+          color_col = {{color_col}},
+          theme = theme,
+          ...,
+          method = method
+        )
+    }
+
+    return(result)
+  }
+
+
+
 
 #' Plot force-directed layouts of single-cell data
 #'
@@ -1831,4 +2167,29 @@ tof_plot_model_survival <-
 
   }
 
+
+#' Generate a color palette using tidytof.
+#'
+#' This function generates a color palette based on the color palette of the
+#' author's favorite pokemon.
+#'
+#' @param num_colors An integer specifying the number of colors you'd like to generate.
+#'
+#' @return A character vector of hex codes specifying the colors in the palette.
+#'
+#' @export
+#'
+#' @examples
+#' tof_generate_palette(num_colors = 5L)
+#'
+tof_generate_palette <- function(num_colors) {
+  charizard <-
+    c(
+      "#D86020", "#28A8B8", "#F89040", "#D0D0D0", "#903000",
+      "#184068", "#E85040", "#F8D068", "#F8E098",
+      "#207890", "#F8A058", "#C03020", "#F8C060", "#F8F8F8"
+    )
+  result <- charizard[1:num_colors]
+  return(result)
+}
 

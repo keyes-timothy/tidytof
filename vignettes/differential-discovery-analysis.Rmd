@@ -29,7 +29,7 @@ library(tidyr)
 library(forcats)
 ```
 
-After clusters are identified, many CyTOF users want to use statistical tools to rigorously quantify which clusters(s) in their dataset associate with a particular experimental or clinical variable.
+After clusters are identified, many cytometrists want to use statistical tools to rigorously quantify which clusters(s) in their dataset associate with a particular experimental or clinical variable.
 
 Such analyses are often grouped under the umbrella term **differential discovery analysis** and include both comparing the relative *size* of clusters between experimental conditions (**differential abundance analysis; DAA**) as well as comparing marker expression patterns of clusters between experimental conditions (**differential expression analysis; DEA**). `{tidytof}` provides the `tof_daa()` and `tof_dea()` verbs for differential abundance and differential expression analyses, respectively.
 

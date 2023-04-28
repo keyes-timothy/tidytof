@@ -178,6 +178,10 @@ tof_upsample_distance <-
 #' be used to perform the upsampling. Options are "euclidean" (the default) and
 #' "cosine".
 #'
+#' @param num_neighbors An integer indicating how many neighbors should be used
+#' in the nearest neighbor calculation. Clusters are assigned based on majority
+#' vote.
+#'
 #' @return A tibble with one column named
 #' `.upsample_cluster`, a character vector of length `nrow(tof_tibble)`
 #' indicating the id of the reference cluster to which each cell
@@ -231,26 +235,46 @@ tof_upsample_neighbor <-
     reference_tibble,
     reference_cluster_col,
     upsample_cols = where(tof_is_numeric),
+    num_neighbors = 1L,
     distance_function = c("euclidean", "cosine")
     ) {
     query_matrix <-
-      tof_tibble %>%
-      dplyr::select({{upsample_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{upsample_cols}})  |>
       as.matrix()
 
     nn_result <-
-      reference_tibble %>%
-      dplyr::select({{upsample_cols}}) %>%
+      reference_tibble |>
+      dplyr::select({{upsample_cols}}) |>
       tof_find_knn(
-        k = 1,
+        k = num_neighbors,
         distance_function = distance_function,
         query = query_matrix
       )
 
     nn_ids <- nn_result$neighbor_ids
 
-    upsampled_clusters <-
-      dplyr::pull(reference_tibble, {{reference_cluster_col}})[nn_ids]
+    clusters <- dplyr::pull(reference_tibble, {{reference_cluster_col}})
+
+    if (num_neighbors == 1L) {
+
+    upsampled_clusters <- clusters[nn_ids]
+
+    } else {
+      upsampled_clusters <-
+        purrr::map_chr(
+          .x = 1:nrow(nn_ids),
+          .f = \(x) {
+            clusters[nn_ids[x, ]] |>
+              table() |>
+              as.data.frame() |>
+              dplyr::as_tibble() |>
+              dplyr::slice_max(order_by = .data$Freq, n = 1L, with_ties = FALSE) |>
+              dplyr::pull(.data$Var1) |>
+              as.character()
+          }
+        )
+    }
 
     result <-
       dplyr::tibble(.upsample_cluster = upsampled_clusters)

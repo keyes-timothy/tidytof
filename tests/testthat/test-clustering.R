@@ -492,5 +492,57 @@ test_that("clustering output is identical for all methods", {
   )
 })
 
+# tof_annotate_clusters --------------------------------------------------------
+
+sim_data <-
+  dplyr::tibble(
+    cd45 = rnorm(n = 1000),
+    cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+    cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+    cd19 = rnorm(n = 1000),
+    cluster_id = c(rep("a", 500), rep("b", 500))
+  )
+
+
+
+test_that("Annotation result is the correct shape", {
+  # using named character vector
+  annotation_result <-
+    sim_data |>
+    tof_annotate_clusters(
+      cluster_col = cluster_id,
+      annotations = c("macrophage" = "a", "dendritic cell" = "b")
+    )
+
+  vector_shape <-
+    annotation_result |>
+    dplyr::count(cluster_id, cluster_id_annotation) |>
+    nrow()
+
+  expect_equal(vector_shape, expected = 2L)
+
+  # using tibble
+  annotation_data_frame <-
+    data.frame(
+      cluster_id = c("a", "b"),
+      cluster_annotation = c("macrophage", "dendritic cell")
+    )
+
+  annotation_result <-
+    sim_data |>
+    tof_annotate_clusters(
+      cluster_col = cluster_id,
+      annotations = annotation_data_frame
+    )
+
+  tibble_shape <-
+    annotation_result |>
+    dplyr::count(cluster_id, cluster_annotation) |>
+    nrow()
+
+  expect_equal(tibble_shape, expected = 2L)
+
+})
+
 
 

@@ -1567,8 +1567,6 @@ tof_get_model_type <-
 #' @export
 #'
 #' @examples
-#'
-#' @examples
 #' feature_tibble <-
 #'     dplyr::tibble(
 #'         sample = as.character(1:100),
