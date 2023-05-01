@@ -9,6 +9,7 @@ tof_upsample_neighbor(
   reference_tibble,
   reference_cluster_col,
   upsample_cols = where(tof_is_numeric),
+  num_neighbors = 1L,
   distance_function = c("euclidean", "cosine")
 )
 }
@@ -26,6 +27,10 @@ each cell in `reference_tibble`.}
 \item{upsample_cols}{Unquoted column names indicating which columns in `tof_tibble` to
 use in computing the distances used for upsampling. Defaults to all numeric columns
 in `tof_tibble`. Supports tidyselect helpers.}
+
+\item{num_neighbors}{An integer indicating how many neighbors should be used
+in the nearest neighbor calculation. Clusters are assigned based on majority
+vote.}
 
 \item{distance_function}{A string indicating which distance function should
 be used to perform the upsampling. Options are "euclidean" (the default) and

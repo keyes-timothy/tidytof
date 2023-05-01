@@ -141,8 +141,8 @@ tof_summarize_clusters <-
         format = "long"
       ) %>%
       tidyr::pivot_wider(
-        names_from = .data$channel,
-        values_from = .data$values
+        names_from = "channel",
+        values_from = "values"
       )
 
     return(result)
@@ -236,6 +236,39 @@ cosine_similarity <- function(x, y) {
 }
 
 # differential discovery analysis ----------------------------------------------
+
+#' @importFrom dplyr as_tibble
+#'
+tidy_lmer_test_glmm <- function(lmer_test) {
+  result <-
+    summary(lmer_test)$coefficients |>
+    dplyr::as_tibble(rownames = "term") |>
+    dplyr::rename(
+      p.value = .data$`Pr(>|z|)`,
+      estimate = .data$Estimate,
+      statistic = .data$`z value`,
+      std_error = .data$`Std. Error`
+    )
+
+  return(result)
+}
+
+
+#' @importFrom dplyr as_tibble
+#'
+tidy_lmer_test <- function(lmer_test) {
+  result <-
+    summary(lmer_test)$coefficients |>
+    dplyr::as_tibble(rownames = "term") |>
+    dplyr::rename(
+      p.value = .data$`Pr(>|t|)`,
+      estimate = .data$Estimate,
+      statistic = .data$`t value`
+    )
+
+  return(result)
+}
+
 
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
@@ -1091,7 +1124,7 @@ tof_make_knn_graph <-
       dplyr::as_tibble() %>%
       dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) %>%
       tidyr::pivot_longer(
-        cols = -.data$from,
+        cols = -"from",
         names_to = "neighbor_index",
         values_to = "to"
       )
@@ -1108,7 +1141,7 @@ tof_make_knn_graph <-
         dplyr::as_tibble() %>%
         dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
         tidyr::pivot_longer(
-          cols = -.data$from,
+          cols = -"from",
           names_to = "neighbor_index",
           values_to = "distance"
         )
@@ -1317,7 +1350,7 @@ tof_plot_heatmap <-
       ggplot2::ggplot(
         ggplot2::aes(x = .data$marker, y = {{y_col}}, fill = .data$expression)
       ) +
-      ggplot2::geom_tile(color = "black", size = line_width) +
+      ggplot2::geom_tile(color = "black", linewidth = line_width) +
       ggplot2::scale_fill_viridis_c()
 
     # rotate x axis labels
@@ -1385,13 +1418,13 @@ tof_model_plot_survival_curves <- function(tof_model, new_x) {
     dplyr::as_tibble() %>%
     dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
     tidyr::pivot_longer(
-      cols = -.data$.timepoint_index,
+      cols = -".timepoint_index",
       names_to = "row_index",
       values_to = "probability"
     ) %>%
     dplyr::left_join(times, by = ".timepoint_index") %>%
-    dplyr::select(-.data$.timepoint_index) %>%
-    tidyr::nest(survival_curve = -.data$row_index)
+    dplyr::select(-".timepoint_index") %>%
+    tidyr::nest(survival_curve = -"row_index")
 
   return(survival_curves)
 }
@@ -1419,13 +1452,13 @@ tof_plot_survival_curves <-
       dplyr::as_tibble() %>%
       dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
       tidyr::pivot_longer(
-        cols = -.data$.timepoint_index,
+        cols = -".timepoint_index",
         names_to = "row_index",
         values_to = "probability"
       ) %>%
       dplyr::left_join(times, by = ".timepoint_index") %>%
-      dplyr::select(-.data$.timepoint_index) %>%
-      tidyr::nest(survival_curve = -.data$row_index)
+      dplyr::select(-".timepoint_index") %>%
+      tidyr::nest(survival_curve = -"row_index")
 
     return(survival_curves)
   }
@@ -1458,7 +1491,7 @@ tof_compute_km_curve <- function(survival_curves) {
 
   km_curve <-
     survival_curves %>%
-    dplyr::select(.data$time_to_event, .data$event) %>%
+    dplyr::select("time_to_event", "event") %>%
     dplyr::arrange(.data$time_to_event) %>%
     dplyr::mutate(
       num_current_deaths = as.character(.data$event) == death_level,
@@ -1485,9 +1518,9 @@ tof_compute_km_curve <- function(survival_curves) {
       is_censored = (.data$num_current_censored == 1)
     ) %>%
    dplyr::select(
-     .data$time_to_event,
-     .data$survival_probability,
-     .data$is_censored
+     "time_to_event",
+     "survival_probability",
+     "is_censored"
    )
 
   return(km_curve)

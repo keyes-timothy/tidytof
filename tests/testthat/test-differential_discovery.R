@@ -1,6 +1,5 @@
 library(dplyr)
 library(purrr)
-library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
@@ -10,7 +9,7 @@ data(ddpr_data)
 # setup
 set.seed(2020)
 dd_data <-
-  ddpr_data %>%
+  ddpr_data |>
   mutate(
     stim = sample(c("stim", "basal"), size = nrow(ddpr_data), replace = TRUE),
     stim_2 = sample(c("a", "b", "c"), size = nrow(ddpr_data), replace = TRUE),
@@ -22,20 +21,20 @@ dd_data <-
     pairs = str_c(condition, replicate, sep = "_"),
     .flowsom_metacluster =
       sample(x= c("1", "2", "3"), size = nrow(ddpr_data), replace = TRUE)
-  ) %>%
-  select(-cell_id) %>%
+  ) |>
+  select(-cell_id) |>
   tof_preprocess()
 
 num_clusters <-
-  dd_data$.flowsom_metacluster %>%
-  unique() %>%
+  dd_data$.flowsom_metacluster |>
+  unique() |>
   length()
 
 # tof_daa_diffcyt --------------------------------------------------------------
 
 ### test basic results
 diffcyt_glmm <-
-  dd_data %>%
+  dd_data |>
   tof_daa_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -45,7 +44,7 @@ diffcyt_glmm <-
   )
 
 diffcyt_glmm_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_daa_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -56,7 +55,7 @@ diffcyt_glmm_fixed <-
   )
 
 diffcyt_voom <-
-  dd_data %>%
+  dd_data |>
   tof_daa_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -66,7 +65,7 @@ diffcyt_voom <-
   )
 
 diffcyt_voom_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_daa_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -75,7 +74,7 @@ diffcyt_voom_fixed <-
   )
 
 diffcyt_edgeR <-
-  dd_data %>%
+  dd_data |>
   tof_daa_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -127,7 +126,7 @@ test_that("diffcyt daa_results have the right content", {
 
 test_that("edgeR throws an error when you try to model random effects", {
   expect_error(
-    dd_data %>%
+    dd_data |>
       tof_daa_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
@@ -140,7 +139,7 @@ test_that("edgeR throws an error when you try to model random effects", {
 
 test_that("OLRE give a warning for any diffcyt_method that isn't GLMMs", {
   expect_warning(
-    dd_data %>%
+    dd_data |>
       tof_daa_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
@@ -151,7 +150,7 @@ test_that("OLRE give a warning for any diffcyt_method that isn't GLMMs", {
   )
 
   expect_warning(
-    dd_data %>%
+    dd_data |>
       tof_daa_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
@@ -182,13 +181,13 @@ test_that("Using only a fixed-effect doesn't break anything", {
 
 test_that("Using a fixed-effect with more than 2 levels results in a nested output tibble", {
   expect_equal(
-    dd_data %>%
+    dd_data |>
       tof_daa_diffcyt(
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = stim_2,
         diffcyt_method = "glmm"
-      ) %>%
+      ) |>
       nrow(),
     3L
   )
@@ -199,7 +198,7 @@ test_that("Using a fixed-effect with more than 2 levels results in a nested outp
 # tof_daa_glmm -----------------------------------------------------------------
 
 daa_glmm <-
-  dd_data %>%
+  dd_data |>
   tof_daa_glmm(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -208,7 +207,7 @@ daa_glmm <-
   )
 
 daa_glmm_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_daa_glmm(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -242,12 +241,12 @@ test_that("glmm daa_results have the right content", {
 
 test_that("Using a fixed-effect with more than 2 levels results in a larger output tibble", {
   expect_equal(
-    dd_data %>%
+    dd_data |>
       tof_daa_glmm(
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
         fixed_effect_cols = stim_2
-      ) %>%
+      ) |>
       nrow(),
     2L
   )
@@ -257,7 +256,7 @@ test_that("Using a fixed-effect with more than 2 levels results in a larger outp
 
 # setup
 daa_t <-
-  dd_data %>%
+  dd_data |>
   tof_daa_ttest(
     cluster_col = .flowsom_metacluster,
     effect_col = condition,
@@ -267,7 +266,7 @@ daa_t <-
   )
 
 daa_t_paired <-
-  dd_data %>%
+  dd_data |>
   tof_daa_ttest(
     cluster_col = .flowsom_metacluster,
     effect_col = stim,
@@ -307,7 +306,7 @@ test_that("results have the right content", {
 
 test_that("choosing effect_col with more than 2 levels throws an error", {
   expect_error(
-    dd_data %>%
+    dd_data |>
       tof_daa_ttest(
         cluster_col = .flowsom_metacluster,
         effect_col = stim_2,
@@ -319,7 +318,7 @@ test_that("choosing effect_col with more than 2 levels throws an error", {
 test_that("omitting group_cols should give an error", {
   # unpaired
   expect_error(
-      dd_data %>%
+      dd_data |>
       tof_daa_ttest(
         cluster_col = .flowsom_metacluster,
         effect_col = condition,
@@ -331,7 +330,7 @@ test_that("omitting group_cols should give an error", {
 
   # paired
   expect_error(
-      dd_data %>%
+      dd_data |>
       tof_daa_ttest(
         cluster_col = .flowsom_metacluster,
         effect_col = stim,
@@ -348,7 +347,7 @@ test_that("omitting group_cols should give an error", {
 
 # setup
 diffcyt_lmm <-
-  dd_data %>%
+  dd_data |>
   tof_dea_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -359,7 +358,7 @@ diffcyt_lmm <-
   )
 
 diffcyt_lmm_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_dea_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -369,7 +368,7 @@ diffcyt_lmm_fixed <-
   )
 
 diffcyt_lmm_tidyselection <-
-  dd_data %>%
+  dd_data |>
   tof_dea_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -380,7 +379,7 @@ diffcyt_lmm_tidyselection <-
   )
 
 diffcyt_limma <-
-  dd_data %>%
+  dd_data |>
   tof_dea_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -391,7 +390,7 @@ diffcyt_limma <-
   )
 
 diffcyt_limma_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_dea_diffcyt(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -443,7 +442,7 @@ test_that("diffcyt dea_results have the right content", {
 
 test_that("OLRE give a warning for any diffcyt_method that isn't GLMMs", {
   expect_warning(
-    dd_data %>%
+    dd_data |>
       tof_dea_diffcyt(
         sample_col = sample_name,
         cluster_col = .flowsom_metacluster,
@@ -473,14 +472,14 @@ test_that("Using only a fixed-effect doesn't break anything", {
 
 test_that("Using a fixed-effect with more than 2 levels results in a larger output tibble", {
   expect_equal(
-    dd_data %>%
+    dd_data |>
       tof_dea_diffcyt(
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
         fixed_effect_cols = stim_2,
         diffcyt_method = "lmm"
-      ) %>%
+      ) |>
       nrow(),
     3L
   )
@@ -489,10 +488,11 @@ test_that("Using a fixed-effect with more than 2 levels results in a larger outp
 
 # tof_dea_lmm ------------------------------------------------------------------
 
+
 # setup
 
 dea_lmm <-
-  dd_data %>%
+  dd_data |>
   tof_dea_lmm(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -502,7 +502,7 @@ dea_lmm <-
   )
 
 dea_lmm_fixed <-
-  dd_data %>%
+  dd_data |>
   tof_dea_lmm(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -511,7 +511,7 @@ dea_lmm_fixed <-
   )
 
 dea_lmm_tidyselection <-
-  dd_data %>%
+  dd_data |>
   tof_dea_lmm(
     sample_col = sample_name,
     cluster_col = .flowsom_metacluster,
@@ -533,9 +533,9 @@ test_that("lmm result tibbles have the right dimensions", {
   expect_equal(nrow(dea_lmm_tidyselection), num_clusters * 3)
 
   # have correct number of columns
-  expect_equal(ncol(dea_lmm), 12L)
-  expect_equal(ncol(dea_lmm_fixed), 11L)
-  expect_equal(ncol(dea_lmm_tidyselection), 12L)
+  expect_equal(ncol(dea_lmm), 11L)
+  expect_equal(ncol(dea_lmm_fixed), 10L)
+  expect_equal(ncol(dea_lmm_tidyselection), 11L)
 
 })
 
@@ -550,13 +550,13 @@ test_that("lmm dea_results have the right content", {
 
 test_that("Using a fixed-effect with more than 2 levels results in a larger output tibble", {
   expect_equal(
-    dd_data %>%
+    dd_data |>
       tof_dea_lmm(
         sample_col = sample_name_2,
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
         fixed_effect_cols = stim_2
-      ) %>%
+      ) |>
       nrow(),
     2L
   )
@@ -567,7 +567,7 @@ test_that("Using a fixed-effect with more than 2 levels results in a larger outp
 
 #setup
 dea_t_unpaired <-
-  dd_data %>%
+  dd_data |>
   tof_dea_ttest(
     cluster_col = .flowsom_metacluster,
     marker_cols = c(cd45, cd19),
@@ -579,7 +579,7 @@ dea_t_unpaired <-
   )
 
 dea_t_paired <-
-  dd_data %>%
+  dd_data |>
   tof_dea_ttest(
     cluster_col = .flowsom_metacluster,
     marker_cols = c(cd45, cd19),
@@ -594,8 +594,8 @@ dea_t_paired <-
 test_that("t-test dea results are shaped correctly", {
   # rows
   num_clusters <-
-    dd_data %>%
-    distinct(.flowsom_metacluster) %>%
+    dd_data |>
+    distinct(.flowsom_metacluster) |>
     nrow()
 
   expect_equal(nrow(dea_t_unpaired), num_clusters * 2)
@@ -624,7 +624,7 @@ test_that("p-values are arranged in ascending order", {
 
 test_that("changing the summary function works", {
   expect_s3_class(
-    dd_data %>%
+    dd_data |>
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = cd45,
@@ -638,7 +638,7 @@ test_that("changing the summary function works", {
   )
 
   expect_s3_class(
-    dd_data %>%
+    dd_data |>
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
@@ -656,7 +656,7 @@ test_that("changing the summary function works", {
 test_that("omitting group_cols should throw an error", {
   # unpaired
   expect_error(
-      dd_data %>%
+      dd_data |>
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
@@ -670,7 +670,7 @@ test_that("omitting group_cols should throw an error", {
 
   # paired
   expect_error(
-      dd_data %>%
+      dd_data |>
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),
@@ -686,7 +686,7 @@ test_that("omitting group_cols should throw an error", {
 
 test_that("lack of effect_col throws an error", {
   expect_error(
-    dd_data %>%
+    dd_data |>
       tof_dea_ttest(
         cluster_col = .flowsom_metacluster,
         marker_cols = c(cd45, cd19),

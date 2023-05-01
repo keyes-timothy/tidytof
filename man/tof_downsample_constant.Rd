@@ -2,7 +2,7 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample_constant}
 \alias{tof_downsample_constant}
-\title{Downsample CyTOF data by randomly selecting a constant number of cells per group.}
+\title{Downsample high-dimensional cytometry data by randomly selecting a constant number of cells per group.}
 \usage{
 tof_downsample_constant(tof_tibble, group_cols = NULL, num_cells)
 }

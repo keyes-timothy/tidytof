@@ -7,21 +7,23 @@ library(testthat)
 
 set.seed(2020)
 
+data(ddpr_data)
+
 ddpr <-
-  ddpr_data %>%
-  group_by(sample_name) %>%
-  slice_sample(n = 100) %>%
+  ddpr_data |>
+  group_by(sample_name) |>
+  slice_sample(n = 100) |>
   ungroup()
 
 # tof_reduce_pca ---------------------------------------------------------------
 
 test_that("Shape of PCA result is correct", {
   dr_ddpr <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_pca()
 
   dr_ddpr_2 <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_pca(num_comp = 4L)
 
   expect_equal(nrow(ddpr), nrow(dr_ddpr))
@@ -31,8 +33,8 @@ test_that("Shape of PCA result is correct", {
 
 test_that("colnames of PCA result are correct", {
   pca_colnames <-
-    ddpr %>%
-    tof_reduce_pca() %>%
+    ddpr |>
+    tof_reduce_pca() |>
     colnames()
 
   expect_true(all(grepl("^\\.pc", pca_colnames)))
@@ -40,7 +42,7 @@ test_that("colnames of PCA result are correct", {
 
 test_that("return_recipe argument works", {
   pca_recipe <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_pca(return_recipe = TRUE)
 
   expect_s3_class(object = pca_recipe, "recipe")
@@ -50,11 +52,11 @@ test_that("return_recipe argument works", {
 
 test_that("Shape of tsne result is correct", {
   dr_ddpr <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_tsne()
 
   dr_ddpr_2 <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_tsne(num_comp = 3L)
 
   expect_equal(nrow(ddpr), nrow(dr_ddpr))
@@ -64,8 +66,8 @@ test_that("Shape of tsne result is correct", {
 
 test_that("colnames of tSNE result are correct", {
   tsne_colnames <-
-    ddpr %>%
-    tof_reduce_tsne() %>%
+    ddpr |>
+    tof_reduce_tsne() |>
     colnames()
 
   expect_true(all(grepl("^\\.tsne", tsne_colnames)))
@@ -75,11 +77,11 @@ test_that("colnames of tSNE result are correct", {
 # tof_reduce_umap --------------------------------------------------------------
 test_that("Shape of umap result is correct", {
   dr_ddpr <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_umap()
 
   dr_ddpr_2 <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_umap(num_comp = 3L)
 
   expect_equal(nrow(ddpr), nrow(dr_ddpr))
@@ -89,8 +91,8 @@ test_that("Shape of umap result is correct", {
 
 test_that("colnames of UMAP result are correct", {
   umap_colnames <-
-    ddpr %>%
-    tof_reduce_umap() %>%
+    ddpr |>
+    tof_reduce_umap() |>
     colnames()
 
   expect_true(all(grepl("^\\.umap", umap_colnames)))
@@ -98,7 +100,7 @@ test_that("colnames of UMAP result are correct", {
 
 test_that("return_recipe argument works", {
   umap_recipe <-
-    ddpr %>%
+    ddpr |>
     tof_reduce_umap(return_recipe = TRUE)
 
   expect_s3_class(object = umap_recipe, "recipe")

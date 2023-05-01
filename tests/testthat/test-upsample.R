@@ -7,8 +7,8 @@ library(testthat)
 data(ddpr_data)
 
 reference_tibble <-
-  ddpr_data %>%
-  slice_sample(prop = 0.1) %>%
+  ddpr_data |>
+  slice_sample(prop = 0.1) |>
   mutate(my_cluster = sample(x = c('a', 'b', 'c'), size = n(), replace = TRUE))
 
 # tof_upsample_distance --------------------------------------------------------
@@ -16,7 +16,7 @@ reference_tibble <-
 test_that("upsample result is a tibble with a single character vector column of correct length", {
 
   result <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -32,7 +32,7 @@ test_that("upsample result is a tibble with a single character vector column of 
 
 test_that("return_distances argument works", {
   result <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -46,7 +46,7 @@ test_that("return_distances argument works", {
 
 test_that("output columns are named correctly", {
   result_mah <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -55,7 +55,7 @@ test_that("output columns are named correctly", {
     )
 
   result_cosine <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -66,7 +66,7 @@ test_that("output columns are named correctly", {
     )
 
   result_pearson <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -91,7 +91,7 @@ test_that("output columns are named correctly", {
 test_that("upsample result is a tibble with a single character vector column of correct length", {
 
   result <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_neighbor(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -106,7 +106,7 @@ test_that("upsample result is a tibble with a single character vector column of 
 
 test_that("output columns are named correctly", {
   result <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_neighbor(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -120,7 +120,7 @@ test_that("output columns are named correctly", {
 
 test_that("tof_upsample and tof_upsample_distance results are the same", {
   result_1 <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_distance(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -129,7 +129,7 @@ test_that("tof_upsample and tof_upsample_distance results are the same", {
     )
 
   result_2 <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -145,7 +145,7 @@ test_that("tof_upsample and tof_upsample_distance results are the same", {
 
 test_that("tof_upsample and tof_upsample_neighbor results are the same", {
   result_1 <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample_neighbor(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,
@@ -153,7 +153,7 @@ test_that("tof_upsample and tof_upsample_neighbor results are the same", {
     )
 
   result_2 <-
-    ddpr_data %>%
+    ddpr_data |>
     tof_upsample(
       reference_tibble = reference_tibble,
       reference_cluster_col = my_cluster,

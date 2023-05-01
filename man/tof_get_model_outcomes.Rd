@@ -16,7 +16,6 @@ A character vector
 Get a `tof_model`'s outcome variable name(s)
 }
 \examples{
-
 feature_tibble <-
     dplyr::tibble(
         sample = as.character(1:100),

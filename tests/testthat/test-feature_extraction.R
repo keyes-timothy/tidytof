@@ -10,9 +10,9 @@ library(testthat)
 data(ddpr_data)
 
 dat <-
-  ddpr_data %>%
-  group_by(sample_name) %>%
-  slice_sample(n = 20) %>%
+  ddpr_data |>
+  group_by(sample_name) |>
+  slice_sample(n = 20) |>
   ungroup() %>%
   mutate(
     condition = str_remove(sample_name, "_Basal"),
@@ -25,23 +25,23 @@ dat <-
 # tof_extract_proportion -------------------------------------------------------
 
 prop_1 <-
-  dat %>%
+  dat |>
   tof_extract_proportion(cluster_col = cluster, group_cols = condition)
 
 prop_2 <-
-  dat %>%
+  dat |>
   tof_extract_proportion(cluster_col = cluster, group_cols = c(condition, replicate))
 
 prop_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_proportion(cluster_col = cluster)
 
 prop_long <-
-  dat %>%
+  dat |>
   tof_extract_proportion(cluster_col = cluster, group_cols = c(condition, replicate), format = "long")
 
 prop_long_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_proportion(cluster_col = cluster, format = "long")
 
 my_list <-
@@ -71,10 +71,10 @@ test_that("All proportions are 0.5", {
       map_lgl(
         .x = mget(my_list, envir = global_env),
         .f = ~
-          .x %>%
-          select(where(is.numeric)) %>%
+          .x |>
+          select(where(is.numeric)) |>
           as.matrix() %>%
-          `==`(0.5) %>%
+          `==`(0.5) |>
           all()
       )
     )
@@ -84,7 +84,7 @@ test_that("All proportions are 0.5", {
 
 # tof_extract_central_tendency -------------------------------------------------
 ct_1 <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     group_cols = condition,
@@ -92,7 +92,7 @@ ct_1 <-
     )
 
 ct_2 <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     group_cols = c(condition, replicate),
@@ -100,14 +100,14 @@ ct_2 <-
     )
 
 ct_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34)
     )
 
 ct_no_groups_stim <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
@@ -115,7 +115,7 @@ ct_no_groups_stim <-
   )
 
 ct_stim <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
@@ -124,7 +124,7 @@ ct_stim <-
   )
 
 ct_long <-
-  dat %>%
+  dat |>
   tof_extract_central_tendency(
     cluster_col = cluster,
     group_cols = condition,
@@ -155,7 +155,7 @@ test_that("results have the right shape", {
 # tof_extract_threshold --------------------------------------------------------
 
 thresh_1 <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     group_cols = condition,
@@ -164,7 +164,7 @@ thresh_1 <-
   )
 
 thresh_1b <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     group_cols = condition,
@@ -173,7 +173,7 @@ thresh_1b <-
   )
 
 thresh_2 <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     group_cols = c(condition, replicate),
@@ -181,7 +181,7 @@ thresh_2 <-
   )
 
 thresh_3 <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     group_cols = condition,
@@ -190,11 +190,11 @@ thresh_3 <-
   )
 
 thresh_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_threshold(cluster_col = cluster, marker_cols = c(cd45, cd34))
 
 thresh_no_groups_stim <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
@@ -202,7 +202,7 @@ thresh_no_groups_stim <-
   )
 
 thresh_long <-
-  dat %>%
+  dat |>
   tof_extract_threshold(
     cluster_col = cluster,
     group_cols = condition,
@@ -233,12 +233,12 @@ test_that("results have the right shape", {
 
 test_that("changing the threshold changes the numeric values", {
   values_1 <-
-    thresh_1 %>%
-    select(where(is.numeric)) %>%
+    thresh_1 |>
+    select(where(is.numeric)) |>
     as.matrix()
   values_2 <-
-    thresh_1b %>%
-    select(where(is.numeric)) %>%
+    thresh_1b |>
+    select(where(is.numeric)) |>
     as.matrix()
   expect_false(all(values_1 == values_2))
 })
@@ -249,10 +249,10 @@ test_that("All proportions are between 0 and 1", {
       map_lgl(
         .x = mget(my_list, envir = global_env),
         .f = ~
-          .x %>%
-          select(where(is.numeric)) %>%
-          as.matrix() %>%
-          (function(x) x >= 0 & x <= 1)() %>%
+          .x |>
+          select(where(is.numeric)) |>
+          as.matrix() |>
+          (function(x) x >= 0 & x <= 1)() |>
           all()
       )
     )
@@ -265,8 +265,8 @@ test_that("All proportions are between 0 and 1", {
 # tof_extract_emd --------------------------------------------------------------
 
 emd_1 <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_emd(
     cluster_col = cluster,
     group_cols = condition,
@@ -277,8 +277,8 @@ emd_1 <-
   )
 
 emd_1b <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_emd(
     cluster_col = cluster,
     group_cols = condition,
@@ -289,8 +289,8 @@ emd_1b <-
   )
 
 emd_2 <-
-  dat %>%
-  mutate(condition_1 = "a", condition_2 = "b") %>%
+  dat |>
+  mutate(condition_1 = "a", condition_2 = "b") |>
   tof_extract_emd(
     cluster_col = cluster,
     group_cols = c(condition_1, condition_2),
@@ -301,8 +301,8 @@ emd_2 <-
   )
 
 emd_3 <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_emd(
     cluster_col = cluster,
     group_cols = condition,
@@ -313,7 +313,7 @@ emd_3 <-
   )
 
 emd_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_emd(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
@@ -323,8 +323,8 @@ emd_no_groups <-
   )
 
 emd_long <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_emd(
     cluster_col = cluster,
     group_cols = condition,
@@ -356,12 +356,12 @@ test_that("results have the right shape", {
 
 test_that("changing the num_dims changes the numeric values", {
   values_1 <-
-    emd_1 %>%
-    select(where(is.numeric)) %>%
+    emd_1 |>
+    select(where(is.numeric)) |>
     as.matrix()
   values_2 <-
-    emd_1b %>%
-    select(where(is.numeric)) %>%
+    emd_1b |>
+    select(where(is.numeric)) |>
     as.matrix()
   expect_false(all(values_1 == values_2))
 })
@@ -372,16 +372,16 @@ test_that("column names change when you change basal_level", {
 
 test_that("EMDs are symmetric", {
   values_1 <-
-    emd_1 %>%
-    select(where(is.numeric)) %>%
-    as.matrix() %>%
-    round(digits = 3) %>%
+    emd_1 |>
+    select(where(is.numeric)) |>
+    as.matrix() |>
+    round(digits = 3) |>
     as.numeric()
   values_2 <-
-    emd_3 %>%
-    select(where(is.numeric)) %>%
-    as.matrix() %>%
-    round(digits = 3) %>%
+    emd_3 |>
+    select(where(is.numeric)) |>
+    as.matrix() |>
+    round(digits = 3) |>
     as.numeric()
   expect_equal(values_1, values_2)
 })
@@ -402,8 +402,8 @@ test_that("errors are thrown when required arguments are omitted", {
 # tof_extract_jsd --------------------------------------------------------------
 
 jsd_1 <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_jsd(
     cluster_col = cluster,
     group_cols = condition,
@@ -414,8 +414,8 @@ jsd_1 <-
   )
 
 jsd_1b <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_jsd(
     cluster_col = cluster,
     group_cols = condition,
@@ -426,8 +426,8 @@ jsd_1b <-
   )
 
 jsd_2 <-
-  dat %>%
-  mutate(condition_1 = "a", condition_2 = "b") %>%
+  dat |>
+  mutate(condition_1 = "a", condition_2 = "b") |>
   tof_extract_jsd(
     cluster_col = cluster,
     group_cols = c(condition_1, condition_2),
@@ -438,8 +438,8 @@ jsd_2 <-
   )
 
 jsd_3 <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_jsd(
     cluster_col = cluster,
     group_cols = condition,
@@ -450,7 +450,7 @@ jsd_3 <-
   )
 
 jsd_no_groups <-
-  dat %>%
+  dat |>
   tof_extract_jsd(
     cluster_col = cluster,
     marker_cols = c(cd45, cd34),
@@ -460,8 +460,8 @@ jsd_no_groups <-
   )
 
 jsd_long <-
-  dat %>%
-  mutate(condition = "a") %>%
+  dat |>
+  mutate(condition = "a") |>
   tof_extract_jsd(
     cluster_col = cluster,
     group_cols = condition,
@@ -493,12 +493,12 @@ test_that("results have the right shape", {
 
 test_that("changing the num_dims changes the numeric values", {
   values_1 <-
-    jsd_1 %>%
-    select(where(is.numeric)) %>%
+    jsd_1 |>
+    select(where(is.numeric)) |>
     as.matrix()
   values_2 <-
-    jsd_1b %>%
-    select(where(is.numeric)) %>%
+    jsd_1b |>
+    select(where(is.numeric)) |>
     as.matrix()
   expect_false(all(values_1 == values_2))
 })
@@ -509,16 +509,16 @@ test_that("column names change when you change reference_level", {
 
 test_that("JSDs are symmetric", {
   values_1 <-
-    jsd_1 %>%
-    select(where(is.numeric)) %>%
-    as.matrix() %>%
-    round(digits = 3) %>%
+    jsd_1 |>
+    select(where(is.numeric)) |>
+    as.matrix() |>
+    round(digits = 3) |>
     as.numeric()
   values_2 <-
-    jsd_3 %>%
-    select(where(is.numeric)) %>%
-    as.matrix() %>%
-    round(digits = 3) %>%
+    jsd_3 |>
+    select(where(is.numeric)) |>
+    as.matrix() |>
+    round(digits = 3) |>
     as.numeric()
   expect_equal(values_1, values_2)
 })
@@ -541,8 +541,8 @@ test_that("errors are thrown when required arguments are omitted", {
 
 # feature extraction with threshold signaling method
 feat_1 <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     group_cols = group,
@@ -554,8 +554,8 @@ feat_1 <-
 
 # same with emd method
 feat_2 <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     group_cols = group,
@@ -568,8 +568,8 @@ feat_2 <-
 
 # same with ct method
 feat_3 <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     group_cols = group,
@@ -582,8 +582,8 @@ feat_3 <-
 
 # same as 1 without any groups
 feat_no_groups <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     stimulation_col = replicate,
@@ -594,8 +594,8 @@ feat_no_groups <-
 
 # same as 1 without stimulation
 feat_no_stim <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     group_cols = group,
@@ -605,8 +605,8 @@ feat_no_stim <-
 
 # same as 1 without stimulation or groups
 feat_no_stim_no_groups <-
-  dat %>%
-  mutate(group = "x") %>%
+  dat |>
+  mutate(group = "x") |>
   tof_extract_features(
     cluster_col = cluster,
     lineage_cols = c(cd45, cd19),

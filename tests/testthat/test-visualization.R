@@ -133,6 +133,35 @@ dea_diffcyt_2 <-
     min_samples = 2
   )
 
+# tof_plot_cells_scatter -------------------------------------------------------
+
+
+test_that("scatterplots return ggplot objects using ggplot2", {
+  scatter_ggplot2 <-
+    tof_plot_cells_scatter(
+      tof_tibble = ddpr_data,
+      x_col = cd34,
+      y_col = cd38,
+      color_col = sample_name
+    )
+
+  expect_s3_class(scatter_ggplot2, "ggplot")
+})
+
+test_that("scatterplots return ggplot objects using scattermore", {
+  scatter_scattermore <-
+    tof_plot_cells_scatter(
+      tof_tibble = ddpr_data,
+      x_col = cd34,
+      y_col = cd38,
+      color_col = sample_name,
+      method = "scattermore"
+    )
+
+  expect_s3_class(scatter_scattermore, "ggplot")
+})
+
+
 # tof_plot_cells_embedding -----------------------------------------------------
 
 test_that("embedding visualizations run and return ggplot objects when embeddings are precomputed", {
@@ -147,7 +176,8 @@ test_that("embedding visualizations run and return ggplot objects when embedding
     tt %>%
     tof_plot_cells_embedding(
       embedding_cols = starts_with(".pc"),
-      color_col = .phenograph_metacluster
+      color_col = .phenograph_metacluster,
+      method = "scattermore"
     )
 
   expect_s3_class(embed_plot_tsne, "ggplot")
@@ -160,7 +190,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "tsne",
-      tsne_cols = c(cd22, cd34, cd45, cd123)
+      compute_embedding_cols = c(cd22, cd34, cd45, cd123)
     )
 
   embed_plot_pca <-
@@ -169,7 +199,8 @@ test_that("embedding visualizations run and return ggplot objects when embedding
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "pca",
-      pca_cols = c(cd22, cd34, cd45, cd123)
+      embedding_args = list(num_comp = 2),
+      compute_embedding_cols = c(cd22, cd34, cd45, cd123)
     )
 
   embed_plot_umap <-
@@ -177,7 +208,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "umap",
-      umap_cols = c(cd22, cd34, cd45, cd123)
+      compute_embedding_cols = c(cd22, cd34, cd45, cd123)
     )
 
   expect_s3_class(embed_plot_tsne, "ggplot")
@@ -570,6 +601,5 @@ test_that("all results are ggplot objects", {
   expect_s3_class(multinomial_plot_tuning, "ggplot")
   expect_s3_class(survival_plot_tuning, "ggplot")
 })
-
 
 

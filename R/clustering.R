@@ -1,6 +1,6 @@
 # clustering.R
 # This file contains functions relevant to performing single-cell clustering
-# on tof_tibble objects containing CyTOF data.
+# on tof_tibble objects containing high-dimensional cytometry data.
 
 # tof_cluster_flowsom ----------------------------------------------------------
 
@@ -94,8 +94,8 @@ tof_cluster_flowsom <-
 
     # extract string indicating which markers should be used for clustering
     clustering_markers <-
-      tof_tibble %>%
-      dplyr::select({{cluster_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{cluster_cols}}) |>
       colnames()
 
     # convert character distance function name to a number that SOM understands
@@ -133,8 +133,8 @@ tof_cluster_flowsom <-
         )
 
       flowsom_metaclusters <-
-        metacluster_result[som$mapping[, 1]] %>%
-        as.integer() %>%
+        metacluster_result[som$mapping[, 1]] |>
+        as.integer() |>
         as.character()
 
       return(dplyr::tibble(.flowsom_metacluster = flowsom_metaclusters))
@@ -272,7 +272,7 @@ tof_cluster_kmeans <-
         x = select(tof_tibble, {{cluster_cols}}),
         centers = num_clusters,
         ...
-      ) %>%
+      ) |>
       purrr::pluck("cluster")
 
     return(dplyr::tibble(.kmeans_cluster = as.character(kmeans_clusters)))
@@ -432,12 +432,12 @@ tof_cluster_ddpr <-
 
     # return result
     result <-
-      result %>%
+      result |>
       dplyr::rename_with(.fn = function(x) paste0(".", x))
 
     if (!return_distances) {
       result <-
-        result %>%
+        result |>
         dplyr::select(tidyselect::all_of(paste0(".", distance_function, "_cluster")))
     }
 
@@ -460,10 +460,9 @@ tof_cluster_ddpr <-
 #' use in computing the clusters. Defaults to all numeric columns
 #' in `tof_tibble`. Supports tidyselect helpers.
 #'
-#' @param group_cols Optional. An unquoted column name indicating which columns
+#' @param group_cols Optional. Unquoted column names indicating which columns
 #' should be used to group cells before clustering. Clustering is then performed
-#' on each group independently.
-#'
+#' on each group independently. Supports tidyselect helpers.
 #'
 #' @param ... Additional arguments to pass to the `tof_cluster_*`
 #' function family member corresponding to the chosen method.
@@ -512,8 +511,8 @@ tof_cluster <-
 
     # find grouping column names
     group_colnames <-
-      tof_tibble %>%
-      dplyr::select({{group_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{group_cols}}) |>
       colnames()
 
     # if groups are present
@@ -576,22 +575,22 @@ tof_cluster_tibble <-
   ) {
     if (method == "flowsom") {
       clusters <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_cluster_flowsom(...)
 
     } else if (method == "phenograph") {
       clusters <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_cluster_phenograph(...)
 
     } else if (method == "kmeans") {
       clusters <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_cluster_kmeans(...)
 
     } else if (method == "ddpr") {
       clusters <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_cluster_ddpr(...)
 
     } else if (method == "xshift") {
@@ -661,15 +660,14 @@ tof_cluster_grouped <-
     method
   ) {
     nested_tibble <-
-      tof_tibble %>%
-      dplyr::group_by({{group_cols}}) %>%
-      tidyr::nest() %>%
+      tof_tibble |>
+      dplyr::group_by({{group_cols}}) |>
+      tidyr::nest() |>
       dplyr::ungroup()
 
     # a list of data frames containing the independently
     # clustered results (appended as columns to the rest of the input tibbles
     # if requested by augment)
-    # TO DO: allow this to be parallel
     nested_clusters <-
       purrr::map(
         .x = nested_tibble$data,
@@ -682,8 +680,8 @@ tof_cluster_grouped <-
     # append each group's cluster labels to the group information itself
     # so that cluster labels are distinct among all groups
     result <-
-      nested_tibble %>%
-      tidyr::unite(col = ".prefix", {{group_cols}}, remove = FALSE) %>%
+      nested_tibble |>
+      tidyr::unite(col = ".prefix", {{group_cols}}, remove = FALSE) |>
       dplyr::mutate(
         clusters = nested_clusters,
         clusters =
@@ -698,28 +696,138 @@ tof_cluster_grouped <-
               return(new_clusters)
             }
           )
-      ) %>%
-      dplyr::select(-.data$.prefix)
+      ) |>
+      dplyr::select(-".prefix")
 
     if (augment) {
       result <-
-        result %>%
-        tidyr::unnest(cols = c(.data$data, .data$clusters))
+        result |>
+        #
+        tidyr::unnest(cols = c("data", "clusters"))
     } else {
       result <-
-        result %>%
-        dplyr::select(.data$clusters) %>%
-        tidyr::unnest(cols = .data$clusters)
+        result |>
+        dplyr::select("clusters") |>
+        #
+        tidyr::unnest(cols = "clusters")
     }
 
     return(result)
   }
 
 
+# tof_annotate_clusters --------------------------------------------------------
+
+#' Manually annotate tidytof-computed clusters using user-specified labels
+#'
+#' This function adds an additional column to a `tibble` or `tof_tbl` to allow
+#' users to incorporate manual cell type labels for clusters identified using
+#' unsupervised algorithms.
+#'
+#' @param tof_tibble `tof_tbl` or `tibble`.
+#'
+#' @param cluster_col An unquoted column name indicating which column in `tof_tibble`
+#' contains the ids of the unsupervised cluster to which each cell belongs.
+#' Cluster labels can be produced via any method the user chooses - including manual gating,
+#' any of the functions in the `tof_cluster_*` function family, or any other method.
+#'
+#' @param annotations A data structure indicating how to annotate each cluster id
+#' in `cluster_col`. `annotations` can be provided as a data.frame with two columns
+#' (the first should have the same name as `cluster_col` and contain each unique
+#' cluster id; the second can have any name and should contain a character vector
+#' indicating which manual annotation should be matched with each cluster
+#' id in the first column). `annotations` can also be provided as a named character vector;
+#' in this case, each entry in `annotations` should be a unique cluster id, and the
+#' names for each entry should be the corresponding manual cluster annotation. See
+#' below for examples.
+#'
+#' @return A `tof_tbl` with the same number of rows as `tof_tibble` and one
+#' additional column containing the manual cluster annotations for each cell
+#' (as a character vector). If `annotations` was provided as a data.frame, the
+#' new column will have the same name as the column containing the cluster annotations
+#' in `annotations`. If `annotations` was provided as a named character vector,
+#' the new column will be named `{cluster_col}_annotation`.
+#'
+#' @export
+#'
+#'
+#' @importFrom dplyr left_join
+#' @importFrom dplyr select
+#'
+#' @importFrom tibble enframe
+#'
+#' @examples
+#'
+#' sim_data <-
+#'   dplyr::tibble(
+#'     cd45 = rnorm(n = 1000),
+#'     cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'     cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'     cd19 = rnorm(n = 1000),
+#'     cluster_id = c(rep("a", 500), rep("b", 500))
+#'   )
+#'
+#' # using named character vector
+#' sim_data |>
+#'   tof_annotate_clusters(
+#'     cluster_col = cluster_id,
+#'     annotations = c("macrophage" = "a", "dendritic cell" = "b")
+#'   )
+#'
+#' # using two-column data.frame
+#' annotation_data_frame <-
+#'   data.frame(
+#'     cluster_id = c("a", "b"),
+#'     cluster_annotation = c("macrophage", "dendritic cell")
+#'   )
+#'
+#' sim_data |>
+#'   tof_annotate_clusters(
+#'     cluster_col = cluster_id,
+#'     annotations = annotation_data_frame
+#'   )
+#'
+#'
+#'
+#'
+#'
+tof_annotate_clusters <- function(tof_tibble, cluster_col, annotations) {
+
+  cluster_colname <-
+    tof_tibble |>
+    dplyr::select({{cluster_col}}) |>
+    colnames()
+
+  # if annotations are provided as a named vector
+  if (is.character(annotations)) {
+    annotations <-
+      tibble::enframe(
+        x = annotations,
+        name = paste0(cluster_colname, "_annotation"),
+        value = cluster_colname
+      )
+
+    # if annotations are provided as a data.frame
+  } else if (is.data.frame(annotations)) {
+    if (!(cluster_colname %in% colnames(annotations))) {
+      stop("One of the columns of `annotations` must have the same name as cluster_col.")
+    } else if (ncol(annotations) != 2) {
+      stop("`annotations` must have exactly 2 columns.")
+    }
+  }
+
+    # compute and return result
+    result <-
+      tof_tibble |>
+      dplyr::left_join(
+        annotations,
+        by = cluster_colname
+      )
+
+  return(result)
 
 
-
-
+}
 
 
 

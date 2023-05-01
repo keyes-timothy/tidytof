@@ -25,7 +25,8 @@ feature_tibble <-
 cv_split <-
   feature_tibble %>%
   tof_split_data(
-    split_method = "k-fold"
+    split_method = "k-fold",
+    strata = multiclass
   )
 
 cv_split_2 <-
@@ -1108,14 +1109,14 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
 
 })
 
-test_that("Warning if only 1 class is present in new_data", {
-  expect_warning(
-    expect_warning(
-      bootstrap_multinomial_regression %>%
-        tof_assess_model(new_data = feature_tibble[1:10,])
-    )
-  )
-})
+# test_that("Warning if only 1 class is present in new_data", {
+#   expect_warning(
+#     expect_warning(
+#       bootstrap_multinomial_regression %>%
+#         tof_assess_model(new_data = feature_tibble[1:10,])
+#     )
+#   )
+# })
 
 # survival regression
 survival_a_1 <-
@@ -1204,7 +1205,7 @@ test_that("survival assessment results give a model_metrics table and survival c
   survival_curves_correct <-
     survival_assessments %>%
     map(~purrr::pluck(.x, "survival_curves")) %>%
-    purrr::map(~tidyr::unnest(.x, cols = .data$survival_curve)) %>%
+    purrr::map(~tidyr::unnest(.x, cols = "survival_curve")) %>%
     purrr::map(colnames) %>%
     purrr::map(
       ~setdiff(

@@ -229,7 +229,7 @@ tof_read_csv <-
       if(all(c("antigens", "metals") %in% panel_names)) {
         panel_info <-
           panel_info %>%
-          dplyr::select(.data$antigens, .data$metals)
+          dplyr::select("antigens", "metals")
       } else if (!identical(panel_info, dplyr::tibble())) {
         stop("panel_info must contain an \"antigens\" and a \"metals\" column")
       }
@@ -633,8 +633,8 @@ tof_write_fcs <-
         names_sep = "_____"
       )  %>%
       tidyr::pivot_wider(
-        names_from = .data$value_type,
-        values_from = .data$value
+        names_from = "value_type",
+        values_from = "value"
       )
 
     # extract the names of all non-grouping columns to be saved to the .fcs file
