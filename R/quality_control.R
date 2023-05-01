@@ -712,7 +712,7 @@ tof_sum_rescale <- function(vec) {
 #' # most cells in "cluster a" are flagged, and few cells in the other clusters are
 #' flagged_cluster_proportions <-
 #'   entropy_result |>
-#'   group_by(cluster_id) |>
+#'   dplyr::group_by(cluster_id) |>
 #'   dplyr::summarize(
 #'     prop_flagged = mean(flagged_cell)
 #'   )
