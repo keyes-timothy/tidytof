@@ -25,6 +25,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check-bioc](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
+[![R-CMD-check](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `{tidytof}` is an R package that implements an open-source, integrated "grammar" of single-cell data analysis for high-dimensional cytometry data (i.e. [mass cytometry](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), full-spectrum flow cytometry, and sequence-based cytometry). Specifically, `{tidytof}` provides an easy-to-use pipeline for handling high-dimensional cytometry data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. 
@@ -35,7 +36,7 @@ As an extension of the `tidyverse` ecosystem of data manipulation tools in R, al
 
 ### Prerequisites
 
-`{tidytof}` makes heavy use of two concepts that R beginners may be unfamiliar with. The first is the `{magrittr}` pipe (`%>%`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). 
+`{tidytof}` makes heavy use of two concepts that R beginners may be unfamiliar with. The first is the pipe (`|>`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). 
 
 Everything else should be self-explanatory for beginner and advanced R users, though if you have *zero* background in running R code, you should read [this chapter](https://r4ds.had.co.nz/workflow-basics.html) of [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham.
 
@@ -74,9 +75,6 @@ if(!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 ```
 
-```{r, echo = FALSE}
-`%>%` <- dplyr::`%>%`
-```
 
 
 ## Usage
@@ -103,10 +101,10 @@ Here, we can use `tof_read_data` to read in all of the .fcs files in the "phenog
 
 ```{r}
 phenograph <- 
-  tidytof_example_data("phenograph") %>% 
+  tidytof_example_data("phenograph") |> 
   tof_read_data()
 
-phenograph %>% 
+phenograph |> 
   class()
 ```
 
@@ -120,31 +118,31 @@ A few notes about `tof_tbl`s:
 
 ```{r}
 phenograph <- 
-  phenograph %>% 
+  phenograph |> 
   # mutate the input tof_tbl
   mutate(
     PhenoGraph = as.character(PhenoGraph), 
     Condition = as.character(Condition)
   )
 
-phenograph %>% 
+phenograph |> 
   # use dplyr's select method to show that the columns have been changed
-  select(where(is.character)) %>% 
+  select(where(is.character)) |> 
   head()
 ```
 
 The `tof_tbl` class is preserved even after these transformations.
 
 ```{r}
-phenograph %>% 
+phenograph |> 
   class()
 ```
 
 Finally, to retrieve panel information from a `tof_tbl`, use `tof_get_panel`:
 
 ```{r}
-phenograph %>% 
-  tof_get_panel() %>% 
+phenograph |> 
+  tof_get_panel() |> 
   head()
 ```
 
@@ -160,20 +158,20 @@ As an example, we can preprocess our `phenograph` `tof_tibble` above and see how
 
 ```{r}
 # before preprocessing
-phenograph %>% 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+phenograph |> 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
   head()
 ```
 
 ```{r}
 # perform preprocessing
 phenograph <- 
-  phenograph %>% 
+  phenograph |> 
   tof_preprocess()
 
 # inspect new values
-phenograph %>% 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+phenograph |> 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
   head()
 ```
 
@@ -190,20 +188,20 @@ Using `{tidytof}`'s built-in dataset `phenograph_data` (which is a smaller versi
 ```{r}
 data(phenograph_data)
 
-phenograph_data %>% 
+phenograph_data |> 
   count(phenograph_cluster)
 ```
 
 To randomly sample 200 cells per cluster, we can use `tof_downsample` using the "constant" `method`:
 
 ```{r}
-phenograph_data %>% 
+phenograph_data |> 
   # downsample 
   tof_downsample(
     method = "constant", 
     group_cols = phenograph_cluster, 
     num_cells = 200
-  ) %>% 
+  ) |> 
   # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 ```
@@ -211,13 +209,13 @@ phenograph_data %>%
 Alternatively, if we wanted to sample 50% of the cells in each cluster, we could use the "prop" `method`:
 
 ```{r}
-phenograph_data %>% 
+phenograph_data |> 
   # downsample
   tof_downsample(
     method = "prop",
     group_cols = phenograph_cluster, 
     prop_cells = 0.5
-  ) %>% 
+  ) |> 
   # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 ```
@@ -225,9 +223,9 @@ phenograph_data %>%
 And finally, you might also be interested in taking a slightly different approach to downsampling that downsamples the number of cells not to a fixed constant or proportion, but to a fixed *density* in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density in `phenograph_data` that contain more cells than others along the `cd34`/`cd38` axes:
 
 ```{r, warning = FALSE, message = FALSE}
-phenograph_data %>% 
+phenograph_data |> 
   # preprocess all numeric columns in the dataset
-  tof_preprocess(undo_noise = FALSE) %>% 
+  tof_preprocess(undo_noise = FALSE) |> 
   # make a scatterplot
   ggplot(aes(x = cd34, y = cd38)) + 
   geom_point(alpha = 0.5) + 
@@ -239,13 +237,13 @@ phenograph_data %>%
 To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the "density" `method` of `tof_downsample`:
 
 ```{r, warning = FALSE, message = FALSE}
-phenograph_data %>% 
-  tof_preprocess(undo_noise = FALSE) %>% 
+phenograph_data |> 
+  tof_preprocess(undo_noise = FALSE) |> 
   tof_downsample(
     density_cols = c(cd34, cd38), 
     target_prop_cells = 0.25, 
     method = "density", 
-  ) %>% 
+  ) |> 
   ggplot(aes(x = cd34, y = cd38)) + 
   geom_point(alpha = 0.5) + 
   scale_x_continuous(limits = c(NA, 1.5)) + 
@@ -268,7 +266,7 @@ Finally, users may wish to store single-cell data as .fcs or .csv files after tr
 # to wherever you'd like to save your output files
 my_path <- file.path("~", "Desktop", "tidytof_vignette_files")
 
-phenograph_data %>% 
+phenograph_data |> 
   tof_write_data(
     group_cols = phenograph_cluster, 
     out_path = my_path,
@@ -285,10 +283,10 @@ phenograph_data %>%
 However, suppose we wanted to write multiple files for each cluster by breaking cells into two groups: those that express high levels of `pstat5` and those that express low levels of `pstat5`. We can use `dplyr::mutate` to create a new column in `phenograph_data` that breaks cells into high- and low-`pstat5` expression groups, then add this column to our `group_cols` specification:
 
 ```{r, eval = FALSE}
-phenograph_data %>% 
+phenograph_data |> 
   # create a variable representing if a cell is above or below the median 
   # expression level of pstat5
-  mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) %>% 
+  mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) |> 
   tof_write_data(
     group_cols = c(phenograph_cluster, expression_group), 
     out_path = my_path, 
@@ -319,12 +317,12 @@ To demonstrate, we can apply the FlowSOM clustering algorithm to our `phenograph
 
 ```{r}
 phenograph_clusters <- 
-  phenograph_data %>% 
-  tof_preprocess() %>% 
+  phenograph_data |> 
+  tof_preprocess() |> 
   tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
 
-phenograph_clusters %>% 
-  select(sample_name, .flowsom_metacluster, everything()) %>% 
+phenograph_clusters |> 
+  select(sample_name, .flowsom_metacluster, everything()) |> 
   head()
 ```
 
@@ -333,7 +331,7 @@ The output of `tof_cluster` is a `tof_tbl` identical to the input tibble, now wi
 Because the output of `tof_cluster` is a `tof_tbl`, we can use `dplyr`'s `count` method to assess the accuracy of the FlowSOM clustering compared to the original clustering from the PhenoGraph paper.
 
 ```{r}
-phenograph_clusters %>% 
+phenograph_clusters |> 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
 ```
 
@@ -343,9 +341,9 @@ To change which clustering algorithm `tof_cluster` uses, alter the `method` flag
 
 ```{r}
 # will result in a tibble with only 1 column (the cluster labels)
-phenograph_data %>% 
-  tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) %>% 
+phenograph_data |> 
+  tof_preprocess() |> 
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) |> 
   head()
 ```
 
@@ -358,12 +356,12 @@ After clusters are identified, a useful tool for visualizing them is dimensional
 ```{r}
 # perform the dimensionality reduction
 phenograph_tsne <- 
-  phenograph_clusters %>% 
+  phenograph_clusters |> 
   tof_reduce_dimensions(method = "tsne")
 
 # select only the tsne embedding columns using a tidyselect helper (contains)
-phenograph_tsne %>% 
-  select(contains("tsne")) %>% 
+phenograph_tsne |> 
+  select(contains("tsne")) |> 
   head()
 ```
 
@@ -373,14 +371,14 @@ Regardless of the method used, reduced-dimension feature embeddings can be visua
 
 ```{r}
 # plot the tsne embeddings using color to distinguish between clusters
-phenograph_tsne %>% 
+phenograph_tsne |> 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = phenograph_cluster)) + 
   geom_point(shape = 21) + 
   theme_bw() + 
   labs(fill = NULL)
 
 # plot the tsne embeddings using color to represent CD11b expression
-phenograph_tsne %>% 
+phenograph_tsne |> 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
   geom_point(shape = 21) + 
   scale_fill_viridis_c() +
@@ -411,7 +409,7 @@ To load the CITRUS data into our current R session, we can call a function from 
 citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
 
 citrus_data <- 
-  citrus_raw %>% 
+  citrus_raw |> 
   as_tof_tbl(sep = "_")
 ```
 
@@ -426,12 +424,12 @@ citrus_metadata <-
     sample_id = 1:length(file_name),
     patient = str_extract(file_name, "patient[:digit:]"), 
     stimulation = str_extract(file_name, "(BCR-XL)|Reference")
-  ) %>% 
+  ) |> 
   mutate(
     stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
   )
 
-citrus_metadata %>%
+citrus_metadata |>
   head()
 ```
 
@@ -441,7 +439,7 @@ Finally, we can join this metadata with our single-cell `tof_tbl` to obtain the 
 
 ```{r}
 citrus_data <- 
-  citrus_data %>% 
+  citrus_data |> 
   left_join(citrus_metadata, by = "sample_id")
 ```
 
@@ -451,7 +449,7 @@ We might wonder if there are certain clusters that expand or deplete within pati
 
 ```{r}
 daa_result <- 
-  citrus_data %>% 
+  citrus_data |> 
   tof_analyze_abundance(
     cluster_col = population_id, 
     effect_col = stimulation, 
@@ -467,20 +465,20 @@ Based on this output, we can see that 6 of our 8 clusters have statistically dif
 
 ```{r, message = FALSE}
 plot_data <- 
-  citrus_data %>% 
-  mutate(population_id = as.character(population_id)) %>%
+  citrus_data |> 
+  mutate(population_id = as.character(population_id)) |>
   left_join(
     select(daa_result, population_id, significant, mean_fc), 
     by = "population_id"
-  ) %>% 
-  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") %>% 
-  group_by(patient, stimulation) %>% 
-  mutate(prop = n / sum(n)) %>% 
-  ungroup() %>% 
+  ) |> 
+  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") |> 
+  group_by(patient, stimulation) |> 
+  mutate(prop = n / sum(n)) |> 
+  ungroup() |> 
   pivot_wider(
     names_from = stimulation, 
     values_from = c(prop, n), 
-  ) %>% 
+  ) |> 
   mutate(
     diff = `prop_BCR-XL` - prop_Basal, 
     fc = `prop_BCR-XL` / prop_Basal,
@@ -494,12 +492,12 @@ plot_data <-
   )
 
 significance_data <- 
-  plot_data %>% 
-  group_by(population_id, significant, direction) %>% 
-  summarize(diff = max(diff), fc = max(fc)) %>% 
+  plot_data |> 
+  group_by(population_id, significant, direction) |> 
+  summarize(diff = max(diff), fc = max(fc)) |> 
   ungroup()
 
-plot_data %>% 
+plot_data |> 
   ggplot(aes(x = population_id, y = fc, fill = direction)) + 
   geom_violin(trim = FALSE) +
   geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) + 
@@ -540,8 +538,8 @@ signaling_markers <-
   )
 
 dea_result <- 
-  citrus_data %>% 
-  tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
+  citrus_data |> 
+  tof_preprocess(channel_cols = any_of(signaling_markers)) |> 
   tof_analyze_expression(
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
@@ -551,7 +549,7 @@ dea_result <-
     method = "ttest"
   )
 
-dea_result %>% 
+dea_result |> 
   head()
 ```
 
@@ -561,7 +559,7 @@ This result can be used to make a volcano plot to visualize the results for all 
 
 ```{r}
 volcano_plot <- 
-  dea_result %>% 
+  dea_result |> 
   tof_plot_cluster_volcano(
     use_ggrepel = TRUE
   ) 
@@ -584,53 +582,53 @@ First, we have `tof_extract_proportion`, which extracts the proportion of cells 
 ```{r}
 # preprocess the numeric columns in the citrus dataset
 citrus_data <- 
-  citrus_data %>% 
-  mutate(cluster = str_c("cluster", population_id)) %>% 
+  citrus_data |> 
+  mutate(cluster = str_c("cluster", population_id)) |> 
   tof_preprocess()
 
-citrus_data %>% 
+citrus_data |> 
   tof_extract_proportion(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation)
-  ) %>% 
+  ) |> 
   head()
 ```
 
 Like all members of the `tof_extract_*` function family, `tof_extract_proportion()` returns one row for each sample (defined as a unique combination of values of the `group_cols`) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in `citrus_data`). These values can also be returned in "long" format by changing the `format` argument:
 
 ```{r}
-citrus_data %>% 
+citrus_data |> 
   tof_extract_proportion(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     format = "long"
-  ) %>% 
+  ) |> 
   head()
 ```
 
 Another member of the same function family, `tof_extract_central_tendency`, computes the central tendency (e.g. mean or median) of user-specified markers in each cluster.
 
 ```{r}
-citrus_data %>% 
+citrus_data |> 
   tof_extract_central_tendency(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     central_tendency_function = mean
-  ) %>% 
+  ) |> 
   head()
 ```
 
 `tof_extract_threshold` is similar to `tof_extract_central_tendency`, but calculates the proportion of cells above a user-specified expression value for each marker instead of a measure of central tendency:
 
 ```{r}
-citrus_data %>% 
+citrus_data |> 
   tof_extract_threshold(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     threshold = 5
-  ) %>% 
+  ) |> 
   head()
 ```
 
@@ -638,34 +636,34 @@ The two final members of the `tof_extract_*` function family -- `tof_extract_emd
 
 ```{r}
 # Earth-mover's distance
-citrus_data %>% 
+citrus_data |> 
   tof_extract_emd(
     cluster_col = cluster, 
     group_cols = patient, 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     emd_col = stimulation, 
     reference_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 ```
 
 ```{r}
 # Jensen-Shannon Divergence
-citrus_data %>% 
+citrus_data |> 
   tof_extract_jsd(
     cluster_col = cluster, 
     group_cols = patient,  
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     jsd_col = stimulation, 
     reference_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 ```
 
 Finally, the `tof_extract_features` verb provides a wrapper to each of the members of its function family, allowing users to extract multiple features types at once. For example, the following code extracts the proportion of each cluster, median of several markers in each cluster, and EMD between the basal condition and stimulated condition in each cluster for all patients in `citrus_data`.
 
 ```{r, eval = FALSE}
-citrus_data %>% 
+citrus_data |> 
   tof_extract_features(
     cluster_col = cluster, 
     group_cols = patient, 
@@ -674,7 +672,7 @@ citrus_data %>%
     signaling_cols = any_of(signaling_markers), 
     signaling_method = "emd", 
     basal_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 ```
 
@@ -694,13 +692,13 @@ data_link <-
 
 # downloading the data and combining it with clinical annotations
 ddpr_patients <- 
-  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) %>% 
-  dplyr::rename(patient_id = Patient_ID) %>% 
-  left_join(ddpr_metadata, by = "patient_id") %>% 
+  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) |> 
+  dplyr::rename(patient_id = Patient_ID) |> 
+  left_join(ddpr_metadata, by = "patient_id") |> 
   dplyr::filter(!str_detect(patient_id, "Healthy"))
 
-ddpr_patients %>% 
-  select(where(~ !is.numeric(.x))) %>% 
+ddpr_patients |> 
+  select(where(~ !is.numeric(.x))) |> 
   head()
 ```
 
@@ -710,7 +708,7 @@ There are also a few preprocessing steps that we might want to perform now to sa
 
 ```{r}
 ddpr_patients <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   # convert the relapse_status variable to a factor first, 
   # which is something we'll want for fitting the model later
   # and create the time_to_event and event columns for survival modeling
@@ -727,11 +725,11 @@ In the original DDPR paper, some patients were used to fit the model and the res
 
 ```{r}
 ddpr_training <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   dplyr::filter(cohort == "Training") 
 
 ddpr_validation <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   dplyr::filter(cohort == "Validation")
 ```
 
@@ -749,7 +747,7 @@ First, we can build an elastic net classifier to predict which patients will rel
 
 ```{r}
 # find how many of each outcome we have in our cohort
-ddpr_training %>% 
+ddpr_training |> 
   dplyr::count(relapse_status)
 ```
 
@@ -757,7 +755,7 @@ Specifically, we can use the `tof_split_data` function to split our cohort into 
 
 ```{r}
 training_split <- 
-  ddpr_training %>% 
+  ddpr_training |> 
   tof_split_data(
     split_method = "k-fold", 
     num_cv_folds = 5, 
@@ -785,12 +783,12 @@ class(my_resample)
 Note that you can use `rsample::training` and `rsample::testing` to return the training and test obeservations from each resampling: 
 
 ```{r}
-my_resample %>% 
-  rsample::training() %>% 
+my_resample |> 
+  rsample::training() |> 
   head()
 
-my_resample %>% 
-  rsample::testing() %>% 
+my_resample |> 
+  rsample::testing() |> 
   head()
 ```
 
@@ -798,7 +796,7 @@ From here, we can feed  `training_split` into the `tof_train_model` function to 
 
 ```{r, warning = FALSE}
 class_mod <- 
-  training_split %>% 
+  training_split |> 
   tof_train_model(
     predictor_cols = contains("Pop2"), 
     response_col = relapse_status,
@@ -820,10 +818,10 @@ We can then use the trained model to make predictions on the validation data tha
 
 ```{r}
 class_predictions <- 
-  class_mod %>% 
+  class_mod |> 
   tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-class_predictions %>% 
+class_predictions |> 
   dplyr::mutate(
     truth = ddpr_validation$relapse_status
   )
@@ -837,7 +835,7 @@ We can also assess the model directly using `tof_assess_model`
 # calling the function with no new_data evaluates the
 # the nodel using its training data
 training_assessment <- 
-  class_mod %>% 
+  class_mod |> 
   tof_assess_model()
 
 training_assessment
@@ -846,7 +844,7 @@ training_assessment
 And we can make an ROC curve using our metrics: 
 
 ```{r}
-class_mod %>% 
+class_mod |> 
   tof_plot_model() + 
   labs(subtitle = "ROC Curve (Training data)")
 ```
@@ -855,7 +853,7 @@ We can then assess the model on the validation data...
 
 ```{r}
 validation_assessment <- 
-  class_mod %>% 
+  class_mod |> 
   tof_assess_model(new_data = ddpr_validation)
 
 validation_assessment
@@ -863,7 +861,7 @@ validation_assessment
 
 
 ```{r}
-class_mod %>% 
+class_mod |> 
   tof_plot_model(new_data = ddpr_validation) + 
   labs(subtitle = "ROC Curve (Validation data)")
 ```
@@ -903,21 +901,21 @@ input_path <- tidytof_example_data("phenograph")
 
 set.seed(0012)
 
-input_path %>% 
+input_path |> 
   # step 1
-  tof_read_data() %>% 
+  tof_read_data() |> 
   # step 2
-  tof_preprocess() %>% 
+  tof_preprocess() |> 
   # step 3
-  tof_cluster(method = "phenograph") %>%
+  tof_cluster(method = "phenograph") |>
   # step 4
   tof_downsample(
     group_cols = .phenograph_cluster, 
     num_cells = 100,
     method = "constant" 
-  ) %>% 
+  ) |> 
   # step 5
-  tof_reduce_dimensions(perplexity = 50, method = "tsne") %>% 
+  tof_reduce_dimensions(perplexity = 50, method = "tsne") |> 
   # step 6
   tof_plot_cells_embedding(
     embedding_cols = starts_with(".tsne"),
