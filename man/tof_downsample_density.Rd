@@ -2,7 +2,7 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample_density}
 \alias{tof_downsample_density}
-\title{Downsample CyTOF data by randomly selecting a proportion of the cells in each group.}
+\title{Downsample high-dimensional cytometry data by randomly selecting a proportion of the cells in each group.}
 \usage{
 tof_downsample_density(
   tof_tibble,

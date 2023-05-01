@@ -112,7 +112,7 @@ tof_split_data <-
     # check split_col
     if (!missing(split_col)) {
       split_method <-
-        feature_tibble %>%
+        feature_tibble |>
         dplyr::pull({{split_col}})
 
       if (!is.logical(split_method)) {
@@ -144,12 +144,12 @@ tof_split_data <-
 
     } else if (split_method == "simple") {
       split_result <-
-        feature_tibble %>%
+        feature_tibble |>
         rsample::initial_split(prop = simple_prop, strata = {{strata}}, ...)
 
     } else if (split_method == "k-fold") {
       split_result <-
-        feature_tibble %>%
+        feature_tibble |>
         rsample::vfold_cv(
           v = num_cv_folds,
           repeats = num_cv_repeats,
@@ -159,7 +159,7 @@ tof_split_data <-
 
     } else {
       split_result <-
-        feature_tibble %>%
+        feature_tibble |>
         rsample::bootstraps(times = num_bootstraps, strata = {{strata}}, ...)
     }
 
@@ -231,7 +231,7 @@ tof_create_grid <-
     }
 
     hyperparam_grid <-
-      tidyr::expand_grid(penalty_values, mixture_values) %>%
+      tidyr::expand_grid(penalty_values, mixture_values) |>
       dplyr::rename(
         penalty = penalty_values,
         mixture = mixture_values
@@ -482,7 +482,7 @@ tof_train_model <-
     if (model_type %in% c("linear", "two-class", "multiclass")) {
       # if any type of model other than survival
       unprepped_recipe <-
-        feature_tibble %>%
+        feature_tibble |>
         tof_create_recipe(
           predictor_cols = {{predictor_cols}},
           outcome_cols = {{response_col}},
@@ -493,7 +493,7 @@ tof_train_model <-
     } else {
       # if survival model
       unprepped_recipe <-
-        feature_tibble %>%
+        feature_tibble |>
         tof_create_recipe(
           predictor_cols = {{predictor_cols}},
           outcome_cols = c({{time_col}}, {{event_col}}),
@@ -506,7 +506,7 @@ tof_train_model <-
     # prep recipe(s) - will be a single recipe if split_data is a single rsplit,
     # but will be a list of recipes if split_data is an rset object.
     prepped_recipe <-
-      split_data %>%
+      split_data |>
       tof_prep_recipe(unprepped_recipe = unprepped_recipe)
 
     # tune the model using the resampling, the recipes, and the
@@ -523,17 +523,18 @@ tof_train_model <-
       )
 
     if (inherits(split_data, "rset")) {
+
       performance_metrics <-
-        tuning_metrics %>%
-        dplyr::select(.data$performance_metrics) %>%
-        tidyr::unnest(cols = .data$performance_metrics) %>%
-        dplyr::group_by(.data$mixture, .data$penalty) %>%
+        tuning_metrics |>
+        dplyr::select("performance_metrics") |>
+        tidyr::unnest(cols = "performance_metrics") |>
+        dplyr::group_by(.data$mixture, .data$penalty) |>
         dplyr::summarize(
           dplyr::across(
             dplyr::everything(),
             .fns = mean,
           )
-        ) %>%
+        ) |>
         dplyr::ungroup()
     } else {
       performance_metrics <- tuning_metrics
@@ -543,14 +544,14 @@ tof_train_model <-
 
     # find hyperparameters with best performance
     best_model_parameters <-
-      performance_metrics %>%
+      performance_metrics |>
       tof_find_best(model_type = model_type, optimization_metric = optimization_metric)
 
     # combine data into a single preprocessing pipeline and glmnet model--------
     all_data <- tof_all_data(split_data = split_data)
 
     final_recipe <-
-      all_data %>%
+      all_data |>
       tof_prep_recipe(unprepped_recipe = unprepped_recipe)
 
     # extract response column names
@@ -564,7 +565,7 @@ tof_train_model <-
     }
 
     tof_model <-
-      all_data %>%
+      all_data |>
       tof_finalize_model(
         best_model_parameters = best_model_parameters,
         recipe = final_recipe,
@@ -576,7 +577,7 @@ tof_train_model <-
     if (inherits(split_data, "rset")) {
 
       fold_predictions <-
-        tuning_metrics %>%
+        tuning_metrics |>
         dplyr::mutate(
           recipes = prepped_recipe,
           .predictions =
@@ -592,26 +593,26 @@ tof_train_model <-
                 outcome_colnames = tof_model$outcome_colnames
               )
             )
-        ) %>%
+        ) |>
         dplyr::select(
-          .data$id,
-          .data$.predictions
+          "id",
+          ".predictions"
         )
 
       tof_model$tuning_metrics <-
-        tuning_metrics %>%
-        dplyr::select(.data$id, .data$performance_metrics) %>%
-        tidyr::unnest(cols = .data$performance_metrics) %>%
+        tuning_metrics |>
+        dplyr::select("id", "performance_metrics") |>
+        tidyr::unnest(cols = "performance_metrics") |>
         dplyr::filter(
           .data$mixture == tof_model$mixture,
           .data$penalty == tof_model$penalty
-        ) %>%
+        ) |>
         dplyr::left_join(fold_predictions, by = "id")
 
 
     } else {
       tof_model$tuning_metrics <-
-        tuning_metrics %>%
+        tuning_metrics |>
         dplyr::filter(
           .data$mixture == tof_model$mixture,
           .data$penalty == tof_model$penalty
@@ -646,9 +647,9 @@ tof_train_model <-
         )
 
       best_log_rank_threshold <-
-        log_rank_thresholds %>%
-        dplyr::filter(.data$is_best) %>%
-        dplyr::pull(.data$candidate_thresholds) %>%
+        log_rank_thresholds |>
+        dplyr::filter(.data$is_best) |>
+        dplyr::pull(.data$candidate_thresholds) |>
         unique()
 
       tof_model$log_rank_thresholds <- log_rank_thresholds
@@ -783,7 +784,7 @@ tof_predict <-
 
     # preprocess the new_data
     preprocessed_data <-
-      new_data %>%
+      new_data |>
       tof_setup_glmnet_xy(
         recipe = recipe,
         outcome_cols = dplyr::any_of(outcome_colnames),
@@ -798,8 +799,8 @@ tof_predict <-
       } else {
 
         preprocessed_training_data <-
-          tof_model %>%
-          tof_get_model_training_data() %>%
+          tof_model |>
+          tof_get_model_training_data() |>
           tof_setup_glmnet_xy(
             recipe = recipe,
             outcome_cols = dplyr::any_of(outcome_colnames),
@@ -822,18 +823,18 @@ tof_predict <-
           )
 
         survival_curves <-
-          survfit_result$surv %>%
-          dplyr::as_tibble() %>%
-          dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+          survfit_result$surv |>
+          dplyr::as_tibble() |>
+          dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) |>
           tidyr::pivot_longer(
-            cols = -.data$.timepoint_index,
+            cols = -".timepoint_index",
             names_to = "row_index",
             values_to = "probability"
-          ) %>%
-          dplyr::left_join(times, by = ".timepoint_index") %>%
-          dplyr::select(-.data$.timepoint_index) %>%
-          tidyr::nest(.survival_curve = -.data$row_index) %>%
-          dplyr::select(-.data$row_index)
+          ) |>
+          dplyr::left_join(times, by = ".timepoint_index") |>
+          dplyr::select(-".timepoint_index") |>
+          tidyr::nest(.survival_curve = -"row_index") |>
+          dplyr::select(-"row_index")
 
         return(survival_curves)
       }
@@ -846,7 +847,7 @@ tof_predict <-
           newx = preprocessed_data$x,
           s = lambda,
           type = prediction_type
-        ) %>%
+        ) |>
         as.vector()
 
       return(dplyr::tibble(.pred = predictions))
@@ -859,7 +860,7 @@ tof_predict <-
             newx = preprocessed_data$x,
             s = lambda,
             type = prediction_type
-          ) %>%
+          ) |>
           as.vector()
 
         predictions <-
@@ -873,7 +874,7 @@ tof_predict <-
             newx = preprocessed_data$x,
             s = lambda,
             type = prediction_type
-          ) %>%
+          ) |>
           dplyr::as_tibble()
 
         colnames(predictions) <-

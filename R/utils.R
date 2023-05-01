@@ -237,6 +237,40 @@ cosine_similarity <- function(x, y) {
 
 # differential discovery analysis ----------------------------------------------
 
+#' @importFrom dplyr as_tibble
+#'
+tidy_lmer_test_glmm <- function(lmer_test) {
+  result <-
+    summary(lmer_test)$coefficients |>
+    dplyr::as_tibble(rownames = "term") |>
+    dplyr::rename(
+      p.value = .data$`Pr(>|z|)`,
+      estimate = .data$Estimate,
+      statistic = .data$`z value`,
+      std_error = .data$`Std. Error`
+    )
+
+  return(result)
+}
+
+
+#' @importFrom dplyr as_tibble
+#'
+tidy_lmer_test <- function(lmer_test) {
+  result <-
+    summary(lmer_test)$coefficients |>
+    dplyr::as_tibble(rownames = "term") |>
+    dplyr::rename(
+      p.value = .data$`Pr(>|t|)`,
+      estimate = .data$Estimate,
+      statistic = .data$`t value`#,
+      #std_error = .data$`Std_ Error`
+    )
+
+  return(result)
+}
+
+
 #' @importFrom rlang enquo
 #' @importFrom tidyselect eval_select
 #' @importFrom purrr map

@@ -1,7 +1,4 @@
-library(FlowSOM)
 library(dplyr)
-library(purrr)
-library(readr)
 library(stringr)
 library(tidytof)
 library(testthat)
@@ -143,7 +140,7 @@ test_that("num_clusters argument works", {
 test_that("ddpr result is a tibble with a single character vector column of correct length", {
   healthy <-
     ddpr_data %>%
-    dplyr::filter(str_detect(sample_name, "Healthy")) %>%
+    dplyr::filter(stringr::str_detect(sample_name, "Healthy")) %>%
     dplyr::mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   # in series
@@ -178,7 +175,7 @@ test_that("ddpr result is a tibble with a single character vector column of corr
 test_that("return_distances argument works", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
+    filter(stringr::str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   # in series
@@ -210,7 +207,7 @@ test_that("return_distances argument works", {
 test_that("output columns are named correctly in series", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
+    filter(stringr::str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   ddpr_1 <-
@@ -248,17 +245,17 @@ test_that("output columns are named correctly in series", {
       distance_function = "pearson"
     )
 
-  expect_true(str_detect(colnames(ddpr_1), "\\.mahalanobis"))
-  expect_true(all(str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
-  expect_true(str_detect(colnames(ddpr_2), "\\.cosine"))
-  expect_true(str_detect(colnames(ddpr_3), "\\.pearson"))
+  expect_true(stringr::str_detect(colnames(ddpr_1), "\\.mahalanobis"))
+  expect_true(all(stringr::str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
+  expect_true(stringr::str_detect(colnames(ddpr_2), "\\.cosine"))
+  expect_true(stringr::str_detect(colnames(ddpr_3), "\\.pearson"))
 
 })
 
 test_that("output columns are named correctly in parallel", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
+    filter(stringr::str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   ddpr_1 <-
@@ -300,10 +297,10 @@ test_that("output columns are named correctly in parallel", {
       parallel_cols = sample_name
     )
 
-  expect_true(str_detect(colnames(ddpr_1), "\\.mahalanobis"))
-  expect_true(all(str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
-  expect_true(str_detect(colnames(ddpr_2), "\\.cosine"))
-  expect_true(str_detect(colnames(ddpr_3), "\\.pearson"))
+  expect_true(stringr::str_detect(colnames(ddpr_1), "\\.mahalanobis"))
+  expect_true(all(stringr::str_detect(colnames(ddpr_1b), "\\.mahalanobis")))
+  expect_true(stringr::str_detect(colnames(ddpr_2), "\\.cosine"))
+  expect_true(stringr::str_detect(colnames(ddpr_3), "\\.pearson"))
 
 })
 
@@ -316,7 +313,7 @@ test_that("output columns are named correctly in parallel", {
 test_that("clustering output is identical for all methods", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
+    filter(stringr::str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   expect_equal(
@@ -452,7 +449,7 @@ test_that("result has the correct number unique cluster ids", {
 test_that("clustering output is identical for all methods", {
   healthy <-
     ddpr_data %>%
-    filter(str_detect(sample_name, "Healthy")) %>%
+    filter(stringr::str_detect(sample_name, "Healthy")) %>%
     mutate(cluster = sample(c("1", "2"), size = nrow(.), replace = TRUE))
 
   expect_equal(
@@ -502,7 +499,6 @@ sim_data <-
     cd19 = rnorm(n = 1000),
     cluster_id = c(rep("a", 500), rep("b", 500))
   )
-
 
 
 test_that("Annotation result is the correct shape", {

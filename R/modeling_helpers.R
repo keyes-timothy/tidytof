@@ -568,12 +568,10 @@ tof_fit_split <-
             purrr::map_dbl(
               .x = .data$predictions,
               .f = ~
-                yardstick::roc_auc(
-                  data = .x,
-                  truth = validation_y,
-                  dplyr::all_of(levels(validation_y))
-                ) %>%
-                dplyr::pull(.data$.estimate)
+                yardstick::roc_auc_vec(
+                  estimate = as.matrix(.x[levels(validation_y)]),
+                  truth = validation_y
+                )
             )
         ) %>%
         dplyr::select(.data$penalty, .data$mixture, .data$roc_auc)
@@ -754,10 +752,6 @@ tof_find_cv_predictions <-
         )
 
       if (model_type == "two-class") {
-        predictions <-
-          # FOR DEBUGGING
-          predictions #%>%
-          #dplyr::mutate(truth = as.character(.data$truth))
 
         outcome_levels <- levels(predictions$truth)
       }
@@ -820,13 +814,13 @@ tof_find_cv_predictions <-
         dplyr::as_tibble() %>%
         dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
         tidyr::pivot_longer(
-          cols = -.data$.timepoint_index,
+          cols = -".timepoint_index",
           names_to = "row_index",
           values_to = "probability"
         ) %>%
         dplyr::left_join(times, by = ".timepoint_index") %>%
-        dplyr::select(-.data$.timepoint_index) %>%
-        tidyr::nest(survival_curve = -.data$row_index)
+        dplyr::select(-".timepoint_index") %>%
+        tidyr::nest(survival_curve = -"row_index")
 
       predictions <-
         predictions %>%
@@ -999,8 +993,8 @@ tof_find_best <- function(performance_metrics, model_type, optimization_metric) 
   best_hyperparameters <-
     best_metrics %>%
     dplyr::select(
-      .data$penalty,
-      .data$mixture,
+      "penalty",
+      "mixture",
       dplyr::any_of(optimization_metric)
     )
 
@@ -1752,8 +1746,8 @@ tof_assess_model_tuning <-
 
     tuning_data <-
       tof_model$tuning_metrics %>%
-      dplyr::select(.data$.predictions) %>%
-      tidyr::unnest(cols = .data$.predictions)
+      dplyr::select(".predictions") %>%
+      tidyr::unnest(cols = ".predictions")
 
     if(model_type %in% c("linear", "two-class", "survival")) {
 
@@ -1788,12 +1782,12 @@ tof_assess_model_tuning <-
     } else {
       prediction_matrix <-
         tuning_data %>%
-        dplyr::select(-.data$truth, -.data$class) %>%
+        dplyr::select(-"truth", -"class") %>%
         as.matrix()
 
       col_names <-
         tuning_data %>%
-        dplyr::select(-.data$truth, -.data$class) %>%
+        dplyr::select(-"truth", -"class") %>%
         colnames()
 
       prediction_matrix <-
@@ -1941,11 +1935,11 @@ tof_assess_model_tuning <-
       survival_curves <-
         survival_curves %>%
         dplyr::select(
-          .data$survival_curve,
-          .data$relative_risk,
-          time_to_event = .data$true_time_to_event,
-          event = .data$true_event,
-          .data$risk_group
+          "survival_curve",
+          "relative_risk",
+          time_to_event = "true_time_to_event",
+          event = "true_event",
+          "risk_group"
         )
 
     } else {
@@ -2159,9 +2153,6 @@ tof_assess_model_new_data <-
         model_metrics %>%
         dplyr::bind_rows(lrt_tibble)
 
-      # survival_curves <-
-      #   survival_curves %>%
-      #   dplyr::select(.data$row_index, .data$survival_curve, .data$risk_group)
 
     } else {
       survival_curves <- NULL
@@ -2263,9 +2254,7 @@ tof_make_roc_curve <- function(input_data, truth_col, prob_cols) {
     roc_curve <-
       input_data %>%
       dplyr::mutate(
-        # FOR DEBUGGING
         truth = dplyr::pull(input_data, {{truth_col}})
-        #truth = factor(.data$truth, levels = outcome_levels)
       ) %>%
       yardstick::roc_curve({{prob_cols}}, truth = .data$truth, event_level = "second") %>%
       dplyr::mutate(

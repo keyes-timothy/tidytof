@@ -404,84 +404,84 @@ tof_plot_cells_scatter <-
 #'         tsne_cols = starts_with("cd")
 #'     )
 #'
-tof_plot_cells_embedding_deprecated <-
-  function(
-    tof_tibble,
-    embedding_cols,
-    color_col,
-    facet_cols,
-    embedding_method = c("pca", "tsne", "umap"),
-    point_alpha = 1,
-    theme = ggplot2::theme_bw(),
-    ...,# optional additional arguments to the specified tof_reduce_* family function
-    method = c("ggplot2", "scattermore")
-  ) {
-
-    # if no embedding_cols are specified, use the embedding_method to compute them
-    if (missing(embedding_cols)) {
-      # if there's no embedding_method specified, just use PCA (for speed)
-      if (identical(embedding_method, c("pca", "tsne", "umap"))) {
-        message("No embedding_cols were specified, and no embedding_method was specified.
-                Performing PCA as the default dimensionality reduction method.")
-      }
-      # check embedding_method columns
-      embedding_method <- rlang::arg_match(embedding_method)
-      embed_tibble <-
-        tof_tibble %>%
-        tof_reduce_dimensions(..., augment = FALSE, method = embedding_method)
-
-    # if there are embedding_cols specified, just use those
-    } else {
-      # check embedding_cols - there should only be two
-      embed_tibble <-
-        tof_tibble %>%
-        dplyr::select({{embedding_cols}})
-
-      num_embed_cols <-
-        embed_tibble %>%
-        ncol()
-
-      if (num_embed_cols != 2) {
-        stop("2 embedding columns must be selected.")
-      }
-    }
-
-    if (missing(color_col)) {
-      shape = 16
-    } else {
-      shape = 21
-    }
-
-    # create plot tibble for memory efficiency
-    if (!missing(facet_cols)) {
-      plot_tibble <-
-        tof_tibble %>%
-        dplyr::select({{color_col}}, {{facet_cols}})
-    } else {
-      plot_tibble <-
-        tof_tibble %>%
-        dplyr::select({{color_col}})
-    }
-
-    # create plot
-    result <-
-      plot_tibble %>%
-      ggplot2::ggplot(
-        ggplot2::aes(x = embed_tibble[[1]], y = embed_tibble[[2]], fill = {{color_col}})
-      ) +
-      ggplot2::geom_point(shape = shape, alpha = point_alpha) +
-      ggplot2::labs(
-        x = colnames(embed_tibble)[[1]],
-        y = colnames(embed_tibble)[[2]]
-      )
-
-    if (!missing(facet_cols)) {
-      result <-
-        result +
-        ggplot2::facet_wrap(facets = ggplot2::vars({{facet_cols}}))
-    }
-    return(result + theme)
-  }
+# tof_plot_cells_embedding_deprecated <-
+#   function(
+#     tof_tibble,
+#     embedding_cols,
+#     color_col,
+#     facet_cols,
+#     embedding_method = c("pca", "tsne", "umap"),
+#     point_alpha = 1,
+#     theme = ggplot2::theme_bw(),
+#     ...,# optional additional arguments to the specified tof_reduce_* family function
+#     method = c("ggplot2", "scattermore")
+#   ) {
+#
+#     # if no embedding_cols are specified, use the embedding_method to compute them
+#     if (missing(embedding_cols)) {
+#       # if there's no embedding_method specified, just use PCA (for speed)
+#       if (identical(embedding_method, c("pca", "tsne", "umap"))) {
+#         message("No embedding_cols were specified, and no embedding_method was specified.
+#                 Performing PCA as the default dimensionality reduction method.")
+#       }
+#       # check embedding_method columns
+#       embedding_method <- rlang::arg_match(embedding_method)
+#       embed_tibble <-
+#         tof_tibble %>%
+#         tof_reduce_dimensions(..., augment = FALSE, method = embedding_method)
+#
+#     # if there are embedding_cols specified, just use those
+#     } else {
+#       # check embedding_cols - there should only be two
+#       embed_tibble <-
+#         tof_tibble %>%
+#         dplyr::select({{embedding_cols}})
+#
+#       num_embed_cols <-
+#         embed_tibble %>%
+#         ncol()
+#
+#       if (num_embed_cols != 2) {
+#         stop("2 embedding columns must be selected.")
+#       }
+#     }
+#
+#     if (missing(color_col)) {
+#       shape = 16
+#     } else {
+#       shape = 21
+#     }
+#
+#     # create plot tibble for memory efficiency
+#     if (!missing(facet_cols)) {
+#       plot_tibble <-
+#         tof_tibble %>%
+#         dplyr::select({{color_col}}, {{facet_cols}})
+#     } else {
+#       plot_tibble <-
+#         tof_tibble %>%
+#         dplyr::select({{color_col}})
+#     }
+#
+#     # create plot
+#     result <-
+#       plot_tibble %>%
+#       ggplot2::ggplot(
+#         ggplot2::aes(x = embed_tibble[[1]], y = embed_tibble[[2]], fill = {{color_col}})
+#       ) +
+#       ggplot2::geom_point(shape = shape, alpha = point_alpha) +
+#       ggplot2::labs(
+#         x = colnames(embed_tibble)[[1]],
+#         y = colnames(embed_tibble)[[2]]
+#       )
+#
+#     if (!missing(facet_cols)) {
+#       result <-
+#         result +
+#         ggplot2::facet_wrap(facets = ggplot2::vars({{facet_cols}}))
+#     }
+#     return(result + theme)
+#   }
 
 
 

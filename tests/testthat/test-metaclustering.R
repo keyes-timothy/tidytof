@@ -6,14 +6,14 @@ data(phenograph_data)
 
 # setup
 clust_data <-
-  phenograph_data %>%
-  tof_preprocess() %>%
+  phenograph_data |>
+  tof_preprocess() |>
   tof_cluster(method = "kmeans")
 
 # tof_metacluster_hierarchical -------------------------------------------------
 test_that("metaclustering result is the right shape", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_hierarchical(
       cluster_col = .kmeans_cluster
     )
@@ -24,7 +24,7 @@ test_that("metaclustering result is the right shape", {
 
 test_that("metaclustering result has the right name", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_hierarchical(
       cluster_col = .kmeans_cluster
     )
@@ -37,7 +37,7 @@ test_that("metaclustering result has the right name", {
 # tof_metacluster_kmeans -------------------------------------------------------
 test_that("metaclustering result is the right shape", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_kmeans(
       cluster_col = .kmeans_cluster
     )
@@ -48,7 +48,7 @@ test_that("metaclustering result is the right shape", {
 
 test_that("metaclustering result has the right name", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_kmeans(
       cluster_col = .kmeans_cluster
     )
@@ -60,7 +60,7 @@ test_that("metaclustering result has the right name", {
 # tof_metacluster_phenograph ---------------------------------------------------
 test_that("metaclustering result is the right shape", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster
     )
@@ -71,7 +71,7 @@ test_that("metaclustering result is the right shape", {
 
 test_that("metaclustering result has the right name", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster
     )
@@ -82,28 +82,28 @@ test_that("metaclustering result has the right name", {
 test_that("metaclustering result works with various kinds of tidyselection", {
 
   result_1 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster,
       metacluster_cols = contains("cd")
     )
 
   result_2 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster,
       metacluster_cols = c(contains("cd"), -cd45)
     )
 
   result_3 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster,
       metacluster_cols = c(cd45)
     )
 
   result_4 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster,
       metacluster_cols = c(cd45, -sample_name)
@@ -122,28 +122,28 @@ test_that("metaclustering result works with various kinds of tidyselection", {
 # tof_metacluster_consensus ----------------------------------------------------
 test_that("metaclustering result is the right shape", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "kmeans"
     )
 
   result_2 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "pam"
     )
 
   result_3 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "hierarchical"
     )
 
   result_4 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "hierarchical",
@@ -165,7 +165,7 @@ test_that("metaclustering result is the right shape", {
 
 test_that("metaclustering result has the right name", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster
     )
@@ -178,28 +178,28 @@ test_that("metaclustering result has the right name", {
 test_that("metaclustering result is the right shape", {
 
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "consensus"
     )
 
   result_2 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "hierarchical"
     )
 
   result_3 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "som"
     )
 
   result_4 <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
       clustering_algorithm = "kmeans"
@@ -220,7 +220,7 @@ test_that("metaclustering result is the right shape", {
 
 test_that("metaclustering result has the right name", {
   result <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster
     )
@@ -232,13 +232,13 @@ test_that("metaclustering result has the right name", {
 
 test_that("hclust tof_metacluster results are identical to subroutine", {
   hclust_sub <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_hierarchical(
       cluster_col = .kmeans_cluster
     )
 
   hclust_wrap <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       augment = FALSE,
@@ -251,14 +251,14 @@ test_that("hclust tof_metacluster results are identical to subroutine", {
 test_that("kmeans tof_metacluster results are identical to subroutine", {
   set.seed(2020)
   kmeans_sub <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_kmeans(
       cluster_col = .kmeans_cluster
     )
 
   set.seed(2020)
   kmeans_wrap <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       augment = FALSE,
@@ -271,14 +271,14 @@ test_that("kmeans tof_metacluster results are identical to subroutine", {
 test_that("phenograph tof_metacluster results are identical to subroutine", {
   set.seed(2020)
   pheno_sub <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_phenograph(
       cluster_col = .kmeans_cluster
     )
 
   set.seed(2020)
   pheno_wrap <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       augment = FALSE,
@@ -290,14 +290,14 @@ test_that("phenograph tof_metacluster results are identical to subroutine", {
 
 test_that("consensus tof_metacluster results are identical to subroutine", {
   ccp_sub <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_consensus(
       cluster_col = .kmeans_cluster,
       seed = 2020L
     )
 
   ccp_wrap <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       seed = 2020L,
@@ -311,14 +311,14 @@ test_that("consensus tof_metacluster results are identical to subroutine", {
 test_that("flowsom tof_metacluster results are identical to subroutine", {
   set.seed(2020)
   flow_sub <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster_flowsom(
       cluster_col = .kmeans_cluster,
     )
 
   set.seed(2020)
   flow_wrap <-
-    clust_data %>%
+    clust_data |>
     tof_metacluster(
       cluster_col = .kmeans_cluster,
       augment = FALSE,

@@ -36,7 +36,7 @@ degrees of freedom. Defaults to 0.01.}
 
 \item{visualize}{A boolean value indicating if a plot should be generated to
 visualize each timestep's relative flow rate (by group). This plot is printed
-to the consolve as a side-effect of this function; for non-interactive R
+to the console as a side-effect of this function; for non-interactive R
 sessions, this argument should always be FALSE (the default).}
 
 \item{...}{Optional additional arguments to pass to \code{\link[ggplot2]{facet_wrap}}.

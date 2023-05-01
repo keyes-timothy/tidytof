@@ -94,13 +94,13 @@ tof_metacluster_hierarchical <-
 
     # extract metacluster colnames
     metacluster_colnames <-
-      tof_tibble %>%
-      dplyr::select({{metacluster_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{metacluster_cols}}) |>
       colnames()
 
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
         metacluster_cols = dplyr::any_of(metacluster_colnames),
@@ -109,26 +109,26 @@ tof_metacluster_hierarchical <-
 
     # distance object
     dist_object <-
-      meta_tibble %>%
-      dplyr::select(-{{cluster_col}}) %>%
-      as.matrix() %>%
+      meta_tibble |>
+      dplyr::select(-{{cluster_col}}) |>
+      as.matrix() |>
       stats::dist(method = distance_function)
 
     # hierarchical clustering
     hclust_object <-
       stats::hclust(d = dist_object, method = agglomeration_method)
     hclusts <-
-      stats::cutree(tree = hclust_object, k = num_metaclusters) %>%
+      stats::cutree(tree = hclust_object, k = num_metaclusters) |>
       as.character()
 
     # return result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_join_metacluster(
         cluster_col = {{cluster_col}},
         meta_tibble = meta_tibble,
         metacluster_vector = hclusts
-      ) %>%
+      ) |>
       dplyr::rename(.hierarchical_metacluster = .data$.metacluster)
     return(result)
   }
@@ -208,13 +208,13 @@ tof_metacluster_kmeans <-
 
     # extract metacluster colnames
     metacluster_colnames <-
-      tof_tibble %>%
-      dplyr::select({{metacluster_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{metacluster_cols}}) |>
       colnames()
 
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
         metacluster_cols = dplyr::any_of(metacluster_colnames),
@@ -223,22 +223,22 @@ tof_metacluster_kmeans <-
 
     # k-means clustering
     kmeans_metaclusters <-
-      meta_tibble %>%
+      meta_tibble |>
       tof_cluster_kmeans(
         cluster_cols = dplyr::any_of(metacluster_colnames),
         num_clusters = num_metaclusters,
         ...
-      ) %>%
+      ) |>
       dplyr::pull(.data$.kmeans_cluster)
 
     # return result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_join_metacluster(
         meta_tibble = meta_tibble,
         cluster_col = {{cluster_col}},
         metacluster_vector = kmeans_metaclusters
-      ) %>%
+      ) |>
       dplyr::rename(.kmeans_metacluster = .data$.metacluster)
 
     return(result)
@@ -321,13 +321,13 @@ tof_metacluster_phenograph <-
 
     # extract metacluster colnames
     metacluster_colnames <-
-      tof_tibble %>%
-      dplyr::select({{metacluster_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{metacluster_cols}}) |>
       colnames()
 
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
         metacluster_cols = dplyr::any_of(metacluster_colnames),
@@ -336,22 +336,22 @@ tof_metacluster_phenograph <-
 
     # phenograph metaclustering
     pheno_metaclusters <-
-      meta_tibble %>%
+      meta_tibble |>
       tof_cluster_phenograph(
         cluster_cols = dplyr::any_of(metacluster_colnames),
         num_neighbors = num_neighbors,
         ...
-      ) %>%
+      ) |>
       dplyr::pull(.data$.phenograph_cluster)
 
     # return result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_join_metacluster(
         meta_tibble = meta_tibble,
         cluster_col = {{cluster_col}},
         metacluster_vector = pheno_metaclusters
-      ) %>%
+      ) |>
       dplyr::rename(.phenograph_metacluster = .data$.metacluster)
 
     return(result)
@@ -489,7 +489,7 @@ tof_metacluster_consensus <-
 
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
         metacluster_cols = {{metacluster_cols}},
@@ -498,9 +498,9 @@ tof_metacluster_consensus <-
 
     # data_matrix object
     data_matrix <-
-      meta_tibble %>%
-      dplyr::select(-{{cluster_col}}) %>%
-      as.matrix() %>%
+      meta_tibble |>
+      dplyr::select(-{{cluster_col}}) |>
+      as.matrix() |>
       t()
     colnames(data_matrix) <- dplyr::pull(meta_tibble, {{cluster_col}})
 
@@ -524,17 +524,17 @@ tof_metacluster_consensus <-
         )
       )
     ccp_metaclusters <-
-      ccp_object[[num_metaclusters]]$consensusClass %>%
+      ccp_object[[num_metaclusters]]$consensusClass |>
       as.character()
 
     # return result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_join_metacluster(
         cluster_col = {{cluster_col}},
         meta_tibble = meta_tibble,
         metacluster_vector = ccp_metaclusters
-      ) %>%
+      ) |>
       dplyr::rename(.consensus_metacluster = .data$.metacluster)
     return(result)
   }
@@ -663,7 +663,7 @@ tof_metacluster_flowsom <-
 
     # find centroids of all input clusters in tof_tibble
     meta_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_summarize_clusters(
         cluster_col = {{cluster_col}},
         metacluster_cols = {{metacluster_cols}},
@@ -672,8 +672,8 @@ tof_metacluster_flowsom <-
 
     # data_matrix
     data_matrix <-
-      meta_tibble %>%
-      dplyr::select(-{{cluster_col}}) %>%
+      meta_tibble |>
+      dplyr::select(-{{cluster_col}}) |>
       as.matrix()
 
     # perform metaclustering
@@ -683,17 +683,17 @@ tof_metacluster_flowsom <-
         method = clustering_algorithm,
         max = num_metaclusters,
         ...
-      ) %>%
+      ) |>
       as.character()
 
     # return result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_join_metacluster(
         meta_tibble = meta_tibble,
         cluster_col = {{cluster_col}},
         metacluster_vector = flowsom_metaclusters
-      ) %>%
+      ) |>
       dplyr::rename(.flowsom_metacluster = .data$.metacluster)
     return(result)
   }

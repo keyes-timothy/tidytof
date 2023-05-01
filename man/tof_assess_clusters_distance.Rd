@@ -22,7 +22,7 @@ Cluster labels can be produced via any method the user chooses - including manua
 any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{marker_cols}{Unquoted column names indicating which column in `tof_tibble`
-should be interpreted as markers to be used in the mahalanobis distance calulation.
+should be interpreted as markers to be used in the mahalanobis distance calculation.
 Defaults to all numeric columns. Supports tidyselection.}
 
 \item{z_threshold}{A scalar indicating the distance z-score threshold above
@@ -65,14 +65,24 @@ sim_data_inner <-
 sim_data_outer <-
   dplyr::tibble(
     cd45 = c(rnorm(n = 10), rnorm(50, mean = 3), rnorm(n = 50, mean = -12)),
-    cd38 = c(rnorm(n = 10, sd = 0.5), rnorm(n = 50, mean = -10), rnorm(n = 50, mean = 10)),
-    cd34 = c(rnorm(n = 10, sd = 0.2, mean = -15), rnorm(n = 50, mean = 15), rnorm(n = 50, mean = 70)),
+    cd38 =
+      c(
+        rnorm(n = 10, sd = 0.5),
+        rnorm(n = 50, mean = -10),
+        rnorm(n = 50, mean = 10)
+      ),
+    cd34 =
+      c(
+        rnorm(n = 10, sd = 0.2, mean = -15),
+        rnorm(n = 50, mean = 15),
+        rnorm(n = 50, mean = 70)
+      ),
     cd19 = c(rnorm(n = 10, sd = 0.3, mean = 19), rnorm(n = 100)),
     cluster_id = c(rep("a", 10), rep("b", 50), rep("c", 50)),
     dataset = "outer"
   )
 
-sim_data <- bind_rows(sim_data_inner, sim_data_outer)
+sim_data <- rbind(sim_data_inner, sim_data_outer)
 
 # detect anomalous cells (in this case, the "outer" dataset contains small
 # clusters that get lumped into the larger clusters in the "inner" dataset)

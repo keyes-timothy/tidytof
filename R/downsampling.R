@@ -1,10 +1,10 @@
 # downsampling.R
 # This file contains functions relevant to downsampling cells within
-# tof_tibble objects containing CyTOF data.
+# tof_tibble objects containing high-dimensional cytometry data.
 
 # tof_downsample_constant ------------------------------------------------------
 
-#' Downsample CyTOF data by randomly selecting a constant number of cells per group.
+#' Downsample high-dimensional cytometry data by randomly selecting a constant number of cells per group.
 #'
 #' This function downsamples the number of cells in a `tof_tbl` by randomly selecting
 #' `num_cells` cells from each unique combination of values in `group_cols`.
@@ -79,7 +79,7 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 
 # tof_downsample_prop ----------------------------------------------------------
 
-#' Downsample CyTOF data by randomly selecting a proportion of the cells in each group.
+#' Downsample high-dimensional cytometry data by randomly selecting a proportion of the cells in each group.
 #'
 #' This function downsamples the number of cells in a `tof_tbl` by randomly selecting
 #' a `prop_cells` proportion of the total number of cells with each unique combination
@@ -147,7 +147,7 @@ tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
 
 # tof_downsample_density -------------------------------------------------------
 
-#' Downsample CyTOF data by randomly selecting a proportion of the cells in each group.
+#' Downsample high-dimensional cytometry data by randomly selecting a proportion of the cells in each group.
 #'
 #' This function downsamples the number of cells in a `tof_tbl` using the
 #' density-dependent downsampling algorithm described in
@@ -305,11 +305,11 @@ tof_downsample_density <-
     nested_data <-
       result %>%
       dplyr::select(
-        .data$..cell_id,
+        "..cell_id",
         dplyr::any_of(group_names),
         dplyr::any_of(density_names)
       ) %>%
-      tidyr::nest(cell_ids = .data$..cell_id, data = {{density_cols}})
+      tidyr::nest(cell_ids = "..cell_id", data = {{density_cols}})
 
     # find local density estimates for each cell in all groups
     nested_data <-
@@ -329,7 +329,7 @@ tof_downsample_density <-
     densities <- purrr::map(.x = nested_data$densities, .f = ~.x[[1]])
     nested_data <-
       nested_data %>%
-      dplyr::select(.data$cell_ids, dplyr::any_of(group_names)) %>%
+      dplyr::select("cell_ids", dplyr::any_of(group_names)) %>%
       dplyr::mutate(
         densities = densities
       )
@@ -352,7 +352,7 @@ tof_downsample_density <-
               .f = ~ quantile(subset(.x, .x > 0), probs = target_percentile),
             )
         ) %>%
-        tidyr::unnest(cols = c(.data$cell_ids, .data$densities)) %>%
+        tidyr::unnest(cols = c("cell_ids", "densities")) %>%
         dplyr::group_by(dplyr::across({{group_cols}})) %>%
         dplyr::arrange(.data$densities) %>%
         dplyr::mutate(
@@ -445,14 +445,14 @@ tof_downsample_density <-
     result <-
       result %>%
       dplyr::filter(.data$..cell_id %in% chosen_cells) %>%
-      dplyr::select(-.data$..cell_id)
+      dplyr::select(-"..cell_id")
 
     return(result)
   }
 
 # tof_downsample ---------------------------------------------------------------
 
-#' Downsample CyTOF data.
+#' Downsample high-dimensional cytometry data.
 #'
 #' This function downsamples the number of cells in a `tof_tbl` using the
 #' one of three methods (randomly sampling a constant number of cells,

@@ -193,6 +193,10 @@ tof_calculate_flow_rate <-
 #' @importFrom dplyr relocate
 #' @importFrom dplyr right_join
 #'
+#' @importFrom stats mad
+#' @importFrom stats qt
+#' @importFrom stats sd
+#'
 #' @examples
 #'
 #' set.seed(1000L)
@@ -250,10 +254,10 @@ tof_assess_flow_rate_tibble <-
     scores <-
       time_counts |>
       dplyr::mutate(
-        r_score = (.data$num_cells - median(.data$num_cells)) / mad(.data$num_cells),
+        r_score = (.data$num_cells - median(.data$num_cells)) / stats::mad(.data$num_cells),
         flagged_window =
-          .data$r_score > qt(p = 1 - alpha_threshold / 2, df = nrow(time_counts)) |
-          .data$r_score < qt(p = alpha_threshold / 2, df = nrow(time_counts))
+          .data$r_score > stats::qt(p = 1 - alpha_threshold / 2, df = nrow(time_counts)) |
+          .data$r_score < stats::qt(p = alpha_threshold / 2, df = nrow(time_counts))
       )
 
     result <-
@@ -300,7 +304,7 @@ tof_assess_flow_rate_tibble <-
 #'
 #' @param visualize A boolean value indicating if a plot should be generated to
 #' visualize each timestep's relative flow rate (by group). This plot is printed
-#' to the consolve as a side-effect of this function; for non-interactive R
+#' to the console as a side-effect of this function; for non-interactive R
 #' sessions, this argument should always be FALSE (the default).
 #'
 #' @param ... Optional additional arguments to pass to \code{\link[ggplot2]{facet_wrap}}.
@@ -407,12 +411,17 @@ tof_assess_flow_rate <-
     result <-
       result |>
       dplyr::select(-"data") |>
-      tidyr::unnest(cols = assessment)
+      tidyr::unnest(cols = .data$assessment)
 
     if (visualize) {
       rate_plot <-
         result |>
-        dplyr::count({{group_cols}}, flagged_window, timestep, name = "num_cells") |>
+        dplyr::count(
+          {{group_cols}},
+          .data$flagged_window,
+          .data$timestep,
+          name = "num_cells"
+        ) |>
         ggplot2::ggplot(ggplot2::aes(x = timestep, y = num_cells, fill = flagged_window)) +
         ggplot2::geom_point(shape = 21) +
         ggplot2::theme_bw()
@@ -453,7 +462,7 @@ tof_assess_flow_rate <-
 #' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param marker_cols  Unquoted column names indicating which column in `tof_tibble`
-#' should be interpreted as markers to be used in the mahalanobis distance calulation.
+#' should be interpreted as markers to be used in the mahalanobis distance calculation.
 #' Defaults to all numeric columns. Supports tidyselection.
 #'
 #' @param z_threshold A scalar indicating the distance z-score threshold above
@@ -498,14 +507,24 @@ tof_assess_flow_rate <-
 #' sim_data_outer <-
 #'   dplyr::tibble(
 #'     cd45 = c(rnorm(n = 10), rnorm(50, mean = 3), rnorm(n = 50, mean = -12)),
-#'     cd38 = c(rnorm(n = 10, sd = 0.5), rnorm(n = 50, mean = -10), rnorm(n = 50, mean = 10)),
-#'     cd34 = c(rnorm(n = 10, sd = 0.2, mean = -15), rnorm(n = 50, mean = 15), rnorm(n = 50, mean = 70)),
+#'     cd38 =
+#'       c(
+#'         rnorm(n = 10, sd = 0.5),
+#'         rnorm(n = 50, mean = -10),
+#'         rnorm(n = 50, mean = 10)
+#'       ),
+#'     cd34 =
+#'       c(
+#'         rnorm(n = 10, sd = 0.2, mean = -15),
+#'         rnorm(n = 50, mean = 15),
+#'         rnorm(n = 50, mean = 70)
+#'       ),
 #'     cd19 = c(rnorm(n = 10, sd = 0.3, mean = 19), rnorm(n = 100)),
 #'     cluster_id = c(rep("a", 10), rep("b", 50), rep("c", 50)),
 #'     dataset = "outer"
 #'   )
 #'
-#' sim_data <- bind_rows(sim_data_inner, sim_data_outer)
+#' sim_data <- rbind(sim_data_inner, sim_data_outer)
 #'
 #' # detect anomalous cells (in this case, the "outer" dataset contains small
 #' # clusters that get lumped into the larger clusters in the "inner" dataset)
@@ -533,7 +552,7 @@ tof_assess_clusters_distance <-
           tof_cluster_ddpr(
             tof_tibble = x,
             healthy_tibble = dplyr::mutate(x, placeholder = "distance"),
-            healthy_label_col = placeholder,
+            healthy_label_col = .data$placeholder,
             cluster_cols = {{marker_cols}},
             distance_function = "mahalanobis",
             num_cores = 1L,
@@ -549,12 +568,13 @@ tof_assess_clusters_distance <-
       result |>
       tidyr::unnest(cols = c(.data$data, .data$distances)) |>
       dplyr::mutate(
-        z_score =
-          (.mahalanobis_distance - mean(.mahalanobis_distance)) / sd(.mahalanobis_distance),
-        z_score = (.mahalanobis_distance - median(.mahalanobis_distance)) / mad(.mahalanobis_distance),
-        flagged_cell = z_score > z_threshold
+        # z_score =
+        #   (.data$.mahalanobis_distance - mean(.data$.mahalanobis_distance)) / sd(.data$.mahalanobis_distance),
+        z_score = (.data$.mahalanobis_distance - median(.data$.mahalanobis_distance)) / stats::mad(.data$.mahalanobis_distance),
+        flagged_cell = .data$z_score > z_threshold
       ) |>
       dplyr::ungroup()
+
 
     if (!augment) {
       result <-
@@ -837,7 +857,7 @@ tof_assess_clusters_knn <-
         num_neighbors = num_neighbors,
         distance_function = distance_function
       ) |>
-      dplyr::rename(.knn_cluster = .upsample_cluster) |>
+      dplyr::rename(.knn_cluster = .data$.upsample_cluster) |>
       dplyr::bind_cols(dplyr::select(tof_tibble, {{cluster_col}})) |>
       dplyr::mutate(flagged_cell = .data$.knn_cluster != {{cluster_col}}) |>
       dplyr::select(-{{cluster_col}})

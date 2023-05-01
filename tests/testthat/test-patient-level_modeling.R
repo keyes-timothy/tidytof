@@ -25,7 +25,8 @@ feature_tibble <-
 cv_split <-
   feature_tibble %>%
   tof_split_data(
-    split_method = "k-fold"
+    split_method = "k-fold",
+    strata = multiclass
   )
 
 cv_split_2 <-
@@ -1204,7 +1205,7 @@ test_that("survival assessment results give a model_metrics table and survival c
   survival_curves_correct <-
     survival_assessments %>%
     map(~purrr::pluck(.x, "survival_curves")) %>%
-    purrr::map(~tidyr::unnest(.x, cols = .data$survival_curve)) %>%
+    purrr::map(~tidyr::unnest(.x, cols = "survival_curve")) %>%
     purrr::map(colnames) %>%
     purrr::map(
       ~setdiff(

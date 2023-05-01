@@ -87,15 +87,15 @@ tof_reduce_pca <-
   ) {
 
     pca_recipe <-
-      recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) %>%
+      recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) |>
       # remove any variables that have 0 variance
-      recipes::step_zv(recipes::all_numeric()) %>%
+      recipes::step_zv(recipes::all_numeric()) |>
       recipes::step_pca(
         recipes::all_numeric(),
         num_comp = num_comp,
         threshold = threshold,
         options = list(center = center, scale. = scale)
-      ) %>%
+      ) |>
       recipes::prep()
 
     if (return_recipe) {
@@ -103,8 +103,8 @@ tof_reduce_pca <-
 
     } else {
       result <-
-        pca_recipe %>%
-        recipes::juice() %>%
+        pca_recipe |>
+        recipes::juice() |>
         dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
       return(result)
     }
@@ -207,8 +207,8 @@ tof_reduce_tsne <-
         max_iter = max_iterations,
         verbose = verbose,
         ...
-      ) %>%
-      purrr::pluck("Y") %>%
+      ) |>
+      purrr::pluck("Y") |>
       dplyr::as_tibble(.name_repair = "minimal")
 
     colnames(result) <- paste0(".tsne_", 1:num_comp)
@@ -325,9 +325,9 @@ tof_reduce_umap <-
 
     suppressWarnings(
       umap_recipe <-
-        recipes::recipe(~ ., data = dplyr::select(tof_tibble, {{umap_cols}})) %>%
+        recipes::recipe(~ ., data = dplyr::select(tof_tibble, {{umap_cols}})) |>
         # remove any variables that have 0 variance
-        recipes::step_zv(recipes::all_numeric()) %>%
+        recipes::step_zv(recipes::all_numeric()) |>
         embed::step_umap(
           recipes::all_numeric(),
           num_comp = num_comp,
@@ -336,7 +336,7 @@ tof_reduce_umap <-
           learn_rate = learn_rate,
           epochs = epochs,
           options = list(verbose = verbose, n_threads = n_threads, ...)
-        ) %>%
+        ) |>
         recipes::prep()
     )
 
@@ -345,8 +345,8 @@ tof_reduce_umap <-
 
     } else {
       result <-
-        umap_recipe %>%
-        recipes::juice() %>%
+        umap_recipe |>
+        recipes::juice() |>
         dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
       return(result)
     }

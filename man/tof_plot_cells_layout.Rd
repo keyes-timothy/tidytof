@@ -106,7 +106,6 @@ layout_cluster <-
 }
 \seealso{
 Other visualization functions: 
-\code{\link{tof_plot_cells_embedding_deprecated}()},
 \code{\link{tof_plot_cells_embedding}()},
 \code{\link{tof_plot_cells_scatter}()}
 }

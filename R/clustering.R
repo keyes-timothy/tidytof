@@ -697,17 +697,19 @@ tof_cluster_grouped <-
             }
           )
       ) |>
-      dplyr::select(-.data$.prefix)
+      dplyr::select(-".prefix")
 
     if (augment) {
       result <-
         result |>
-        tidyr::unnest(cols = c(.data$data, .data$clusters))
+        #
+        tidyr::unnest(cols = c("data", "clusters"))
     } else {
       result <-
         result |>
-        dplyr::select(.data$clusters) |>
-        tidyr::unnest(cols = .data$clusters)
+        dplyr::select("clusters") |>
+        #
+        tidyr::unnest(cols = "clusters")
     }
 
     return(result)

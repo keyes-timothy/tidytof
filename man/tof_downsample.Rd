@@ -2,7 +2,7 @@
 % Please edit documentation in R/downsampling.R
 \name{tof_downsample}
 \alias{tof_downsample}
-\title{Downsample CyTOF data.}
+\title{Downsample high-dimensional cytometry data.}
 \usage{
 tof_downsample(
   tof_tibble,
