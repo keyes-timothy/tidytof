@@ -125,7 +125,7 @@
 #'# For differential discovery examples, please see the package vignettes
 #'
 #'
-tof_daa_diffcyt <-
+tof_analyze_abundance_diffcyt <-
   function(
     tof_tibble,
     sample_col,
@@ -240,7 +240,7 @@ tof_daa_diffcyt <-
                   dplyr::mutate(
                     significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
                   ) |>
-                  dplyr::rename("{{cluster_col}}" := .data$cluster_id)
+                  dplyr::rename("{{cluster_col}}" := "cluster_id")
               }
             )
         )
@@ -295,10 +295,10 @@ tof_daa_diffcyt <-
                         significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
                       ) |>
                       dplyr::select(
-                        "{{cluster_col}}" := .data$cluster_id,
-                        .data$p_val,
-                        .data$p_adj,
-                        .data$significant,
+                        "{{cluster_col}}" := "cluster_id",
+                        "p_val",
+                        "p_adj",
+                        "significant",
                         tidyselect::everything()
                       )
                   }
@@ -332,10 +332,10 @@ tof_daa_diffcyt <-
                     significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
                   ) |>
                   dplyr::select(
-                    "{{cluster_col}}" := .data$cluster_id,
-                    .data$p_val,
-                    .data$p_adj,
-                    .data$significant,
+                    "{{cluster_col}}" := "cluster_id",
+                    "p_val",
+                    "p_adj",
+                    "significant",
                     tidyselect::everything()
                   )
               }
@@ -350,7 +350,7 @@ tof_daa_diffcyt <-
       result_tibble <-
         result_tibble |>
         dplyr::filter(.data$tested_effect != "omnibus") |>
-        tidyr::unnest(cols = .data$daa_results)
+        tidyr::unnest(cols = "daa_results")
     }
 
     attr(result_tibble, "daa_method") <- paste0("diffcyt_", diffcyt_method)
@@ -477,7 +477,7 @@ tof_daa_diffcyt <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_dea_diffcyt <-
+tof_analyze_expression_diffcyt <-
   function(
     tof_tibble,
     sample_col,
@@ -582,14 +582,14 @@ tof_dea_diffcyt <-
                       ) |>
                       dplyr::rename(
                         marker = .data$marker_id,
-                        "{{cluster_col}}" := .data$cluster_id
+                        "{{cluster_col}}" := "cluster_id"
                       ) |>
                       dplyr::select(
                         {{cluster_col}},
-                        .data$marker,
-                        .data$p_val,
-                        .data$p_adj,
-                        .data$significant,
+                        "marker",
+                        "p_val",
+                        "p_adj",
+                        "significant",
                         tidyselect::everything()
                       )
                   }
@@ -647,14 +647,14 @@ tof_dea_diffcyt <-
                       ) |>
                       dplyr::rename(
                         marker = .data$marker_id,
-                        "{{cluster_col}}" := .data$cluster_id
+                        "{{cluster_col}}" := "cluster_id"
                       ) |>
                       dplyr::select(
                         {{cluster_col}},
-                        .data$marker,
-                        .data$p_val,
-                        .data$p_adj,
-                        .data$significant,
+                        "marker",
+                        "p_val",
+                        "p_adj",
+                        "significant",
                         tidyselect::everything()
                       )
                   }
@@ -670,7 +670,7 @@ tof_dea_diffcyt <-
       result_tibble <-
         result_tibble |>
         dplyr::filter(.data$tested_effect != "omnibus") |>
-        tidyr::unnest(cols = .data$dea_results)
+        tidyr::unnest(cols = "dea_results")
     }
 
     attr(result_tibble, "dea_method") <- paste0("diffcyt_", diffcyt_method)
@@ -782,7 +782,7 @@ tof_dea_diffcyt <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_daa_glmm <-
+tof_analyze_abundance_glmm <-
   function(
     tof_tibble,
     sample_col,
@@ -798,7 +798,7 @@ tof_daa_glmm <-
     # rlang::check_installed(pkg = "broomExtra")
     #
     # if (!requireNamespace(package = "broomExtra")) {
-    #   stop("tof_daa_glmm requires the broomExtra package to be installed")
+    #   stop("tof_analyze_abundance_glmm requires the broomExtra package to be installed")
     # }
 
     # extract sample column as a character vector
@@ -843,13 +843,13 @@ tof_daa_glmm <-
       ) |>
       dplyr::mutate(
         dplyr::across(
-          c(.data$metadata, {{cluster_col}}),
+          c("metadata", {{cluster_col}}),
           .f = as.factor
           ),
       ) |>
       dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) |>
       tidyr::separate(
-        col = .data$metadata,
+        col = "metadata",
         into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
         sep = my_sep
       ) |>
@@ -960,7 +960,7 @@ tof_daa_glmm <-
     fit_data <-
       fit_data |>
       dplyr::select(-"data") |>
-      tidyr::unnest(cols = .data$results) |>
+      tidyr::unnest(cols = "results") |>
       dplyr::filter(.data$term != "(Intercept)", !is.na(.data$p.value)) |>
       dplyr::mutate(p_adj = stats::p.adjust(.data$p.value, method = "fdr")) |>
       dplyr::arrange(.data$p_adj) |>
@@ -969,9 +969,9 @@ tof_daa_glmm <-
         mean_fc = exp(.data$estimate)
       ) |>
       dplyr::rename(
-        tested_effect = .data$term,
-        p_val = .data$p.value,
-        f_statistic = .data$statistic
+        tested_effect = "term",
+        p_val = "p.value",
+        f_statistic = "statistic"
       )
 
     # if (has_random_effects) {
@@ -985,18 +985,18 @@ tof_daa_glmm <-
       dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
       dplyr::select(
         {{cluster_col}},
-        .data$p_val,
-        .data$p_adj,
-        .data$significant,
+        "p_val",
+        "p_adj",
+        "significant",
         tidyselect::everything()
       ) |>
-      tidyr::nest(daa_results = c(-.data$tested_effect))
+      tidyr::nest(daa_results = c(-"tested_effect"))
 
     # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
     # unnest it (which is more intuitive)
     if (nrow(fit_data) == 1) {
       fit_data <-
-        tidyr::unnest(fit_data, cols = .data$daa_results)
+        tidyr::unnest(fit_data, cols = "daa_results")
     }
 
     attr(fit_data, which = "daa_method") <- "glmm"
@@ -1124,7 +1124,7 @@ tof_daa_glmm <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_dea_lmm <-
+tof_analyze_expression_lmm <-
   function(
     tof_tibble,
     sample_col,
@@ -1142,7 +1142,7 @@ tof_dea_lmm <-
     # rlang::check_installed(pkg = "broomExtra")
     #
     # if (!requireNamespace(package = "broomExtra")) {
-    #   stop("tof_dea_lmm requires the broomExtra package to be installed")
+    #   stop("tof_analyze_expression_lmm requires the broomExtra package to be installed")
     # }
 
     # extract sample column as a character vector
@@ -1192,13 +1192,13 @@ tof_dea_lmm <-
       ) |>
       dplyr::mutate(
         dplyr::across(
-          c(.data$metadata, {{cluster_col}}),
+          c("metadata", {{cluster_col}}),
           .f = as.factor
         ),
       ) |>
       dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) |>
       tidyr::separate(
-        col = .data$metadata,
+        col = "metadata",
         into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
         sep = my_sep
       ) |>
@@ -1322,15 +1322,15 @@ tof_dea_lmm <-
               ),
             results = purrr::map(.x = .data$results, .f = tidy_lmer_test)
           ) |>
-          dplyr::select(-.data$data) |>
-          tidyr::unnest(cols = .data$results)
+          dplyr::select(-"data") |>
+          tidyr::unnest(cols = "results")
       ))
 
     intercepts <-
       fit_data |>
       dplyr::filter(.data$term == "(Intercept)", !is.na(.data$p.value)) |>
-      dplyr::rename(baseline_expression = .data$estimate) |>
-      dplyr::select({{cluster_col}}, .data$marker, .data$baseline_expression)
+      dplyr::rename(baseline_expression = "estimate") |>
+      dplyr::select({{cluster_col}}, "marker", "baseline_expression")
 
     fit_data <-
       fit_data |>
@@ -1342,9 +1342,9 @@ tof_dea_lmm <-
         mean_diff = .data$estimate
       ) |>
       dplyr::rename(
-        tested_effect = .data$term,
-        p_val = .data$p.value,
-        f_statistic = .data$statistic
+        tested_effect = "term",
+        p_val = "p.value",
+        f_statistic = "statistic"
       ) |>
       dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
       dplyr::left_join(
@@ -1354,13 +1354,13 @@ tof_dea_lmm <-
       dplyr::mutate(
         mean_fc = (.data$baseline_expression + .data$mean_diff) / .data$baseline_expression
       ) |>
-      dplyr::select(-.data$baseline_expression) |>
+      dplyr::select(-"baseline_expression") |>
       dplyr::select(
         {{cluster_col}},
-        .data$marker,
-        .data$p_val,
-        .data$p_adj,
-        .data$significant,
+        "marker",
+        "p_val",
+        "p_adj",
+        "significant",
         tidyselect::everything()
       ) |>
       dplyr::select(-"estimate")
@@ -1368,13 +1368,13 @@ tof_dea_lmm <-
     fit_data <-
       fit_data |>
       dplyr::rename(std_error = `Std_ Error`) |>
-      tidyr::nest(dea_results = c(-.data$tested_effect))
+      tidyr::nest(dea_results = c(-"tested_effect"))
 
     # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
     # unnest it (which is more intuitive)
     if (nrow(fit_data) == 1) {
       fit_data <-
-        tidyr::unnest(fit_data, cols = .data$dea_results)
+        tidyr::unnest(fit_data, cols = "dea_results")
     }
 
     attr(fit_data, which = "dea_method") <- "lmm"
@@ -1408,7 +1408,7 @@ tof_dea_lmm <-
 #'
 #' @param group_cols Unquoted names of the columns other than `effect_col`
 #' that should be used to group cells into independent observations. Fills a similar role
-#' to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
+#' to `sample_col` in other `tof_analyze_abundance_*` functions. For example, if an experiment involves
 #' analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),
 #' then group_cols should be the name of the column representing patient IDs.
 #'
@@ -1476,7 +1476,7 @@ tof_dea_lmm <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_daa_ttest <-
+tof_analyze_abundance_ttest <-
   function(
     tof_tibble,
     cluster_col,
@@ -1537,10 +1537,10 @@ tof_daa_ttest <-
     if (test_type == "paired") {
       t_df <-
         count_df |>
-        dplyr::select({{group_cols}}, {{effect_col}}, {{cluster_col}}, .data$prop) |>
+        dplyr::select({{group_cols}}, {{effect_col}}, {{cluster_col}}, "prop") |>
         tidyr::pivot_wider(
           names_from = {{effect_col}},
-          values_from = .data$prop
+          values_from = "prop"
         ) |>
         tidyr::nest(data = -{{cluster_col}}) |>
         dplyr::mutate(
@@ -1568,7 +1568,7 @@ tof_daa_ttest <-
               .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001))
             )
         ) |>
-        dplyr::select(-.data$t_test, -.data$data)
+        dplyr::select(-"t_test", -"data")
 
     } else {
       # extract cluster_col names as a string
@@ -1629,10 +1629,10 @@ tof_daa_ttest <-
             )
         ) |>
         dplyr::select(
-          -.data$t_test,
-          -.data$effect_1_vector,
-          -.data$effect_2_vector,
-          -.data$enough_samples
+          -"t_test",
+          -"effect_1_vector",
+          -"effect_2_vector",
+          -"enough_samples"
         ) |>
         dplyr::arrange(.data$p_adj)
     }
@@ -1642,9 +1642,10 @@ tof_daa_ttest <-
     t_df <-
       dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{cluster_col}})) |>
       dplyr::select(
-        {{cluster_col}}, .data$p_val,
-        .data$p_adj,
-        .data$significant,
+        {{cluster_col}},
+        "p_val",
+        "p_adj",
+        "significant",
         tidyselect::everything()
       )
 
@@ -1691,7 +1692,7 @@ tof_daa_ttest <-
 #'
 #' @param group_cols Unquoted names of the columns other than `effect_col`
 #' that should be used to group cells into independent observations. Fills a similar role
-#' to `sample_col` in other `tof_daa_*` functions. For example, if an experiment involves
+#' to `sample_col` in other `tof_analyze_abundance_*` functions. For example, if an experiment involves
 #' analyzing samples taken from multiple patients at two timepoints (with `effect_col = timepoint`),
 #' then group_cols should be the name of the column representing patient IDs.
 #'
@@ -1769,7 +1770,7 @@ tof_daa_ttest <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_dea_ttest <-
+tof_analyze_expression_ttest <-
   function(
     tof_tibble,
     cluster_col,
@@ -1857,7 +1858,7 @@ tof_dea_ttest <-
           names_to = "marker",
           values_to = "summary"
         ) |>
-        tidyr::nest(data = c(-.data$marker, -{{cluster_col}})) |>
+        tidyr::nest(data = c(-"marker", -{{cluster_col}})) |>
         dplyr::mutate(
           data =
             purrr::map(
@@ -1894,13 +1895,13 @@ tof_dea_ttest <-
               .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001), na.rm = TRUE)
             )
         ) |>
-        dplyr::select(-.data$t_test, -.data$data) |>
+        dplyr::select(-"t_test", -"data") |>
         dplyr::select(
           {{cluster_col}},
-          .data$marker,
-          .data$p_val,
-          .data$p_adj,
-          .data$significant,
+          "marker",
+          "p_val",
+          "p_adj",
+          "significant",
           tidyselect::everything()
         ) |>
         dplyr::arrange(.data$p_adj)
@@ -1913,7 +1914,7 @@ tof_dea_ttest <-
           names_to = "marker",
           values_to = "summary"
         ) |>
-        tidyr::nest(data = c(-{{effect_col}}, -{{cluster_col}}, -.data$marker)) |>
+        tidyr::nest(data = c(-{{effect_col}}, -{{cluster_col}}, -"marker")) |>
         tidyr::pivot_wider(names_from = {{effect_col}}, values_from = data) |>
         dplyr::mutate(
           enough_samples =
@@ -1947,16 +1948,16 @@ tof_dea_ttest <-
             )
         ) |>
         dplyr::select(
-          -.data$t_test,
+          -"t_test",
           -dplyr::any_of(effect_levels),
-          -.data$enough_samples
+          -"enough_samples"
         ) |>
         dplyr::select(
           {{cluster_col}},
-          .data$marker,
-          .data$p_val,
-          .data$p_adj,
-          .data$significant,
+          "marker",
+          "p_val",
+          "p_adj",
+          "significant",
           tidyselect::everything()
         ) |>
         dplyr::arrange(.data$p_adj)
@@ -1987,21 +1988,21 @@ tof_dea_ttest <-
 #'
 #' This function performs differential abundance analysis on the cell clusters
 #' contained within a `tof_tbl` using one of three methods
-#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_daa_*`
-#' function family: \code{\link{tof_daa_diffcyt}},
-#' \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}}.
+#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_analyze_abundance_*`
+#' function family: \code{\link{tof_analyze_abundance_diffcyt}},
+#' \code{\link{tof_analyze_abundance_glmm}}, and \code{\link{tof_analyze_abundance_ttest}}.
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param method A string indicating which statistical method should be used. Valid
 #' values include "diffcyt", "glmm", and "ttest".
 #'
-#' @param ... Additional arguments to pass onto the `tof_daa_*`
+#' @param ... Additional arguments to pass onto the `tof_analyze_abundance_*`
 #' function family member corresponding to the chosen method.
 #'
 #' @return A tibble or nested tibble containing the differential abundance results
-#' from the chosen method. See \code{\link{tof_daa_diffcyt}},
-#' \code{\link{tof_daa_glmm}}, and \code{\link{tof_daa_ttest}} for details.
+#' from the chosen method. See \code{\link{tof_analyze_abundance_diffcyt}},
+#' \code{\link{tof_analyze_abundance_glmm}}, and \code{\link{tof_analyze_abundance_ttest}} for details.
 #'
 #' @family differential abundance analysis functions
 #'
@@ -2012,7 +2013,7 @@ tof_dea_ttest <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_daa <-
+tof_analyze_abundance <-
   function(
     tof_tibble,
     method = c("diffcyt", "glmm", "ttest"),
@@ -2025,15 +2026,15 @@ tof_daa <-
     if (method == "diffcyt") {
       result <-
         tof_tibble |>
-        tof_daa_diffcyt(...)
+        tof_analyze_abundance_diffcyt(...)
     } else if (method == "glmm") {
       result <-
         tof_tibble |>
-        tof_daa_glmm(...)
+        tof_analyze_abundance_glmm(...)
     } else {
       result <-
         tof_tibble |>
-        tof_daa_ttest(...)
+        tof_analyze_abundance_ttest(...)
     }
     # return result
     return(result)
@@ -2045,21 +2046,21 @@ tof_daa <-
 #'
 #' This function performs differential expression analysis on the cell clusters
 #' contained within a `tof_tbl` using one of three methods
-#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_dea_*`
-#' function family: \code{\link{tof_dea_diffcyt}},
-#' \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}}.
+#' ("diffcyt", "glmm", and "ttest"). It wraps the members of the `tof_analyze_expression_*`
+#' function family: \code{\link{tof_analyze_expression_diffcyt}},
+#' \code{\link{tof_analyze_expression_lmm}}, and \code{\link{tof_analyze_expression_ttest}}.
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
 #' @param method A string indicating which statistical method should be used. Valid
 #' values include "diffcyt", "lmm", and "ttest".
 #'
-#' @param ... Additional arguments to pass onto the `tof_dea_*`
+#' @param ... Additional arguments to pass onto the `tof_analyze_expression_*`
 #' function family member corresponding to the chosen method.
 #'
 #' @return A tibble or nested tibble containing the differential abundance results
-#' from the chosen method. See \code{\link{tof_dea_diffcyt}},
-#' \code{\link{tof_dea_lmm}}, and \code{\link{tof_dea_ttest}} for details.
+#' from the chosen method. See \code{\link{tof_analyze_expression_diffcyt}},
+#' \code{\link{tof_analyze_expression_lmm}}, and \code{\link{tof_analyze_expression_ttest}} for details.
 #'
 #' @family differential expression analysis functions
 #'
@@ -2070,7 +2071,7 @@ tof_daa <-
 #' @examples
 #'# For differential discovery examples, please see the package vignettes
 #'
-tof_dea <-
+tof_analyze_expression <-
   function(
     tof_tibble,
     method = c("diffcyt", "glmm", "ttest"),
@@ -2083,21 +2084,31 @@ tof_dea <-
     if (method == "diffcyt") {
       result <-
         tof_tibble |>
-        tof_dea_diffcyt(...)
+        tof_analyze_expression_diffcyt(...)
     } else if (method == "lmm") {
       result <-
         tof_tibble |>
-        tof_dea_lmm(...)
+        tof_analyze_expression_lmm(...)
     } else {
       result <-
         tof_tibble |>
-        tof_dea_ttest(...)
+        tof_analyze_expression_ttest(...)
     }
     # return result
     return(result)
   }
 
+# aliases for backwards compatibility ------------------------------------------
 
+tof_daa_diffcyt <- tof_analyze_abundance_diffcyt
+tof_daa_glmm <- tof_analyze_abundance_glmm
+tof_daa_ttest <- tof_analyze_abundance_ttest
+tof_daa <- tof_analyze_abundance
+
+tof_dea_diffcyt <- tof_analyze_expression_diffcyt
+tof_dea_lmm <- tof_analyze_expression_lmm
+tof_dea_ttest <- tof_analyze_expression_ttest
+tof_dea <- tof_analyze_expression
 
 
 

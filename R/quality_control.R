@@ -242,7 +242,7 @@ tof_assess_flow_rate_tibble <-
         time_window = cut({{time_col}}, breaks = num_timesteps),
         timestep = as.numeric(.data$time_window)
       ) |>
-      dplyr::select(-.data$time_window)
+      dplyr::select(-"time_window")
 
     time_counts <-
       tof_tibble |>
@@ -262,7 +262,7 @@ tof_assess_flow_rate_tibble <-
 
     result <-
       scores |>
-      dplyr::select(.data$flagged_window, .data$timestep) |>
+      dplyr::select("flagged_window", "timestep") |>
       dplyr::right_join(cut_tibble, by = "timestep") |>
       dplyr::relocate(dplyr::any_of(colnames(scores)), .after = dplyr::everything())
 
@@ -411,7 +411,7 @@ tof_assess_flow_rate <-
     result <-
       result |>
       dplyr::select(-"data") |>
-      tidyr::unnest(cols = .data$assessment)
+      tidyr::unnest(cols = "assessment")
 
     if (visualize) {
       rate_plot <-
@@ -552,13 +552,13 @@ tof_assess_clusters_distance <-
           tof_cluster_ddpr(
             tof_tibble = x,
             healthy_tibble = dplyr::mutate(x, placeholder = "distance"),
-            healthy_label_col = .data$placeholder,
+            healthy_label_col = "placeholder",
             cluster_cols = {{marker_cols}},
             distance_function = "mahalanobis",
             num_cores = 1L,
             return_distances = TRUE
           ) |>
-            dplyr::select(-.data$.mahalanobis_cluster)
+            dplyr::select(-".mahalanobis_cluster")
         }
       )
 
@@ -566,7 +566,7 @@ tof_assess_clusters_distance <-
 
     result <-
       result |>
-      tidyr::unnest(cols = c(.data$data, .data$distances)) |>
+      tidyr::unnest(cols = c("data", "distances")) |>
       dplyr::mutate(
         # z_score =
         #   (.data$.mahalanobis_distance - mean(.data$.mahalanobis_distance)) / sd(.data$.mahalanobis_distance),
@@ -735,7 +735,7 @@ tof_assess_clusters_entropy <-
         cluster_cols = {{marker_cols}},
         return_distances = TRUE
       ) |>
-      dplyr::select(-.data$.mahalanobis_cluster)
+      dplyr::select(-".mahalanobis_cluster")
 
     if (missing(num_closest_clusters)) {
       num_closest_clusters <- ncol(distance_tibble)
@@ -857,7 +857,7 @@ tof_assess_clusters_knn <-
         num_neighbors = num_neighbors,
         distance_function = distance_function
       ) |>
-      dplyr::rename(.knn_cluster = .data$.upsample_cluster) |>
+      dplyr::rename(.knn_cluster = ".upsample_cluster") |>
       dplyr::bind_cols(dplyr::select(tof_tibble, {{cluster_col}})) |>
       dplyr::mutate(flagged_cell = .data$.knn_cluster != {{cluster_col}}) |>
       dplyr::select(-{{cluster_col}})

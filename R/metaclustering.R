@@ -129,7 +129,7 @@ tof_metacluster_hierarchical <-
         meta_tibble = meta_tibble,
         metacluster_vector = hclusts
       ) |>
-      dplyr::rename(.hierarchical_metacluster = .data$.metacluster)
+      dplyr::rename(.hierarchical_metacluster = ".metacluster")
     return(result)
   }
 
@@ -239,7 +239,7 @@ tof_metacluster_kmeans <-
         cluster_col = {{cluster_col}},
         metacluster_vector = kmeans_metaclusters
       ) |>
-      dplyr::rename(.kmeans_metacluster = .data$.metacluster)
+      dplyr::rename(.kmeans_metacluster = ".metacluster")
 
     return(result)
   }
@@ -352,7 +352,7 @@ tof_metacluster_phenograph <-
         cluster_col = {{cluster_col}},
         metacluster_vector = pheno_metaclusters
       ) |>
-      dplyr::rename(.phenograph_metacluster = .data$.metacluster)
+      dplyr::rename(.phenograph_metacluster = ".metacluster")
 
     return(result)
 
@@ -535,7 +535,7 @@ tof_metacluster_consensus <-
         meta_tibble = meta_tibble,
         metacluster_vector = ccp_metaclusters
       ) |>
-      dplyr::rename(.consensus_metacluster = .data$.metacluster)
+      dplyr::rename(.consensus_metacluster = ".metacluster")
     return(result)
   }
 
@@ -694,7 +694,7 @@ tof_metacluster_flowsom <-
         cluster_col = {{cluster_col}},
         metacluster_vector = flowsom_metaclusters
       ) |>
-      dplyr::rename(.flowsom_metacluster = .data$.metacluster)
+      dplyr::rename(.flowsom_metacluster = ".metacluster")
     return(result)
   }
 

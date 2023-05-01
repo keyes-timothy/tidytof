@@ -31,7 +31,7 @@ library(forcats)
 
 After clusters are identified, many cytometrists want to use statistical tools to rigorously quantify which clusters(s) in their dataset associate with a particular experimental or clinical variable.
 
-Such analyses are often grouped under the umbrella term **differential discovery analysis** and include both comparing the relative *size* of clusters between experimental conditions (**differential abundance analysis; DAA**) as well as comparing marker expression patterns of clusters between experimental conditions (**differential expression analysis; DEA**). `{tidytof}` provides the `tof_daa()` and `tof_dea()` verbs for differential abundance and differential expression analyses, respectively.
+Such analyses are often grouped under the umbrella term **differential discovery analysis** and include both comparing the relative *size* of clusters between experimental conditions (**differential abundance analysis; DAA**) as well as comparing marker expression patterns of clusters between experimental conditions (**differential expression analysis; DEA**). `{tidytof}` provides the `tof_analyze_abundance()` and `tof_analyze_expression()` verbs for differential abundance and differential expression analyses, respectively.
 
 ## Accessing the data for this vignette
 
@@ -87,14 +87,14 @@ citrus_data <-
 
 After these data cleaning steps, we now have `citrus_data`, a `tof_tbl` containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells' B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In `citrus_data`, each cell's patient of origin is stored in the `patient` column, and each cell's stimulation condition is stored in the `stimulation` column. In addition, the `population_id` column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run `?HDCytoData::Bodenmiller_BCR_XL` in the R console).
 
-## Differential abundance analysis using `tof_daa()`
+## Differential abundance analysis using `tof_analyze_abundance()`
 
-We might wonder if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question that requires differential abundance analysis (DAA). `{tidytof}`'s `tof_daa()` verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:
+We might wonder if there are certain clusters that expand or deplete within patients between the two stimulation conditions described above - this is a question that requires differential abundance analysis (DAA). `{tidytof}`'s `tof_analyze_abundance()` verb supports the use of 3 statistical approaches for performing DAA: diffcyt, generalized-linear mixed modeling (GLMMs), and simple t-tests. Because the setup described above uses a paired design and only has 2 experimental conditions of interest (Basal vs. BCR-XL), we can use the paired t-test method:
 
 ```{r}
 daa_result <- 
   citrus_data %>% 
-  tof_daa(
+  tof_analyze_abundance(
     cluster_col = population_id, 
     effect_col = stimulation, 
     group_cols = patient, 
@@ -166,15 +166,15 @@ plot_data %>%
   )
 ```
 
-Importantly, the output of `tof_daa` depends slightly on the underlying statistical method being used, and details can be found in the documentation for each `tof_daa_*` function family member:
+Importantly, the output of `tof_analyze_abundance` depends slightly on the underlying statistical method being used, and details can be found in the documentation for each `tof_analyze_abundance_*` function family member:
 
--   `tof_daa_diffcyt`
--   `tof_daa_glmm`
--   `tof_daa_ttest`
+-   `tof_analyze_abundance_diffcyt`
+-   `tof_analyze_abundance_glmm`
+-   `tof_analyze_abundance_ttest`
 
-## Differential expression analysis with `tof_dea()`
+## Differential expression analysis with `tof_analyze_expression()`
 
-Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_dea` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each cluster's expression of our signaling markers between stimulation conditions.
+Similarly, suppose we're interested in how intracellular signaling proteins change their expression levels between our two stimulation conditions in each of our clusters. This is a Differential Expression Analysis (DEA) and can be performed using `{tidytof}`'s `tof_analyze_expression` verb. As above, we can use paired t-tests with multiple-hypothesis correction to to test for significant differences in each cluster's expression of our signaling markers between stimulation conditions.
 
 ```{r}
 signaling_markers <- 
@@ -186,7 +186,7 @@ signaling_markers <-
 dea_result <- 
   citrus_data %>% 
   tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
-  tof_dea(
+  tof_analyze_expression(
     method = "ttest", 
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
@@ -199,7 +199,7 @@ dea_result %>%
   head()
 ```
 
-While the output of `tof_dea()` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_daa()`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.
+While the output of `tof_analyze_expression()` also depends on the underlying test being used, we can see that the result above looks relatively similar to the output from `tof_analyze_abundance()`. Above, the output is a tibble in which each row represents the differential expression results from a single cluster-marker pair - for example, the first row represents the difference in expression of pS6 in cluster 1 between the BCR-XL and Basal conditions. Each row includes the raw p-value and multiple-hypothesis-corrected p-value for each cluster-marker pair.
 
 This result can be used to make a volcano plot to visualize the results for all cluster-marker pairs:
 
@@ -243,9 +243,9 @@ volcano_data %>%
   )
 ```
 
-As above, details can be found in the documentation for each `tof_dea_*` function family member:
+As above, details can be found in the documentation for each `tof_analyze_expression_*` function family member:
 
--   `tof_dea_diffcyt`
--   `tof_dea_lmm`
--   `tof_dea_ttest`
+-   `tof_analyze_expression_diffcyt`
+-   `tof_analyze_expression_lmm`
+-   `tof_analyze_expression_ttest`
 

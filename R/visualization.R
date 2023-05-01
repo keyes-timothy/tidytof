@@ -113,7 +113,7 @@ tof_plot_cells_density <-
         expression = purrr::map(.x = .data$densities, .f = ~ .x$x),
         density = purrr::map(.x = .data$densities, .f = ~ .x$y)
       ) %>%
-      dplyr::select({{group_col}}, .data$expression, .data$density) %>%
+      dplyr::select({{group_col}}, "expression", "density") %>%
       tidyr::unnest(cols = tidyselect::everything())
 
     # if ggridges requested
@@ -1181,11 +1181,11 @@ tof_plot_cluster_mst <-
         tidygraph::left_join(
           new_layout %>%
             dplyr::select(
-              -.data$x,
-              -.data$y,
-              -.data$.ggraph.index,
-              -.data$.ggraph.orig_index,
-              -.data$circular
+              -"x",
+              -"y",
+              -".ggraph.index",
+              -".ggraph.orig_index",
+              -"circular"
             ),
           by = cluster_colname
         )
@@ -1196,10 +1196,10 @@ tof_plot_cluster_mst <-
         tidygraph::as_tibble() %>%
         dplyr::left_join(
           new_layout %>%
-            dplyr::select({{cluster_col}}, .data$x, .data$y),
+            dplyr::select({{cluster_col}}, "x", "y"),
           by = cluster_colname
         ) %>%
-        dplyr::select(.data$x, .data$y)
+        dplyr::select("x", "y")
 
     } else {
       #calculate the KNN graph from scratch
@@ -1383,7 +1383,7 @@ tof_plot_cluster_volcano <-
       plot_tibble <-
         dea_result %>%
         dplyr::filter(.data$tested_effect == "omnibus") %>%
-        tidyr::unnest(cols = .data$dea_results)
+        tidyr::unnest(cols = "dea_results")
     } else {
       plot_tibble <- dea_result
     }
@@ -1946,7 +1946,7 @@ tof_plot_model_linear <-
 
         plot_df <-
           plot_df %>%
-          tidyr::unnest(cols = .data$.predictions) %>%
+          tidyr::unnest(cols = ".predictions") %>%
           dplyr::mutate(predictions = .data$response)
       }
     } else {
@@ -2136,8 +2136,8 @@ tof_plot_model_survival <-
       tidyr::nest() %>%
       dplyr::mutate(km_curves = purrr::map(.x = data, .f = tof_compute_km_curve)) %>%
       dplyr::ungroup() %>%
-      dplyr::select(-data) %>%
-      tidyr::unnest(cols = .data$km_curves)
+      dplyr::select(-"data") %>%
+      tidyr::unnest(cols = "km_curves")
 
     censor_dat <-
       km_curves %>%

@@ -543,7 +543,7 @@ tof_fit_split <-
         model_metrics = model_metrics
       ) %>%
       tidyr::unnest(cols = model_metrics) %>%
-      dplyr::relocate(.data$mixture, .data$penalty, dplyr::everything())
+      dplyr::relocate("mixture", "penalty", dplyr::everything())
 
 
     # use yardstick to compute the hand-till roc_auc for multiclass problems
@@ -574,7 +574,7 @@ tof_fit_split <-
                 )
             )
         ) %>%
-        dplyr::select(.data$penalty, .data$mixture, .data$roc_auc)
+        dplyr::select("penalty", "mixture", "roc_auc")
 
       # combine multiclass roc_auc with other performance metrics
       result <-
@@ -825,7 +825,7 @@ tof_find_cv_predictions <-
       predictions <-
         predictions %>%
         dplyr::mutate(survival_curve = survival_curves$survival_curve) %>%
-        dplyr::rename(relative_risk = .data$response)
+        dplyr::rename(relative_risk = "response")
     }
 
     return(predictions)
@@ -861,9 +861,9 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        binomial_deviance = .data$deviance,
-        misclassification_error = .data$class,
-        roc_auc = .data$auc
+        binomial_deviance = "deviance",
+        misclassification_error = "class",
+        roc_auc = "auc"
       ) %>%
       dplyr::mutate(accuracy = 1 - .data$misclassification_error)
 
@@ -875,8 +875,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        multinomial_deviance = .data$deviance,
-        misclassification_error = .data$class
+        multinomial_deviance = "deviance",
+        misclassification_error = "class"
       ) %>%
       dplyr::mutate(accuracy = 1 - .data$misclassification_error)
 
@@ -886,8 +886,8 @@ tof_clean_metric_names <- function(metric_tibble, model_type) {
     new_metric_tibble <-
       metric_tibble %>%
       dplyr::rename(
-        neg_log_partial_likelihood = .data$deviance,
-        concordance_index = .data$C
+        neg_log_partial_likelihood = "deviance",
+        concordance_index = "C"
       )
   }
 
@@ -1847,8 +1847,8 @@ tof_assess_model_tuning <-
         tuning_data %>%
         dplyr::mutate(truth = factor(.data$truth, levels = outcome_levels)) %>%
         tof_make_roc_curve(
-          truth_col = .data$truth,
-          prob_cols = .data$response
+          truth_col = "truth",
+          prob_cols = "response"
         )
 
       confusion_matrix <-
@@ -1874,7 +1874,7 @@ tof_assess_model_tuning <-
         tuning_data %>%
         dplyr::mutate(truth = as.factor(.data$truth)) %>%
         yardstick::roc_auc(
-          truth = .data$truth,
+          truth = "truth",
           dplyr::any_of(prediction_colnames)
         )
 
@@ -1892,7 +1892,7 @@ tof_assess_model_tuning <-
           .fn = ~ gsub(pattern = "prob_", x = .x, replacement = "")
         ) %>%
         tof_make_roc_curve(
-          truth_col = .data$truth,
+          truth_col = "truth",
           prob_cols = dplyr::any_of(outcome_levels)
         )
 
@@ -2040,8 +2040,8 @@ tof_assess_model_new_data <-
       roc_curve <-
         tof_make_roc_curve(
           input_data = roc_tibble,
-          truth_col = .data$truth,
-          prob_cols = .data$response
+          truth_col = "truth",
+          prob_cols = "response"
         )
 
     } else if (model_type == "multiclass") {
@@ -2061,7 +2061,7 @@ tof_assess_model_new_data <-
         predictions %>%
         dplyr::mutate(truth = new_data[[tof_model$outcome_colnames]]) %>%
         yardstick::roc_auc(
-          truth = .data$truth,
+          truth = "truth",
           dplyr::any_of(prediction_colnames)
         )
 
@@ -2083,7 +2083,7 @@ tof_assess_model_new_data <-
       roc_curve <-
         tof_make_roc_curve(
           input_data = roc_tibble,
-          truth_col = .data$truth,
+          truth_col = "truth",
           prob_cols = dplyr::any_of(outcome_levels)
         )
 
@@ -2256,7 +2256,7 @@ tof_make_roc_curve <- function(input_data, truth_col, prob_cols) {
       dplyr::mutate(
         truth = dplyr::pull(input_data, {{truth_col}})
       ) %>%
-      yardstick::roc_curve({{prob_cols}}, truth = .data$truth, event_level = "second") %>%
+      yardstick::roc_curve({{prob_cols}}, truth = "truth", event_level = "second") %>%
       dplyr::mutate(
         tpr = .data$sensitivity,
         fpr = 1 - .data$specificity

@@ -532,7 +532,7 @@ tof_train_model <-
         dplyr::summarize(
           dplyr::across(
             dplyr::everything(),
-            .fns = mean,
+            .fns = mean
           )
         ) |>
         dplyr::ungroup()

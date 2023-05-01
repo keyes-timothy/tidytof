@@ -74,7 +74,6 @@ Suggests:
     testthat (>= 3.0.0),
     lmerTest,
     lme4,
-    broomExtra,
     ggridges,
     spelling,
     scattermore,

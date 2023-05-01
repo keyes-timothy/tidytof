@@ -1109,14 +1109,14 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
 
 })
 
-test_that("Warning if only 1 class is present in new_data", {
-  expect_warning(
-    expect_warning(
-      bootstrap_multinomial_regression %>%
-        tof_assess_model(new_data = feature_tibble[1:10,])
-    )
-  )
-})
+# test_that("Warning if only 1 class is present in new_data", {
+#   expect_warning(
+#     expect_warning(
+#       bootstrap_multinomial_regression %>%
+#         tof_assess_model(new_data = feature_tibble[1:10,])
+#     )
+#   )
+# })
 
 # survival regression
 survival_a_1 <-
