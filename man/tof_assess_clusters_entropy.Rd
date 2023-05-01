@@ -111,7 +111,7 @@ entropy_result <-
 flagged_cluster_proportions <-
   entropy_result |>
   group_by(cluster_id) |>
-  summarize(
+  dplyr::summarize(
     prop_flagged = mean(flagged_cell)
   )
 
