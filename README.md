@@ -11,6 +11,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test
 coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
+[![R-CMD-check](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `{tidytof}` is an R package that implements an open-source, integrated
@@ -36,11 +37,10 @@ scientists with a wide range of coding experience (including beginners).
 ### Prerequisites
 
 `{tidytof}` makes heavy use of two concepts that R beginners may be
-unfamiliar with. The first is the `{magrittr}` pipe (`%>%`), which you
-can read about [here](https://r4ds.had.co.nz/pipes.html). The second is
-“grouping” data in a `data.frame` or `tibble` using `dplyr::group_by`,
-which you can read about
-[here](https://dplyr.tidyverse.org/articles/grouping.html).
+unfamiliar with. The first is the pipe (`|>`), which you can read about
+[here](https://r4ds.had.co.nz/pipes.html). The second is “grouping” data
+in a `data.frame` or `tibble` using `dplyr::group_by`, which you can
+read about [here](https://dplyr.tidyverse.org/articles/grouping.html).
 
 Everything else should be self-explanatory for beginner and advanced R
 users, though if you have *zero* background in running R code, you
@@ -59,8 +59,8 @@ levels of analysis inherent in single-cell data:
 3.  Building models (for inference or prediction) at the level of
     **patients** or **samples**
 
-How to use `{tidytof}` at each of these levels of CyTOF data analysis is
-detailed in the “Usage” section below.
+How to use `{tidytof}` at each of these levels of cytometry data
+analysis is detailed in the “Usage” section below.
 
 ## Installation
 
@@ -104,9 +104,10 @@ datasets contained in `{tidytof}`:
 
 ``` r
 tidytof_example_data()
-#> [1] "aml"               "ddpr"              "ddpr_metadata.csv"
-#> [4] "mix"               "mix2"              "phenograph"       
-#> [7] "phenograph_csv"    "surgery"
+#>  [1] "aml"                  "ddpr"                 "ddpr_metadata.csv"   
+#>  [4] "mix"                  "mix2"                 "phenograph"          
+#>  [7] "phenograph_csv"       "scaffold"             "statistical_scaffold"
+#> [10] "surgery"
 ```
 
 To obtain the file path for the directory containing each dataset, call
@@ -116,16 +117,16 @@ use the following command:
 
 ``` r
 tidytof_example_data("phenograph")
-#> [1] "/Library/Frameworks/R.framework/Versions/4.1/Resources/library/tidytof/extdata/phenograph"
+#> [1] "/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/tidytof/extdata/phenograph"
 ```
 
-Using one of these directories (or any other directory containing CyTOF
-data on your local machine), we can use `tof_read_data` to read CyTOF
-data from raw files. Acceptable formats include .fcs files and .csv
-files. Importantly, `tof_read_data` is smart enough to read single
-.fcs/.csv files or multiple .fcs/.csv files depending on whether its
-first argument (`path`) leads to a single file or to a directory of
-files.
+Using one of these directories (or any other directory containing
+cytometry data on your local machine), we can use `tof_read_data` to
+read cytometry data from raw files. Acceptable formats include .fcs
+files and .csv files. Importantly, `tof_read_data` is smart enough to
+read single .fcs/.csv files or multiple .fcs/.csv files depending on
+whether its first argument (`path`) leads to a single file or to a
+directory of files.
 
 Here, we can use `tof_read_data` to read in all of the .fcs files in the
 “phenograph” example dataset bundled into `{tidytof}` and store it in
@@ -133,10 +134,10 @@ the `phenograph` variable.
 
 ``` r
 phenograph <- 
-  tidytof_example_data("phenograph") %>% 
+  tidytof_example_data("phenograph") |> 
   tof_read_data()
 
-phenograph %>% 
+phenograph |> 
   class()
 #> [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"
 ```
@@ -145,38 +146,38 @@ Regardless of its input format, `{tidytof}` reads data into an extended
 `tibble` called a `tof_tbl` (pronounced “tof tibble”), an S3 class
 identical to `tbl_df`, but with one additional attribute (“panel”).
 `{tidytof}` stores this additional attribute in `tof_tbl`s because, in
-addition to analyzing CyTOF data from individual experiments, CyTOF
-users often want to compare panels between experiments to find common
-markers or to compare which metals are associated with particular
+addition to analyzing cytometry data from individual experiments,
+cytometry users often want to compare panels between experiments to find
+common markers or to compare which metals are associated with particular
 markers across panels.
 
 A few notes about `tof_tbl`s:
 
--   `tof_tbl`s contains one cell per row and one CyTOF channel per
-    column (to provide the data in its “tidy” format).
--   `tof_read_data` adds an additional column to the output `tof_tbl`
-    encoding the name of the file from which each cell was read (the
-    “file_name” column).
--   Because `tof_tbl`s inherit from the `tbl_df` class, all methods
-    available to tibbles are also available to `tof_tbl`s. For example,
-    `{dplyr}`’s useful `mutate` method can be applied to our `tof_tbl`
-    named `phenograph` above to convert the columns encoding the
-    phenograph cluster ID and stimulation condition to which each cell
-    belongs into character vectors (instead of their original numeric
-    codes in the uncleaned dataset).
+- `tof_tbl`s contains one cell per row and one cytometry channel per
+  column (to provide the data in its “tidy” format).
+- `tof_read_data` adds an additional column to the output `tof_tbl`
+  encoding the name of the file from which each cell was read (the
+  “file_name” column).
+- Because `tof_tbl`s inherit from the `tbl_df` class, all methods
+  available to tibbles are also available to `tof_tbl`s. For example,
+  `{dplyr}`’s useful `mutate` method can be applied to our `tof_tbl`
+  named `phenograph` above to convert the columns encoding the
+  phenograph cluster ID and stimulation condition to which each cell
+  belongs into character vectors (instead of their original numeric
+  codes in the uncleaned dataset).
 
 ``` r
 phenograph <- 
-  phenograph %>% 
+  phenograph |> 
   # mutate the input tof_tbl
   mutate(
     PhenoGraph = as.character(PhenoGraph), 
     Condition = as.character(Condition)
   )
 
-phenograph %>% 
+phenograph |> 
   # use dplyr's select method to show that the columns have been changed
-  select(where(is.character)) %>% 
+  select(where(is.character)) |> 
   head()
 #> # A tibble: 6 × 3
 #>   file_name                  PhenoGraph Condition
@@ -192,7 +193,7 @@ phenograph %>%
 The `tof_tbl` class is preserved even after these transformations.
 
 ``` r
-phenograph %>% 
+phenograph |> 
   class()
 #> [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"
 ```
@@ -201,8 +202,8 @@ Finally, to retrieve panel information from a `tof_tbl`, use
 `tof_get_panel`:
 
 ``` r
-phenograph %>% 
-  tof_get_panel() %>% 
+phenograph |> 
+  tof_get_panel() |> 
   head()
 #> # A tibble: 6 × 2
 #>   metals      antigens   
@@ -226,7 +227,7 @@ they contain).
 #### Pre-processing with `tof_preprocess`
 
 Generally, the raw ion counts for each analyte measured on a mass
-cytometer need to be transformed before CyTOF data analysis. Common
+cytometer need to be transformed before cytometry data analysis. Common
 preprocessing steps may include variance-stabilizing transformations -
 such as the hyperbolic arcsine (arcsinh) transformation or a log
 transformation - scaling/centering, and/or denoising.
@@ -244,8 +245,8 @@ see how our first few measurements change before and after.
 
 ``` r
 # before preprocessing
-phenograph %>% 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+phenograph |> 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
   head()
 #> # A tibble: 6 × 3
 #>   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`
@@ -261,12 +262,12 @@ phenograph %>%
 ``` r
 # perform preprocessing
 phenograph <- 
-  phenograph %>% 
+  phenograph |> 
   tof_preprocess()
 
 # inspect new values
-phenograph %>% 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) %>% 
+phenograph |> 
+  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
   head()
 #> # A tibble: 6 × 3
 #>   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`
@@ -294,8 +295,8 @@ identically `tof_preprocess`, but provides different default behavior
 
 #### Downsampling with `tof_downsample`
 
-Often, CyTOF experiments collect tens or hundreds or millions of cells
-in total, and it can be useful to downsample to a smaller, more
+Often, cytometry experiments collect tens or hundreds or millions of
+cells in total, and it can be useful to downsample to a smaller, more
 computationally tractable number of cells - either for a final analysis
 or while developing code. To do this, `{tidytof}` implements the
 `tof_downsample` verb, which allows downsampling using 3 methods.
@@ -308,7 +309,7 @@ cells in total:
 ``` r
 data(phenograph_data)
 
-phenograph_data %>% 
+phenograph_data |> 
   count(phenograph_cluster)
 #> # A tibble: 3 × 2
 #>   phenograph_cluster     n
@@ -322,13 +323,13 @@ To randomly sample 200 cells per cluster, we can use `tof_downsample`
 using the “constant” `method`:
 
 ``` r
-phenograph_data %>% 
+phenograph_data |> 
   # downsample 
   tof_downsample(
     method = "constant", 
     group_cols = phenograph_cluster, 
     num_cells = 200
-  ) %>% 
+  ) |> 
   # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 #> # A tibble: 3 × 2
@@ -343,13 +344,13 @@ Alternatively, if we wanted to sample 50% of the cells in each cluster,
 we could use the “prop” `method`:
 
 ``` r
-phenograph_data %>% 
+phenograph_data |> 
   # downsample
   tof_downsample(
     method = "prop",
     group_cols = phenograph_cluster, 
     prop_cells = 0.5
-  ) %>% 
+  ) |> 
   # count the number of downsampled cells in each cluster
   count(phenograph_cluster)
 #> # A tibble: 3 × 2
@@ -368,10 +369,31 @@ are certain areas of phenotypic density in `phenograph_data` that
 contain more cells than others along the `cd34`/`cd38` axes:
 
 ``` r
-phenograph_data %>% 
+phenograph_data |> 
   # preprocess all numeric columns in the dataset
-  tof_preprocess(undo_noise = FALSE) %>% 
+  tof_preprocess(undo_noise = FALSE) |> 
   # make a scatterplot
+  ggplot(aes(x = cd34, y = cd38)) + 
+  geom_point(alpha = 0.5) + 
+  scale_x_continuous(limits = c(NA, 1.5)) + 
+  scale_y_continuous(limits = c(NA, 4)) + 
+  theme_bw()
+```
+
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+
+To reduce the number of cells in our dataset until the local density
+around each cell in our dataset is relatively constant, we can use the
+“density” `method` of `tof_downsample`:
+
+``` r
+phenograph_data |> 
+  tof_preprocess(undo_noise = FALSE) |> 
+  tof_downsample(
+    density_cols = c(cd34, cd38), 
+    target_prop_cells = 0.25, 
+    method = "density", 
+  ) |> 
   ggplot(aes(x = cd34, y = cd38)) + 
   geom_point(alpha = 0.5) + 
   scale_x_continuous(limits = c(NA, 1.5)) + 
@@ -381,34 +403,13 @@ phenograph_data %>%
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
-To reduce the number of cells in our dataset until the local density
-around each cell in our dataset is relatively constant, we can use the
-“density” `method` of `tof_downsample`:
-
-``` r
-phenograph_data %>% 
-  tof_preprocess(undo_noise = FALSE) %>% 
-  tof_downsample(
-    density_cols = c(cd34, cd38), 
-    target_prop_cells = 0.25, 
-    method = "density", 
-  ) %>% 
-  ggplot(aes(x = cd34, y = cd38)) + 
-  geom_point(alpha = 0.5) + 
-  scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4)) + 
-  theme_bw()
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
-
 For more details, check out the documentation for the 3 underlying
 members of the `tof_downsample_*` function family (which are wrapped by
 `tof_downsample`):
 
--   `tof_downsample_constant`
--   `tof_downsample_prop`
--   `tof_downsample_density`
+- `tof_downsample_constant`
+- `tof_downsample_prop`
+- `tof_downsample_density`
 
 #### Writing data with `tof_write_data`
 
@@ -423,7 +424,7 @@ write single-cell data from a `tof_tbl` into .fcs or .csv files, use
 # to wherever you'd like to save your output files
 my_path <- file.path("~", "Desktop", "tidytof_vignette_files")
 
-phenograph_data %>% 
+phenograph_data |> 
   tof_write_data(
     group_cols = phenograph_cluster, 
     out_path = my_path,
@@ -442,9 +443,9 @@ files - one for each of the 3 clusters encoded by the
 have the following names (derived from the values in the
 `phenograph_cluster` column):
 
--   cluster1.fcs
--   cluster2.fcs
--   cluster3.fcs
+- cluster1.fcs
+- cluster2.fcs
+- cluster3.fcs
 
 However, suppose we wanted to write multiple files for each cluster by
 breaking cells into two groups: those that express high levels of
@@ -454,10 +455,10 @@ cells into high- and low-`pstat5` expression groups, then add this
 column to our `group_cols` specification:
 
 ``` r
-phenograph_data %>% 
+phenograph_data |> 
   # create a variable representing if a cell is above or below the median 
   # expression level of pstat5
-  mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) %>% 
+  mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) |> 
   tof_write_data(
     group_cols = c(phenograph_cluster, expression_group), 
     out_path = my_path, 
@@ -468,18 +469,18 @@ phenograph_data %>%
 This will write 6 files with the following names (derived from the
 values in `phenograph_cluster` and `expression_group`).
 
--   cluster1_low.fcs
--   cluster1_high.fcs
--   cluster2_low.fcs
--   cluster2_high.fcs
--   cluster3_low.fcs
--   cluster3_high.fcs
+- cluster1_low.fcs
+- cluster1_high.fcs
+- cluster2_low.fcs
+- cluster2_high.fcs
+- cluster3_low.fcs
+- cluster3_high.fcs
 
 A useful feature of `tof_write_data` is that it will automatically
 concatenate cells into single .fcs or .csv files based on the specified
 `group_cols` *regardless of how many unique files those cells came
 from*, allowing for easy concatenation of .fcs or .csv files containing
-data from a single sample acquired over multiple CyTOF runs.
+data from a single sample acquired over multiple cytometry runs.
 
 ### Analyzing data at the cluster-level
 
@@ -502,26 +503,26 @@ PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)).
 
 ``` r
 phenograph_clusters <- 
-  phenograph_data %>% 
-  tof_preprocess() %>% 
+  phenograph_data |> 
+  tof_preprocess() |> 
   tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
 
-phenograph_clusters %>% 
-  select(sample_name, .flowsom_metacluster, everything()) %>% 
+phenograph_clusters |> 
+  select(sample_name, .flowsom_metacluster, everything()) |> 
   head()
 #> # A tibble: 6 × 26
-#>   sample_name      .flowsom_metacl… phenograph_clus…    cd19 cd11b    cd34  cd45
-#>   <chr>            <chr>            <chr>              <dbl> <dbl>   <dbl> <dbl>
-#> 1 H1_PhenoGraph_c… 3                cluster1         -0.0336 2.46   0.608   3.96
-#> 2 H1_PhenoGraph_c… 7                cluster1          0.324  0.856 -0.116   4.52
-#> 3 H1_PhenoGraph_c… 3                cluster1          0.532  2.67   0.909   4.76
-#> 4 H1_PhenoGraph_c… 4                cluster1          0.0163 2.97   0.0725  5.15
-#> 5 H1_PhenoGraph_c… 2                cluster1          0.144  2.98   0.128   4.52
-#> 6 H1_PhenoGraph_c… 4                cluster1          0.742  3.41   0.336   5.71
-#> # … with 19 more variables: cd123 <dbl>, cd33 <dbl>, cd47 <dbl>, cd7 <dbl>,
-#> #   cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>, cd41 <dbl>,
-#> #   pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>, ps6 <dbl>,
-#> #   pcreb <dbl>, `pzap70-syk` <dbl>, prb <dbl>, `perk1-2` <dbl>
+#>   sample_name      .flowsom_metacluster phenograph_cluster    cd19 cd11b    cd34
+#>   <chr>            <chr>                <chr>                <dbl> <dbl>   <dbl>
+#> 1 H1_PhenoGraph_c… 8                    cluster1           -0.0336 2.46   0.608 
+#> 2 H1_PhenoGraph_c… 9                    cluster1            0.324  0.856 -0.116 
+#> 3 H1_PhenoGraph_c… 8                    cluster1            0.532  2.67   0.909 
+#> 4 H1_PhenoGraph_c… 2                    cluster1            0.0163 2.97   0.0725
+#> 5 H1_PhenoGraph_c… 8                    cluster1            0.144  2.98   0.128 
+#> 6 H1_PhenoGraph_c… 1                    cluster1            0.742  3.41   0.336 
+#> # ℹ 20 more variables: cd45 <dbl>, cd123 <dbl>, cd33 <dbl>, cd47 <dbl>,
+#> #   cd7 <dbl>, cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>,
+#> #   cd41 <dbl>, pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>,
+#> #   ps6 <dbl>, pcreb <dbl>, `pzap70-syk` <dbl>, prb <dbl>, `perk1-2` <dbl>
 ```
 
 The output of `tof_cluster` is a `tof_tbl` identical to the input
@@ -536,22 +537,22 @@ Because the output of `tof_cluster` is a `tof_tbl`, we can use `dplyr`’s
 to the original clustering from the PhenoGraph paper.
 
 ``` r
-phenograph_clusters %>% 
+phenograph_clusters |> 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 22 × 3
+#> # A tibble: 24 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster3           15                     436
-#>  2 cluster1           5                      278
-#>  3 cluster1           4                      260
-#>  4 cluster2           19                     258
-#>  5 cluster2           14                     242
-#>  6 cluster3           8                      241
-#>  7 cluster3           11                     183
-#>  8 cluster1           2                      158
-#>  9 cluster2           16                     157
-#> 10 cluster2           20                     156
-#> # … with 12 more rows
+#>  1 cluster3           15                     426
+#>  2 cluster2           17                     299
+#>  3 cluster2           5                      291
+#>  4 cluster1           3                      228
+#>  5 cluster3           16                     196
+#>  6 cluster3           19                     184
+#>  7 cluster1           1                      173
+#>  8 cluster1           6                      173
+#>  9 cluster2           12                     173
+#> 10 cluster1           2                      170
+#> # ℹ 14 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -566,19 +567,19 @@ added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
 
 ``` r
 # will result in a tibble with only 1 column (the cluster labels)
-phenograph_data %>% 
-  tof_preprocess() %>% 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) %>% 
+phenograph_data |> 
+  tof_preprocess() |> 
+  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) |> 
   head()
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 4                   
-#> 2 6                   
-#> 3 3                   
-#> 4 2                   
-#> 5 3                   
-#> 6 2
+#> 1 13                  
+#> 2 14                  
+#> 3 13                  
+#> 4 18                  
+#> 5 15                  
+#> 6 18
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -597,22 +598,22 @@ approximation and projection (UMAP). To apply these to a dataset, use
 ``` r
 # perform the dimensionality reduction
 phenograph_tsne <- 
-  phenograph_clusters %>% 
+  phenograph_clusters |> 
   tof_reduce_dimensions(method = "tsne")
 
 # select only the tsne embedding columns using a tidyselect helper (contains)
-phenograph_tsne %>% 
-  select(contains("tsne")) %>% 
+phenograph_tsne |> 
+  select(contains("tsne")) |> 
   head()
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1    8.65  -5.01 
-#> 2   14.3   -2.76 
-#> 3   37.0   13.4  
-#> 4   24.1   -0.176
-#> 5   11.6   -3.47 
-#> 6   22.6    7.79
+#> 1   13.8   -14.8 
+#> 2    5.10   -7.82
+#> 3    7.70  -36.1 
+#> 4   -1.95  -17.0 
+#> 5   11.2   -18.7 
+#> 6    1.50  -25.5
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -626,19 +627,19 @@ be visualized using `{ggplot2}` (or any graphics package):
 
 ``` r
 # plot the tsne embeddings using color to distinguish between clusters
-phenograph_tsne %>% 
+phenograph_tsne |> 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = phenograph_cluster)) + 
   geom_point(shape = 21) + 
   theme_bw() + 
   labs(fill = NULL)
 ```
 
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
 
 ``` r
 
 # plot the tsne embeddings using color to represent CD11b expression
-phenograph_tsne %>% 
+phenograph_tsne |> 
   ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
   geom_point(shape = 21) + 
   scale_fill_viridis_c() +
@@ -646,17 +647,17 @@ phenograph_tsne %>%
   labs(fill = "CD11b expression")
 ```
 
-<img src="man/figures/README-unnamed-chunk-25-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-24-2.png" width="100%" />
 
 Such visualizations can be helpful in qualitatively describing the
 phenotypic differences between the clusters in a dataset. For example,
 in the example above, we can see that one of the clusters has high CD11b
 expression, whereas the others have lower CD11b expression.
 
-#### Differential discovery analysis with `tof_daa` and `tof_dea`
+#### Differential discovery analysis with `tof_analyze_abundance` and `tof_analyze_expression`
 
 While dimensionality reduction can be used to visualize a clustering
-result, many CyTOF users also want to use statistical tools to
+result, many cytometry users also want to use statistical tools to
 rigorously quantify which clusters(s) in their dataset associate with a
 particular experimental or clinical variable.
 
@@ -665,9 +666,9 @@ discovery analysis** and include both comparing the relative *size* of
 clusters between experimental conditions (**differential abundance
 analysis; DAA**) as well as comparing marker expression patterns of
 clusters between experimental conditions (**differential expression
-analysis; DEA**). `{tidytof}` provides the `tof_daa` and `tof_dea` verbs
-for differential abundance and differential expression analyses,
-respectively.
+analysis; DEA**). `{tidytof}` provides the `tof_analyze_abundance` and
+`tof_analyze_expression` verbs for differential abundance and
+differential expression analyses, respectively.
 
 To demonstrate how to use these verbs, we’ll first download a dataset
 originally collected for the development of the
@@ -693,7 +694,7 @@ converting flowCore objects into `tof_tbl`’s .
 citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
 
 citrus_data <- 
-  citrus_raw %>% 
+  citrus_raw |> 
   as_tof_tbl(sep = "_")
 ```
 
@@ -711,12 +712,12 @@ citrus_metadata <-
     sample_id = 1:length(file_name),
     patient = str_extract(file_name, "patient[:digit:]"), 
     stimulation = str_extract(file_name, "(BCR-XL)|Reference")
-  ) %>% 
+  ) |> 
   mutate(
     stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
   )
 
-citrus_metadata %>%
+citrus_metadata |>
   head()
 #> # A tibble: 6 × 4
 #>   file_name                          sample_id patient  stimulation
@@ -738,7 +739,7 @@ obtain the cleaned dataset.
 
 ``` r
 citrus_data <- 
-  citrus_data %>% 
+  citrus_data |> 
   left_join(citrus_metadata, by = "sample_id")
 ```
 
@@ -756,16 +757,16 @@ combination of FlowSOM clustering and manual merging (for details, run
 We might wonder if there are certain clusters that expand or deplete
 within patients between the two stimulation conditions described above -
 this is a question that requires differential abundance analysis (DAA).
-`{tidytof}`’s `tof_daa` verb supports the use of 3 statistical
-approaches for performing DAA: diffcyt, generalized-linear mixed
-modeling (GLMMs), and simple t-tests. Because the setup described above
-uses a paired design and only has 2 experimental conditions of interest
-(Basal vs. BCR-XL), we can use the paired t-test method:
+`{tidytof}`’s `tof_analyze_abundance` verb supports the use of 3
+statistical approaches for performing DAA: diffcyt, generalized-linear
+mixed modeling (GLMMs), and simple t-tests. Because the setup described
+above uses a paired design and only has 2 experimental conditions of
+interest (Basal vs. BCR-XL), we can use the paired t-test method:
 
 ``` r
 daa_result <- 
-  citrus_data %>% 
-  tof_daa(
+  citrus_data |> 
+  tof_analyze_abundance(
     cluster_col = population_id, 
     effect_col = stimulation, 
     group_cols = patient, 
@@ -796,20 +797,20 @@ using `{ggplot2}`:
 
 ``` r
 plot_data <- 
-  citrus_data %>% 
-  mutate(population_id = as.character(population_id)) %>%
+  citrus_data |> 
+  mutate(population_id = as.character(population_id)) |>
   left_join(
     select(daa_result, population_id, significant, mean_fc), 
     by = "population_id"
-  ) %>% 
-  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") %>% 
-  group_by(patient, stimulation) %>% 
-  mutate(prop = n / sum(n)) %>% 
-  ungroup() %>% 
+  ) |> 
+  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") |> 
+  group_by(patient, stimulation) |> 
+  mutate(prop = n / sum(n)) |> 
+  ungroup() |> 
   pivot_wider(
     names_from = stimulation, 
     values_from = c(prop, n), 
-  ) %>% 
+  ) |> 
   mutate(
     diff = `prop_BCR-XL` - prop_Basal, 
     fc = `prop_BCR-XL` / prop_Basal,
@@ -823,12 +824,12 @@ plot_data <-
   )
 
 significance_data <- 
-  plot_data %>% 
-  group_by(population_id, significant, direction) %>% 
-  summarize(diff = max(diff), fc = max(fc)) %>% 
+  plot_data |> 
+  group_by(population_id, significant, direction) |> 
+  summarize(diff = max(diff), fc = max(fc)) |> 
   ungroup()
 
-plot_data %>% 
+plot_data |> 
   ggplot(aes(x = population_id, y = fc, fill = direction)) + 
   geom_violin(trim = FALSE) +
   geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) + 
@@ -853,23 +854,25 @@ plot_data %>%
   )
 ```
 
-<img src="man/figures/README-unnamed-chunk-31-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
-Importantly, the output of `tof_daa` depends slightly on the underlying
-statistical method being used, and details can be found in the
-documentation for each `tof_daa_*` function family member:
+Importantly, the output of `tof_analyze_abundance` depends slightly on
+the underlying statistical method being used, and details can be found
+in the documentation for each `tof_analyze_abundance_*` function family
+member:
 
--   `tof_daa_diffcyt`
--   `tof_daa_glmm`
--   `tof_daa_ttest`
+- `tof_analyze_abundance_diffcyt`
+- `tof_analyze_abundance_glmm`
+- `tof_analyze_abundance_ttest`
 
 Similarly, suppose we’re interested in how intracellular signaling
 proteins change their expression levels between our two stimulation
 conditions in each of our clusters. This is a Differential Expression
-Analysis (DEA) and can be performed using `{tidytof}`’s `tof_dea` verb.
-As above, we can use paired t-tests with multiple-hypothesis correction
-to to test for significant differences in each cluster’s expression of
-our signaling markers between stimulation conditions.
+Analysis (DEA) and can be performed using `{tidytof}`’s
+`tof_analyze_expression` verb. As above, we can use paired t-tests with
+multiple-hypothesis correction to to test for significant differences in
+each cluster’s expression of our signaling markers between stimulation
+conditions.
 
 ``` r
 signaling_markers <- 
@@ -879,9 +882,9 @@ signaling_markers <-
   )
 
 dea_result <- 
-  citrus_data %>% 
-  tof_preprocess(channel_cols = any_of(signaling_markers)) %>% 
-  tof_dea(
+  citrus_data |> 
+  tof_preprocess(channel_cols = any_of(signaling_markers)) |> 
+  tof_analyze_expression(
     cluster_col = population_id, 
     marker_cols = any_of(signaling_markers), 
     effect_col = stimulation,
@@ -890,7 +893,7 @@ dea_result <-
     method = "ttest"
   )
 
-dea_result %>% 
+dea_result |> 
   head()
 #> # A tibble: 6 × 9
 #>   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc
@@ -903,21 +906,22 @@ dea_result %>%
 #> 6 4             pBtk_… 7.85e-7 1.05e-5 *           -16.3     7    -0.462   0.296
 ```
 
-While the output of `tof_dea()` also depends on the underlying test
-being used, we can see that the result above looks relatively similar to
-the output from `tof_daa()`. Above, the output is a tibble in which each
-row represents the differential expression results from a single
-cluster-marker pair - for example, the first row represents the
-difference in expression of pS6 in cluster 1 between the BCR-XL and
-Basal conditions. Each row includes the raw p-value and
-multiple-hypothesis-corrected p-value for each cluster-marker pair.
+While the output of `tof_analyze_expression()` also depends on the
+underlying test being used, we can see that the result above looks
+relatively similar to the output from `tof_analyze_abundance()`. Above,
+the output is a tibble in which each row represents the differential
+expression results from a single cluster-marker pair - for example, the
+first row represents the difference in expression of pS6 in cluster 1
+between the BCR-XL and Basal conditions. Each row includes the raw
+p-value and multiple-hypothesis-corrected p-value for each
+cluster-marker pair.
 
 This result can be used to make a volcano plot to visualize the results
 for all cluster-marker pairs:
 
 ``` r
 volcano_plot <- 
-  dea_result %>% 
+  dea_result |> 
   tof_plot_cluster_volcano(
     use_ggrepel = TRUE
   ) 
@@ -925,7 +929,7 @@ volcano_plot <-
 volcano_plot
 ```
 
-<img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-32-1.png" width="100%" />
 
 ### Analyzing data at the patient- and sample-level
 
@@ -936,13 +940,14 @@ be analyzed using a variety of statistical models.
 
 #### Feature extraction with `tof_extract_features`
 
-In addition to its functions for analyzing and visualizing CyTOF data at
-the single-cell and cluster levels, `{tidytof}`’s `tof_extract_features`
-verb allows users to aggregate single-cell and cluster-level information
-in order to summarize whole-samples (or whole-patients) from which cells
-were collected. These features can be useful for visualizing the
-differences between patients and samples in different experimental
-conditions or for building machine learning models.
+In addition to its functions for analyzing and visualizing cytometry
+data at the single-cell and cluster levels, `{tidytof}`’s
+`tof_extract_features` verb allows users to aggregate single-cell and
+cluster-level information in order to summarize whole-samples (or
+whole-patients) from which cells were collected. These features can be
+useful for visualizing the differences between patients and samples in
+different experimental conditions or for building machine learning
+models.
 
 To understand how the `tof_extract_features` verb works, it’s easiest to
 look at each of its subroutines (the members of the `tof_extract_*`
@@ -955,15 +960,15 @@ the `group_cols` argument):
 ``` r
 # preprocess the numeric columns in the citrus dataset
 citrus_data <- 
-  citrus_data %>% 
-  mutate(cluster = str_c("cluster", population_id)) %>% 
+  citrus_data |> 
+  mutate(cluster = str_c("cluster", population_id)) |> 
   tof_preprocess()
 
-citrus_data %>% 
+citrus_data |> 
   tof_extract_proportion(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation)
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 10
 #>   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`
@@ -974,7 +979,7 @@ citrus_data %>%
 #> 4 patient2 BCR-XL               0.0101          0.0143           0.358
 #> 5 patient3 Basal                0.0326          0.0830           0.397
 #> 6 patient3 BCR-XL               0.0200          0.0412           0.323
-#> # … with 5 more variables: `prop@cluster4` <dbl>, `prop@cluster5` <dbl>,
+#> # ℹ 5 more variables: `prop@cluster4` <dbl>, `prop@cluster5` <dbl>,
 #> #   `prop@cluster6` <dbl>, `prop@cluster7` <dbl>, `prop@cluster8` <dbl>
 ```
 
@@ -986,12 +991,12 @@ the 8 clusters in `citrus_data`). These values can also be returned in
 “long” format by changing the `format` argument:
 
 ``` r
-citrus_data %>% 
+citrus_data |> 
   tof_extract_proportion(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     format = "long"
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 4
 #>   patient  stimulation cluster     prop
@@ -1009,30 +1014,30 @@ Another member of the same function family,
 or median) of user-specified markers in each cluster.
 
 ``` r
-citrus_data %>% 
+citrus_data |> 
   tof_extract_central_tendency(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     central_tendency_function = mean
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 26
-#>   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`
-#>   <chr>    <chr>                         <dbl>            <dbl>            <dbl>
-#> 1 patient1 Basal                          4.68           0.765              3.72
-#> 2 patient1 BCR-XL                         4.80           0.0967             4.11
-#> 3 patient2 Basal                          4.88           0.808              3.54
-#> 4 patient2 BCR-XL                         5.00          -0.0579             3.90
-#> 5 patient3 Basal                          4.98           0.745              3.59
-#> 6 patient3 BCR-XL                         5.04          -0.0432             3.91
-#> # … with 21 more variables: `CD45_In115@cluster2_ct` <dbl>,
-#> #   `CD4_Nd145@cluster2_ct` <dbl>, `CD20_Sm147@cluster2_ct` <dbl>,
-#> #   `CD45_In115@cluster3_ct` <dbl>, `CD4_Nd145@cluster3_ct` <dbl>,
-#> #   `CD20_Sm147@cluster3_ct` <dbl>, `CD45_In115@cluster4_ct` <dbl>,
-#> #   `CD4_Nd145@cluster4_ct` <dbl>, `CD20_Sm147@cluster4_ct` <dbl>,
-#> #   `CD45_In115@cluster5_ct` <dbl>, `CD4_Nd145@cluster5_ct` <dbl>,
-#> #   `CD20_Sm147@cluster5_ct` <dbl>, `CD45_In115@cluster6_ct` <dbl>, …
+#>   patient  stimulation `CD45_In115@cluster1_ct` `CD4_Nd145@cluster1_ct`
+#>   <chr>    <chr>                          <dbl>                   <dbl>
+#> 1 patient1 BCR-XL                          4.80                  0.0967
+#> 2 patient1 Basal                           4.68                  0.765 
+#> 3 patient2 BCR-XL                          5.00                 -0.0579
+#> 4 patient2 Basal                           4.88                  0.808 
+#> 5 patient3 BCR-XL                          5.04                 -0.0432
+#> 6 patient3 Basal                           4.98                  0.745 
+#> # ℹ 22 more variables: `CD20_Sm147@cluster1_ct` <dbl>,
+#> #   `CD45_In115@cluster2_ct` <dbl>, `CD4_Nd145@cluster2_ct` <dbl>,
+#> #   `CD20_Sm147@cluster2_ct` <dbl>, `CD45_In115@cluster3_ct` <dbl>,
+#> #   `CD4_Nd145@cluster3_ct` <dbl>, `CD20_Sm147@cluster3_ct` <dbl>,
+#> #   `CD45_In115@cluster4_ct` <dbl>, `CD4_Nd145@cluster4_ct` <dbl>,
+#> #   `CD20_Sm147@cluster4_ct` <dbl>, `CD45_In115@cluster5_ct` <dbl>,
+#> #   `CD4_Nd145@cluster5_ct` <dbl>, `CD20_Sm147@cluster5_ct` <dbl>, …
 ```
 
 `tof_extract_threshold` is similar to `tof_extract_central_tendency`,
@@ -1040,30 +1045,30 @@ but calculates the proportion of cells above a user-specified expression
 value for each marker instead of a measure of central tendency:
 
 ``` r
-citrus_data %>% 
+citrus_data |> 
   tof_extract_threshold(
     cluster_col = cluster, 
     group_cols = c(patient, stimulation), 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     threshold = 5
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 26
-#>   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`
-#>   <chr>    <chr>                         <dbl>            <dbl>            <dbl>
-#> 1 patient1 Basal                         0.365                0           0.0769
-#> 2 patient1 BCR-XL                        0.516                0           0.0968
-#> 3 patient2 Basal                         0.452                0           0.0323
-#> 4 patient2 BCR-XL                        0.554                0           0.101 
-#> 5 patient3 Basal                         0.549                0           0.0552
-#> 6 patient3 BCR-XL                        0.547                0           0.0816
-#> # … with 21 more variables: `CD45_In115@cluster2_threshold` <dbl>,
+#>   patient  stimulation `CD45_In115@cluster1_threshold` CD4_Nd145@cluster1_thre…¹
+#>   <chr>    <chr>                                 <dbl>                     <dbl>
+#> 1 patient1 BCR-XL                                0.516                         0
+#> 2 patient1 Basal                                 0.365                         0
+#> 3 patient2 BCR-XL                                0.554                         0
+#> 4 patient2 Basal                                 0.452                         0
+#> 5 patient3 BCR-XL                                0.547                         0
+#> 6 patient3 Basal                                 0.549                         0
+#> # ℹ abbreviated name: ¹​`CD4_Nd145@cluster1_threshold`
+#> # ℹ 22 more variables: `CD20_Sm147@cluster1_threshold` <dbl>,
+#> #   `CD45_In115@cluster2_threshold` <dbl>,
 #> #   `CD4_Nd145@cluster2_threshold` <dbl>,
 #> #   `CD20_Sm147@cluster2_threshold` <dbl>,
 #> #   `CD45_In115@cluster3_threshold` <dbl>,
-#> #   `CD4_Nd145@cluster3_threshold` <dbl>,
-#> #   `CD20_Sm147@cluster3_threshold` <dbl>,
-#> #   `CD45_In115@cluster4_threshold` <dbl>, …
+#> #   `CD4_Nd145@cluster3_threshold` <dbl>, …
 ```
 
 The two final members of the `tof_extract_*` function family –
@@ -1083,60 +1088,60 @@ higher-resolution) than simply comparing measures of central tendency.
 
 ``` r
 # Earth-mover's distance
-citrus_data %>% 
+citrus_data |> 
   tof_extract_emd(
     cluster_col = cluster, 
     group_cols = patient, 
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     emd_col = stimulation, 
     reference_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 25
-#>   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`
-#>   <chr>                 <dbl>            <dbl>            <dbl>            <dbl>
-#> 1 patient1              0.864             2.47            13.0             1.45 
-#> 2 patient2              1.11              7.05            10.8             0.726
-#> 3 patient3              0.670             6.23            10.5             0.640
-#> 4 patient4              2.64              5.86             9.90            3.27 
-#> 5 patient5              0.594             7.56             8.13            0.788
-#> 6 patient6              0.661             4.77             7.97            1.59 
-#> # … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_emd` <dbl>,
+#>   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³
+#>   <chr>                      <dbl>                  <dbl>                  <dbl>
+#> 1 patient1                   0.864                   2.47                  13.0 
+#> 2 patient2                   1.11                    7.05                  10.8 
+#> 3 patient3                   0.670                   6.23                  10.5 
+#> 4 patient4                   2.64                    5.86                   9.90
+#> 5 patient5                   0.594                   7.56                   8.13
+#> 6 patient6                   0.661                   4.77                   7.97
+#> # ℹ abbreviated names: ¹​`BCR-XL_CD45_In115@cluster3_emd`,
+#> #   ²​`BCR-XL_CD4_Nd145@cluster3_emd`, ³​`BCR-XL_CD20_Sm147@cluster3_emd`
+#> # ℹ 21 more variables: `BCR-XL_CD45_In115@cluster7_emd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster7_emd` <dbl>,
 #> #   `BCR-XL_CD20_Sm147@cluster7_emd` <dbl>,
 #> #   `BCR-XL_CD45_In115@cluster4_emd` <dbl>,
-#> #   `BCR-XL_CD4_Nd145@cluster4_emd` <dbl>,
-#> #   `BCR-XL_CD20_Sm147@cluster4_emd` <dbl>,
-#> #   `BCR-XL_CD45_In115@cluster2_emd` <dbl>,
-#> #   `BCR-XL_CD4_Nd145@cluster2_emd` <dbl>, …
+#> #   `BCR-XL_CD4_Nd145@cluster4_emd` <dbl>, …
 ```
 
 ``` r
 # Jensen-Shannon Divergence
-citrus_data %>% 
+citrus_data |> 
   tof_extract_jsd(
     cluster_col = cluster, 
     group_cols = patient,  
     marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
     jsd_col = stimulation, 
     reference_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 #> # A tibble: 6 × 25
-#>   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`
-#>   <chr>                 <dbl>            <dbl>            <dbl>            <dbl>
-#> 1 patient1            0.0367            0.0513            0.347           0.0538
-#> 2 patient2            0.00831           0.168             0.401           0.0170
-#> 3 patient3            0.0104            0.115             0.357           0.0197
-#> 4 patient4            0.0301            0.135             0.205           0.0398
-#> 5 patient5            0.00911           0.0789            0.274           0.0251
-#> 6 patient6            0.00972           0.0346            0.214           0.0480
-#> # … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_jsd` <dbl>,
+#>   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³
+#>   <chr>                      <dbl>                  <dbl>                  <dbl>
+#> 1 patient1                 0.0367                  0.0513                  0.347
+#> 2 patient2                 0.00831                 0.168                   0.401
+#> 3 patient3                 0.0104                  0.115                   0.357
+#> 4 patient4                 0.0301                  0.135                   0.205
+#> 5 patient5                 0.00911                 0.0789                  0.274
+#> 6 patient6                 0.00972                 0.0346                  0.214
+#> # ℹ abbreviated names: ¹​`BCR-XL_CD45_In115@cluster3_jsd`,
+#> #   ²​`BCR-XL_CD4_Nd145@cluster3_jsd`, ³​`BCR-XL_CD20_Sm147@cluster3_jsd`
+#> # ℹ 21 more variables: `BCR-XL_CD45_In115@cluster7_jsd` <dbl>,
+#> #   `BCR-XL_CD4_Nd145@cluster7_jsd` <dbl>,
 #> #   `BCR-XL_CD20_Sm147@cluster7_jsd` <dbl>,
 #> #   `BCR-XL_CD45_In115@cluster4_jsd` <dbl>,
-#> #   `BCR-XL_CD4_Nd145@cluster4_jsd` <dbl>,
-#> #   `BCR-XL_CD20_Sm147@cluster4_jsd` <dbl>,
-#> #   `BCR-XL_CD45_In115@cluster2_jsd` <dbl>,
-#> #   `BCR-XL_CD4_Nd145@cluster2_jsd` <dbl>, …
+#> #   `BCR-XL_CD4_Nd145@cluster4_jsd` <dbl>, …
 ```
 
 Finally, the `tof_extract_features` verb provides a wrapper to each of
@@ -1147,7 +1152,7 @@ and EMD between the basal condition and stimulated condition in each
 cluster for all patients in `citrus_data`.
 
 ``` r
-citrus_data %>% 
+citrus_data |> 
   tof_extract_features(
     cluster_col = cluster, 
     group_cols = patient, 
@@ -1156,7 +1161,7 @@ citrus_data %>%
     signaling_cols = any_of(signaling_markers), 
     signaling_method = "emd", 
     basal_level = "Basal"
-  ) %>% 
+  ) |> 
   head()
 ```
 
@@ -1181,13 +1186,13 @@ data_link <-
 
 # downloading the data and combining it with clinical annotations
 ddpr_patients <- 
-  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) %>% 
-  dplyr::rename(patient_id = Patient_ID) %>% 
-  left_join(ddpr_metadata, by = "patient_id") %>% 
+  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) |> 
+  dplyr::rename(patient_id = Patient_ID) |> 
+  left_join(ddpr_metadata, by = "patient_id") |> 
   dplyr::filter(!str_detect(patient_id, "Healthy"))
 
-ddpr_patients %>% 
-  select(where(~ !is.numeric(.x))) %>% 
+ddpr_patients |> 
+  select(where(~ !is.numeric(.x))) |> 
   head()
 #> # A tibble: 6 × 8
 #>   patient_id gender mrd_risk nci_rome_risk relapse_status type_of_relapse cohort
@@ -1198,7 +1203,7 @@ ddpr_patients %>%
 #> 4 UPN3       Female Standard Standard      No             <NA>            Train…
 #> 5 UPN4       Male   Standard Standard      No             <NA>            Valid…
 #> 6 UPN5       Female Standard High          No             <NA>            Valid…
-#> # … with 1 more variable: ddpr_risk <chr>
+#> # ℹ 1 more variable: ddpr_risk <chr>
 ```
 
 The data processing steps above result in the `ddpr_patients` tibble.
@@ -1213,7 +1218,7 @@ now to save us some headaches when we’re fitting models later.
 
 ``` r
 ddpr_patients <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   # convert the relapse_status variable to a factor first, 
   # which is something we'll want for fitting the model later
   # and create the time_to_event and event columns for survival modeling
@@ -1233,11 +1238,11 @@ in `ddpr_patients`
 
 ``` r
 ddpr_training <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   dplyr::filter(cohort == "Training") 
 
 ddpr_validation <- 
-  ddpr_patients %>% 
+  ddpr_patients |> 
   dplyr::filter(cohort == "Validation")
 ```
 
@@ -1258,7 +1263,7 @@ now). For this, we can use the `relapse_status` column in
 
 ``` r
 # find how many of each outcome we have in our cohort
-ddpr_training %>% 
+ddpr_training |> 
   dplyr::count(relapse_status)
 #> # A tibble: 2 × 2
 #>   relapse_status     n
@@ -1275,7 +1280,7 @@ documentation of `tof_split_data` demonstrates how to use other methods.
 
 ``` r
 training_split <- 
-  ddpr_training %>% 
+  ddpr_training |> 
   tof_split_data(
     split_method = "k-fold", 
     num_cv_folds = 5, 
@@ -1299,10 +1304,10 @@ is used. For cross-validation, the result is a `rset` object from the
 [rsample](https://rsample.tidymodels.org/) package. `rset` objects are a
 type of tibble with two columns:
 
--   `splits` - a column in which each entry is an `rsplit` object (which
-    contains a single resample of the full dataset)
--   `id` - a character column in which each entry represents the name of
-    the fold that each entry in `splits` belongs to.
+- `splits` - a column in which each entry is an `rsplit` object (which
+  contains a single resample of the full dataset)
+- `id` - a character column in which each entry represents the name of
+  the fold that each entry in `splits` belongs to.
 
 We can inspect one of the resamples in the `splits` column to see what
 they contain:
@@ -1322,19 +1327,19 @@ Note that you can use `rsample::training` and `rsample::testing` to
 return the training and test obeservations from each resampling:
 
 ``` r
-my_resample %>% 
-  rsample::training() %>% 
+my_resample |> 
+  rsample::training() |> 
   head()
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
 #> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 3 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
 #> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
-#> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
+#> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
 #> #   TSLPr_Pop1 <dbl>, RAG1_Pop1 <dbl>, CD123_Pop1 <dbl>, CD45_Pop1 <dbl>,
@@ -1342,19 +1347,19 @@ my_resample %>%
 #> #   HLADR_Pop1 <dbl>, p4EBP1_FC_Basal_Pop1 <dbl>, pSTAT5_FC_Basal_Pop1 <dbl>,
 #> #   pPLCg1_2_FC_Basal_Pop1 <dbl>, pAkt_FC_Basal_Pop1 <dbl>, …
 
-my_resample %>% 
-  rsample::testing() %>% 
+my_resample |> 
+  rsample::testing() |> 
   head()
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN7           0.474      0.966   0.124       1.24       2.59     0.243
-#> 2 UPN8           0.951      0.958   0.161       0.556      3.18     0.556
-#> 3 UPN12          0.0565     0.185   0.0115      0.142      2.49     0.254
-#> 4 UPN24          0.0989     0.196   0.0198      0.210      2.36     0.382
-#> 5 UPN26          0.390      0.650   0.00157     0.622      2.81     0.684
-#> 6 UPN27          0.563      1.07    0.00276     0.712      2.40     0.411
-#> # … with 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
+#> 1 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 2 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
+#> 3 UPN11          0.332     0.488    0.0146     0.598       2.16     0.320
+#> 4 UPN22-Rx       0.0643    1.68     0.0804     1.56        3.06     0.529
+#> 5 UPN25          0.0181    0.0266   0.00152    0.108       2.73     0.386
+#> 6 UPN29          1.09      1.63     0.00561    1.29        3.05     0.606
+#> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
 #> #   TSLPr_Pop1 <dbl>, RAG1_Pop1 <dbl>, CD123_Pop1 <dbl>, CD45_Pop1 <dbl>,
@@ -1377,7 +1382,7 @@ from many more features).
 
 ``` r
 class_mod <- 
-  training_split %>% 
+  training_split |> 
   tof_train_model(
     predictor_cols = contains("Pop2"), 
     response_col = relapse_status,
@@ -1396,7 +1401,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1410,7 +1415,7 @@ print(class_mod)
 #>  8 pSyk_dP_TSLP_Pop2          1.08
 #>  9 pErk_dP_IL7_Pop2          -1.05
 #> 10 Ki67_Pop2                 -1.05
-#> # … with 15 more rows
+#> # ℹ 15 more rows
 ```
 
 We can then use the trained model to make predictions on the validation
@@ -1418,10 +1423,10 @@ data that we set aside earlier:
 
 ``` r
 class_predictions <- 
-  class_mod %>% 
+  class_mod |> 
   tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-class_predictions %>% 
+class_predictions |> 
   dplyr::mutate(
     truth = ddpr_validation$relapse_status
   )
@@ -1451,7 +1456,7 @@ We can also assess the model directly using `tof_assess_model`
 # calling the function with no new_data evaluates the
 # the nodel using its training data
 training_assessment <- 
-  class_mod %>% 
+  class_mod |> 
   tof_assess_model()
 
 training_assessment
@@ -1480,7 +1485,7 @@ training_assessment
 #>  8    0.00135         0.194            1     1 0.806
 #>  9    0.00142         0.226            1     1 0.774
 #> 10    0.00194         0.258            1     1 0.742
-#> # … with 41 more rows
+#> # ℹ 41 more rows
 #> 
 #> $confusion_matrix
 #> # A tibble: 4 × 3
@@ -1495,18 +1500,18 @@ training_assessment
 And we can make an ROC curve using our metrics:
 
 ``` r
-class_mod %>% 
+class_mod |> 
   tof_plot_model() + 
   labs(subtitle = "ROC Curve (Training data)")
 ```
 
-<img src="man/figures/README-unnamed-chunk-53-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-52-1.png" width="100%" />
 
 We can then assess the model on the validation data…
 
 ``` r
 validation_assessment <- 
-  class_mod %>% 
+  class_mod |> 
   tof_assess_model(new_data = ddpr_validation)
 
 validation_assessment
@@ -1551,18 +1556,18 @@ validation_assessment
 ```
 
 ``` r
-class_mod %>% 
+class_mod |> 
   tof_plot_model(new_data = ddpr_validation) + 
   labs(subtitle = "ROC Curve (Validation data)")
 ```
 
-<img src="man/figures/README-unnamed-chunk-55-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-54-1.png" width="100%" />
 
 ## `{tidytof}`’s Design Principles (and some tips)
 
 {tidytof} was designed by a multidisciplinary team of wet-lab
 biologists, bioinformaticians, and physician-scientists who analyze
-CyTOF and other kinds of single-cell data to solve a variety of
+cytometry and other kinds of single-cell data to solve a variety of
 problems. As a result, `{tidytof}`’s high-level API was designed with
 great care to mirror that of the `{tidyverse}` itself - that is, to be
 [human-centered, consistent, composable, and
@@ -1622,21 +1627,21 @@ input_path <- tidytof_example_data("phenograph")
 
 set.seed(0012)
 
-input_path %>% 
+input_path |> 
   # step 1
-  tof_read_data() %>% 
+  tof_read_data() |> 
   # step 2
-  tof_preprocess() %>% 
+  tof_preprocess() |> 
   # step 3
-  tof_cluster(method = "phenograph") %>%
+  tof_cluster(method = "phenograph") |>
   # step 4
   tof_downsample(
     group_cols = .phenograph_cluster, 
     num_cells = 100,
     method = "constant" 
-  ) %>% 
+  ) |> 
   # step 5
-  tof_reduce_dimensions(perplexity = 50, method = "tsne") %>% 
+  tof_reduce_dimensions(perplexity = 50, method = "tsne") |> 
   # step 6
   tof_plot_cells_embedding(
     embedding_cols = starts_with(".tsne"),
@@ -1644,7 +1649,7 @@ input_path %>%
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-56-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-55-1.png" width="100%" />
 
 As shown above, stringing together `{tidytof}` verbs creates a pipeline
 that can be read easily from left-to-right and top-to-bottom – this

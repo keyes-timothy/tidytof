@@ -1,4 +1,114 @@
-url: https://keyes-timothy.github.io/tidytof/
+url: https://keyes-timothy.github.io/tidytof
 template:
   bootstrap: 5
+  bootswatch: lux
+  bslib:
+    pkgdown-nav-height: 100px
+reference:
+- title: "Reading and writing data"
+  desc: "Functions for reading and writing high-dimensional cytometry data to and from file storage"
+  contents:
+  - starts_with("tof_read")
+  - starts_with("tof_write")
+  - tidytof_example_data
+  - new_tof_tibble
+  - as_tof_tbl
+  - as_tof_tbl.flowSet
+  - tof_get_panel
+  - tof_set_panel
+  - tof_find_panel_info
+- title: "Single-cell data analysis"
+  desc: "Functions for data processing tasks at the single-cell level"
+  contents:
+  - tof_preprocess
+  - tof_postprocess
+  - starts_with("tof_downsample")
+  - starts_with("tof_reduce")
+  - starts_with("tof_cluster")
+  - tof_estimate_density
+  - tof_apply_classifier
+  - tof_build_classifier
+  - tof_classify_cells
+- title: "Cluster-level data analysis"
+  desc: "Functions for data processing tasks at the cluster or cell subpopulation level"
+  contents:
+  - starts_with("tof_metacluster")
+  - starts_with("tof_upsample")
+  - starts_with("tof_daa")
+  - starts_with("tof_dea")
+  - starts_with("tof_extract")
+- title: "Sample- or patient-level data analysis"
+  desc: "Functions for data processing tasks at the whole-sample or whole-patient level"
+  contents:
+  - tof_split_data
+  - tof_train_model
+  - tof_check_model_args
+  - tof_predict
+  - tof_assess_model
+  - tof_assess_model_new_data
+  - tof_assess_model_tuning
+  - tof_clean_metric_names
+  - tof_create_grid
+  - new_tof_model
+  - starts_with("tof_get_model")
+  - tof_fit_split
+  - tof_tune_glmnet
+  - tof_find_best
+- title: "Visualization"
+  desc: "Functions for visualizing CyTOF data"
+  contents:
+  - starts_with("tof_plot")
+- title: "Utilities"
+  desc: "Utility functions for performing miscellaneous high-dimensional cytometry data processing tasks"
+  contents:
+  - get_extension
+  - rev_asinh
+  - cosine_similarity
+  - l2_normalize
+  - dot
+  - magnitude
+  - where
+  - tof_cosine_dist
+  - tof_is_numeric
+  - tof_find_knn
+  - tof_knn_density
+  - tof_spade_density
+  - tof_find_emd
+  - tof_find_jsd
+  - tof_create_recipe
+  - tof_prep_recipe
+  - tof_compute_km_curve
+  - tof_find_cv_predictions
+  - tof_find_log_rank_threshold
+  - tof_log_rank_test
+  - tof_make_roc_curve
+- title: "Built-in data"
+  desc: "Example cytometry datasets built into {tidytof}"
+  contents:
+  - ddpr_data
+  - ddpr_metadata
+  - phenograph_data
+  - metal_masterlist
+articles:
+- title: "Contributing"
+  navbar: "Extending {tidytof}"
+  contents:
+  - contributing-to-tidytof
+- title: "Single-cell"
+  navbar: "Cell-level operations"
+  contents:
+  - reading-and-writing-data
+  - preprocessing
+  - downsampling
+  - dimensionality-reduction
+- title: "Cluster"
+  navbar: "Cluster-level operations"
+  contents:
+  - clustering
+  - differential-discovery-analysis
+  - feature-extraction
+- title: "Sample"
+  navbar: "Sample-level operations"
+  contents:
+  - modeling
 
