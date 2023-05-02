@@ -106,6 +106,7 @@ articles:
   navbar: "Cell-level operations"
   contents:
   - reading-and-writing-data
+  - quality-control
   - preprocessing
   - downsampling
   - dimensionality-reduction
