@@ -27,16 +27,23 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <h6 class="dropdown-header" data-toc-skip>Extending {tidytof}</h6>
     <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
-    <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
-    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
-    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
-    <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
-    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
-    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Cell-level operations</h6>
     <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
+    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
+    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
+    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -109,23 +116,23 @@
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">tof_get_model_y</span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]  2.21958414  2.94004129  4.45334261  4.16876157  5.05346042  2.08070621</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  6.17902214  2.22861853  3.59217907  5.04980232  1.61646570  3.49879018</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]  0.09669632  2.37424278  4.76615642  3.69035026  5.72751344  4.05816580</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  4.82068586  5.43275002  2.23910993  3.95600599  1.18480343  6.00437364</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25]  2.01140436  2.19286630  1.99643675  3.84903827 -0.10502788  1.65506972</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  2.90870608  1.26664979  1.04385612  4.12128453  2.16485785  6.21853659</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  0.85648080  2.16893644  4.84275659  2.92635135  3.07436273  2.49842722</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]  3.94281202  3.67174228  5.93265931  3.65051641  2.89063005  1.98523641</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  1.77970253  4.67582115  6.34523155  6.43961917  5.97660655  5.91476530</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  0.18241922  2.92400095  2.78000242  2.11664373  2.91807024  5.59839844</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  6.08095223  4.30553580  3.97014301  1.95506987  1.56761017  4.53195290</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  7.13930401  0.87513673  1.80418533  3.21945414  2.29414091  2.93848913</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  0.38293396  3.27447155  2.49096864  2.60249400  1.64893815  2.85751421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]  6.02949067  3.07170660  0.26063529  4.40555031  1.26841802  3.10442199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85]  3.67590709  3.76281871 -0.53913255  1.85881381  2.49588976  3.69739693</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  1.37546573  3.04382640  4.75501869  2.68829044  5.30247586  4.12475343</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]  6.68874686  3.01651899  3.81348090  0.72390355</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]  2.5669483  4.9015289  2.9778107  1.3853445  1.5747855  7.0573447</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  1.9231666  1.6928750  2.9141838  1.6253626  1.7016935  3.4662545</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]  6.1432645 -0.8729019  3.3474136  4.1011750  6.8707497  2.8969909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  5.3239442  4.6181397  3.3802633  4.8002104  2.5979382  4.6621345</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25]  5.1720179  2.6119863 -2.2359218  1.5324548  3.1525087  5.7265987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  2.7305977  3.5996023  4.1189027  7.2114449  5.7606435  2.0694957</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  4.0339230  0.2277402  6.1585056  4.8146716  1.9865026 -0.1293907</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]  2.4283032  1.9148661  4.4127155  3.6738924  6.1066659  3.1517974</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  6.1552236  5.0386866  1.7528382  5.4189219  3.8452073  4.2570959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  2.4854123  0.9083685  2.4330279  2.3535155  4.2410207  4.0550120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  3.0496195 -0.1170269  0.8072348  5.3421341  0.5888532  6.1670766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  1.7110870  4.6983751  3.9890320  4.4995431  3.7659076  1.7346546</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  1.7864311  4.7668758  4.1175984  2.5517533  3.5061683  1.6954565</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]  4.9718098  4.4516921  0.2846626  1.7965901  4.0008436  2.0790386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85]  4.5414028  7.2033410  2.6830375  5.3080501  4.1543090  3.8760242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  2.1516743  2.1558677  2.5780613  6.3258454  3.4639396  6.0230859</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]  4.4514346  6.2882884  4.7748957  2.8346795</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

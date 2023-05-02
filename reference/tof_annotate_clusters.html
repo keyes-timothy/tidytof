@@ -31,16 +31,23 @@ unsupervised algorithms."><!-- mathjax --><script src="https://cdnjs.cloudflare.
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <h6 class="dropdown-header" data-toc-skip>Extending {tidytof}</h6>
     <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
-    <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
-    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
-    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
-    <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
-    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
-    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Cell-level operations</h6>
     <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
+    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
+    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
+    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
+    <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
+    <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -125,18 +132,18 @@ the new column will be named `cluster_col_annotation`.</p>
 <span class="r-in"><span>    annotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"macrophage"</span> <span class="op">=</span> <span class="st">"a"</span>, <span class="st">"dendritic cell"</span> <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45   cd38    cd34    cd19 cluster_id cluster_id_annotation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  0.079<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.407</span> -<span style="color: #BB0000;">0.559</span>   2.17   a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.10    0.509 -<span style="color: #BB0000;">1.61</span>    0.130  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">0.020</span><span style="color: #BB0000; text-decoration: underline;">4</span> -<span style="color: #BB0000;">1.60</span>   0.900  -<span style="color: #BB0000;">1.10</span>   a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  1.59    0.371 -<span style="color: #BB0000;">1.24</span>   -<span style="color: #BB0000;">0.236</span>  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  1.76    0.334  0.068<span style="text-decoration: underline;">1</span> -<span style="color: #BB0000;">0.824</span>  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.69</span>   -<span style="color: #BB0000;">1.28</span>   0.053<span style="text-decoration: underline;">5</span>  0.092<span style="text-decoration: underline;">5</span> a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.455</span>   0.526 -<span style="color: #BB0000;">1.34</span>   -<span style="color: #BB0000;">0.365</span>  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  1.00    1.10   1.34    0.504  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">0.675</span>   1.02  -<span style="color: #BB0000;">0.831</span>  -<span style="color: #BB0000;">0.822</span>  a          macrophage           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.311</span>  -<span style="color: #BB0000;">0.437</span>  0.538  -<span style="color: #BB0000;">0.354</span>  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      cd45    cd38    cd34    cd19 cluster_id cluster_id_annotation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  0.343 -<span style="color: #BB0000;">0.853</span>  -<span style="color: #BB0000;">1.23</span>   -<span style="color: #BB0000;">0.055</span><span style="color: #BB0000; text-decoration: underline;">9</span> a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  0.300  0.459  -<span style="color: #BB0000;">0.317</span>   0.931  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  1.15  -<span style="color: #BB0000;">0.478</span>  -<span style="color: #BB0000;">1.46</span>   -<span style="color: #BB0000;">1.05</span>   a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.305  0.358  -<span style="color: #BB0000;">0.877</span>   0.748  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">0.504</span> -<span style="color: #BB0000;">0.121</span>  -<span style="color: #BB0000;">1.65</span>    0.589  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.48</span>   1.40   -<span style="color: #BB0000;">2.06</span>   -<span style="color: #BB0000;">0.667</span>  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.338</span>  0.741   1.64   -<span style="color: #BB0000;">1.12</span>   a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">1.91</span>   1.17    0.361  -<span style="color: #BB0000;">0.450</span>  a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  0.534 -<span style="color: #BB0000;">0.086</span><span style="color: #BB0000; text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.075</span><span style="color: #BB0000; text-decoration: underline;">0</span> -<span style="color: #BB0000;">1.94</span>   a          macrophage           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  0.170  0.117  -<span style="color: #BB0000;">0.177</span>   1.19   a          macrophage           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 990 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using two-column data.frame</span></span></span>
@@ -152,18 +159,18 @@ the new column will be named `cluster_col_annotation`.</p>
 <span class="r-in"><span>    annotations <span class="op">=</span> <span class="va">annotation_data_frame</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45   cd38    cd34    cd19 cluster_id cluster_annotation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  0.079<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.407</span> -<span style="color: #BB0000;">0.559</span>   2.17   a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.10    0.509 -<span style="color: #BB0000;">1.61</span>    0.130  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">0.020</span><span style="color: #BB0000; text-decoration: underline;">4</span> -<span style="color: #BB0000;">1.60</span>   0.900  -<span style="color: #BB0000;">1.10</span>   a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  1.59    0.371 -<span style="color: #BB0000;">1.24</span>   -<span style="color: #BB0000;">0.236</span>  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  1.76    0.334  0.068<span style="text-decoration: underline;">1</span> -<span style="color: #BB0000;">0.824</span>  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.69</span>   -<span style="color: #BB0000;">1.28</span>   0.053<span style="text-decoration: underline;">5</span>  0.092<span style="text-decoration: underline;">5</span> a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.455</span>   0.526 -<span style="color: #BB0000;">1.34</span>   -<span style="color: #BB0000;">0.365</span>  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  1.00    1.10   1.34    0.504  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">0.675</span>   1.02  -<span style="color: #BB0000;">0.831</span>  -<span style="color: #BB0000;">0.822</span>  a          macrophage        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.311</span>  -<span style="color: #BB0000;">0.437</span>  0.538  -<span style="color: #BB0000;">0.354</span>  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      cd45    cd38    cd34    cd19 cluster_id cluster_annotation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  0.343 -<span style="color: #BB0000;">0.853</span>  -<span style="color: #BB0000;">1.23</span>   -<span style="color: #BB0000;">0.055</span><span style="color: #BB0000; text-decoration: underline;">9</span> a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  0.300  0.459  -<span style="color: #BB0000;">0.317</span>   0.931  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  1.15  -<span style="color: #BB0000;">0.478</span>  -<span style="color: #BB0000;">1.46</span>   -<span style="color: #BB0000;">1.05</span>   a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.305  0.358  -<span style="color: #BB0000;">0.877</span>   0.748  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">0.504</span> -<span style="color: #BB0000;">0.121</span>  -<span style="color: #BB0000;">1.65</span>    0.589  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.48</span>   1.40   -<span style="color: #BB0000;">2.06</span>   -<span style="color: #BB0000;">0.667</span>  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.338</span>  0.741   1.64   -<span style="color: #BB0000;">1.12</span>   a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">1.91</span>   1.17    0.361  -<span style="color: #BB0000;">0.450</span>  a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  0.534 -<span style="color: #BB0000;">0.086</span><span style="color: #BB0000; text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.075</span><span style="color: #BB0000; text-decoration: underline;">0</span> -<span style="color: #BB0000;">1.94</span>   a          macrophage        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  0.170  0.117  -<span style="color: #BB0000;">0.177</span>   1.19   a          macrophage        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 990 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
