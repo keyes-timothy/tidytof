@@ -43,6 +43,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/articles/preprocessing.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/articles/quality-control.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/articles/reading-and-writing-data.html</loc>
   </url>
   <url>
@@ -106,7 +109,52 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tidytof_example_data.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_abundance.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_abundance_diffcyt.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_abundance_glmm.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_abundance_ttest.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_expression.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_expression_diffcyt.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_expression_lmm.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_analyze_expression_ttest.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_annotate_clusters.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_apply_classifier.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_channels.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_clusters_distance.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_clusters_entropy.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_clusters_knn.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_flow_rate.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_flow_rate_tibble.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_model.html</loc>
@@ -118,7 +166,22 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_assess_model_tuning.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_batch_correct.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_batch_correct_quantile.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_batch_correct_quantile_tibble.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_batch_correct_rescale.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_build_classifier.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_calculate_flow_rate.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_check_model_args.html</loc>
@@ -161,30 +224,6 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_create_recipe.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_daa.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_daa_diffcyt.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_daa_glmm.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_daa_ttest.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_dea.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_dea_diffcyt.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_dea_lmm.html</loc>
-  </url>
-  <url>
-    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_dea_ttest.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_downsample.html</loc>
@@ -242,6 +281,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_fit_split.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_generate_palette.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_get_model_mixture.html</loc>
@@ -305,6 +347,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cells_layout.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cells_scatter.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_plot_cluster_heatmap.html</loc>
@@ -386,6 +431,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_train_model.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_transform.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_tune_glmnet.html</loc>

@@ -9,10 +9,10 @@
 ">
 <title>Feature extraction • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Feature extraction">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Feature extraction">
 <meta property="og:description" content="Read this vignette to learn how to compute summary statistics like cluster  abundance and cluster marker expression using {tidytof} 
 ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -46,22 +46,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>Extending {tidytof}</h6>
-    <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Cell-level operations</h6>
-    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
-    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
-    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
     <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
+    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
+    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
   </div>
 </li>
       </ul>
@@ -78,12 +72,14 @@
 
 
 
-<script src="feature-extraction_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
-  <main id="main"><div class="page-header">
+
+<div class="row">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Feature extraction</h1>
-                        <h4 data-toc-skip class="author">Timothy Keyes</h4>
+                        <h4 data-toc-skip class="author">Timothy
+Keyes</h4>
             
-            <h4 data-toc-skip class="date">2022-06-03</h4>
+            <h4 data-toc-skip class="date">2023-05-02</h4>
       
       
       <div class="d-none name"><code>feature-extraction.Rmd</code></div>
@@ -92,300 +88,380 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'dplyr'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     filter, lag</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></code></pre></div>
-<p>In addition to its functions for analyzing and visualizing CyTOF data at the single-cell and cluster levels, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb allows users to aggregate single-cell and cluster-level information in order to summarize whole samples (or whole patients) from which cells were collected. These features can be useful for visualizing the differences between patients and samples in different experimental conditions or for building machine learning models.</p>
-<p>To understand how the <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb works, it’s easiest to look at each of its subroutines (the members of the <code>tof_extract_*</code> function family) independently.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span></code></pre></div>
+<p>In addition to its functions for analyzing and visualizing CyTOF data
+at the single-cell and cluster levels, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s
+<code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb allows users to aggregate
+single-cell and cluster-level information in order to summarize whole
+samples (or whole patients) from which cells were collected. These
+features can be useful for visualizing the differences between patients
+and samples in different experimental conditions or for building machine
+learning models.</p>
+<p>To understand how the <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb works,
+it’s easiest to look at each of its subroutines (the members of the
+<code>tof_extract_*</code> function family) independently.</p>
 <div class="section level2">
 <h2 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
 </h2>
-<p>To demonstrate how to use these verbs, we’ll first download a dataset originally collected for the development of the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/" class="external-link">CITRUS</a> algorithm. These data are available in the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a> package, which is available on Bioconductor and can be downloaded with the following command:</p>
+<p>To demonstrate how to use these verbs, we’ll first download a dataset
+originally collected for the development of the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/" class="external-link">CITRUS</a>
+algorithm. These data are available in the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>
+package, which is available on Bioconductor and can be downloaded with
+the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></code></pre></div>
-<p>To load the CITRUS data into our current R session, we can call a function from the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>, which will provide it to us in a format from the <code>{flowCore}</code> package (called a “flowSet”). To convert this into a tidy tibble, we can use <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> built-in method for converting flowCore objects into <code>tof_tbl</code>’s .</p>
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></span></code></pre></div>
+<p>To load the CITRUS data into our current R session, we can call a
+function from the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>, which will provide it to us
+in a format from the <code>{flowCore}</code> package (called a
+“flowSet”). To convert this into a tidy tibble, we can use
+<a href="https://keyes-timothy.github.io/tidytof">tidytof</a> built-in method for converting flowCore objects
+into <code>tof_tbl</code>’s .</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_raw</span> <span class="op">&lt;-</span> <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">Bodenmiller_BCR_XL_flowSet</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_raw</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span>sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></code></pre></div>
-<p>Thus, we can see that <code>citrus_data</code> is a <code>tof_tbl</code> with 172791 cells (one in each row) and 39 pieces of information about each cell (one in each column).</p>
-<p>We can also extract some metadata from the raw data and join it with our single-cell data using some functions from the <code>tidyverse</code>:</p>
+<code class="sourceCode R"><span><span class="va">citrus_raw</span> <span class="op">&lt;-</span> <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">Bodenmiller_BCR_XL_flowSet</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">citrus_data</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">citrus_raw</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span>sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></span></code></pre></div>
+<p>Thus, we can see that <code>citrus_data</code> is a
+<code>tof_tbl</code> with 172791 cells (one in each row) and 39 pieces
+of information about each cell (one in each column).</p>
+<p>We can also extract some metadata from the raw data and join it with
+our single-cell data using some functions from the
+<code>tidyverse</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_metadata</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>
-    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">flowCore</span><span class="fu">::</span><span class="fu">pData</span><span class="op">(</span><span class="va">citrus_raw</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, 
-    sample_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span>,
-    patient <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"patient[:digit:]"</span><span class="op">)</span>, 
-    stimulation <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"(BCR-XL)|Reference"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>
-    stimulation <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">stimulation</span> <span class="op">==</span> <span class="st">"Reference"</span>, <span class="st">"Basal"</span>, <span class="va">stimulation</span><span class="op">)</span>
-  <span class="op">)</span>
-
-<span class="va">citrus_metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span>
-<span class="co">#&gt;   file_name                          sample_id patient  stimulation</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PBMC8_30min_patient1_BCR-XL.fcs            1 patient1 BCR-XL     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PBMC8_30min_patient1_Reference.fcs         2 patient1 Basal      </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> PBMC8_30min_patient2_BCR-XL.fcs            3 patient2 BCR-XL     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> PBMC8_30min_patient2_Reference.fcs         4 patient2 Basal      </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> PBMC8_30min_patient3_BCR-XL.fcs            5 patient3 BCR-XL     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> PBMC8_30min_patient3_Reference.fcs         6 patient3 Basal</span></code></pre></div>
-<p>Thus, we now have sample-level information about which patient each sample was collected from and which stimulation condition (“Basal” or “BCR-XL”) each sample was exposed to before data acquisition.</p>
-<p>Finally, we can join this metadata with our single-cell <code>tof_tbl</code> to obtain the cleaned dataset.</p>
+<code class="sourceCode R"><span><span class="va">citrus_metadata</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">flowCore</span><span class="fu">::</span><span class="fu">pData</span><span class="op">(</span><span class="va">citrus_raw</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, </span>
+<span>    sample_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span>,</span>
+<span>    patient <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"patient[:digit:]"</span><span class="op">)</span>, </span>
+<span>    stimulation <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"(BCR-XL)|Reference"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    stimulation <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">stimulation</span> <span class="op">==</span> <span class="st">"Reference"</span>, <span class="st">"Basal"</span>, <span class="va">stimulation</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">citrus_metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   file_name                          sample_id patient  stimulation</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PBMC8_30min_patient1_BCR-XL.fcs            1 patient1 BCR-XL     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PBMC8_30min_patient1_Reference.fcs         2 patient1 Basal      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> PBMC8_30min_patient2_BCR-XL.fcs            3 patient2 BCR-XL     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> PBMC8_30min_patient2_Reference.fcs         4 patient2 Basal      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> PBMC8_30min_patient3_BCR-XL.fcs            5 patient3 BCR-XL     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> PBMC8_30min_patient3_Reference.fcs         6 patient3 Basal</span></span></code></pre></div>
+<p>Thus, we now have sample-level information about which patient each
+sample was collected from and which stimulation condition (“Basal” or
+“BCR-XL”) each sample was exposed to before data acquisition.</p>
+<p>Finally, we can join this metadata with our single-cell
+<code>tof_tbl</code> to obtain the cleaned dataset.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">citrus_metadata</span>, by <span class="op">=</span> <span class="st">"sample_id"</span><span class="op">)</span></code></pre></div>
-<p>After these data cleaning steps, we now have <code>citrus_data</code>, a <code>tof_tbl</code> containing cells collected from 8 patients. Specifically, 2 samples were taken from each patient: one in which the cells’ B-cell receptors were stimulated (BCR-XL) and one in which they were not (Basal). In <code>citrus_data</code>, each cell’s patient of origin is stored in the <code>patient</code> column, and each cell’s stimulation condition is stored in the <code>stimulation</code> column. In addition, the <code>population_id</code> column stores information about cluster labels that were applied to each cell using a combination of FlowSOM clustering and manual merging (for details, run <code><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">?HDCytoData::Bodenmiller_BCR_XL</a></code> in the R console).</p>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">citrus_metadata</span>, by <span class="op">=</span> <span class="st">"sample_id"</span><span class="op">)</span></span></code></pre></div>
+<p>After these data cleaning steps, we now have
+<code>citrus_data</code>, a <code>tof_tbl</code> containing cells
+collected from 8 patients. Specifically, 2 samples were taken from each
+patient: one in which the cells’ B-cell receptors were stimulated
+(BCR-XL) and one in which they were not (Basal). In
+<code>citrus_data</code>, each cell’s patient of origin is stored in the
+<code>patient</code> column, and each cell’s stimulation condition is
+stored in the <code>stimulation</code> column. In addition, the
+<code>population_id</code> column stores information about cluster
+labels that were applied to each cell using a combination of FlowSOM
+clustering and manual merging (for details, run
+<code><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">?HDCytoData::Bodenmiller_BCR_XL</a></code> in the R console).</p>
 </div>
 <div class="section level2">
-<h2 id="calculating-cluster-proportions-using-tof_extract_proportion">Calculating cluster proportions using <code>tof_extract_proportion()</code><a class="anchor" aria-label="anchor" href="#calculating-cluster-proportions-using-tof_extract_proportion"></a>
+<h2 id="calculating-cluster-proportions-using-tof_extract_proportion">Calculating cluster proportions using
+<code>tof_extract_proportion()</code><a class="anchor" aria-label="anchor" href="#calculating-cluster-proportions-using-tof_extract_proportion"></a>
 </h2>
-<p>First, we have <code><a href="../reference/tof_extract_proportion.html">tof_extract_proportion()</a></code>, which extracts the proportion of cells in each cluster within each sample (with samples defined using the <code>group_cols</code> argument):</p>
+<p>First, we have <code><a href="../reference/tof_extract_proportion.html">tof_extract_proportion()</a></code>, which extracts
+the proportion of cells in each cluster within each sample (with samples
+defined using the <code>group_cols</code> argument):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># preprocess the numeric columns in the citrus dataset</span>
-<span class="va">citrus_data</span> <span class="op">&lt;-</span> 
-  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster"</span>, <span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span>
-<span class="co">#&gt;   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                0.019<span style="text-decoration: underline;">0</span>          0.048<span style="text-decoration: underline;">2</span>           0.447</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL               0.010<span style="text-decoration: underline;">9</span>          0.039<span style="text-decoration: underline;">5</span>           0.268</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                0.013<span style="text-decoration: underline;">0</span>          0.028<span style="text-decoration: underline;">0</span>           0.491</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL               0.010<span style="text-decoration: underline;">1</span>          0.014<span style="text-decoration: underline;">3</span>           0.358</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                0.032<span style="text-decoration: underline;">6</span>          0.083<span style="text-decoration: underline;">0</span>           0.397</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL               0.020<span style="text-decoration: underline;">0</span>          0.041<span style="text-decoration: underline;">2</span>           0.323</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 5 more variables: `prop@cluster4` &lt;dbl&gt;, `prop@cluster5` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster6` &lt;dbl&gt;, `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;</span></span></code></pre></div>
-<p>Like all members of the <code>tof_extract_*</code> function family, <code><a href="../reference/tof_extract_proportion.html">tof_extract_proportion()</a></code> returns one row for each sample (defined as a unique combination of values of the columns specified in <code>group_cols</code>) and one column for each extracted feature (above, one column for the proportion of each of the 8 clusters in <code>citrus_data</code>). These values can also be returned in “long” format by changing the <code>format</code> argument:</p>
+<code class="sourceCode R"><span><span class="co"># preprocess the numeric columns in the citrus dataset</span></span>
+<span><span class="va">citrus_data</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster"</span>, <span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
+<span><span class="co">#&gt;   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                0.019<span style="text-decoration: underline;">0</span>          0.048<span style="text-decoration: underline;">2</span>           0.447</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL               0.010<span style="text-decoration: underline;">9</span>          0.039<span style="text-decoration: underline;">5</span>           0.268</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                0.013<span style="text-decoration: underline;">0</span>          0.028<span style="text-decoration: underline;">0</span>           0.491</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL               0.010<span style="text-decoration: underline;">1</span>          0.014<span style="text-decoration: underline;">3</span>           0.358</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                0.032<span style="text-decoration: underline;">6</span>          0.083<span style="text-decoration: underline;">0</span>           0.397</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL               0.020<span style="text-decoration: underline;">0</span>          0.041<span style="text-decoration: underline;">2</span>           0.323</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: `prop@cluster4` &lt;dbl&gt;, `prop@cluster5` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster6` &lt;dbl&gt;, `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>Like all members of the <code>tof_extract_*</code> function family,
+<code><a href="../reference/tof_extract_proportion.html">tof_extract_proportion()</a></code> returns one row for each sample
+(defined as a unique combination of values of the columns specified in
+<code>group_cols</code>) and one column for each extracted feature
+(above, one column for the proportion of each of the 8 clusters in
+<code>citrus_data</code>). These values can also be returned in “long”
+format by changing the <code>format</code> argument:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
-    format <span class="op">=</span> <span class="st">"long"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span>
-<span class="co">#&gt;   patient  stimulation cluster     prop</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal       cluster1 0.019<span style="text-decoration: underline;">0</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 Basal       cluster2 0.048<span style="text-decoration: underline;">2</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient1 Basal       cluster3 0.447  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient1 Basal       cluster4 0.237  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient1 Basal       cluster5 0.002<span style="text-decoration: underline;">19</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient1 Basal       cluster6 0.075<span style="text-decoration: underline;">9</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_proportion.html">tof_extract_proportion</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, </span>
+<span>    format <span class="op">=</span> <span class="st">"long"</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   patient  stimulation cluster     prop</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal       cluster1 0.019<span style="text-decoration: underline;">0</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 Basal       cluster2 0.048<span style="text-decoration: underline;">2</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient1 Basal       cluster3 0.447  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient1 Basal       cluster4 0.237  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient1 Basal       cluster5 0.002<span style="text-decoration: underline;">19</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient1 Basal       cluster6 0.075<span style="text-decoration: underline;">9</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="calculating-cluster-marker-expression-measures-using-tof_extract_central_tendency">Calculating cluster marker expression measures using <code>tof_extract_central_tendency()</code><a class="anchor" aria-label="anchor" href="#calculating-cluster-marker-expression-measures-using-tof_extract_central_tendency"></a>
+<h2 id="calculating-cluster-marker-expression-measures-using-tof_extract_central_tendency">Calculating cluster marker expression measures using
+<code>tof_extract_central_tendency()</code><a class="anchor" aria-label="anchor" href="#calculating-cluster-marker-expression-measures-using-tof_extract_central_tendency"></a>
 </h2>
-<p>Another member of the <code>tof_extract_*()</code> function family, <code><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency()</a></code>, computes the central tendency (e.g. mean or median) of user-specified markers in each cluster.</p>
+<p>Another member of the <code>tof_extract_*()</code> function family,
+<code><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency()</a></code>, computes the central
+tendency (e.g. mean or median) of user-specified markers in each
+cluster.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
-    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    central_tendency_function <span class="op">=</span> <span class="va">mean</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                          4.68           0.765              3.72</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                         4.80           0.096<span style="text-decoration: underline;">7</span>             4.11</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                          4.88           0.808              3.54</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                         5.00          -<span style="color: #BB0000;">0.057</span><span style="color: #BB0000; text-decoration: underline;">9</span>             3.90</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                          4.98           0.745              3.59</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                         5.04          -<span style="color: #BB0000;">0.043</span><span style="color: #BB0000; text-decoration: underline;">2</span>             3.91</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_ct` &lt;dbl&gt;, `CD20_Sm147@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD4_Nd145@cluster3_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster4_ct` &lt;dbl&gt;, `CD20_Sm147@cluster4_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster5_ct` &lt;dbl&gt;, `CD4_Nd145@cluster5_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, `CD45_In115@cluster6_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
-<p>The argument <code>central_tendency_function</code> can be used to compute any summary statistic. For example, the following choice for <code>central_tendency_function</code> will compute the 75th percentile for each marker-cluster pair in <code>citrus_data</code>:</p>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, </span>
+<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    central_tendency_function <span class="op">=</span> <span class="va">mean</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span></span>
+<span><span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_ct` `CD4_Nd145@cluster1_ct`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 BCR-XL                          4.80                  0.096<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 Basal                           4.68                  0.765 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 BCR-XL                          5.00                 -<span style="color: #BB0000;">0.057</span><span style="color: #BB0000; text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 Basal                           4.88                  0.808 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 BCR-XL                          5.04                 -<span style="color: #BB0000;">0.043</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 Basal                           4.98                  0.745 </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more variables: `CD20_Sm147@cluster1_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster2_ct` &lt;dbl&gt;, `CD4_Nd145@cluster2_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_ct` &lt;dbl&gt;, `CD45_In115@cluster3_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster3_ct` &lt;dbl&gt;, `CD20_Sm147@cluster3_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster4_ct` &lt;dbl&gt;, `CD4_Nd145@cluster4_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster4_ct` &lt;dbl&gt;, `CD45_In115@cluster5_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster5_ct` &lt;dbl&gt;, `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, …</span></span></span></code></pre></div>
+<p>The argument <code>central_tendency_function</code> can be used to
+compute any summary statistic. For example, the following choice for
+<code>central_tendency_function</code> will compute the 75th percentile
+for each marker-cluster pair in <code>citrus_data</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
-    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    central_tendency_function <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, probs <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                          5.18           1.32               4.32</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                         5.30          -<span style="color: #BB0000;">0.018</span><span style="color: #BB0000; text-decoration: underline;">6</span>             4.70</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                          5.28           1.39               4.21</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                         5.41          -<span style="color: #BB0000;">0.020</span><span style="color: #BB0000; text-decoration: underline;">1</span>             4.36</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                          5.41           1.27               4.28</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                         5.42          -<span style="color: #BB0000;">0.036</span><span style="color: #BB0000; text-decoration: underline;">2</span>             4.46</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_ct` &lt;dbl&gt;, `CD20_Sm147@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD4_Nd145@cluster3_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster4_ct` &lt;dbl&gt;, `CD20_Sm147@cluster4_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster5_ct` &lt;dbl&gt;, `CD4_Nd145@cluster5_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, `CD45_In115@cluster6_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, </span>
+<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    central_tendency_function <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, probs <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span></span>
+<span><span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_ct` `CD4_Nd145@cluster1_ct`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 BCR-XL                          5.30                 -<span style="color: #BB0000;">0.018</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 Basal                           5.18                  1.32  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 BCR-XL                          5.41                 -<span style="color: #BB0000;">0.020</span><span style="color: #BB0000; text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 Basal                           5.28                  1.39  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 BCR-XL                          5.42                 -<span style="color: #BB0000;">0.036</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 Basal                           5.41                  1.27  </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more variables: `CD20_Sm147@cluster1_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster2_ct` &lt;dbl&gt;, `CD4_Nd145@cluster2_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_ct` &lt;dbl&gt;, `CD45_In115@cluster3_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster3_ct` &lt;dbl&gt;, `CD20_Sm147@cluster3_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster4_ct` &lt;dbl&gt;, `CD4_Nd145@cluster4_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster4_ct` &lt;dbl&gt;, `CD45_In115@cluster5_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster5_ct` &lt;dbl&gt;, `CD20_Sm147@cluster5_ct` &lt;dbl&gt;, …</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion">Calculating the proportion of cells with marker expression above a threshold using <code>tof_extract_proportion()</code><a class="anchor" aria-label="anchor" href="#calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion"></a>
+<h2 id="calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion">Calculating the proportion of cells with marker expression above a
+threshold using <code>tof_extract_proportion()</code><a class="anchor" aria-label="anchor" href="#calculating-the-proportion-of-cells-with-marker-expression-above-a-threshold-using-tof_extract_proportion"></a>
 </h2>
-<p><code><a href="../reference/tof_extract_threshold.html">tof_extract_threshold()</a></code> is similar to <code><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency()</a></code>, but calculates the proportion of cells above a user-specified expression value for each marker instead of a measure of central tendency:</p>
+<p><code><a href="../reference/tof_extract_threshold.html">tof_extract_threshold()</a></code> is similar to
+<code><a href="../reference/tof_extract_central_tendency.html">tof_extract_central_tendency()</a></code>, but calculates the
+proportion of cells above a user-specified expression value for each
+marker instead of a measure of central tendency:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_threshold.html">tof_extract_threshold</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, 
-    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    threshold <span class="op">=</span> <span class="fl">5</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span>
-<span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_…` `CD4_Nd145@clu…` `CD20_Sm147@cl…`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 Basal                         0.365                0           0.076<span style="text-decoration: underline;">9</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 BCR-XL                        0.516                0           0.096<span style="text-decoration: underline;">8</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 Basal                         0.452                0           0.032<span style="text-decoration: underline;">3</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 BCR-XL                        0.554                0           0.101 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 Basal                         0.549                0           0.055<span style="text-decoration: underline;">2</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 BCR-XL                        0.547                0           0.081<span style="text-decoration: underline;">6</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 21 more variables: `CD45_In115@cluster2_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster3_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster3_threshold` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster4_threshold` &lt;dbl&gt;, …</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_threshold.html">tof_extract_threshold</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span>, </span>
+<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    threshold <span class="op">=</span> <span class="fl">5</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 26</span></span></span>
+<span><span class="co">#&gt;   patient  stimulation `CD45_In115@cluster1_threshold` CD4_Nd145@cluster1_thre…¹</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1 BCR-XL                                0.516                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient1 Basal                                 0.365                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient2 BCR-XL                                0.554                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient2 Basal                                 0.452                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient3 BCR-XL                                0.547                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient3 Basal                                 0.549                         0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`CD4_Nd145@cluster1_threshold`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 22 more variables: `CD20_Sm147@cluster1_threshold` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster2_threshold` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster2_threshold` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_threshold` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_threshold` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD4_Nd145@cluster3_threshold` &lt;dbl&gt;, …</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd">Calculating differences in marker distributions using <code>tof_extract_emd()</code> and <code>tof_extract_jsd()</code><a class="anchor" aria-label="anchor" href="#calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd"></a>
+<h2 id="calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd">Calculating differences in marker distributions using
+<code>tof_extract_emd()</code> and <code>tof_extract_jsd()</code><a class="anchor" aria-label="anchor" href="#calculating-differences-in-marker-distributions-using-tof_extract_emd-and-tof_extract_jsd"></a>
 </h2>
-<p>The two final members of the <code>tof_extract_*</code> function family – <code>tof_extract_emd</code> and <code>tof_extract_jsd</code> – are designed specifically for comparing distributions of marker expression between stimulation conditions. As such, they must be given a stimulation column (using the <code>emd_col</code> or <code>jsd_col</code> argument) that identifies the stimulation condition each cell is in, and a <code>reference_level</code> that specifies the reference (i.e. unstimulated) condition within the <code>emd_col</code> or <code>jsd_col</code>.</p>
-<p>With these additional arguments, <code>tof_extract_emd</code> computes the Earth-mover’s distance between each marker’s distribution in the stimulation conditions (within each cluster) and the basal condition; similarly, <code>tof_extract_jsd</code> computes the Jensen-Shannon divergence index between the same distributions. Both of these values are ways to compare how different 2 distributions are to one another and are more computationally expensive (but also higher-resolution) than simply comparing measures of central tendency.</p>
+<p>The two final members of the <code>tof_extract_*</code> function
+family – <code>tof_extract_emd</code> and <code>tof_extract_jsd</code> –
+are designed specifically for comparing distributions of marker
+expression between stimulation conditions. As such, they must be given a
+stimulation column (using the <code>emd_col</code> or
+<code>jsd_col</code> argument) that identifies the stimulation condition
+each cell is in, and a <code>reference_level</code> that specifies the
+reference (i.e. unstimulated) condition within the <code>emd_col</code>
+or <code>jsd_col</code>.</p>
+<p>With these additional arguments, <code>tof_extract_emd</code>
+computes the Earth-mover’s distance between each marker’s distribution
+in the stimulation conditions (within each cluster) and the basal
+condition; similarly, <code>tof_extract_jsd</code> computes the
+Jensen-Shannon divergence index between the same distributions. Both of
+these values are ways to compare how different 2 distributions are to
+one another and are more computationally expensive (but also
+higher-resolution) than simply comparing measures of central
+tendency.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Earth-mover's distance</span>
-<span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_emd.html">tof_extract_emd</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="va">patient</span>, 
-    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    emd_col <span class="op">=</span> <span class="va">stimulation</span>, 
-    reference_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>
-<span class="co">#&gt;   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1              0.864             2.47            13.0             1.45 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2              1.11              7.05            10.8             0.726</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3              0.670             6.23            10.5             0.640</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4              2.64              5.86             9.90            3.27 </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5              0.594             7.56             8.13            0.788</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6              0.661             4.77             7.97            1.59 </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster4_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster2_emd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster2_emd` &lt;dbl&gt;, …</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Earth-mover's distance</span></span>
+<span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_emd.html">tof_extract_emd</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="va">patient</span>, </span>
+<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    emd_col <span class="op">=</span> <span class="va">stimulation</span>, </span>
+<span>    reference_level <span class="op">=</span> <span class="st">"Basal"</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span></span>
+<span><span class="co">#&gt;   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1                   0.864                   2.47                  13.0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2                   1.11                    7.05                  10.8 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3                   0.670                   6.23                  10.5 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4                   2.64                    5.86                   9.90</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5                   0.594                   7.56                   8.13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6                   0.661                   4.77                   7.97</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated names: ¹​`BCR-XL_CD45_In115@cluster3_emd`,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ²​`BCR-XL_CD4_Nd145@cluster3_emd`, ³​`BCR-XL_CD20_Sm147@cluster3_emd`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 21 more variables: `BCR-XL_CD45_In115@cluster7_emd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster7_emd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_emd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_emd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_emd` &lt;dbl&gt;, …</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Jensen-Shannon Divergence</span>
-<span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_jsd.html">tof_extract_jsd</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="va">patient</span>,  
-    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, 
-    jsd_col <span class="op">=</span> <span class="va">stimulation</span>, 
-    reference_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span>
-<span class="co">#&gt;   patient  `BCR-XL_CD45_In1…` `BCR-XL_CD4_Nd…` `BCR-XL_CD20_S…` `BCR-XL_CD45_I…`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1            0.036<span style="text-decoration: underline;">7</span>            0.051<span style="text-decoration: underline;">3</span>            0.347           0.053<span style="text-decoration: underline;">8</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2            0.008<span style="text-decoration: underline;">31</span>           0.168             0.401           0.017<span style="text-decoration: underline;">0</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3            0.010<span style="text-decoration: underline;">4</span>            0.115             0.357           0.019<span style="text-decoration: underline;">7</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4            0.030<span style="text-decoration: underline;">1</span>            0.135             0.205           0.039<span style="text-decoration: underline;">8</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5            0.009<span style="text-decoration: underline;">11</span>           0.078<span style="text-decoration: underline;">9</span>            0.274           0.025<span style="text-decoration: underline;">1</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6            0.009<span style="text-decoration: underline;">72</span>           0.034<span style="text-decoration: underline;">6</span>            0.214           0.048<span style="text-decoration: underline;">0</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 20 more variables: `BCR-XL_CD4_Nd145@cluster7_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster4_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster2_jsd` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster2_jsd` &lt;dbl&gt;, …</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Jensen-Shannon Divergence</span></span>
+<span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_jsd.html">tof_extract_jsd</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="va">patient</span>,  </span>
+<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD4_Nd145"</span>, <span class="st">"CD20_Sm147"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    jsd_col <span class="op">=</span> <span class="va">stimulation</span>, </span>
+<span>    reference_level <span class="op">=</span> <span class="st">"Basal"</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 25</span></span></span>
+<span><span class="co">#&gt;   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1                 0.036<span style="text-decoration: underline;">7</span>                  0.051<span style="text-decoration: underline;">3</span>                  0.347</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2                 0.008<span style="text-decoration: underline;">31</span>                 0.168                   0.401</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3                 0.010<span style="text-decoration: underline;">4</span>                  0.115                   0.357</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4                 0.030<span style="text-decoration: underline;">1</span>                  0.135                   0.205</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5                 0.009<span style="text-decoration: underline;">11</span>                 0.078<span style="text-decoration: underline;">9</span>                  0.274</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6                 0.009<span style="text-decoration: underline;">72</span>                 0.034<span style="text-decoration: underline;">6</span>                  0.214</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated names: ¹​`BCR-XL_CD45_In115@cluster3_jsd`,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ²​`BCR-XL_CD4_Nd145@cluster3_jsd`, ³​`BCR-XL_CD20_Sm147@cluster3_jsd`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 21 more variables: `BCR-XL_CD45_In115@cluster7_jsd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster7_jsd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD20_Sm147@cluster7_jsd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD45_In115@cluster4_jsd` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `BCR-XL_CD4_Nd145@cluster4_jsd` &lt;dbl&gt;, …</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="putting-it-all-together-with-tof_extract_features">Putting it all together with <code>tof_extract_features()</code><a class="anchor" aria-label="anchor" href="#putting-it-all-together-with-tof_extract_features"></a>
+<h2 id="putting-it-all-together-with-tof_extract_features">Putting it all together with
+<code>tof_extract_features()</code><a class="anchor" aria-label="anchor" href="#putting-it-all-together-with-tof_extract_features"></a>
 </h2>
-<p>Finally, the <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb provides a wrapper to each of the members of its function family, allowing users to extract multiple features types at once. For example, the following code extracts the proportion of each cluster, median of several markers in each cluster, and EMD between the basal condition and stimulated condition in each cluster for all patients in <code>citrus_data</code>.</p>
+<p>Finally, the <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> verb provides a
+wrapper to each of the members of its function family, allowing users to
+extract multiple features types at once. For example, the following code
+extracts the proportion of each cluster, median of several markers in
+each cluster, and EMD between the basal condition and stimulated
+condition in each cluster for all patients in
+<code>citrus_data</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">signaling_markers</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>
-    <span class="st">"pNFkB_Nd142"</span>, <span class="st">"pStat5_Nd150"</span>, <span class="st">"pAkt_Sm152"</span>, <span class="st">"pStat1_Eu153"</span>, <span class="st">"pStat3_Gd158"</span>, 
-    <span class="st">"pSlp76_Dy164"</span>, <span class="st">"pBtk_Er166"</span>, <span class="st">"pErk_Er168"</span>, <span class="st">"pS6_Yb172"</span>, <span class="st">"pZap70_Gd156"</span>
-  <span class="op">)</span>
-
-<span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/tof_extract_features.html">tof_extract_features</a></span><span class="op">(</span>
-    cluster_col <span class="op">=</span> <span class="va">cluster</span>, 
-    group_cols <span class="op">=</span> <span class="va">patient</span>, 
-    stimulation_col <span class="op">=</span> <span class="va">stimulation</span>,
-    lineage_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD20_Sm147"</span>, <span class="st">"CD33_Nd148"</span><span class="op">)</span><span class="op">)</span>, 
-    signaling_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>, 
-    signaling_method <span class="op">=</span> <span class="st">"emd"</span>, 
-    basal_level <span class="op">=</span> <span class="st">"Basal"</span>
-  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 193</span></span>
-<span class="co">#&gt;   patient  `prop@cluster1` `prop@cluster2` `prop@cluster3` `prop@cluster4`</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1          0.014<span style="text-decoration: underline;">9</span>          0.043<span style="text-decoration: underline;">8</span>           0.356           0.351</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2          0.011<span style="text-decoration: underline;">5</span>          0.021<span style="text-decoration: underline;">2</span>           0.425           0.323</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3          0.025<span style="text-decoration: underline;">5</span>          0.059<span style="text-decoration: underline;">4</span>           0.355           0.217</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4          0.012<span style="text-decoration: underline;">7</span>          0.041<span style="text-decoration: underline;">8</span>           0.320           0.223</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5          0.020<span style="text-decoration: underline;">7</span>          0.042<span style="text-decoration: underline;">3</span>           0.377           0.269</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6          0.018<span style="text-decoration: underline;">3</span>          0.049<span style="text-decoration: underline;">3</span>           0.459           0.250</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 188 more variables: `prop@cluster5` &lt;dbl&gt;, `prop@cluster6` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster1_ct` &lt;dbl&gt;, `CD20_Sm147@cluster1_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster1_ct` &lt;dbl&gt;, `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_ct` &lt;dbl&gt;, `CD33_Nd148@cluster2_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD20_Sm147@cluster3_ct` &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;, …</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">signaling_markers</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"pNFkB_Nd142"</span>, <span class="st">"pStat5_Nd150"</span>, <span class="st">"pAkt_Sm152"</span>, <span class="st">"pStat1_Eu153"</span>, <span class="st">"pStat3_Gd158"</span>, </span>
+<span>    <span class="st">"pSlp76_Dy164"</span>, <span class="st">"pBtk_Er166"</span>, <span class="st">"pErk_Er168"</span>, <span class="st">"pS6_Yb172"</span>, <span class="st">"pZap70_Gd156"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_extract_features.html">tof_extract_features</a></span><span class="op">(</span></span>
+<span>    cluster_col <span class="op">=</span> <span class="va">cluster</span>, </span>
+<span>    group_cols <span class="op">=</span> <span class="va">patient</span>, </span>
+<span>    stimulation_col <span class="op">=</span> <span class="va">stimulation</span>,</span>
+<span>    lineage_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD45_In115"</span>, <span class="st">"CD20_Sm147"</span>, <span class="st">"CD33_Nd148"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    signaling_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>, </span>
+<span>    signaling_method <span class="op">=</span> <span class="st">"emd"</span>, </span>
+<span>    basal_level <span class="op">=</span> <span class="st">"Basal"</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 193</span></span></span>
+<span><span class="co">#&gt;   patient  `prop@cluster1` `prop@cluster2` `prop@cluster3` `prop@cluster4`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> patient1          0.014<span style="text-decoration: underline;">9</span>          0.043<span style="text-decoration: underline;">8</span>           0.356           0.351</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> patient2          0.011<span style="text-decoration: underline;">5</span>          0.021<span style="text-decoration: underline;">2</span>           0.425           0.323</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> patient3          0.025<span style="text-decoration: underline;">5</span>          0.059<span style="text-decoration: underline;">4</span>           0.355           0.217</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> patient4          0.012<span style="text-decoration: underline;">7</span>          0.041<span style="text-decoration: underline;">8</span>           0.320           0.223</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> patient5          0.020<span style="text-decoration: underline;">7</span>          0.042<span style="text-decoration: underline;">3</span>           0.377           0.269</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> patient6          0.018<span style="text-decoration: underline;">3</span>          0.049<span style="text-decoration: underline;">3</span>           0.459           0.250</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 188 more variables: `prop@cluster5` &lt;dbl&gt;, `prop@cluster6` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `prop@cluster7` &lt;dbl&gt;, `prop@cluster8` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster1_ct` &lt;dbl&gt;, `CD20_Sm147@cluster1_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster1_ct` &lt;dbl&gt;, `CD45_In115@cluster2_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD20_Sm147@cluster2_ct` &lt;dbl&gt;, `CD33_Nd148@cluster2_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD45_In115@cluster3_ct` &lt;dbl&gt;, `CD20_Sm147@cluster3_ct` &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `CD33_Nd148@cluster3_ct` &lt;dbl&gt;, `CD45_In115@cluster4_ct` &lt;dbl&gt;, …</span></span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -400,7 +476,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer>

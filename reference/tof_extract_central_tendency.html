@@ -3,7 +3,7 @@
 (i.e. median or mode) of the cells in each cluster in a `tof_tibble` across a
 user-specified selection of CyTOF markers. These calculations can be done either
 overall (across all cells in the dataset) or after breaking down the cells into
-subgroups using `group_cols`."><title>Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`. — tof_extract_central_tendency • tidytof</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`. — tof_extract_central_tendency"><meta property="og:description" content="This feature extraction function calculates a user-specified measurement of central tendency
+subgroups using `group_cols`."><title>Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`. — tof_extract_central_tendency • tidytof</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Extract the central tendencies of CyTOF markers in each cluster in a `tof_tibble`. — tof_extract_central_tendency"><meta property="og:description" content="This feature extraction function calculates a user-specified measurement of central tendency
 (i.e. median or mode) of the cells in each cluster in a `tof_tibble` across a
 user-specified selection of CyTOF markers. These calculations can be done either
 overall (across all cells in the dataset) or after breaking down the cells into
@@ -35,22 +35,16 @@ subgroups using `group_cols`."><!-- mathjax --><script src="https://cdnjs.cloudf
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>Extending {tidytof}</h6>
-    <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Cell-level operations</h6>
-    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
-    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
-    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
-    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Cluster-level operations</h6>
     <a class="dropdown-item" href="../articles/clustering.html">Clustering and metaclustering</a>
+    <a class="dropdown-item" href="../articles/contributing-to-tidytof.html">How to contribute code</a>
     <a class="dropdown-item" href="../articles/differential-discovery-analysis.html">Differential discovery analysis</a>
+    <a class="dropdown-item" href="../articles/dimensionality-reduction.html">Dimensionality reduction</a>
+    <a class="dropdown-item" href="../articles/downsampling.html">Downsampling</a>
     <a class="dropdown-item" href="../articles/feature-extraction.html">Feature extraction</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Sample-level operations</h6>
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
+    <a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing</a>
+    <a class="dropdown-item" href="../articles/quality-control.html">Quality control</a>
+    <a class="dropdown-item" href="../articles/reading-and-writing-data.html">Reading and writing data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -78,15 +72,15 @@ subgroups using `group_cols`.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tof_extract_central_tendency</span><span class="op">(</span>
-  <span class="va">tof_tibble</span>,
-  <span class="va">cluster_col</span>,
-  group_cols <span class="op">=</span> <span class="cn">NULL</span>,
-  marker_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,
-  stimulation_col <span class="op">=</span> <span class="cn">NULL</span>,
-  central_tendency_function <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span>,
-  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wide"</span>, <span class="st">"long"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span>
+<span>  <span class="va">tof_tibble</span>,</span>
+<span>  <span class="va">cluster_col</span>,</span>
+<span>  group_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  marker_cols <span class="op">=</span> <span class="fu"><a href="where.html">where</a></span><span class="op">(</span><span class="va">tof_is_numeric</span><span class="op">)</span>,</span>
+<span>  stimulation_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  central_tendency_function <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span>,</span>
+<span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wide"</span>, <span class="st">"long"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -95,44 +89,63 @@ subgroups using `group_cols`.</p>
 <dd><p>A `tof_tibble` or a `tibble` in which each row represents a
 single cell and each column represents a CyTOF measurement or a piece of metadata
 (i.e. cluster id, patient id, etc.) about each cell.</p></dd>
+
+
 <dt>cluster_col</dt>
 <dd><p>An unquoted column name indicating which column in `tof_tibble`
 stores the cluster ids of the cluster to which each cell belongs.
 Cluster labels can be produced via any method the user chooses - including manual gating,
 any of the functions in the `tof_cluster_*` function family, or any other method.</p></dd>
+
+
 <dt>group_cols</dt>
 <dd><p>Unquoted column names representing which columns in `tof_tibble`
 should be used to break the rows of `tof_tibble` into subgroups for the feature
 extraction calculation. Defaults to NULL (i.e. performing the extraction without subgroups).</p></dd>
+
+
 <dt>marker_cols</dt>
 <dd><p>Unquoted column names representing which columns in `tof_tibble`
 (i.e. which CyTOF protein measurements) should be included in the feature extraction
 calculation. Defaults to all numeric (integer or double) columns.
 Supports tidyselection.</p></dd>
+
+
 <dt>stimulation_col</dt>
 <dd><p>Optional. An unquoted column name that indicates which
 column in `tof_tibble` contains information about which stimulation condition each cell
 was exposed to during data acquisition. If provided, the feature extraction will be
 further broken down into subgroups by stimulation condition (and features from each stimulation
 condition will be included as their own features in wide format).</p></dd>
+
+
 <dt>central_tendency_function</dt>
 <dd><p>The function that will be used to calculate
 the measurement of central tendency for each cluster (to be used
 as the dependent variable in the linear model). Defaults to <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></code>.</p></dd>
+
+
 <dt>format</dt>
 <dd><p>A string indicating if the data should be returned in "wide" format
 (the default; each cluster feature is given its own column) or in "long" format
 (each cluster feature is provided as its own row).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble.
-If format == "wide", the tibble will have 1 row for each combination of
+    
+
+<p>A tibble.</p>
+
+
+<p>If format == "wide", the tibble will have 1 row for each combination of
 the grouping variables provided in `group_cols` and one column for each grouping variable,
 one column for each extracted feature (the central tendency of a given marker in a given cluster).
 The names of each column containing cluster features is obtained using the following pattern:
-"{marker_id}@{cluster_id}_ct".
-If format == "long", the tibble will have 1 row for each combination of the grouping variables
+"{marker_id}@{cluster_id}_ct".</p>
+
+
+<p>If format == "long", the tibble will have 1 row for each combination of the grouping variables
 in `group_cols`, each cluster id (i.e. level) in `cluster_col`, and each marker in `marker_cols`.
 It will have one column for each grouping variable, one column for the cluster ids, one
 column for the CyTOF channel names, and one column (`value`) containing the features.</p>
@@ -149,58 +162,58 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">sim_data</span> <span class="op">&lt;-</span></span>
-<span class="r-in">    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span class="r-in">        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
-<span class="r-in">        cd38 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
-<span class="r-in">        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
-<span class="r-in">        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span>
-<span class="r-in">        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span class="r-in">        patient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kirby"</span>, <span class="st">"mario"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span class="r-in">        stim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basal"</span>, <span class="st">"stim"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># extract proportion of each cluster in each patient in wide format</span></span>
-<span class="r-in"><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span>
-<span class="r-in">    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
-<span class="r-in">    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
-<span class="r-in">    group_cols <span class="op">=</span> <span class="va">patient</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sim_data</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cd38 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cd34 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        patient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kirby"</span>, <span class="st">"mario"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        stim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basal"</span>, <span class="st">"stim"</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># extract proportion of each cluster in each patient in wide format</span></span></span>
+<span class="r-in"><span><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span></span>
+<span class="r-in"><span>    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span></span>
+<span class="r-in"><span>    group_cols <span class="op">=</span> <span class="va">patient</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 105</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   patient `cd45@a_ct` `cd38@a_ct` `cd34@a_ct` `cd19@a_ct` `cd45@b_ct`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby         0.302       0.824      -<span style="color: #BB0000;">0.286</span>       0.299      -<span style="color: #BB0000;">0.501</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario         0.217      -<span style="color: #BB0000;">0.388</span>       0.456      -<span style="color: #BB0000;">0.152</span>      -<span style="color: #BB0000;">0.114</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 99 more variables: `cd38@b_ct` &lt;dbl&gt;, `cd34@b_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@b_ct` &lt;dbl&gt;, `cd45@c_ct` &lt;dbl&gt;, `cd38@c_ct` &lt;dbl&gt;, `cd34@c_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@c_ct` &lt;dbl&gt;, `cd45@d_ct` &lt;dbl&gt;, `cd38@d_ct` &lt;dbl&gt;, `cd34@d_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@d_ct` &lt;dbl&gt;, `cd45@e_ct` &lt;dbl&gt;, `cd38@e_ct` &lt;dbl&gt;, `cd34@e_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@e_ct` &lt;dbl&gt;, `cd45@f_ct` &lt;dbl&gt;, `cd38@f_ct` &lt;dbl&gt;, `cd34@f_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@f_ct` &lt;dbl&gt;, `cd45@g_ct` &lt;dbl&gt;, `cd38@g_ct` &lt;dbl&gt;, `cd34@g_ct` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd19@g_ct` &lt;dbl&gt;, `cd45@h_ct` &lt;dbl&gt;, `cd38@h_ct` &lt;dbl&gt;, …</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># extract proportion of each cluster in each patient in long format</span></span>
-<span class="r-in"><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span>
-<span class="r-in">    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span>
-<span class="r-in">    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
-<span class="r-in">    group_cols <span class="op">=</span> <span class="va">patient</span>,</span>
-<span class="r-in">    format <span class="op">=</span> <span class="st">"long"</span></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby         0.146      -<span style="color: #BB0000;">0.491</span>       0.249      0.205       0.340 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario         0.937       0.529      -<span style="color: #BB0000;">0.415</span>      0.070<span style="text-decoration: underline;">7</span>      0.080<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 99 more variables: `cd38@b_ct` &lt;dbl&gt;, `cd34@b_ct` &lt;dbl&gt;, `cd19@b_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@c_ct` &lt;dbl&gt;, `cd38@c_ct` &lt;dbl&gt;, `cd34@c_ct` &lt;dbl&gt;, `cd19@c_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@d_ct` &lt;dbl&gt;, `cd38@d_ct` &lt;dbl&gt;, `cd34@d_ct` &lt;dbl&gt;, `cd19@d_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@e_ct` &lt;dbl&gt;, `cd38@e_ct` &lt;dbl&gt;, `cd34@e_ct` &lt;dbl&gt;, `cd19@e_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@f_ct` &lt;dbl&gt;, `cd38@f_ct` &lt;dbl&gt;, `cd34@f_ct` &lt;dbl&gt;, `cd19@f_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@g_ct` &lt;dbl&gt;, `cd38@g_ct` &lt;dbl&gt;, `cd34@g_ct` &lt;dbl&gt;, `cd19@g_ct` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `cd45@h_ct` &lt;dbl&gt;, `cd38@h_ct` &lt;dbl&gt;, `cd34@h_ct` &lt;dbl&gt;, …</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># extract proportion of each cluster in each patient in long format</span></span></span>
+<span class="r-in"><span><span class="fu">tof_extract_central_tendency</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    tof_tibble <span class="op">=</span> <span class="va">sim_data</span>,</span></span>
+<span class="r-in"><span>    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span></span>
+<span class="r-in"><span>    group_cols <span class="op">=</span> <span class="va">patient</span>,</span></span>
+<span class="r-in"><span>    format <span class="op">=</span> <span class="st">"long"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 208 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id channel   values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          cd45     0.302  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   a          cd38     0.824  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   a          cd34    -<span style="color: #BB0000;">0.286</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   a          cd19     0.299  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   b          cd45    -<span style="color: #BB0000;">0.501</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   b          cd38    -<span style="color: #BB0000;">0.096</span><span style="color: #BB0000; text-decoration: underline;">4</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   b          cd34    -<span style="color: #BB0000;">0.144</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   b          cd19    -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">05</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   c          cd45     0.210  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   c          cd38     0.264  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 198 more rows</span></span>
-<span class="r-in"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id channel  values</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          cd45     0.146 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   a          cd38    -<span style="color: #BB0000;">0.491</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   a          cd34     0.249 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   a          cd19     0.205 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   b          cd45     0.340 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   b          cd38    -<span style="color: #BB0000;">0.204</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   b          cd34     0.091<span style="text-decoration: underline;">4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   b          cd19    -<span style="color: #BB0000;">0.137</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   c          cd45    -<span style="color: #BB0000;">0.057</span><span style="color: #BB0000; text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   c          cd38     0.025<span style="text-decoration: underline;">3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 198 more rows</span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -212,7 +225,7 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

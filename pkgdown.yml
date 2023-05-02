@@ -1,5 +1,5 @@
-pandoc: 2.7.3
-pkgdown: 2.0.3
+pandoc: 2.19.2
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   clustering: clustering.html
@@ -10,9 +10,10 @@ articles:
   feature-extraction: feature-extraction.html
   modeling: modeling.html
   preprocessing: preprocessing.html
+  quality-control: quality-control.html
   reading-and-writing-data: reading-and-writing-data.html
   tidytof: tidytof.html
-last_built: 2022-06-03T06:02Z
+last_built: 2023-05-02T01:11Z
 urls:
   reference: https://keyes-timothy.github.io/tidytof/reference
   article: https://keyes-timothy.github.io/tidytof/articles
