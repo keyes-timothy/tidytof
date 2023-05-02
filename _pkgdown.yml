@@ -10,6 +10,10 @@ reference:
   contents:
   - starts_with("tof_read")
   - starts_with("tof_write")
+  - tof_assess_channels
+  - starts_with("tof_assess_flow_rate")
+  - tof_calculate_flow_rate
+  - starts_with("tof_batch_correct")
   - tidytof_example_data
   - new_tof_tibble
   - as_tof_tbl
@@ -21,6 +25,7 @@ reference:
   desc: "Functions for data processing tasks at the single-cell level"
   contents:
   - tof_preprocess
+  - tof_transform
   - tof_postprocess
   - starts_with("tof_downsample")
   - starts_with("tof_reduce")
@@ -32,10 +37,12 @@ reference:
 - title: "Cluster-level data analysis"
   desc: "Functions for data processing tasks at the cluster or cell subpopulation level"
   contents:
+  - tof_annotate_clusters
+  - starts_with("tof_assess_clusters")
   - starts_with("tof_metacluster")
   - starts_with("tof_upsample")
-  - starts_with("tof_daa")
-  - starts_with("tof_dea")
+  - starts_with("tof_analyze_abundance")
+  - starts_with("tof_analyze_expression")
   - starts_with("tof_extract")
 - title: "Sample- or patient-level data analysis"
   desc: "Functions for data processing tasks at the whole-sample or whole-patient level"
@@ -82,6 +89,7 @@ reference:
   - tof_find_log_rank_threshold
   - tof_log_rank_test
   - tof_make_roc_curve
+  - tof_generate_palette
 - title: "Built-in data"
   desc: "Example cytometry datasets built into {tidytof}"
   contents:
