@@ -84,7 +84,8 @@ LazyData: false
 RoxygenNote: 7.2.3
 LinkingTo: 
     Rcpp
-URL: https://keyes-timothy.github.io/tidytof
+URL: https://keyes-timothy.github.io/tidytof,
+    https://keyes-timothy.github.io/tidytof/
 VignetteBuilder: knitr
 Language: en-US
 biocViews: SingleCellWorkflow

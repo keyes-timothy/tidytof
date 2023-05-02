@@ -1367,7 +1367,7 @@ tof_analyze_expression_lmm <-
 
     fit_data <-
       fit_data |>
-      dplyr::rename(std_error = `Std_ Error`) |>
+      dplyr::rename(std_error = "Std_ Error") |> # TO DO: Check
       tidyr::nest(dea_results = c(-"tested_effect"))
 
     # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \

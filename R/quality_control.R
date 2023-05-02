@@ -422,7 +422,7 @@ tof_assess_flow_rate <-
           .data$timestep,
           name = "num_cells"
         ) |>
-        ggplot2::ggplot(ggplot2::aes(x = timestep, y = num_cells, fill = flagged_window)) +
+        ggplot2::ggplot(ggplot2::aes(x = .data$timestep, y = .data$num_cells, fill = .data$flagged_window)) +
         ggplot2::geom_point(shape = 21) +
         ggplot2::theme_bw()
 
@@ -712,8 +712,8 @@ tof_sum_rescale <- function(vec) {
 #' # most cells in "cluster a" are flagged, and few cells in the other clusters are
 #' flagged_cluster_proportions <-
 #'   entropy_result |>
-#'   group_by(cluster_id) |>
-#'   summarize(
+#'   dplyr::group_by(cluster_id) |>
+#'   dplyr::summarize(
 #'     prop_flagged = mean(flagged_cell)
 #'   )
 #'
