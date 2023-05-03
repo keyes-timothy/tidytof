@@ -513,12 +513,12 @@ phenograph_clusters |>
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacluster phenograph_cluster    cd19 cd11b    cd34
 #>   <chr>            <chr>                <chr>                <dbl> <dbl>   <dbl>
-#> 1 H1_PhenoGraph_c… 8                    cluster1           -0.0336 2.46   0.608 
-#> 2 H1_PhenoGraph_c… 9                    cluster1            0.324  0.856 -0.116 
-#> 3 H1_PhenoGraph_c… 8                    cluster1            0.532  2.67   0.909 
-#> 4 H1_PhenoGraph_c… 2                    cluster1            0.0163 2.97   0.0725
-#> 5 H1_PhenoGraph_c… 8                    cluster1            0.144  2.98   0.128 
-#> 6 H1_PhenoGraph_c… 1                    cluster1            0.742  3.41   0.336 
+#> 1 H1_PhenoGraph_c… 15                   cluster1           -0.0336 2.46   0.608 
+#> 2 H1_PhenoGraph_c… 15                   cluster1            0.324  0.856 -0.116 
+#> 3 H1_PhenoGraph_c… 15                   cluster1            0.532  2.67   0.909 
+#> 4 H1_PhenoGraph_c… 9                    cluster1            0.0163 2.97   0.0725
+#> 5 H1_PhenoGraph_c… 10                   cluster1            0.144  2.98   0.128 
+#> 6 H1_PhenoGraph_c… 9                    cluster1            0.742  3.41   0.336 
 #> # ℹ 20 more variables: cd45 <dbl>, cd123 <dbl>, cd33 <dbl>, cd47 <dbl>,
 #> #   cd7 <dbl>, cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>,
 #> #   cd41 <dbl>, pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>,
@@ -539,20 +539,20 @@ to the original clustering from the PhenoGraph paper.
 ``` r
 phenograph_clusters |> 
   count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 24 × 3
+#> # A tibble: 23 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster3           15                     426
-#>  2 cluster2           17                     299
-#>  3 cluster2           5                      291
-#>  4 cluster1           3                      228
-#>  5 cluster3           16                     196
-#>  6 cluster3           19                     184
-#>  7 cluster1           1                      173
-#>  8 cluster1           6                      173
-#>  9 cluster2           12                     173
-#> 10 cluster1           2                      170
-#> # ℹ 14 more rows
+#>  1 cluster3           19                     321
+#>  2 cluster2           3                      319
+#>  3 cluster3           13                     304
+#>  4 cluster3           14                     259
+#>  5 cluster1           10                     215
+#>  6 cluster2           1                      207
+#>  7 cluster2           4                      205
+#>  8 cluster1           17                     179
+#>  9 cluster2           5                      165
+#> 10 cluster1           18                     153
+#> # ℹ 13 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -574,12 +574,12 @@ phenograph_data |>
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 13                  
-#> 2 14                  
-#> 3 13                  
-#> 4 18                  
-#> 5 15                  
-#> 6 18
+#> 1 9                   
+#> 2 10                  
+#> 3 8                   
+#> 4 3                   
+#> 5 9                   
+#> 6 3
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -608,12 +608,12 @@ phenograph_tsne |>
 #> # A tibble: 6 × 2
 #>   .tsne_1 .tsne_2
 #>     <dbl>   <dbl>
-#> 1   13.8   -14.8 
-#> 2    5.10   -7.82
-#> 3    7.70  -36.1 
-#> 4   -1.95  -17.0 
-#> 5   11.2   -18.7 
-#> 6    1.50  -25.5
+#> 1   0.699  -15.8 
+#> 2   5.33   -14.9 
+#> 3  30.1     -9.60
+#> 4  15.2    -11.9 
+#> 5   3.65   -16.6 
+#> 6  18.2    -19.8
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -1335,10 +1335,10 @@ my_resample |>
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 UPN1           3.06      0.583    0.00449    0.164       1.94     0.416
 #> 2 UPN1-Rx        0.0395    0.618    0.0634     0.572       2.93     0.944
-#> 3 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
-#> 4 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
-#> 5 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
-#> 6 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
+#> 3 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 4 UPN3           0.633     0.0234   0.0165     0.0327      2.25     0.226
+#> 5 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 6 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
 #> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1353,12 +1353,12 @@ my_resample |>
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
-#> 2 UPN8           0.951     0.958    0.161      0.556       3.18     0.556
-#> 3 UPN11          0.332     0.488    0.0146     0.598       2.16     0.320
-#> 4 UPN22-Rx       0.0643    1.68     0.0804     1.56        3.06     0.529
-#> 5 UPN25          0.0181    0.0266   0.00152    0.108       2.73     0.386
-#> 6 UPN29          1.09      1.63     0.00561    1.29        3.05     0.606
+#> 1 UPN13         0.0634     0.0300   0.0219     0.109       2.34     0.314
+#> 2 UPN23         0.00719    0.0259   0.00392    0.0825      2.33     0.501
+#> 3 UPN25         0.0181     0.0266   0.00152    0.108       2.73     0.386
+#> 4 UPN26         0.390      0.650    0.00157    0.622       2.81     0.684
+#> 5 UPN31         0.891      0.0319   0.0140     0.0491      2.39     0.437
+#> 6 UPN35         0.0948     0.138    0.155      0.839       3.46     0.970
 #> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,

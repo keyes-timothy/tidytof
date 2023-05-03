@@ -53,8 +53,8 @@ tof_cluster_supercluster <-
     cluster_data <- dplyr::select(tof_tibble, {{cluster_cols}})
     
     result <- 
-      cluster_data %>% 
-      do_something(...) %>% 
+      cluster_data }> 
+      do_something(...) }> 
       do_something_else(...)
   }
 ```
