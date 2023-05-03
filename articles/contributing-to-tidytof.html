@@ -163,16 +163,15 @@ verb<a class="anchor" aria-label="anchor" href="#contributing-a-new-method-to-an
 <p>For example, if I wanted to write a <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>-style
 interface for my new clustering algorithm “supercluster”, I might write
 something like this:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tof_cluster_supercluster</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="va">cluster_cols</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span> </span>
-<span>    <span class="va">cluster_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="op">{</span><span class="op">{</span><span class="va">cluster_cols</span><span class="op">}</span><span class="op">}</span><span class="op">)</span></span>
-<span>    </span>
-<span>    <span class="va">result</span> <span class="op">&lt;-</span> </span>
-<span>      <span class="va">cluster_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu">do_something</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu">do_something_else</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tof_cluster_supercluster <span class="ot">&lt;-</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(tof_tibble, cluster_cols, ...) { </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    cluster_data <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(tof_tibble, {{cluster_cols}})</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      cluster_data }<span class="sc">&gt;</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">do_something</span>(...) <span class="er">}</span><span class="sc">&gt;</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">do_something_else</span>(...)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="creating-a-new-tidytof-verb">Creating a new <code>{tidytof}</code> verb<a class="anchor" aria-label="anchor" href="#creating-a-new-tidytof-verb"></a>
