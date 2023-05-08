@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_phenograph}
 \alias{tof_cluster_phenograph}
-\title{Perform PhenoGraph clustering on CyTOF data.}
+\title{Perform PhenoGraph clustering on high-dimensional cytometry data.}
 \usage{
 tof_cluster_phenograph(
   tof_tibble,
@@ -37,8 +37,8 @@ integer vector of length `nrow(tof_tibble)` indicating the id of
 the PhenoGraph cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{
-This function performs PhenoGraph clustering on CyTOF data using a user-specified
-selection of input variables/CyTOF measurements.
+This function performs PhenoGraph clustering on high-dimensional cytometry data using a user-specified
+selection of input variables/high-dimensional cytometry measurements.
 }
 \details{
 For additional details about the Phenograph algorithm,

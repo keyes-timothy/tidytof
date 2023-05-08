@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_kmeans}
 \alias{tof_cluster_kmeans}
-\title{Perform k-means clustering on CyTOF data.}
+\title{Perform k-means clustering on high-dimensional cytometry data.}
 \usage{
 tof_cluster_kmeans(
   tof_tibble,
@@ -30,8 +30,8 @@ integer vector of length `nrow(tof_tibble)` indicating the id of
 the k-means cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{
-This function performs k-means clustering on CyTOF data using a user-specified
-selection of input variables/CyTOF measurements. It is mostly a convenient
+This function performs k-means clustering on high-dimensional cytometry data using a user-specified
+selection of input variables/high-dimensional cytometry measurements. It is mostly a convenient
 wrapper around \code{\link[stats]{kmeans}}.
 }
 \examples{

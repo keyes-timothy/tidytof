@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_ddpr}
 \alias{tof_cluster_ddpr}
-\title{Perform developmental clustering on CyTOF data.}
+\title{Perform developmental clustering on high-dimensional cytometry data.}
 \usage{
 tof_cluster_ddpr(
   tof_tibble,
@@ -71,7 +71,7 @@ This column will contain an integer vector of length `nrow(tof_tibble)` indicati
 the developmental cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }
 \description{
-This function performs distance-based clustering on CyTOF data
+This function performs distance-based clustering on high-dimensional cytometry data
 by sorting cancer cells (passed into the function as `tof_tibble`) into
 their most phenotypically similar healthy cell subpopulation (passed into the
 function using `healthy_tibble`). For details about

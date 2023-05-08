@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 
-In addition to implementing its own built-in functions, `{tidytof}` proposes a general framework for analyzing single-cell data using a tidy interface. Users may wish to extend `{tidytof}`'s existing functionality by writing functions that implements additional tidy interfaces to new algorithms or data analysis methods not currently included in `{tidytof}`. 
+In addition to implementing its own built-in functions, `{tidytof}` proposes a general framework for analyzing single-cell data using a tidy interface. This framework centers on the use of "verbs," i.e. modular function families that represent specific data operations. Users may wish to extend `{tidytof}`'s existing functionality by writing functions that implements additional tidy interfaces to new algorithms or data analysis methods not currently included in `{tidytof}`. 
 
 If you're interested in contributing new functions to `{tidytof}`, this vignette provides some details about how to do so. 
 
@@ -41,28 +41,109 @@ In addition to written well-styled code, we encourage you to write unit tests fo
 
 # How to contribute
 
+## General principles
+
+The most important part of writing a function that extends `{tidytof}` is to adhere to `{tidytof}` verb syntax. With very few exceptions, `{tidytof}` functions follow a specific, shared syntax that involves 3 types of arguments that always occur in the same order. These argument types are as follows:
+
+1.  For almost all `{tidytof}` functions, the first argument is a data frame (or tibble). This enables the use of the pipe (`|>`) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). 
+2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html) and follow the same rules for tidyselection as tidyverse verbs like `dplyr::select()` and `tidyr::pivot_longer()`.
+3.  Finally, the third group of arguments for each `{tidytof}` verb are called *method specifications*, and they're comprised of every argument that isn't an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the `tof_cluster_phenograph()` function requires the method specification `num_neighbors`, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm's k-nearest-neighbor graph.
+
+With few exceptions, any `{tidytof}` extension should include the same 3 argument types (in the same order). 
+
+In addition, any functions that extend `{tidytof}` should have a name that starts with the prefix `tof_`. This will make it easier for users to find `{tidytof}` functions using the text completion functionality included in most development environments. 
+
 ## Contributing a new method to an existing `{tidytof}` verb
 
-TO DO 
+`{tidytof}` currently includes multiple verbs that perform fundamental single-cell data manipulation tasks. Currently, `{tidytof}`'s extensible verbs are the following: 
 
-For example, if I wanted to write a `{tidytof}`-style interface for my new clustering algorithm "supercluster", I might write something like this: 
+- `tof_analyze_abundance`: Perform differential cluster abundance analysis
+- `tof_analyze_expression`: Perform differential marker expression analysis
+- `tof_annotate_clusters`: Annotate clusters with manual IDs
+- `tof_batch_correct`: Perform batch correction
+- `tof_cluster`: Cluster cells into subpopulations
+- `tof_downsample`: Subsample a dataset into a smaller number of cells
+- `tof_extract`: Calculate sample-level summary statistics 
+- `tof_metacluster`: Metacluster clusters into a smaller number of subpopulations
+- `tof_plot_cells`: Plot cell-level data
+- `tof_plot_clusters`: Plot cluster-level data
+- `tof_plot_model`: Plot the results of a sample-level model 
+- `tof_read_data`: Read data into memory from disk
+- `tof_reduce_dimensions`: Perform dimensionality reduction
+- `tof_transform`: Transform marker expression values in a vectorized fashion
+- `tof_upsample`: Assign new cells to existing clusters (defined on a downsample dataset)
+- `tof_write_data`: Write data from memory to disk
 
-```{r, eval = FALSE}
+Each `{tidytof}` verb wraps a family of related functions that all perform the same basic task. For example, the `tof_cluster` verb is a wrapper for the following functions: `tof_cluster_ddpr`, `tof_cluster_flowsom`, `tof_cluster_kmeans`, and `tof_cluster_phenograph`. All of these functions implement a different clustering algorithm, but they share an underlying logic that is standardized under the `tof_cluster` abstraction. In practice, this means that users can apply the DDPR, FlowSOM, K-means, and PhenoGraph clustering algorithms to their datasets either by calling one of the `tof_cluster_*` functions directly, or by calling `tof_cluster` with the `method` argument set to the appropriate value ("ddpr", "flowsom", "kmeans", and "phenograph", respectively). 
+
+To extend an existing `{tidytof}` verb, write a function whose name fits the pattern `tof_{verb name}_*`, where "*" represents the name of the algorithm being used to perform the computation. In the function definition, try to share as many arguments as possible with the `{tidytof}` verb you're extending, and return the same output object as that described in the "Value" heading of the help file for the verb being extended. 
+
+For example, suppose I wanted to write a `{tidytof}`-style interface for my new clustering algorithm "supercluster", which performs k-means clustering on a dataset twice and then outputs a final cluster assignment equal to the two k-means cluster assignments spliced together. To add the supercluster algorithm to `{tidytof}`, I might write a function like this: 
+
+```{r}
+#' Perform superclustering on high-dimensional cytometry data. 
+#' 
+#' This function applies the silly, hypothetical clustering algorithm 
+#' "supercluster" to high-dimensional cytometry data using user-specified 
+#' input variables/cytometry measurements.
+#'
+#' @param tof_tibble A `tof_tbl` or `tibble`.
+#' 
+#' @param cluster_cols Unquoted column names indicating which columns in 
+#' `tof_tibble` to use in computing the supercluster clusters. 
+#' Supports tidyselect helpers.
+#' 
+#' @param num_kmeans_clusters An integer indicating how many clusters should be 
+#' used for the two k-means clustering steps. 
+#' 
+#' @param sep A string to use when splicing the 2 k-means clustering assignments
+#' to one another. 
+#' 
+#' @param ... Optional additional parameters to pass to 
+#' \code{\link[tidytof]{tof_cluster_kmeans}}
+#'
+#' @return A tibble with one column named `.supercluster_cluster` containing
+#' a character vector of length `nrow(tof_tibble)` indicating the id of the 
+#' supercluster cluster to which each cell (i.e. each row) in `tof_tibble` was 
+#' assigned.
+#' 
+#' @importFrom dplyr tibble
+#'
 tof_cluster_supercluster <- 
-  function(tof_tibble, cluster_cols, ...) { 
-    cluster_data <- dplyr::select(tof_tibble, {{cluster_cols}})
+  function(tof_tibble, cluster_cols, num_superclusters = 10L, sep = "_", ...) { 
+    kmeans_1 <- 
+      tof_tibble |> 
+      tof_cluster_kmeans(
+        cluster_cols = {{cluster_cols}}, 
+        num_clusters = num_kmeans_clusters, 
+        ...
+      )
     
-    result <- 
-      cluster_data }> 
-      do_something(...) }> 
-      do_something_else(...)
+    kmeans_2 <- 
+      tof_tibble  |> 
+      tof_cluster_kmeans(
+        cluster_cols = {{cluster_cols}}, 
+        num_clusters = num_kmeans_clusters, 
+        ...
+      )
+    
+    final_result <- 
+      dplyr::tibble(
+        .supercluster_cluster = 
+          paste(kmeans_1$.kmeans_cluster, kmeans_2$.kmeans_cluster, sep = sep)
+      )
+    
+    return(final_result)
+    
   }
+
 ```
 
+In the example above, note that `tof_cluster_supercluster` is named using the `tof_{verb name}_*` style, that the function definition uses the same `tof_tibble` and `cluster_cols` arguments as `tof_cluster`, and that the returned output object is a `tof_tbl` with a single column encoding the cluster ids for each of the cells in `tof_tibble`. 
 
 ## Creating a new `{tidytof}` verb
 
-It's possible that your algorithm doesn't...
+If you want to contribute a function to `{tidytof}` that represents a new operation not encompassed by any of the existing verbs above, you should include the suggestion to create a new verb in your pull request to the `{tidytof}` team. In this case, you'll have considerably more flexibility to define the interface `{tidytof}` will use to implement your new verb, and the `{tidytof}` team is happy to work with you to figure out what makes the most sense (or at least to brainstorm together). 
 
 ## A note about modeling functions
 

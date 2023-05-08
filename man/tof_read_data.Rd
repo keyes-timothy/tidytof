@@ -9,19 +9,19 @@ tof_read_data(path = NULL, sep = "|", panel_info = dplyr::tibble())
 \arguments{
 \item{path}{A file path to a single file or to a directory of files.
 The only valid file types are .fcs files or .csv files
-containing CyTOF data.}
+containing high-dimensional cytometry data.}
 
 \item{sep}{Optional. A string to use to separate the antigen name and its associated
 metal in the column names of the output tibble. Defaults to "|". Only used if
 the input file is an .fcs file.}
 
 \item{panel_info}{Optional. A tibble or data.frame containing information about the
-panel used during CyTOF data acquisition. Two columns are required:
+panel used during high-dimensional cytometry data acquisition. Two columns are required:
 "metals" and "antigens". Only used if the input file is a .csv file.}
 }
 \value{
 An [c by m+1] tibble in which each row represents a single cell (of c
-total in the dataset) and each column represents a CyTOF measurement
+total in the dataset) and each column represents a high-dimensional cytometry measurement
 (of m total in the dataset). If more than one .fcs is read at once,
 the last column of the tibble (`file_name`) will represent the file name
 of the .fcs file from which each cell was read.

@@ -812,7 +812,7 @@ tof_plot_cells_layout <-
 #'
 #' # make a layout colored by a marker
 #' layout_cd38 <-
-#'     tof_plot_cluster_mst(
+#'     tof_plot_clusters_mst(
 #'         tof_tibble = sim_data,
 #'         cluster_col = cluster_id,
 #'         color_col = cd38
@@ -821,14 +821,14 @@ tof_plot_cells_layout <-
 #'  # use the same layout as the plot above to color the same
 #'  # tree using a different marker
 #'  layout_cd45 <-
-#'     tof_plot_cluster_mst(
+#'     tof_plot_clusters_mst(
 #'         tof_tibble = sim_data,
 #'         cluster_col = cluster_id,
 #'         color_col = cd45,
 #'         graph_layout = layout_cd38
 #'     )
 #'
-tof_plot_cluster_mst <-
+tof_plot_clusters_mst <-
   function(
     tof_tibble,
     cluster_col,
@@ -1195,10 +1195,10 @@ tof_plot_cluster_mst <-
 #'  attr(sim_dea_result, which = "dea_method") <- "t_unpaired"
 #'
 #'  # create the volcano plot
-#'  volcano <- tof_plot_cluster_volcano(dea_result = sim_dea_result)
+#'  volcano <- tof_plot_clusters_volcano(dea_result = sim_dea_result)
 #'
 #'
-tof_plot_cluster_volcano <-
+tof_plot_clusters_volcano <-
   function(
     dea_result,
     num_top_pairs = 10L,
@@ -1376,6 +1376,14 @@ tof_plot_cluster_volcano <-
 #' @param theme A ggplot2 theme to apply to the heatmap.
 #' Defaults to \code{\link[ggplot2]{theme_minimal}}
 #'
+#' @param cluster_markers A boolean value indicating if the heatmap should
+#' order its columns (i.e. markers) using hierarchical clustering. Defaults to
+#' TRUE.
+#'
+#' @param cluster_clusters A boolean value indicating if the heatmap should
+#' order its rows (i.e. clusters) using hierarchical clustering. Defaults to
+#' TRUE.
+#'
 #' @return A ggplot object.
 #'
 #' @export
@@ -1395,12 +1403,12 @@ tof_plot_cluster_volcano <-
 #'     )
 #'
 #' heatmap <-
-#'     tof_plot_cluster_heatmap(
+#'     tof_plot_clusters_heatmap(
 #'         tof_tibble = sim_data,
 #'         cluster_col = cluster_id
 #'     )
 #'
-tof_plot_cluster_heatmap <-
+tof_plot_clusters_heatmap <-
   function(
     tof_tibble,
     cluster_col,
@@ -1408,6 +1416,8 @@ tof_plot_cluster_heatmap <-
     central_tendency_function = stats::median,
     scale_markerwise = FALSE,
     scale_clusterwise = FALSE,
+    cluster_markers = TRUE,
+    cluster_clusters = TRUE,
     line_width = 0.25,
     theme = ggplot2::theme_minimal()
   ) {
@@ -1420,6 +1430,8 @@ tof_plot_cluster_heatmap <-
         central_tendency_function = central_tendency_function,
         scale_markerwise = scale_markerwise,
         scale_ywise = scale_clusterwise,
+        cluster_markers = cluster_markers,
+        cluster_groups = cluster_clusters,
         line_width = line_width,
         theme = theme
       )

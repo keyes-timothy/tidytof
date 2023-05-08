@@ -62,7 +62,7 @@ reference:
   - tof_tune_glmnet
   - tof_find_best
 - title: "Visualization"
-  desc: "Functions for visualizing CyTOF data"
+  desc: "Functions for visualizing high-dimensional cytometry data"
   contents:
   - starts_with("tof_plot")
 - title: "Utilities"

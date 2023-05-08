@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster_tibble}
 \alias{tof_cluster_tibble}
-\title{Cluster (ungrouped) CyTOF data.}
+\title{Cluster (ungrouped) high-dimensional cytometry data.}
 \usage{
 tof_cluster_tibble(tof_tibble, ..., augment = TRUE, method)
 }

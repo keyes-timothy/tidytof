@@ -2,7 +2,7 @@
 % Please edit documentation in R/io.R
 \name{tof_write_data}
 \alias{tof_write_data}
-\title{Write cytof data to a file or to a directory of files}
+\title{Write high-dimensional cytometry data to a file or to a directory of files}
 \usage{
 tof_write_data(
   tof_tibble = NULL,

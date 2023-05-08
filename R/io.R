@@ -1,21 +1,21 @@
 # io.R
-# This file contains functions relevant to reading input CyTOF data from files
+# This file contains functions relevant to reading input high-dimensional cytometry data from files
 # and writing output data to files.
 
 # tof_find_panel_info ----------------------------------------------------------
 
-#' Use tidytof's opinionated heuristic for extracted a CyTOF panel's metal-antigen pairs
+#' Use tidytof's opinionated heuristic for extracted a high-dimensional cytometry panel's metal-antigen pairs
 #' from a flowFrame (read from a .fcs file.)
 #'
 #' Using the character vectors obtained from the `name` and `desc` columns of
-#' the parameters of the data of a flowFrame, figure out the CyTOF panel used
+#' the parameters of the data of a flowFrame, figure out the high-dimensional cytometry panel used
 #' to collect the data and return it as a tidy tibble.
 #'
 #' @param input_flowFrame a raw flowFrame (just read from an .fcs file) from which
-#' a CyTOF panel should be extracted
+#' a high-dimensional cytometry panel should be extracted
 #'
 #' @return A tibble with 2 columns (`metals` and `antigens`) that correspond to the
-#' metals and antigens of the CyTOF panel used during data acquisition.
+#' metals and antigens of the high-dimensional cytometry panel used during data acquisition.
 #'
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_extract
@@ -44,24 +44,24 @@ tof_find_panel_info <- function(input_flowFrame) {
         stringr::str_extract(
           data_names,
           pattern = stringr::str_c(metal_masterlist, collapse = "|")
-        ) %>%
+        ) |>
           stringr::str_extract("[:alpha:]+"),
         stringr::str_extract(
           data_names,
           pattern = stringr::str_c(metal_masterlist, collapse = "|")
-        ) %>%
+        ) |>
           stringr::str_extract("[:digit:]+")
       ),
       stringr::str_c(
         stringr::str_extract(
           data_desc,
           pattern = stringr::str_c(metal_masterlist, collapse = "|")
-        ) %>%
+        ) |>
           stringr::str_extract("[:alpha:]+"),
         stringr::str_extract(
           data_desc,
           pattern = stringr::str_c(metal_masterlist, collapse = "|")
-        ) %>%
+        ) |>
           stringr::str_extract("[:digit:]+")
       )
     )
@@ -85,8 +85,8 @@ tof_find_panel_info <- function(input_flowFrame) {
       stringr::str_detect(data_desc, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
       stringr::str_remove(data_desc, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
       data_desc
-    ) %>%
-    stringr::str_remove("^[:punct:]|[:punct:]$") %>%
+    ) |>
+    stringr::str_remove("^[:punct:]|[:punct:]$") |>
     stringr::str_remove_all("\\(|\\)|Di")
 
   # if a given antigen name is empty after the first round of candidates is
@@ -97,8 +97,8 @@ tof_find_panel_info <- function(input_flowFrame) {
       antigens == "" | is.na(antigens),
       stringr::str_remove(data_names, pattern = stringr::str_c(metal_masterlist, collapse = "|")),
       antigens
-    ) %>%
-    stringr::str_remove("^[:punct:]|[:punct:]$") %>%
+    ) |>
+    stringr::str_remove("^[:punct:]|[:punct:]$") |>
     stringr::str_remove_all("\\(|\\)|Di")
 
   # if the antigen name of any given channel is still empty (or NA), just put
@@ -120,12 +120,12 @@ tof_find_panel_info <- function(input_flowFrame) {
 
 # tof_read_fcs -----------------------------------------------------------------
 
-#' Read CyTOF data from an .fcs file into a tidy tibble.
+#' Read high-dimensional cytometry data from an .fcs file into a tidy tibble.
 #'
-#' This function reads CyTOF data from a single .fcs file into a tidy data
+#' This function reads high-dimensional cytometry data from a single .fcs file into a tidy data
 #' structure called a `tof_tbl` ("tof_tibble"). tof_tibbles are identical to normal
 #' tibbles except for an additional attribute ("panel") that stores information
-#' about the CyTOF panel used during data acquisition.
+#' about the high-dimensional cytometry panel used during data acquisition.
 #'
 #' @param file_path A file path to a single .fcs file.
 #'
@@ -133,7 +133,7 @@ tof_find_panel_info <- function(input_flowFrame) {
 #' metal in the column names of the output tibble. Defaults to "|".
 #'
 #' @return a `tof_tbl` in which each row represents a single cell and each
-#' column represents a CyTOF antigen channel.
+#' column represents a high-dimensional cytometry antigen channel.
 #'
 #' A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 #' one additional attribute: "panel" (a tibble storing information about the
@@ -153,7 +153,7 @@ tof_read_fcs <-
     invisible(
       utils::capture.output(
         tof_flowFrame <-
-          file_path %>%
+          file_path |>
           flowCore::read.FCS(transformation = FALSE, truncate_max_range = FALSE)
       )
     )
@@ -188,16 +188,16 @@ tof_read_fcs <-
 
 # tof_read_csv -----------------------------------------------------------------
 
-#' Read CyTOF data from a .csv file into a tidy tibble.
+#' Read high-dimensional cytometry data from a .csv file into a tidy tibble.
 #'
 #' @param file_path A file path to a single .csv file.
 #'
 #' @param panel_info Optional. A tibble or data.frame containing information about the
-#' panel used during CyTOF data acquisition. Two columns are required:
+#' panel used during high-dimensional cytometry data acquisition. Two columns are required:
 #' "metals" and "antigens".
 #'
 #' @return A `tof_tbl` in which each row represents a single cell and each
-#' column represents a CyTOF antigen channel.
+#' column represents a high-dimensional cytometry antigen channel.
 #'
 #' A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 #' one additional attribute: "panel" (a tibble storing information about the
@@ -217,7 +217,7 @@ tof_read_csv <-
   function(file_path = NULL, panel_info = dplyr::tibble()) {
 
     tof_tibble <-
-      file_path %>%
+      file_path |>
       readr::read_csv(col_types = readr::cols(), progress = FALSE)
 
     # check that panel_info typing is correct
@@ -228,7 +228,7 @@ tof_read_csv <-
 
       if(all(c("antigens", "metals") %in% panel_names)) {
         panel_info <-
-          panel_info %>%
+          panel_info |>
           dplyr::select("antigens", "metals")
       } else if (!identical(panel_info, dplyr::tibble())) {
         stop("panel_info must contain an \"antigens\" and a \"metals\" column")
@@ -250,7 +250,7 @@ tof_read_csv <-
 
 # tof_read_file ----------------------------------------------------------------
 
-#' Read CyTOF data from a single .fcs or .csv file into a tidy tibble.
+#' Read high-dimensional cytometry data from a single .fcs or .csv file into a tidy tibble.
 #'
 #' @param file_path A file path to a single .fcs or .csv file.
 #'
@@ -259,11 +259,11 @@ tof_read_csv <-
 #' if the input file is an .fcs file.
 #'
 #' @param panel_info Optional. A tibble or data.frame containing information about the
-#' panel used during CyTOF data acquisition. Two columns are required:
+#' panel used during high-dimensional cytometry data acquisition. Two columns are required:
 #' "metals" and "antigens". Only used if the input file is a .csv file.
 #'
 #' @return A `tof_tbl` in which each row represents a single cell and each
-#' column represents a CyTOF antigen channel.
+#' column represents a high-dimensional cytometry antigen channel.
 #'
 #' A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 #' one additional attribute: "panel" (a tibble storing information about the
@@ -275,11 +275,11 @@ tof_read_csv <-
 tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibble()) {
   if (get_extension(file_path) == "fcs") {
     tof_tibble <-
-      file_path %>%
+      file_path |>
       tof_read_fcs(sep = sep)
   } else if (get_extension(file_path) == "csv") {
     tof_tibble <-
-      file_path %>%
+      file_path |>
       tof_read_csv(panel_info = panel_info)
   }
   return(tof_tibble)
@@ -291,18 +291,18 @@ tof_read_file <- function(file_path = NULL, sep = "|", panel_info = dplyr::tibbl
 #'
 #' @param path A file path to a single file or to a directory of files.
 #' The only valid file types are .fcs files or .csv files
-#' containing CyTOF data.
+#' containing high-dimensional cytometry data.
 #'
 #' @param sep Optional. A string to use to separate the antigen name and its associated
 #' metal in the column names of the output tibble. Defaults to "|". Only used if
 #' the input file is an .fcs file.
 #'
 #' @param panel_info Optional. A tibble or data.frame containing information about the
-#' panel used during CyTOF data acquisition. Two columns are required:
+#' panel used during high-dimensional cytometry data acquisition. Two columns are required:
 #' "metals" and "antigens". Only used if the input file is a .csv file.
 #'
 #' @return An [c by m+1] tibble in which each row represents a single cell (of c
-#' total in the dataset) and each column represents a CyTOF measurement
+#' total in the dataset) and each column represents a high-dimensional cytometry measurement
 #' (of m total in the dataset). If more than one .fcs is read at once,
 #' the last column of the tibble (`file_name`) will represent the file name
 #' of the .fcs file from which each cell was read.
@@ -375,16 +375,16 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) 
     purrr::map(.x = tof_tibble$data, ~attr(x = .x, which = "panel"))
 
   num_panels <-
-    panels %>%
-    unique() %>%
+    panels |>
+    unique() |>
     length()
 
   if (num_panels > 1) {
     # group by panel
     tof_tibble <-
-      tof_tibble %>%
-      dplyr::mutate(panel = panels) %>%
-      tidyr::nest(data = -panel) %>%
+      tof_tibble |>
+      dplyr::mutate(panel = panels) |>
+      tidyr::nest(data = -panel) |>
       dplyr::mutate(
         data =
           purrr::map2(
@@ -392,7 +392,7 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) 
             .y = panel,
             .f = ~new_tof_tibble(x = .x, panel = .y)
           )
-      ) %>%
+      ) |>
       mutate(
         data =
           purrr::map2(
@@ -406,11 +406,11 @@ tof_read_data <- function(path = NULL, sep = "|", panel_info = dplyr::tibble()) 
   } else {
     # put everything together
     tof_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       tidyr::unnest(cols = data)
 
     panel <-
-      panels %>%
+      panels |>
       unique()
     panel <- panel[[1]]
 
@@ -478,20 +478,20 @@ tof_write_csv <-
     if (missing(group_cols)) {
       tof_tibble <-
         suppressWarnings(
-          tof_tibble %>%
-            tidyr::nest() %>%
+          tof_tibble |>
+            tidyr::nest() |>
             dplyr::ungroup()
-        ) %>%
+        ) |>
         dplyr::mutate(prefix = file_name)
 
     } else {
       tof_tibble <-
         suppressWarnings(
-          tof_tibble %>%
-            dplyr::group_by(dplyr::across({{group_cols}})) %>%
-            tidyr::nest() %>%
+          tof_tibble |>
+            dplyr::group_by(dplyr::across({{group_cols}})) |>
+            tidyr::nest() |>
             dplyr::ungroup()
-        ) %>%
+        ) |>
         tidyr::unite(col = "prefix", -data, sep = sep)
     }
 
@@ -587,18 +587,18 @@ tof_write_fcs <-
     # eliminate all non-grouping and non-numeric columns from tof_tibble
     if (!missing(group_cols)) {
     tof_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       dplyr::select({{group_cols}}, where(tof_is_numeric))
     } else {
       tof_tibble <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::select(where(tof_is_numeric))
     }
 
     # find max and min values for all non-grouping columns in tof_tibble
     if (!missing(group_cols)) {
       maxes_and_mins <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::summarize(
           dplyr::across(
             -{{group_cols}},
@@ -611,7 +611,7 @@ tof_write_fcs <-
         )
     } else {
       maxes_and_mins <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::summarize(
           dplyr::across(
             dplyr::everything(),
@@ -625,13 +625,13 @@ tof_write_fcs <-
     }
 
     maxes_and_mins <-
-      maxes_and_mins %>%
+      maxes_and_mins |>
       tidyr::pivot_longer(
         cols = dplyr::everything(),
         names_to = c("antigen", "value_type"),
         values_to = "value",
         names_sep = "_____"
-      )  %>%
+      )  |>
       tidyr::pivot_wider(
         names_from = "value_type",
         values_from = "value"
@@ -645,20 +645,20 @@ tof_write_fcs <-
     if (missing(group_cols)) {
       tof_tibble <-
         suppressWarnings(
-          tof_tibble %>%
-            tidyr::nest() %>%
+          tof_tibble |>
+            tidyr::nest() |>
             dplyr::ungroup()
-        ) %>%
+        ) |>
         dplyr::mutate(prefix = file_name)
 
     } else {
       tof_tibble <-
         suppressWarnings(
-          tof_tibble %>%
-            dplyr::group_by(dplyr::across({{group_cols}})) %>%
-            tidyr::nest() %>%
+          tof_tibble |>
+            dplyr::group_by(dplyr::across({{group_cols}})) |>
+            tidyr::nest() |>
             dplyr::ungroup()
-        ) %>%
+        ) |>
         tidyr::unite(col = "prefix", -data, sep = sep)
     }
 
@@ -676,7 +676,7 @@ tof_write_fcs <-
       )
 
     fcs_data <-
-      maxes_and_mins %>%
+      maxes_and_mins |>
       dplyr::transmute(
         # have to change any instances of "|" in column names to another
         # separator, as "|" has special meaning as an .fcs file delimiter
@@ -685,7 +685,7 @@ tof_write_fcs <-
         range = max - min,
         minRange = min,
         maxRange = max
-      ) %>%
+      ) |>
       as.data.frame()
 
     row.names(fcs_data) <- stringr::str_c("$", "P", 1:nrow(fcs_data))
@@ -700,7 +700,7 @@ tof_write_fcs <-
 
     # make flowFrames for each row of tof_tibble
     tof_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       dplyr::transmute(
         .data$prefix,
         flowFrames =
@@ -739,7 +739,7 @@ tof_write_fcs <-
 
 # tof_write_data ---------------------------------------------------------------
 
-#' Write cytof data to a file or to a directory of files
+#' Write high-dimensional cytometry data to a file or to a directory of files
 #'
 #' Write data (in the form of a `tof_tbl`) into either a .csv or an .fcs file for storage.
 #'

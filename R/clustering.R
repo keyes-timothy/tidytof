@@ -4,10 +4,10 @@
 
 # tof_cluster_flowsom ----------------------------------------------------------
 
-#' Perform FlowSOM clustering on CyTOF data
+#' Perform FlowSOM clustering on high-dimensional cytometry data
 #'
-#' This function performs FlowSOM clustering on CyTOF data using a user-specified
-#' selection of input variables/CyTOF measurements. It is mostly a convenient
+#' This function performs FlowSOM clustering on high-dimensional cytometry data using a user-specified
+#' selection of input variables/high-dimensional cytometry measurements. It is mostly a convenient
 #' wrapper around \code{\link[FlowSOM]{SOM}} and \code{\link[FlowSOM]{MetaClustering}}.
 #'
 #' For additional details about the FlowSOM algorithm,
@@ -144,10 +144,10 @@ tof_cluster_flowsom <-
 
 # tof_cluster_phenograph -------------------------------------------------------
 
-#' Perform PhenoGraph clustering on CyTOF data.
+#' Perform PhenoGraph clustering on high-dimensional cytometry data.
 #'
-#' This function performs PhenoGraph clustering on CyTOF data using a user-specified
-#' selection of input variables/CyTOF measurements.
+#' This function performs PhenoGraph clustering on high-dimensional cytometry data using a user-specified
+#' selection of input variables/high-dimensional cytometry measurements.
 #'
 #' For additional details about the Phenograph algorithm,
 #' see \href{https://pubmed.ncbi.nlm.nih.gov/26095251/}{this paper}.
@@ -215,10 +215,10 @@ tof_cluster_phenograph <-
 
 # tof_cluster_kmeans -----------------------------------------------------------
 
-#' Perform k-means clustering on CyTOF data.
+#' Perform k-means clustering on high-dimensional cytometry data.
 #'
-#' This function performs k-means clustering on CyTOF data using a user-specified
-#' selection of input variables/CyTOF measurements. It is mostly a convenient
+#' This function performs k-means clustering on high-dimensional cytometry data using a user-specified
+#' selection of input variables/high-dimensional cytometry measurements. It is mostly a convenient
 #' wrapper around \code{\link[stats]{kmeans}}.
 #'
 #' @param tof_tibble A `tof_tibble`.
@@ -282,9 +282,9 @@ tof_cluster_kmeans <-
 
 # tof_cluster_ddpr -------------------------------------------------------------
 
-#' Perform developmental clustering on CyTOF data.
+#' Perform developmental clustering on high-dimensional cytometry data.
 #'
-#' This function performs distance-based clustering on CyTOF data
+#' This function performs distance-based clustering on high-dimensional cytometry data
 #' by sorting cancer cells (passed into the function as `tof_tibble`) into
 #' their most phenotypically similar healthy cell subpopulation (passed into the
 #' function using `healthy_tibble`). For details about
@@ -448,10 +448,10 @@ tof_cluster_ddpr <-
 
 # tof_cluster ------------------------------------------------------------------
 
-#' Cluster CyTOF data.
+#' Cluster high-dimensional cytometry data.
 #'
 #' This function is a wrapper around {tidytof}'s tof_cluster_* function family.
-#' It performs clustering on CyTOF data using a user-specified method (of 5 choices)
+#' It performs clustering on high-dimensional cytometry data using a user-specified method (of 5 choices)
 #' and each method's corresponding input parameters.
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
@@ -541,7 +541,7 @@ tof_cluster <-
     return(result)
   }
 
-#' Cluster (ungrouped) CyTOF data.
+#' Cluster (ungrouped) high-dimensional cytometry data.
 #'
 #' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
 #' provides a low-level API for clustering ungrouped data frames. It is a subroutine
@@ -611,7 +611,7 @@ tof_cluster_tibble <-
   }
 
 
-#' Cluster (grouped) CyTOF data.
+#' Cluster (grouped) high-dimensional cytometry data.
 #'
 #' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
 #' provides a low-level API for clustering grouped data frames. It is a subroutine

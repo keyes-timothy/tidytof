@@ -27,13 +27,13 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 library(tidytof)
 ```
 
-Analyzing single-cell data can be surprisingly complicated. One one hand, this is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
+Analyzing single-cell data can be surprisingly complicated. This is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
 
-To address both of these challenges for [mass cytometry (CyTOF)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing CyTOF data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to CyTOF datasets.
+To address both of these challenges for high-dimensional cytometry, `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing high-dimensional cytometry data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to high-dimensional cytometry datasets.
 
 ## Prerequisites
 
-`{tidytof}` makes heavy use of two concepts that may be unfamiliar to R beginners. The first is the `{magrittr}` pipe (`%>%`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). Most `{tidytof}` users will also benefit from a relatively in-depth understanding of the dplyr package, which has a wonderful introductory vignette here:
+`{tidytof}` makes heavy use of two concepts that may be unfamiliar to R beginners. The first is the pipe (`|>`), which you can read about [here](https://r4ds.had.co.nz/pipes.html). The second is "grouping" data in a `data.frame` or `tibble` using `dplyr::group_by`, which you can read about [here](https://dplyr.tidyverse.org/articles/grouping.html). Most `{tidytof}` users will also benefit from a relatively in-depth understanding of the dplyr package, which has a wonderful introductory vignette here:
 
 ```{r, eval = FALSE}
 vignette("dplyr")
@@ -61,10 +61,10 @@ Broadly speaking, `{tidytof}`'s functionality is organized to support the 3 leve
 
 -   Cluster-level data:
 
-    -   `tof_cluster()` clusters cells using one of several algorithms commonly applied to CyTOF data
+    -   `tof_cluster()` clusters cells using one of several algorithms commonly applied to high-dimensional cytometry data
     -   `tof_metacluster()` agglomerates clusters into a smaller number of metaclusters
-    -   `tof_daa()` performs differential abundance analysis (DAA) for clusters or metaclusters across experimental groups
-    -   `tof_dea()` performs differential expression analysis (DEA) for clusters' or metaclusters' marker expression levels across experimental groups
+    -   `tof_analyze_abundance()` performs differential abundance analysis (DAA) for clusters or metaclusters across experimental groups
+    -   `tof_analyze_expression()` performs differential expression analysis (DEA) for clusters' or metaclusters' marker expression levels across experimental groups
     -   `tof_extract_features()` computes summary statistics (such as mean marker expression) for each cluster. Also (optionally) pivots these summary statistics into a sample-level tidy data frame in which each row represents a sample and each column represents a cluster-level summary statistic.
 
 -   Sample-level data:
@@ -79,8 +79,8 @@ Broadly speaking, `{tidytof}`'s functionality is organized to support the 3 leve
 
 With very few exceptions, `{tidytof}` functions follow a specific, shared syntax that involves 3 types of arguments that always occur in the same order. These argument types are as follows:
 
-1.  For almost all `{tidytof}` functions, the first argument is a data frame (or tibble). This enables the use of the pipe (`%>%`) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). This also means that most `{tidytof}` functions are so-called ["single-table verbs,"](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html) with the exception of `tof_cluster_ddpr`, which is a "two-table verb" (for details about how to use `tof_cluster_ddpr`, see the "clustering-and-metaclustering" vignette).
-2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html).
+1.  For almost all `{tidytof}` functions, the first argument is a data frame (or tibble). This enables the use of the pipe (`|>`) for multi-step calculations, which means that your first argument for most functions will be implicit (passed from the previous function using the pipe). This also means that most `{tidytof}` functions are so-called ["single-table verbs,"](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html) with the exception of `tof_cluster_ddpr`, which is a "two-table verb" (for details about how to use `tof_cluster_ddpr`, see the "clustering-and-metaclustering" vignette).
+2.  The second group of arguments are called *column specifications*, and they end in the suffix `_col` or `_cols`. Column specifications are unquoted column names that tell a `{tidytof}` verb which columns to compute over for a particular operation. For example, the `cluster_cols` argument in `tof_cluster` allows the user to specify which column in the input data frames should be used to perform the clustering. Regardless of which verb requires them, column specifications support [tidyselect helpers](https://tidyselect.r-lib.org/reference/language.html) and follow the same rules for tidyselection as tidyverse verbs like `dplyr::select()` and `tidyr::pivot_longer()`.
 3.  Finally, the third group of arguments for each `{tidytof}` verb are called *method specifications*, and they're comprised of every argument that isn't an input data frame or a column specification. Whereas column specifications represent which columns should be used to perform an operation, method specifications represent the details of how that operation should be performed. For example, the `tof_cluster_phenograph()` function requires the method specification `num_neighbors`, which specifies how many nearest neighbors should be used to construct the PhenoGraph algorithm's k-nearest-neighbor graph. In most cases, `{tidytof}` sets reasonable defaults for each verb's particular method specifications, but your workflows are can also be customized by experimenting with non-default values.
 
 The following code demonstrates how `{tidytof}` verb syntax looks in practice, with column and method specifications explicitly pointed out:
@@ -90,22 +90,22 @@ data(ddpr_data)
 
 set.seed(777L)
 
-ddpr_data %>% 
-  tof_preprocess() %>%
+ddpr_data |> 
+  tof_preprocess() |>
   tof_cluster(
     cluster_cols = starts_with("cd"), # column specification
     method = "phenograph", # method specification, 
-  ) %>% 
+  ) |> 
   tof_metacluster(
     cluster_col = .phenograph_cluster, # column specification
     num_metaclusters = 4, # method specification
     method = "kmeans" # method specification
-  ) %>% 
+  ) |> 
   tof_downsample(
     group_cols = .kmeans_metacluster, # column specification
     num_cells = 200, # method specification
     method = "constant" # method specification
-  ) %>%
+  ) |>
   tof_plot_cells_layout(
     knn_cols = starts_with("cd"), # column specification
     color_col = .kmeans_metacluster, # column specification
@@ -116,7 +116,7 @@ ddpr_data %>%
 
 ## Pipelines
 
-`{tidytof}` verbs can be used on their own or in combination with one another using the pipe (`%>%`) operator. For example, here is a multistep "pipeline" that takes a built-in `{tidytof}` dataset and performs the following analytical steps:
+`{tidytof}` verbs can be used on their own or in combination with one another using the pipe (`|>`) operator. For example, here is a multistep "pipeline" that takes a built-in `{tidytof}` dataset and performs the following analytical steps:
 
 1.  Arcsinh-transform each column of protein measurements (the default behavior of the `tof_preprocess` verb
 
@@ -129,24 +129,24 @@ ddpr_data %>%
 5.  Visualize the clusters using a low-dimensional tSNE embedding
 
 ```{r}
-ddpr_data %>% 
+ddpr_data |> 
   # step 1
-  tof_preprocess() %>% 
+  tof_preprocess() |> 
   # step 2
   tof_cluster(
     cluster_cols = starts_with("cd"), 
     method = "phenograph", 
     #num_metaclusters = 4L, 
     seed = 2020L
-  ) %>%
+  ) |>
   # step 3
   tof_downsample(
     group_cols = .phenograph_cluster, 
     method = "constant", 
     num_cells = 400
-  ) %>% 
+  ) |> 
   # step 4
-  tof_reduce_dimensions(method = "tsne") %>% 
+  tof_reduce_dimensions(method = "tsne") |> 
   # step 5
   tof_plot_cells_embedding(
     embedding_cols = contains("tsne"),
@@ -158,7 +158,7 @@ ddpr_data %>%
 
 ## Other tips
 
-`{tidytof}` was designed by a multidisciplinary team of wet-lab biologists, bioinformaticians, and physician-scientists who analyze CyTOF and other kinds of single-cell data to solve a variety of problems. As a result, `{tidytof}`'s high-level API was designed with great care to mirror that of the `{tidyverse}` itself - that is, to be [human-centered, consistent, composable, and inclusive](https://design.tidyverse.org/unifying-principles.html) for a wide userbase.
+`{tidytof}` was designed by a multidisciplinary team of wet-lab biologists, bioinformaticians, and physician-scientists who analyze high-dimensional cytometry and other kinds of single-cell data to solve a variety of problems. As a result, `{tidytof}`'s high-level API was designed with great care to mirror that of the `{tidyverse}` itself - that is, to be [human-centered, consistent, composable, and inclusive](https://design.tidyverse.org/unifying-principles.html) for a wide userbase.
 
 Practically speaking, this means a few things about using `{tidytof}`.
 
@@ -166,4 +166,4 @@ First, it means that `{tidytof}` was designed with a few quality-of-life feature
 
 Second, it means that `{tidytof}` functions *should* be relatively intuitive to use due to their shared logic - in other words, if you understand how to use one `{tidytof}` function, you should understand how to use most of the others. An example of shared logic across `{tidytof}` functions is the argument `group_cols`, which shows up in multiple verbs (`tof_downsample`, `tof_cluster`, `tof_daa`, `tof_dea`, `tof_extract_features`, and `tof_write_data`). In each case, `group_cols` works the same way: it accepts an unquoted vector of column names (specified manually or using [tidyselection](https://r4ds.had.co.nz/transform.html#select)) that should be used to group cells before an operation is performed. This idea generalizes throughout `{tidytof}`: if you see an argument in one place, it will behave identically (or at least very similarly) wherever else you encounter it.
 
-Finally, it means that `{tidytof}` is optimized first for ease-of-use, then for performance. Because humans and computers interact with data differently, there is always a trade-off between choosing a data representation that is intuitive to a human user vs. choosing a data representation optimized for computational speed and memory efficiency. When these design choices conflict with one another, our team tends to err on the side of choosing a representation that is easy-to-understand for users even at the expense of small performance costs. Ultimately, this means that `{tidytof}` may not be the optimal tool for every CyTOF analysis, though hopefully its general framework will provide most users with some useful functionality.
+Finally, it means that `{tidytof}` is optimized first for ease-of-use, then for performance. Because humans and computers interact with data differently, there is always a trade-off between choosing a data representation that is intuitive to a human user vs. choosing a data representation optimized for computational speed and memory efficiency. When these design choices conflict with one another, our team tends to err on the side of choosing a representation that is easy-to-understand for users even at the expense of small performance costs. Ultimately, this means that `{tidytof}` may not be the optimal tool for every high-dimensional cytometry analysis, though hopefully its general framework will provide most users with some useful functionality.

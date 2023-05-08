@@ -560,7 +560,7 @@ This result can be used to make a volcano plot to visualize the results for all 
 ```{r}
 volcano_plot <- 
   dea_result |> 
-  tof_plot_cluster_volcano(
+  tof_plot_clusters_volcano(
     use_ggrepel = TRUE
   ) 
 

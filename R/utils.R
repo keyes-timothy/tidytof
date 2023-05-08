@@ -132,14 +132,14 @@ tof_summarize_clusters <-
     }
 
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_extract_central_tendency(
         cluster_col = {{cluster_col}},
         group_cols = {{group_cols}},
         marker_cols = {{metacluster_cols}},
         central_tendency_function = central_tendency_function,
         format = "long"
-      ) %>%
+      ) |>
       tidyr::pivot_wider(
         names_from = "channel",
         values_from = "values"
@@ -158,14 +158,14 @@ tof_join_metacluster <-
     cluster_colname <- colnames(dplyr::select(tof_tibble, {{cluster_col}}))
 
     cluster_dictionary <-
-      meta_tibble %>%
-      dplyr::select({{cluster_col}}) %>%
+      meta_tibble |>
+      dplyr::select({{cluster_col}}) |>
       dplyr::mutate(.metacluster = metacluster_vector)
 
     result <-
-      tof_tibble %>%
-      dplyr::select({{cluster_col}}) %>%
-      dplyr::left_join(cluster_dictionary, by = cluster_colname) %>%
+      tof_tibble |>
+      dplyr::select({{cluster_col}}) |>
+      dplyr::left_join(cluster_dictionary, by = cluster_colname) |>
       dplyr::select(-{{cluster_col}})
 
     return(result)
@@ -174,7 +174,7 @@ tof_join_metacluster <-
 flowsom_consensus <-
   function(data_matrix, num_clusters) {
     tof_tibble <-
-      t(data_matrix) %>%
+      t(data_matrix) |>
       dplyr::as_tibble()
 
     result <-
@@ -184,7 +184,7 @@ flowsom_consensus <-
       som_ydim = 1,
       som_distance_function = "euclidean",
       perform_metaclustering = FALSE
-    ) %>%
+    ) |>
       dplyr::pull(.data$flowsom_cluster)
 
     return(result)
@@ -294,7 +294,7 @@ prepare_diffcyt_args <-
       tidyselect::eval_select(
         expr = rlang::enquo(sample_col),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     # extract cluster column name as a string
@@ -302,7 +302,7 @@ prepare_diffcyt_args <-
       tidyselect::eval_select(
         expr = rlang::enquo(cluster_col),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     # extract fixed effect columns as a character vector
@@ -311,7 +311,7 @@ prepare_diffcyt_args <-
       tidyselect::eval_select(
         expr = rlang::enquo(fixed_effect_cols),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     # extract random effect columns as a character vector
@@ -320,7 +320,7 @@ prepare_diffcyt_args <-
       tidyselect::eval_select(
         expr = rlang::enquo(random_effect_cols),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     # find all marker names by process of elimination
@@ -338,15 +338,15 @@ prepare_diffcyt_args <-
 
     # create diffcyt experiment_info
     experiment_info <-
-      tof_tibble %>%
-      dplyr::select({{sample_col}}, {{fixed_effect_cols}}, {{random_effect_cols}}) %>%
-      dplyr::distinct() %>%
-      dplyr::rename(sample_id = {{sample_col}}) %>%
+      tof_tibble |>
+      dplyr::select({{sample_col}}, {{fixed_effect_cols}}, {{random_effect_cols}}) |>
+      dplyr::distinct() |>
+      dplyr::rename(sample_id = {{sample_col}}) |>
       dplyr::arrange(.data$sample_id)
 
     # create diffcyt marker_info
     marker_info <-
-      dplyr::tibble(marker_name = marker_names) %>%
+      dplyr::tibble(marker_name = marker_names) |>
       dplyr::mutate(marker_class = "state")
 
     # create formula or design matrix depending on which method is being used
@@ -395,10 +395,10 @@ prepare_diffcyt_args <-
           purrr::map(
             .x = 1:length(contrast_names),
             .f = ~
-              make_binary_vector(length = length(contrast_names), indices = .x) %>%
+              make_binary_vector(length = length(contrast_names), indices = .x) |>
               diffcyt::createContrast()
           )
-      ) %>%
+      ) |>
       dplyr::filter(contrast_names != "(Intercept)")
 
     # test against the null hypothesis that all fixed-effect coefficients are 0
@@ -415,10 +415,10 @@ prepare_diffcyt_args <-
 
     # configure data into the format diffcyt likes
     data_list <-
-      tof_tibble %>%
-      dplyr::group_by({{sample_col}}) %>%
-      tidyr::nest() %>%
-      dplyr::arrange({{sample_col}}) %>%
+      tof_tibble |>
+      dplyr::group_by({{sample_col}}) |>
+      tidyr::nest() |>
+      dplyr::arrange({{sample_col}}) |>
       dplyr::pull(data)
 
     cols_to_include <-
@@ -435,26 +435,26 @@ prepare_diffcyt_args <-
 
     # add clusters to diffcyt object
     temp <-
-      data_diff %>%
+      data_diff |>
       SummarizedExperiment::rowData()
 
     temp[,"cluster_id"] <-
-      tof_tibble %>%
-      dplyr::pull({{cluster_col}}) %>%
+      tof_tibble |>
+      dplyr::pull({{cluster_col}}) |>
       as.factor()
 
     SummarizedExperiment::rowData(data_diff) <- temp
 
     # fix type-related issues in the exprs component of the SummarizedExperiment
     data_exprs <-
-      data_diff %>%
-      SummarizedExperiment::assays() %>%
+      data_diff |>
+      SummarizedExperiment::assays() |>
       `[[`("exprs")
 
     data_colnames <- colnames(data_exprs)
 
     data_exprs <-
-      data_exprs %>%
+      data_exprs |>
       apply(MARGIN = 2, FUN = as.numeric)
 
     colnames(data_exprs) <- data_colnames
@@ -580,11 +580,11 @@ tof_find_emd <- function(vec_1, vec_2, num_bins = 100) {
 
   # find histograms
   density_1 <-
-    graphics::hist(vec_1, breaks = bins, plot = FALSE)$density %>%
+    graphics::hist(vec_1, breaks = bins, plot = FALSE)$density |>
     as.matrix()
 
   density_2 <-
-    graphics::hist(vec_2, breaks = bins, plot = FALSE)$density %>%
+    graphics::hist(vec_2, breaks = bins, plot = FALSE)$density |>
     as.matrix()
 
   # return final result
@@ -630,20 +630,20 @@ tof_find_jsd <- function(vec_1, vec_2, num_bins = 100) {
 
   # find histograms
   p1 <-
-    graphics::hist(vec_1, breaks = bins, plot = FALSE)$counts %>%
+    graphics::hist(vec_1, breaks = bins, plot = FALSE)$counts |>
     as.numeric()
 
   p1 <- p1 / sum(p1)
 
   p2 <-
-    graphics::hist(vec_2, breaks = bins, plot = FALSE)$counts %>%
+    graphics::hist(vec_2, breaks = bins, plot = FALSE)$counts |>
     as.numeric()
 
   p2 <- p2 / sum(p2)
 
   # return final result
   js_dist <-
-    purrr::quietly(philentropy::JSD)(rbind(p1, p2))$result %>%
+    purrr::quietly(philentropy::JSD)(rbind(p1, p2))$result |>
     as.numeric()
 
   return(js_dist)
@@ -857,9 +857,9 @@ tof_spade_density <-
 
     # find median nearest-neighbor distances for num_alpha_cells sampled cells
     alpha_knns <-
-      tof_tibble %>%
-      tof_downsample_constant(num_cells = num_alpha_cells) %>%
-      dplyr::select({{distance_cols}}) %>%
+      tof_tibble |>
+      tof_downsample_constant(num_cells = num_alpha_cells) |>
+      dplyr::select({{distance_cols}}) |>
       tof_find_knn(
         k = 1L,
         distance_function = distance_function,
@@ -873,8 +873,8 @@ tof_spade_density <-
     # compute number of neighbors within a sphere of radius alpha for each
     # input cell in tof_tibble
     spade_neighbors <-
-      tof_tibble %>%
-      dplyr::select({{distance_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{distance_cols}}) |>
       tof_find_knn(
         k = max_neighbors,
         distance_function = distance_function,
@@ -885,7 +885,7 @@ tof_spade_density <-
     # calculate densities equal to the number of neighbors
     # (up to max_neighbors) that each cell has
     num_zeros <-
-      (spade_neighbors$neighbor_ids == 0) %>%
+      (spade_neighbors$neighbor_ids == 0) |>
       rowSums()
     densities <- (max_neighbors) - num_zeros
 
@@ -960,8 +960,8 @@ tof_knn_density <-
 
     # compute knn information
     knn_result <-
-      tof_tibble %>%
-      dplyr::select({{distance_cols}}) %>%
+      tof_tibble |>
+      dplyr::select({{distance_cols}}) |>
       tof_find_knn(
         k = num_neighbors,
         distance_function = distance_function,
@@ -1104,9 +1104,9 @@ tof_make_knn_graph <-
     graph_type = c("weighted", "unweighted") # weighted or unweighted graph
   ) {
     knn_data <-
-      tof_tibble %>%
+      tof_tibble |>
       # select only knn_cols
-      dplyr::select({{knn_cols}}) %>%
+      dplyr::select({{knn_cols}}) |>
       tof_find_knn(
         k = num_neighbors,
         distance_function = distance_function,
@@ -1115,14 +1115,14 @@ tof_make_knn_graph <-
 
     # extract knn_ids and put them into long format
     knn_ids <-
-      knn_data %>%
+      knn_data |>
       purrr::pluck("neighbor_ids")
     colnames(knn_ids) <- 1:ncol(knn_ids)
 
     knn_ids <-
-      knn_ids %>%
-      dplyr::as_tibble() %>%
-      dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) %>%
+      knn_ids |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(from = seq(from = 1, to = nrow(knn_ids), by = 1)) |>
       tidyr::pivot_longer(
         cols = -"from",
         names_to = "neighbor_index",
@@ -1132,14 +1132,14 @@ tof_make_knn_graph <-
     if (graph_type == "weighted") {
       # extract knn distances and put them into long format
       knn_dists <-
-        knn_data %>%
+        knn_data |>
         purrr::pluck("neighbor_distances")
       colnames(knn_dists) <- 1:ncol(knn_dists)
 
       knn_dists <-
-        knn_dists %>%
-        dplyr::as_tibble() %>%
-        dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) %>%
+        knn_dists |>
+        dplyr::as_tibble() |>
+        dplyr::mutate(from = seq(from = 1, to = nrow(knn_dists), by = 1)) |>
         tidyr::pivot_longer(
           cols = -"from",
           names_to = "neighbor_index",
@@ -1148,16 +1148,16 @@ tof_make_knn_graph <-
 
       # join knn distances with knn ids for final edge tibble
       edge_tibble <-
-        knn_ids %>%
+        knn_ids |>
         dplyr::left_join(knn_dists, by = (c("from", "neighbor_index")))
 
       if (distance_function == "euclidean") {
         edge_tibble <-
-          edge_tibble %>%
+          edge_tibble |>
           dplyr::mutate(weight = 1 / (1 + .data$distance))
       } else {
         edge_tibble <-
-          edge_tibble %>%
+          edge_tibble |>
           dplyr::mutate(weight = 1 - .data$distance)
       }
 
@@ -1238,6 +1238,14 @@ tof_rescale <-
 #' @param theme A ggplot2 theme to apply to the heatmap.
 #' Defaults to \code{\link[ggplot2]{theme_minimal}}
 #'
+#' @param cluster_markers A boolean value indicating if the heatmap should
+#' order its columns (i.e. markers) using hierarchical clustering. Defaults to
+#' TRUE.
+#'
+#' @param cluster_groups A boolean value indicating if the heatmap should
+#' order its rows (i.e. groups) using hierarchical clustering. Defaults to
+#' TRUE.
+#'
 #' @return A ggplot object.
 #'
 #' @importFrom dplyr as_tibble
@@ -1268,16 +1276,18 @@ tof_plot_heatmap <-
     central_tendency_function = stats::median,
     scale_markerwise = FALSE,
     scale_ywise = FALSE,
+    cluster_markers = TRUE,
+    cluster_groups = TRUE,
     line_width = 0.25,
     theme = ggplot2::theme_minimal()
   ) {
     # compute summary statistics for each group ------------------------------
     group_tibble <-
-      tof_tibble %>%
+      tof_tibble |>
       dplyr::select(
         {{y_col}},
         {{marker_cols}}
-      ) %>%
+      ) |>
       # compute one summary statistic for each group across all knn_cols
       tof_summarize_clusters(
         cluster_col = {{y_col}},
@@ -1286,8 +1296,8 @@ tof_plot_heatmap <-
       )
 
     group_matrix <-
-      group_tibble %>%
-      dplyr::select({{marker_cols}}) %>%
+      group_tibble |>
+      dplyr::select({{marker_cols}}) |>
       as.matrix()
 
     marker_names <- colnames(group_matrix)
@@ -1305,7 +1315,7 @@ tof_plot_heatmap <-
 
     if (scale_ywise) {
       group_matrix <-
-        apply(X = group_matrix, MARGIN = 1, FUN = tof_rescale) %>%
+        apply(X = group_matrix, MARGIN = 1, FUN = tof_rescale) |>
         t()
 
       # if there are NaN values, tell the user
@@ -1317,36 +1327,45 @@ tof_plot_heatmap <-
 
     colnames(group_matrix) <- marker_names
 
+    if (cluster_markers) {
+
     marker_order <-
-      group_matrix %>%
-      t() %>%
-      stats::dist(method = "euclidean") %>%
-      stats::hclust() %>%
+      group_matrix |>
+      t() |>
+      stats::dist(method = "euclidean") |>
+      stats::hclust() |>
       purrr::pluck("order")
     marker_order <- marker_names[marker_order]
+    } else {
+      marker_order <- marker_names
+    }
 
+    if (cluster_groups) {
     group_order <-
-      stats::dist(x = group_matrix, method = "euclidean") %>%
-      stats::hclust() %>%
+      stats::dist(x = group_matrix, method = "euclidean") |>
+      stats::hclust() |>
       purrr::pluck("order")
     group_order <- dplyr::pull(group_tibble, {{y_col}})[group_order]
+    } else {
+      group_order <- dplyr::pull(group_tibble, {{y_col}})
+    }
 
     group_tibble_long <-
-      group_matrix %>%
-      dplyr::as_tibble() %>%
-      dplyr::bind_cols(dplyr::select(group_tibble, {{y_col}})) %>%
+      group_matrix |>
+      dplyr::as_tibble() |>
+      dplyr::bind_cols(dplyr::select(group_tibble, {{y_col}})) |>
       tidyr::pivot_longer(
         cols = {{marker_cols}},
         names_to = "marker",
         values_to = "expression"
-      ) %>%
+      ) |>
       dplyr::mutate(
         "{{y_col}}" := factor({{y_col}}, levels = group_order),
         marker = factor(.data$marker, levels = marker_order)
       )
 
     heatmap <-
-      group_tibble_long %>%
+      group_tibble_long |>
       ggplot2::ggplot(
         ggplot2::aes(x = .data$marker, y = {{y_col}}, fill = .data$expression)
       ) +
@@ -1414,16 +1433,16 @@ tof_model_plot_survival_curves <- function(tof_model, new_x) {
     )
 
   survival_curves <-
-    survfit_result$surv %>%
-    dplyr::as_tibble() %>%
-    dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+    survfit_result$surv |>
+    dplyr::as_tibble() |>
+    dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) |>
     tidyr::pivot_longer(
       cols = -".timepoint_index",
       names_to = "row_index",
       values_to = "probability"
-    ) %>%
-    dplyr::left_join(times, by = ".timepoint_index") %>%
-    dplyr::select(-".timepoint_index") %>%
+    ) |>
+    dplyr::left_join(times, by = ".timepoint_index") |>
+    dplyr::select(-".timepoint_index") |>
     tidyr::nest(survival_curve = -"row_index")
 
   return(survival_curves)
@@ -1448,16 +1467,16 @@ tof_plot_survival_curves <-
       )
 
     survival_curves <-
-      survfit_result$surv %>%
-      dplyr::as_tibble() %>%
-      dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) %>%
+      survfit_result$surv |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) |>
       tidyr::pivot_longer(
         cols = -".timepoint_index",
         names_to = "row_index",
         values_to = "probability"
-      ) %>%
-      dplyr::left_join(times, by = ".timepoint_index") %>%
-      dplyr::select(-".timepoint_index") %>%
+      ) |>
+      dplyr::left_join(times, by = ".timepoint_index") |>
+      dplyr::select(-".timepoint_index") |>
       tidyr::nest(survival_curve = -"row_index")
 
     return(survival_curves)
@@ -1490,15 +1509,15 @@ tof_compute_km_curve <- function(survival_curves) {
   death_level <- levels(survival_curves$event)[2]
 
   km_curve <-
-    survival_curves %>%
-    dplyr::select("time_to_event", "event") %>%
-    dplyr::arrange(.data$time_to_event) %>%
+    survival_curves |>
+    dplyr::select("time_to_event", "event") |>
+    dplyr::arrange(.data$time_to_event) |>
     dplyr::mutate(
       num_current_deaths = as.character(.data$event) == death_level,
       num_deaths = cumsum(.data$num_current_deaths),
       num_current_censored = as.character(.data$event) == censor_level,
       num_censored = cumsum(.data$num_current_censored)
-    ) %>%
+    ) |>
     dplyr::add_row(
       dplyr::tibble(
         time_to_event = 0,
@@ -1508,7 +1527,7 @@ tof_compute_km_curve <- function(survival_curves) {
         num_censored = 0
       ),
       .before = 1L
-    ) %>%
+    ) |>
     dplyr::mutate(
       num_at_risk = dplyr::n() - (.data$num_deaths + .data$num_censored + 1),
       num_at_risk = dplyr::lag(.data$num_at_risk, default = dplyr::n() - 1),
@@ -1516,7 +1535,7 @@ tof_compute_km_curve <- function(survival_curves) {
       survival_probability = 1,
       survival_probability = cumprod(.data$multiplier),
       is_censored = (.data$num_current_censored == 1)
-    ) %>%
+    ) |>
    dplyr::select(
      "time_to_event",
      "survival_probability",

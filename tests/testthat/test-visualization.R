@@ -7,36 +7,36 @@ data(ddpr_data)
 set.seed(3030)
 
 tt <-
-  ddpr_data %>%
-  tof_preprocess() %>%
+  ddpr_data |>
+  tof_preprocess() |>
   tof_cluster(
     cluster_cols = starts_with("CD"),
     group_cols = sample_name,
     perform_metaclustering = FALSE,
     method = "flowsom"
-  ) %>%
+  ) |>
   tof_metacluster(
     cluster_col = .flowsom_cluster,
     metacluster_cols = starts_with("CD"),
     method = "phenograph"
-  ) %>%
+  ) |>
   tof_metacluster(
     cluster_col = .flowsom_cluster,
     metacluster_cols = starts_with("CD"),
     num_metaclusters = 3,
     method = "kmeans"
-  ) %>%
+  ) |>
   tof_downsample(
     group_cols = .phenograph_metacluster,
     num_cells = 500,
     method = "constant"
-  ) %>%
-  tof_reduce_dimensions(tsne_cols = starts_with("CD"), method = "tsne") %>%
+  ) |>
+  tof_reduce_dimensions(tsne_cols = starts_with("CD"), method = "tsne") |>
   tof_reduce_dimensions(
     pca_cols = starts_with("CD"),
     num_comp = 2L,
     method = "pca"
-  ) %>%
+  ) |>
   mutate(
     replicate = sample(c("a", "b", "c", "d"), size = n(), replace = TRUE),
     sample_name_2 =
@@ -48,7 +48,7 @@ tt <-
   )
 
 daa_ttest <-
-  tt %>%
+  tt |>
   tof_daa_ttest(
     cluster_col = .kmeans_metacluster,
     effect_col = sample_name,
@@ -57,8 +57,8 @@ daa_ttest <-
   )
 
 daa_diffcyt <-
-  tt %>%
-  mutate(sample = paste0(sample_name, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name, replicate)) |>
   tof_daa_diffcyt(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -68,8 +68,8 @@ daa_diffcyt <-
   )
 
 daa_diffcyt_2 <-
-  tt %>%
-  mutate(sample = paste0(sample_name_2, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name_2, replicate)) |>
   tof_daa_diffcyt(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -79,8 +79,8 @@ daa_diffcyt_2 <-
   )
 
 daa_glmm <-
-  tt %>%
-  mutate(sample = paste0(sample_name, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name, replicate)) |>
   tof_daa_glmm(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -90,7 +90,7 @@ daa_glmm <-
 
 dea_ttest <-
  suppressWarnings(
-   tt %>%
+   tt |>
      tof_dea_ttest(
        cluster_col = .kmeans_metacluster,
        effect_col = sample_name,
@@ -100,8 +100,8 @@ dea_ttest <-
  )
 
 dea_lmm <-
-  tt %>%
-  mutate(sample = paste0(sample_name, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name, replicate)) |>
   tof_dea_lmm(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -110,8 +110,8 @@ dea_lmm <-
   )
 
 dea_diffcyt <-
-  tt %>%
-  mutate(sample = paste0(sample_name, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name, replicate)) |>
   tof_dea_diffcyt(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -122,8 +122,8 @@ dea_diffcyt <-
   )
 
 dea_diffcyt_2 <-
-  tt %>%
-  mutate(sample = paste0(sample_name_2, replicate)) %>%
+  tt |>
+  mutate(sample = paste0(sample_name_2, replicate)) |>
   tof_dea_diffcyt(
     sample_col = sample,
     cluster_col = .kmeans_metacluster,
@@ -166,14 +166,14 @@ test_that("scatterplots return ggplot objects using scattermore", {
 
 test_that("embedding visualizations run and return ggplot objects when embeddings are precomputed", {
   embed_plot_tsne <-
-    tt %>%
+    tt |>
     tof_plot_cells_embedding(
       embedding_cols = starts_with(".tsne"),
       color_col = .phenograph_metacluster
     )
 
   embed_plot_pca <-
-    tt %>%
+    tt |>
     tof_plot_cells_embedding(
       embedding_cols = starts_with(".pc"),
       color_col = .phenograph_metacluster,
@@ -186,7 +186,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
 
 test_that("embedding visualizations run and return ggplot objects when embeddings are computed de novo", {
   embed_plot_tsne <-
-    tt %>%
+    tt |>
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "tsne",
@@ -195,7 +195,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
 
   embed_plot_pca <-
     embed_plot_tsne <-
-    tt %>%
+    tt |>
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "pca",
@@ -204,7 +204,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
     )
 
   embed_plot_umap <-
-    tt %>%
+    tt |>
     tof_plot_cells_embedding(
       color_col = .phenograph_metacluster,
       embedding_method = "umap",
@@ -222,7 +222,7 @@ test_that("embedding visualizations run and return ggplot objects when embedding
 test_that("layout visualizations run and return ggplot objects", {
 
   layout_plot <-
-    tt %>%
+    tt |>
     tof_plot_cells_layout(
       knn_cols = starts_with("CD"),
       color_col = .phenograph_metacluster,
@@ -237,8 +237,8 @@ test_that("layout visualizations run and return ggplot objects", {
 test_that("layout visualizations can use old plots as a template", {
 
   layout_plot <-
-    tt %>%
-    tof_downsample_constant(group_cols = .phenograph_metacluster, num_cells = 20) %>%
+    tt |>
+    tof_downsample_constant(group_cols = .phenograph_metacluster, num_cells = 20) |>
     tof_plot_cells_layout(
       knn_cols = starts_with("CD"),
       color_col = .phenograph_metacluster,
@@ -259,7 +259,7 @@ test_that("layout visualizations can use old plots as a template", {
 test_that("density plots run and result in ggplot objects", {
 
   density_1 <-
-    tt %>%
+    tt |>
     tof_plot_cells_density(
       marker_col = cd43,
       group_col = .kmeans_metacluster,
@@ -267,7 +267,7 @@ test_that("density plots run and result in ggplot objects", {
     )
 
   density_2 <-
-    tt %>%
+    tt |>
     tof_plot_cells_density(
       marker_col = ps6,
       group_col = .kmeans_metacluster,
@@ -275,7 +275,7 @@ test_that("density plots run and result in ggplot objects", {
     )
 
   density_3 <-
-    tt %>%
+    tt |>
     tof_plot_cells_density(
       marker_col = cd45,
       use_ggridges = FALSE
@@ -287,13 +287,13 @@ test_that("density plots run and result in ggplot objects", {
 })
 
 
-# tof_plot_cluster_mst ---------------------------------------------------------
+# tof_plot_clusters_mst ---------------------------------------------------------
 
 test_that("layout visualizations run and return ggplot objects", {
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         color_col = sample_name
       ),
@@ -301,8 +301,8 @@ test_that("layout visualizations run and return ggplot objects", {
   )
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         color_col = .phenograph_metacluster
       ),
@@ -310,8 +310,8 @@ test_that("layout visualizations run and return ggplot objects", {
   )
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         color_col = .phenograph_metacluster,
         node_size = "cluster_size"
@@ -320,8 +320,8 @@ test_that("layout visualizations run and return ggplot objects", {
   )
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         group_cols = .phenograph_metacluster,
         color_col = .phenograph_metacluster,
@@ -332,8 +332,8 @@ test_that("layout visualizations run and return ggplot objects", {
   )
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         color_col = .phenograph_metacluster,
         graph_type = "unweighted"
@@ -343,16 +343,16 @@ test_that("layout visualizations run and return ggplot objects", {
 
   # use an existing plot as a template layout
   layout_plot <-
-    tt %>%
-    tof_plot_cluster_mst(
+    tt |>
+    tof_plot_clusters_mst(
       cluster_col = .flowsom_cluster,
       color_col = .phenograph_metacluster,
       graph_type = "unweighted"
     )
 
   expect_s3_class(
-    tt %>%
-      tof_plot_cluster_mst(
+    tt |>
+      tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
         color_col = cd34,
         graph_type = "unweighted",
@@ -363,20 +363,20 @@ test_that("layout visualizations run and return ggplot objects", {
 
 })
 
-# tof_plot_cluster_heatmap ---------------------------------------------------------
+# tof_plot_clusters_heatmap ---------------------------------------------------------
 
 test_that("heatmap function runs and returns ggplot object", {
   heatmap_1 <-
-    tt %>%
-    tof_plot_cluster_heatmap(
+    tt |>
+    tof_plot_clusters_heatmap(
       marker_cols = starts_with("cd"),
       cluster_col = .flowsom_cluster
     )
   expect_s3_class(heatmap_1, "ggplot")
 
   heatmap_2 <-
-    tt %>%
-    tof_plot_cluster_heatmap(
+    tt |>
+    tof_plot_clusters_heatmap(
       marker_cols = starts_with("cd"),
       cluster_col = .flowsom_cluster,
       scale_markerwise = TRUE,
@@ -386,8 +386,8 @@ test_that("heatmap function runs and returns ggplot object", {
 
 
   heatmap_3 <-
-    tt %>%
-    tof_plot_cluster_heatmap(
+    tt |>
+    tof_plot_clusters_heatmap(
       marker_cols = starts_with("cd"),
       cluster_col = .flowsom_cluster,
       scale_markerwise = TRUE,
@@ -397,8 +397,8 @@ test_that("heatmap function runs and returns ggplot object", {
 
 
   heatmap_4 <-
-    tt %>%
-    tof_plot_cluster_heatmap(
+    tt |>
+    tof_plot_clusters_heatmap(
       marker_cols = starts_with("cd"),
       cluster_col = .phenograph_metacluster,
       scale_markerwise = FALSE,
@@ -408,7 +408,7 @@ test_that("heatmap function runs and returns ggplot object", {
 
 
   heatmap_5 <-
-    tt %>%
+    tt |>
     tof_plot_heatmap(
       y_col = sample_name
     )
@@ -416,7 +416,7 @@ test_that("heatmap function runs and returns ggplot object", {
 
 
   heatmap_6 <-
-    tt %>%
+    tt |>
     tof_plot_sample_heatmap(
       sample_col = sample_name_2
     )
@@ -424,33 +424,33 @@ test_that("heatmap function runs and returns ggplot object", {
 
 })
 
-# tof_plot_cluster_volcano -----------------------------------------------------
+# tof_plot_clusters_volcano -----------------------------------------------------
 
-test_that("tof_plot_cluster_volcano throws an error if diffcyt_lmm was the dea_method", {
+test_that("tof_plot_clusters_volcano throws an error if diffcyt_lmm was the dea_method", {
   expect_error(
-    dea_diffcyt %>%
-      tof_plot_cluster_volcano(
+    dea_diffcyt |>
+      tof_plot_clusters_volcano(
       )
   )
 })
 
-test_that("tof_plot_cluster_volcano runs and creates ggplot objects", {
+test_that("tof_plot_clusters_volcano runs and creates ggplot objects", {
   volcano_diffcyt_2 <-
-    dea_diffcyt_2 %>%
-    tof_plot_cluster_volcano(point_size = 4, use_ggrepel = FALSE)
+    dea_diffcyt_2 |>
+    tof_plot_clusters_volcano(point_size = 4, use_ggrepel = FALSE)
   expect_s3_class(volcano_diffcyt_2, "ggplot")
 
   volcano_lmm <-
     suppressWarnings(
-      dea_lmm %>%
-        tof_plot_cluster_volcano(use_ggrepel = TRUE)
+      dea_lmm |>
+        tof_plot_clusters_volcano(use_ggrepel = TRUE)
     )
   expect_s3_class(volcano_lmm, "ggplot")
 
   dea_ttest <-
     suppressWarnings(
-      tt %>%
-        select(-starts_with(".tsne"), -starts_with(".pc")) %>%
+      tt |>
+        select(-starts_with(".tsne"), -starts_with(".pc")) |>
         tof_dea_ttest(
           cluster_col = .kmeans_metacluster,
           marker_cols = where(tof_is_numeric), #starts_with("CD"),
@@ -462,8 +462,8 @@ test_that("tof_plot_cluster_volcano runs and creates ggplot objects", {
 
   volcano_ttest <-
     suppressWarnings(
-      dea_ttest %>%
-        tof_plot_cluster_volcano(use_ggrepel = TRUE)
+      dea_ttest |>
+        tof_plot_clusters_volcano(use_ggrepel = TRUE)
     )
   expect_s3_class(volcano_ttest, "ggplot")
 
@@ -480,10 +480,10 @@ feature_tibble <-
     cd34 = runif(n = 100),
     outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
     class =
-      if_else(outcome > median(outcome), "class1", "class2") %>%
+      if_else(outcome > median(outcome), "class1", "class2") |>
       as.factor(),
     multiclass =
-      if_else(class == "class1", "class1", sample(c("class2", "class3"), size = 100, replace = TRUE)) %>%
+      if_else(class == "class1", "class1", sample(c("class2", "class3"), size = 100, replace = TRUE)) |>
       as.factor(),
        # as.factor(c(rep("class1", 30), rep("class2", 30), rep("class3", 40))),
     event = c(rep(0, times = 50), rep(1, times = 50)),
@@ -497,12 +497,12 @@ feature_tibble <-
 
 # permute all columns to get "new" data
 new_data <-
-  feature_tibble %>%
+  feature_tibble |>
   mutate(across(everything(), ~ sample(x = .x, size = length(.x), replace = FALSE)))
 
 linear_tof_model <-
-  feature_tibble %>%
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  feature_tibble |>
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) |>
   tof_train_model(
     predictor_cols = c(cd45, pstat5, cd34),
     response_col = outcome,
@@ -510,8 +510,8 @@ linear_tof_model <-
   )
 
 logistic_tof_model <-
-  feature_tibble %>%
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  feature_tibble |>
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) |>
   tof_train_model(
     predictor_cols = c(cd45, pstat5, cd34),
     response_col = class,
@@ -519,8 +519,8 @@ logistic_tof_model <-
   )
 
 multinomial_tof_model <-
-  feature_tibble %>%
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  feature_tibble |>
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) |>
   tof_train_model(
     predictor_cols = c(cd45, pstat5, cd34),
     response_col = multiclass,
@@ -528,8 +528,8 @@ multinomial_tof_model <-
   )
 
 survival_tof_model <-
-  feature_tibble %>%
-  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) %>%
+  feature_tibble |>
+  tof_split_data(split_method = "bootstrap", num_bootstraps = 1L) |>
   tof_train_model(
     predictor_cols = c(cd45, pstat5, cd34),
     event_col = event,
@@ -538,51 +538,51 @@ survival_tof_model <-
   )
 
 linear_plot <-
-  linear_tof_model %>%
+  linear_tof_model |>
   tof_plot_model()
 
 linear_plot_new <-
-  linear_tof_model %>%
+  linear_tof_model |>
   tof_plot_model(new_data = new_data)
 
 linear_plot_tuning <-
-  linear_tof_model %>%
+  linear_tof_model |>
   tof_plot_model(new_data = "tuning")
 
 logistic_plot <-
-  logistic_tof_model %>%
+  logistic_tof_model |>
   tof_plot_model()
 
 logistic_plot_new <-
-  logistic_tof_model %>%
+  logistic_tof_model |>
   tof_plot_model(new_data = new_data)
 
 logistic_plot_tuning <-
-  logistic_tof_model %>%
+  logistic_tof_model |>
   tof_plot_model(new_data = "tuning")
 
 multinomial_plot <-
-  multinomial_tof_model %>%
+  multinomial_tof_model |>
   tof_plot_model()
 
 multinomial_plot_new <-
-  multinomial_tof_model %>%
+  multinomial_tof_model |>
   tof_plot_model(new_data = new_data)
 
 multinomial_plot_tuning <-
-  multinomial_tof_model %>%
+  multinomial_tof_model |>
   tof_plot_model(new_data = "tuning")
 
 survival_plot <-
-  survival_tof_model %>%
+  survival_tof_model |>
   tof_plot_model()
 
 survival_plot_new <-
-  survival_tof_model %>%
+  survival_tof_model |>
   tof_plot_model(new_data = new_data)
 
 survival_plot_tuning <-
-  survival_tof_model %>%
+  survival_tof_model |>
   tof_plot_model(new_data = "tuning")
 
 test_that("all results are ggplot objects", {

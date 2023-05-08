@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{tof_cluster}
 \alias{tof_cluster}
-\title{Cluster CyTOF data.}
+\title{Cluster high-dimensional cytometry data.}
 \usage{
 tof_cluster(
   tof_tibble,
@@ -42,7 +42,7 @@ plus an additional column encoding the cluster ids.
 }
 \description{
 This function is a wrapper around {tidytof}'s tof_cluster_* function family.
-It performs clustering on CyTOF data using a user-specified method (of 5 choices)
+It performs clustering on high-dimensional cytometry data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters.
 }
 \examples{

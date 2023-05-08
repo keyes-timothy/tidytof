@@ -2,7 +2,7 @@
 % Please edit documentation in R/io.R
 \name{tof_read_file}
 \alias{tof_read_file}
-\title{Read CyTOF data from a single .fcs or .csv file into a tidy tibble.}
+\title{Read high-dimensional cytometry data from a single .fcs or .csv file into a tidy tibble.}
 \usage{
 tof_read_file(file_path = NULL, sep = "|", panel_info = dplyr::tibble())
 }
@@ -14,12 +14,12 @@ metal in the column names of the output tibble. Defaults to "|". Only used
 if the input file is an .fcs file.}
 
 \item{panel_info}{Optional. A tibble or data.frame containing information about the
-panel used during CyTOF data acquisition. Two columns are required:
+panel used during high-dimensional cytometry data acquisition. Two columns are required:
 "metals" and "antigens". Only used if the input file is a .csv file.}
 }
 \value{
 A `tof_tbl` in which each row represents a single cell and each
-column represents a CyTOF antigen channel.
+column represents a high-dimensional cytometry antigen channel.
 
 A `tof_tbl` is an S3 class that extends the "tibble" class by storing
 one additional attribute: "panel" (a tibble storing information about the
@@ -28,5 +28,5 @@ obvious from data read as a .csv file, this information must be provided
 manually by the user.
 }
 \description{
-Read CyTOF data from a single .fcs or .csv file into a tidy tibble.
+Read high-dimensional cytometry data from a single .fcs or .csv file into a tidy tibble.
 }

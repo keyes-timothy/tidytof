@@ -11,6 +11,8 @@ tof_plot_heatmap(
   central_tendency_function = stats::median,
   scale_markerwise = FALSE,
   scale_ywise = FALSE,
+  cluster_markers = TRUE,
+  cluster_groups = TRUE,
   line_width = 0.25,
   theme = ggplot2::theme_minimal()
 )
@@ -36,6 +38,14 @@ marker is 1 and the minimum value is 0. Defaults to FALSE.}
 \item{scale_ywise}{A boolean value indicating if the heatmap should
 rescale the rows of the heatmap such that the maximum value for each
 group is 1 and the minimum value is 0. Defaults to FALSE.}
+
+\item{cluster_markers}{A boolean value indicating if the heatmap should
+order its columns (i.e. markers) using hierarchical clustering. Defaults to
+TRUE.}
+
+\item{cluster_groups}{A boolean value indicating if the heatmap should
+order its rows (i.e. groups) using hierarchical clustering. Defaults to
+TRUE.}
 
 \item{line_width}{A numeric value indicating how thick the lines separating
 the tiles of the heatmap should be. Defaults to 0.25.}
