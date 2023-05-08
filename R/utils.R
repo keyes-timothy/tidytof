@@ -448,8 +448,8 @@ prepare_diffcyt_args <-
     # fix type-related issues in the exprs component of the SummarizedExperiment
     data_exprs <-
       data_diff |>
-      SummarizedExperiment::assays() |>
-      `[[`("exprs")
+      SummarizedExperiment::assays()
+    data_exprs <- data_exprs[["exprs"]]
 
     data_colnames <- colnames(data_exprs)
 
