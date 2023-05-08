@@ -110,7 +110,7 @@ For example, suppose I wanted to write a `{tidytof}`-style interface for my new 
 #' @importFrom dplyr tibble
 #'
 tof_cluster_supercluster <- 
-  function(tof_tibble, cluster_cols, num_superclusters = 10L, sep = "_", ...) { 
+  function(tof_tibble, cluster_cols, num_kmeans_clusters = 10L, sep = "_", ...) { 
     kmeans_1 <- 
       tof_tibble |> 
       tof_cluster_kmeans(
