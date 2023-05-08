@@ -310,7 +310,7 @@ might write a function like this:</p>
 <span><span class="co">#' @importFrom dplyr tibble</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="va">tof_cluster_supercluster</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="va">cluster_cols</span>, <span class="va">num_superclusters</span> <span class="op">=</span> <span class="fl">10L</span>, <span class="va">sep</span> <span class="op">=</span> <span class="st">"_"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span> </span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">tof_tibble</span>, <span class="va">cluster_cols</span>, <span class="va">num_kmeans_clusters</span> <span class="op">=</span> <span class="fl">10L</span>, <span class="va">sep</span> <span class="op">=</span> <span class="st">"_"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span> </span>
 <span>    <span class="va">kmeans_1</span> <span class="op">&lt;-</span> </span>
 <span>      <span class="va">tof_tibble</span> <span class="op">|&gt;</span> </span>
 <span>      <span class="fu"><a href="../reference/tof_cluster_kmeans.html">tof_cluster_kmeans</a></span><span class="op">(</span></span>
