@@ -75,7 +75,7 @@
     <dl><dt>path</dt>
 <dd><p>A file path to a single file or to a directory of files.
 The only valid file types are .fcs files or .csv files
-containing CyTOF data.</p></dd>
+containing high-dimensional cytometry data.</p></dd>
 
 
 <dt>sep</dt>
@@ -86,7 +86,7 @@ the input file is an .fcs file.</p></dd>
 
 <dt>panel_info</dt>
 <dd><p>Optional. A tibble or data.frame containing information about the
-panel used during CyTOF data acquisition. Two columns are required:
+panel used during high-dimensional cytometry data acquisition. Two columns are required:
 "metals" and "antigens". Only used if the input file is a .csv file.</p></dd>
 
 </dl></div>
@@ -95,7 +95,7 @@ panel used during CyTOF data acquisition. Two columns are required:
     
 
 <p>An [c by m+1] tibble in which each row represents a single cell (of c
-total in the dataset) and each column represents a CyTOF measurement
+total in the dataset) and each column represents a high-dimensional cytometry measurement
 (of m total in the dataset). If more than one .fcs is read at once,
 the last column of the tibble (`file_name`) will represent the file name
 of the .fcs file from which each cell was read.</p>

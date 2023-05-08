@@ -86,7 +86,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-03</h4>
+            <h4 data-toc-skip class="date">2023-05-08</h4>
       
       
       <div class="d-none name"><code>dimensionality-reduction.Rmd</code></div>
@@ -131,12 +131,12 @@ which we use tSNE to visualize data in <a href="https://keyes-timothy.github.io/
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">#&gt;   .tsne_1 .tsne_2</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    18.3   3.57 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    17.5  -<span style="color: #BB0000;">1.78</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    34.4 -<span style="color: #BB0000;">12.6</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    15.5 -<span style="color: #BB0000;">11.1</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    19.2   0.625</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    23.3 -<span style="color: #BB0000;">11.8</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  -<span style="color: #BB0000;">10.1</span>     4.11</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   -<span style="color: #BB0000;">9.77</span>    9.22</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  -<span style="color: #BB0000;">24.7</span>    29.3 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  -<span style="color: #BB0000;">12.4</span>    18.2 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  -<span style="color: #BB0000;">11.1</span>     7.26</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  -<span style="color: #BB0000;">19.4</span>    16.3</span></span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add
 reduced-dimension feature embeddings to the input <code>tof_tbl</code>
 and return the augmented <code>tof_tbl</code> (that is, a
@@ -151,16 +151,16 @@ its result. To return only the features embeddings themselves, set
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
 <span><span class="co">#&gt;    .tsne_1 .tsne_2</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  -<span style="color: #BB0000;">17.9</span>    -<span style="color: #BB0000;">2.24</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   -<span style="color: #BB0000;">9.01</span>  -<span style="color: #BB0000;">11.0</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  -<span style="color: #BB0000;">29.5</span>   -<span style="color: #BB0000;">22.4</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  -<span style="color: #BB0000;">16.5</span>   -<span style="color: #BB0000;">15.8</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  -<span style="color: #BB0000;">20.8</span>    -<span style="color: #BB0000;">7.13</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  -<span style="color: #BB0000;">12.4</span>   -<span style="color: #BB0000;">21.6</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   -<span style="color: #BB0000;">8.27</span>  -<span style="color: #BB0000;">12.5</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   -<span style="color: #BB0000;">8.12</span>  -<span style="color: #BB0000;">25.2</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  -<span style="color: #BB0000;">11.9</span>   -<span style="color: #BB0000;">18.6</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   -<span style="color: #BB0000;">8.51</span>   -<span style="color: #BB0000;">3.49</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  -<span style="color: #BB0000;">15.7</span>    2.50 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  -<span style="color: #BB0000;">15.4</span>   -<span style="color: #BB0000;">2.51</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  -<span style="color: #BB0000;">32.0</span>  -<span style="color: #BB0000;">14.4</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  -<span style="color: #BB0000;">14.3</span>  -<span style="color: #BB0000;">12.2</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  -<span style="color: #BB0000;">17.4</span>    0.134</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  -<span style="color: #BB0000;">19.9</span>  -<span style="color: #BB0000;">10.0</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  -<span style="color: #BB0000;">16.9</span>   -<span style="color: #BB0000;">4.11</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  -<span style="color: #BB0000;">26.5</span>   -<span style="color: #BB0000;">9.83</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  -<span style="color: #BB0000;">16.0</span>  -<span style="color: #BB0000;">13.8</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   -<span style="color: #BB0000;">8.99</span>   1.58 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span></code></pre></div>
 <p>Changing the <code>method</code> argument results in different
 low-dimensional embeddings:</p>
@@ -168,18 +168,18 @@ low-dimensional embeddings:</p>
 <code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"umap"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
-<span><span class="co">#&gt;    .umap1 .umap2</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 10.3    3.65 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  9.13   3.18 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  2.14  -<span style="color: #BB0000;">0.352</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  2.06  -<span style="color: #BB0000;">1.86</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 10.3    3.39 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.355</span> -<span style="color: #BB0000;">2.83</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 10.4    2.90 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  1.46  -<span style="color: #BB0000;">1.01</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  7.00   0.594</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  9.24   5.71 </span></span>
+<span><span class="co">#&gt;    .umap1  .umap2</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">9.22</span>  -<span style="color: #BB0000;">5.07</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">8.42</span>  -<span style="color: #BB0000;">3.99</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">3.22</span>  -<span style="color: #BB0000;">0.056</span><span style="color: #BB0000; text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">3.10</span>   1.73  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">9.39</span>  -<span style="color: #BB0000;">4.85</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.618</span>  2.59  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">9.50</span>  -<span style="color: #BB0000;">4.42</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">2.41</span>   0.710 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">5.68</span>   0.098<span style="text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">7.56</span>  -<span style="color: #BB0000;">6.06</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span>
 <span></span>
 <span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>

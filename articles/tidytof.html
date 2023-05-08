@@ -86,7 +86,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-03</h4>
+            <h4 data-toc-skip class="date">2023-05-08</h4>
       
       
       <div class="d-none name"><code>tidytof.Rmd</code></div>
@@ -94,35 +94,34 @@ Keyes</h4>
 
     
     
-<p>Analyzing single-cell data can be surprisingly complicated. One one
-hand, this is partially because single-cell data analysis is an
-incredibly active area of research, with new methods being published on
-a weekly - or even daily! - basis. Accordingly, when new tools are
-published, they often require researchers to learn unique,
-method-specific application programming interfaces (APIs) with distinct
-requirements for input data formatting, function syntax, and output data
-structure. On the other hand, analyzing single-cell data can be
-challenging because it often involves simultaneously asking questions at
-multiple levels of biological scope - the single-cell level, the cell
-subpopulation (i.e. cluster) level, and the whole-sample or
-whole-patient level - each of which has distinct data processing
-needs.</p>
-<p>To address both of these challenges for <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/" class="external-link">mass
-cytometry (CyTOF)</a>, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements a concise,
-integrated “grammar” of single-cell data analysis capable of answering a
-variety of biological questions. Available as an open-source R package,
-<a href="https://keyes-timothy.github.io/tidytof">tidytof</a> provides an easy-to-use pipeline for analyzing
-CyTOF data by automating many common data-processing tasks under a
+<p>Analyzing single-cell data can be surprisingly complicated. This is
+partially because single-cell data analysis is an incredibly active area
+of research, with new methods being published on a weekly - or even
+daily! - basis. Accordingly, when new tools are published, they often
+require researchers to learn unique, method-specific application
+programming interfaces (APIs) with distinct requirements for input data
+formatting, function syntax, and output data structure. On the other
+hand, analyzing single-cell data can be challenging because it often
+involves simultaneously asking questions at multiple levels of
+biological scope - the single-cell level, the cell subpopulation
+(i.e. cluster) level, and the whole-sample or whole-patient level - each
+of which has distinct data processing needs.</p>
+<p>To address both of these challenges for high-dimensional cytometry,
+<a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements a concise, integrated “grammar” of
+single-cell data analysis capable of answering a variety of biological
+questions. Available as an open-source R package, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>
+provides an easy-to-use pipeline for analyzing high-dimensional
+cytometry data by automating many common data-processing tasks under a
 common <a href="https://r4ds.had.co.nz/tidy-data.html" class="external-link">“tidy data”</a>
 interface. This vignette introduces you to the tidytof’s high-level API
-and shows quick examples of how they can be applied to CyTOF
-datasets.</p>
+and shows quick examples of how they can be applied to high-dimensional
+cytometry datasets.</p>
 <div class="section level2">
 <h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h2>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> makes heavy use of two concepts that may be
-unfamiliar to R beginners. The first is the <a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a> pipe
-(<code>%&gt;%</code>), which you can read about <a href="https://r4ds.had.co.nz/pipes.html" class="external-link">here</a>. The second is
+unfamiliar to R beginners. The first is the pipe (<code>|&gt;</code>),
+which you can read about <a href="https://r4ds.had.co.nz/pipes.html" class="external-link">here</a>. The second is
 “grouping” data in a <code>data.frame</code> or <code>tibble</code>
 using <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by</a></code>, which you can read about <a href="https://dplyr.tidyverse.org/articles/grouping.html" class="external-link">here</a>. Most
 <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> users will also benefit from a relatively
@@ -186,17 +185,18 @@ file.</li>
 <ul>
 <li>
 <code><a href="../reference/tof_cluster.html">tof_cluster()</a></code> clusters cells using one of several
-algorithms commonly applied to CyTOF data</li>
+algorithms commonly applied to high-dimensional cytometry data</li>
 <li>
 <code><a href="../reference/tof_metacluster.html">tof_metacluster()</a></code> agglomerates clusters into a smaller
 number of metaclusters</li>
 <li>
-<code>tof_daa()</code> performs differential abundance analysis
-(DAA) for clusters or metaclusters across experimental groups</li>
+<code><a href="../reference/tof_analyze_abundance.html">tof_analyze_abundance()</a></code> performs differential abundance
+analysis (DAA) for clusters or metaclusters across experimental
+groups</li>
 <li>
-<code>tof_dea()</code> performs differential expression analysis
-(DEA) for clusters’ or metaclusters’ marker expression levels across
-experimental groups</li>
+<code><a href="../reference/tof_analyze_expression.html">tof_analyze_expression()</a></code> performs differential
+expression analysis (DEA) for clusters’ or metaclusters’ marker
+expression levels across experimental groups</li>
 <li>
 <code><a href="../reference/tof_extract_features.html">tof_extract_features()</a></code> computes summary statistics
 (such as mean marker expression) for each cluster. Also (optionally)
@@ -237,7 +237,7 @@ occur in the same order. These argument types are as follows:</p>
 <ol style="list-style-type: decimal">
 <li>For almost all <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions, the first argument
 is a data frame (or tibble). This enables the use of the pipe
-(<code>%&gt;%</code>) for multi-step calculations, which means that your
+(<code>|&gt;</code>) for multi-step calculations, which means that your
 first argument for most functions will be implicit (passed from the
 previous function using the pipe). This also means that most
 <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions are so-called <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html" class="external-link">“single-table
@@ -254,7 +254,9 @@ argument in <code>tof_cluster</code> allows the user to specify which
 column in the input data frames should be used to perform the
 clustering. Regardless of which verb requires them, column
 specifications support <a href="https://tidyselect.r-lib.org/reference/language.html" class="external-link">tidyselect
-helpers</a>.</li>
+helpers</a> and follow the same rules for tidyselection as tidyverse
+verbs like <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> and
+<code><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">tidyr::pivot_longer()</a></code>.</li>
 <li>Finally, the third group of arguments for each
 <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verb are called <em>method specifications</em>,
 and they’re comprised of every argument that isn’t an input data frame
@@ -277,22 +279,22 @@ explicitly pointed out:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">777L</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ddpr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">ddpr_data</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
 <span>    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
 <span>    method <span class="op">=</span> <span class="st">"phenograph"</span>, <span class="co"># method specification, </span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/tof_metacluster.html">tof_metacluster</a></span><span class="op">(</span></span>
 <span>    cluster_col <span class="op">=</span> <span class="va">.phenograph_cluster</span>, <span class="co"># column specification</span></span>
 <span>    num_metaclusters <span class="op">=</span> <span class="fl">4</span>, <span class="co"># method specification</span></span>
 <span>    method <span class="op">=</span> <span class="st">"kmeans"</span> <span class="co"># method specification</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
 <span>    group_cols <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
 <span>    num_cells <span class="op">=</span> <span class="fl">200</span>, <span class="co"># method specification</span></span>
 <span>    method <span class="op">=</span> <span class="st">"constant"</span> <span class="co"># method specification</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/tof_plot_cells_layout.html">tof_plot_cells_layout</a></span><span class="op">(</span></span>
 <span>    knn_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
 <span>    color_col <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
@@ -305,7 +307,7 @@ explicitly pointed out:</p>
 <h2 id="pipelines">Pipelines<a class="anchor" aria-label="anchor" href="#pipelines"></a>
 </h2>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs can be used on their own or in
-combination with one another using the pipe (<code>%&gt;%</code>)
+combination with one another using the pipe (<code>|&gt;</code>)
 operator. For example, here is a multistep “pipeline” that takes a
 built-in <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> dataset and performs the following
 analytical steps:</p>
@@ -322,24 +324,24 @@ tSNE</p></li>
 embedding</p></li>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ddpr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">ddpr_data</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># step 1</span></span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># step 2</span></span>
 <span>  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
 <span>    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, </span>
 <span>    method <span class="op">=</span> <span class="st">"phenograph"</span>, </span>
 <span>    <span class="co">#num_metaclusters = 4L, </span></span>
 <span>    seed <span class="op">=</span> <span class="fl">2020L</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># step 3</span></span>
 <span>  <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
 <span>    group_cols <span class="op">=</span> <span class="va">.phenograph_cluster</span>, </span>
 <span>    method <span class="op">=</span> <span class="st">"constant"</span>, </span>
 <span>    num_cells <span class="op">=</span> <span class="fl">400</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># step 4</span></span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># step 5</span></span>
 <span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
 <span>    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,</span>
@@ -354,10 +356,10 @@ embedding</p></li>
 </h2>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> was designed by a multidisciplinary team of
 wet-lab biologists, bioinformaticians, and physician-scientists who
-analyze CyTOF and other kinds of single-cell data to solve a variety of
-problems. As a result, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s high-level API was
-designed with great care to mirror that of the <a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a>
-itself - that is, to be <a href="https://design.tidyverse.org/unifying-principles.html" class="external-link">human-centered,
+analyze high-dimensional cytometry and other kinds of single-cell data
+to solve a variety of problems. As a result, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s
+high-level API was designed with great care to mirror that of the
+<a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a> itself - that is, to be <a href="https://design.tidyverse.org/unifying-principles.html" class="external-link">human-centered,
 consistent, composable, and inclusive</a> for a wide userbase.</p>
 <p>Practically speaking, this means a few things about using
 <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>.</p>
@@ -400,8 +402,9 @@ efficiency. When these design choices conflict with one another, our
 team tends to err on the side of choosing a representation that is
 easy-to-understand for users even at the expense of small performance
 costs. Ultimately, this means that <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> may not be the
-optimal tool for every CyTOF analysis, though hopefully its general
-framework will provide most users with some useful functionality.</p>
+optimal tool for every high-dimensional cytometry analysis, though
+hopefully its general framework will provide most users with some useful
+functionality.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
