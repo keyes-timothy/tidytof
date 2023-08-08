@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{tof_plot_heatmap}
 \alias{tof_plot_heatmap}
-\title{Make a heatmap summarizing group marker expression patterns in CyTOF data}
+\title{Make a heatmap summarizing group marker expression patterns in high-dimensional cytometry data}
 \usage{
 tof_plot_heatmap(
   tof_tibble,

@@ -794,13 +794,6 @@ tof_analyze_abundance_glmm <-
     alpha = 0.05
   ) {
 
-    # check to see if broomExtra is installed
-    # rlang::check_installed(pkg = "broomExtra")
-    #
-    # if (!requireNamespace(package = "broomExtra")) {
-    #   stop("tof_analyze_abundance_glmm requires the broomExtra package to be installed")
-    # }
-
     # extract sample column as a character vector
     # will return an empty character vector if the argument is missing
     sample_colname <-
@@ -1137,13 +1130,6 @@ tof_analyze_expression_lmm <-
     min_samples = 5,
     alpha = 0.05
   ) {
-
-    # check to see if broomExtra is installed
-    # rlang::check_installed(pkg = "broomExtra")
-    #
-    # if (!requireNamespace(package = "broomExtra")) {
-    #   stop("tof_analyze_expression_lmm requires the broomExtra package to be installed")
-    # }
 
     # extract sample column as a character vector
     # will return an empty character vector if the argument is missing

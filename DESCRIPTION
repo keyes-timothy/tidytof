@@ -29,7 +29,6 @@ Depends:
 Imports:
     doParallel,
     dplyr,
-    embed,
     flowCore,
     foreach,
     ggplot2,
@@ -38,7 +37,6 @@ Imports:
     methods,
     parallel,
     purrr,
-    RANN,
     readr,
     recipes,
     rlang,
@@ -52,7 +50,8 @@ Imports:
     Rcpp,
     tibble,
     stats,
-    utils
+    utils,
+    RcppHNSW
 Suggests:
     ConsensusClusterPlus,
     Biobase,
@@ -77,7 +76,12 @@ Suggests:
     ggridges,
     spelling,
     scattermore,
-    preprocessCore
+    preprocessCore,
+    SingleCellExperiment,
+    Seurat,
+    SeuratObject,
+    RANN,
+    embed
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: false

@@ -10,7 +10,7 @@ tof_assess_clusters_knn(
   cluster_col,
   marker_cols = where(tof_is_numeric),
   num_neighbors = min(10, nrow(tof_tibble)),
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
   augment = FALSE
 )
 }

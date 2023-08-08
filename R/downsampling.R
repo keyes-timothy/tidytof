@@ -61,11 +61,11 @@
 tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 
   result <-
-    tof_tibble %>%
-    dplyr::group_by(dplyr::across({{group_cols}})) %>%
+    tof_tibble |>
+    dplyr::group_by(dplyr::across({{group_cols}})) |>
     dplyr::filter(
       sample(x = 1:dplyr::n(), size = dplyr::n(), replace = FALSE) %in% 1:num_cells
-    ) %>%
+    ) |>
     dplyr::ungroup()
 
   if (inherits(tof_tibble, "tof_tbl")) {
@@ -132,9 +132,9 @@ tof_downsample_constant <- function(tof_tibble, group_cols = NULL, num_cells) {
 #'
 tof_downsample_prop <- function(tof_tibble, group_cols = NULL, prop_cells) {
   result <-
-    tof_tibble %>%
-    dplyr::group_by(dplyr::across({{group_cols}})) %>%
-    dplyr::slice_sample(prop = prop_cells) %>%
+    tof_tibble |>
+    dplyr::group_by(dplyr::across({{group_cols}})) |>
+    dplyr::slice_sample(prop = prop_cells) |>
     dplyr::ungroup()
 
   if (inherits(tof_tibble, "tof_tbl")) {
@@ -273,7 +273,7 @@ tof_downsample_density <-
     target_prop_cells,
     target_percentile = 0.03,
     outlier_percentile = 0.01,
-    distance_function = c("euclidean", "cosine"),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
     density_estimation_method = c("mean_distance", "sum_distance", "spade"),
     ...
   ) {
@@ -283,7 +283,7 @@ tof_downsample_density <-
 
     #initialize result
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       dplyr::mutate(..cell_id = 1:nrow(tof_tibble))
 
     # extract group and density column names
@@ -291,29 +291,29 @@ tof_downsample_density <-
       tidyselect::eval_select(
         expr = rlang::enquo(group_cols),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     density_names <-
       tidyselect::eval_select(
         expr = rlang::enquo(density_cols),
         data = tof_tibble
-      ) %>%
+      ) |>
       names()
 
     # nest data needed to compute densities for each group
     nested_data <-
-      result %>%
+      result |>
       dplyr::select(
         "..cell_id",
         dplyr::any_of(group_names),
         dplyr::any_of(density_names)
-      ) %>%
+      ) |>
       tidyr::nest(cell_ids = "..cell_id", data = {{density_cols}})
 
     # find local density estimates for each cell in all groups
     nested_data <-
-      nested_data %>%
+      nested_data |>
       dplyr::mutate(
         densities =
           purrr::map(
@@ -328,8 +328,8 @@ tof_downsample_density <-
     # save the local density estimates as one vector per group
     densities <- purrr::map(.x = nested_data$densities, .f = ~.x[[1]])
     nested_data <-
-      nested_data %>%
-      dplyr::select("cell_ids", dplyr::any_of(group_names)) %>%
+      nested_data |>
+      dplyr::select("cell_ids", dplyr::any_of(group_names)) |>
       dplyr::mutate(
         densities = densities
       )
@@ -340,7 +340,7 @@ tof_downsample_density <-
 
       # store a vector of ..cell_ids for which cells to keep from tof_tibble
       chosen_cells <-
-        nested_data %>%
+        nested_data |>
         dplyr::mutate(
           target_density =
             purrr::map_dbl(
@@ -351,23 +351,23 @@ tof_downsample_density <-
               # final filtering step anyway)
               .f = ~ quantile(subset(.x, .x > 0), probs = target_percentile),
             )
-        ) %>%
-        tidyr::unnest(cols = c("cell_ids", "densities")) %>%
-        dplyr::group_by(dplyr::across({{group_cols}})) %>%
-        dplyr::arrange(.data$densities) %>%
+        ) |>
+        tidyr::unnest(cols = c("cell_ids", "densities")) |>
+        dplyr::group_by(dplyr::across({{group_cols}})) |>
+        dplyr::arrange(.data$densities) |>
         dplyr::mutate(
           rank = 1:dplyr::n(),
           percentile = rank / dplyr::n()
-        ) %>%
+        ) |>
         dplyr::mutate(
           sample_prob = (.data$target_density / .data$densities)
-        ) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(sample_value = stats::runif(n = dplyr::n())) %>%
+        ) |>
+        dplyr::ungroup() |>
+        dplyr::mutate(sample_value = stats::runif(n = dplyr::n())) |>
         dplyr::filter(
           .data$percentile > outlier_percentile,
           .data$sample_prob > .data$sample_value
-        ) %>%
+        ) |>
         dplyr::pull(.data$..cell_id)
 
       # if either target_num_cells or target_prop_cells are specified, find
@@ -391,7 +391,7 @@ tof_downsample_density <-
       }
 
       chosen_cells <-
-        nested_data %>%
+        nested_data |>
         dplyr::mutate(
           num_cells = target_num_cells_vector,
           # remove cells at a lower percentile than the outlier percentile
@@ -403,15 +403,15 @@ tof_downsample_density <-
                 dplyr::tibble(
                   densities = .x,
                   ..cell_ids = 1:length(.x)
-                ) %>%
-                dplyr::arrange(.data$densities) %>%
+                ) |>
+                dplyr::arrange(.data$densities) |>
                 dplyr::mutate(
                   rank = 1:dplyr::n(),
                   percentile = rank / dplyr::n(),
-                ) %>%
+                ) |>
                 dplyr::filter(
                   .data$percentile <= outlier_percentile | .data$densities == 0
-                ) %>%
+                ) |>
                 dplyr::pull(.data$..cell_ids)
             ),
           densities =
@@ -426,7 +426,7 @@ tof_downsample_density <-
               .y = .data$cells_to_remove,
               .f = ~ .x[-.y, ]
             )
-        ) %>%
+        ) |>
         # use tof_spade_downsampling to find which cells should be retained
         # after downsampling
         dplyr::transmute(
@@ -435,16 +435,16 @@ tof_downsample_density <-
               .l = list(.data$densities, .data$cell_ids, .data$num_cells),
               .f = tof_spade_downsampling
             )
-        ) %>%
-        dplyr::pull(.data$sampled_cells) %>%
+        ) |>
+        dplyr::pull(.data$sampled_cells) |>
         c(recursive = TRUE)
 
     }
 
     # filter only selected cells out of the original tof_tibble
     result <-
-      result %>%
-      dplyr::filter(.data$..cell_id %in% chosen_cells) %>%
+      result |>
+      dplyr::filter(.data$..cell_id %in% chosen_cells) |>
       dplyr::select(-"..cell_id")
 
     return(result)
@@ -529,15 +529,15 @@ tof_downsample <-
     # perform the downsampling
     if (method == "constant") {
       result <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_downsample_constant(group_cols = {{group_cols}}, ...)
     } else if (method == "prop") {
       result <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_downsample_prop(group_cols = {{group_cols}}, ...)
     } else {
       result <-
-        tof_tibble %>%
+        tof_tibble |>
         tof_downsample_density(group_cols = {{group_cols}}, ...)
     }
     return(result)

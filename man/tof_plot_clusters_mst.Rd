@@ -14,7 +14,6 @@ tof_plot_clusters_mst(
   graph_layout = "nicely",
   central_tendency_function = stats::median,
   distance_function = c("euclidean", "cosine"),
-  knn_error = 0,
   edge_alpha = 0.4,
   node_size = "cluster_size",
   theme = ggplot2::theme_void(),
@@ -64,14 +63,6 @@ cluster_col. Defaults to the median.}
 in computing the cluster-to-clusters distances in constructing the MST.
 Valid options include "euclidean" (the default) and "cosine".}
 
-\item{knn_error}{A value > 0 used in the k-nearest-neighbor approximation.
-`knn_error` is an error bound such that the ratio between the a cell's reported
-ith nearest neighbor and its true ith nearest neighbor will be at most
-1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
-Will generally be between 0 and 1. Larger values will result in more
-approximate KNN calculations (i.e. a higher likelihood of small errors) but
-will also decrease the computational time of the algorithm significantly.}
-
 \item{edge_alpha}{A numeric value between 0 and 1 specifying the transparency
 of the edges drawn in the force-directed layout. Defaults to 0.25.}
 
@@ -83,7 +74,7 @@ each cluster will be scaled according to the number of cells in that cluster
 \item{theme}{A ggplot2 theme to apply to the force-directed layout.
 Defaults to \code{\link[ggplot2]{theme_void}}}
 
-\item{...}{Not currently used.}
+\item{...}{Optional additional arguments to \code{\link[RcppHNSW]{hnsw_knn}}}
 }
 \value{
 A ggraph/ggplot object.

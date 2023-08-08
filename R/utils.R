@@ -57,11 +57,11 @@ get_extension <- function(filename) {
 #' @param x A numeric vector.
 #'
 #' @param shift_factor The scalar value `a` in the following equation used to
-#' transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+#' transform high-dimensional cytometry raw data ion counts using the hyperbolic arcsinh function:
 #'    `new_x <- asinh(a + b * x)`.
 #'
 #' @param scale_factor The scalar value `b` in the following equation used to
-#' transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+#' transform high-dimensional cytometry raw data ion counts using the hyperbolic arcsinh function:
 #'    `new_x <- asinh(a + b * x)`.
 #'
 #' @return A numeric vector after undergoing reverse
@@ -663,10 +663,10 @@ pull_unless_null <- function(tib, uq_colname) {
 # local density estimation -----------------------------------------------------
 
 
-#' Estimate the local densities for all cells in a CyTOF dataset.
+#' Estimate the local densities for all cells in a high-dimensional cytometry dataset.
 #'
 #' This function is a wrapper around {tidytof}'s tof_*_density() function family.
-#' It performs local density estimation on CyTOF data using a user-specified
+#' It performs local density estimation on high-dimensional cytometry data using a user-specified
 #' method (of 3 choices) and each method's corresponding input parameters.
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
@@ -725,15 +725,16 @@ tof_estimate_density <-
   function(
     tof_tibble,
     distance_cols = where(tof_is_numeric),
-    distance_function = c("euclidean", "cosine"),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
     normalize = TRUE,
     ...,
     augment = TRUE,
     method = c("mean_distance", "sum_distance", "spade")
   ) {
-  # check method argument
+  # check arguments
     method <-
       rlang::arg_match(method, values = c("mean_distance", "sum_distance", "spade"))
+    distance_function <- rlang::arg_match(distance_function)
 
     if (method %in% c("mean_distance", "sum_distance")) {
       densities <-
@@ -770,7 +771,7 @@ tof_estimate_density <-
 #'
 #' This function uses the algorithm described in
 #' \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)} to estimate
-#' the local density of each cell in a `tof_tbl` or `tibble` containing CyTOF data.
+#' the local density of each cell in a `tof_tbl` or `tibble` containing high-dimensional cytometry data.
 #' Briefly, this algorithm involves counting the number of neighboring cells
 #' within  a sphere of radius alpha surrounding each cell. Here, we do so using
 #' the \code{\link[RANN]{nn2}} function.
@@ -814,6 +815,11 @@ tof_estimate_density <-
 #'
 #' @family local density estimation functions
 #'
+#' @importFrom dplyr select
+#' @importFrom dplyr tibble
+#'
+#' @importFrom rlang arg_match
+#'
 #' @export
 #'
 #' @examples
@@ -846,13 +852,16 @@ tof_spade_density <-
   function(
     tof_tibble,
     distance_cols = where(tof_is_numeric),
-    distance_function = c("euclidean", "cosine"),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
     num_alpha_cells = 2000L,
     alpha_multiplier = 5,
     max_neighbors = round(0.01 * nrow(tof_tibble)),
     normalize = TRUE,
     ...
   ) {
+
+    distance_function <- rlang::arg_match(distance_function)
+
     # estimate alpha -----------------------------------------------------------
 
     # find median nearest-neighbor distances for num_alpha_cells sampled cells
@@ -875,7 +884,7 @@ tof_spade_density <-
     spade_neighbors <-
       tof_tibble |>
       dplyr::select({{distance_cols}}) |>
-      tof_find_knn(
+      tof_find_knn_rann(
         k = max_neighbors,
         distance_function = distance_function,
         searchtype = "radius",
@@ -908,7 +917,7 @@ tof_spade_density <-
 #'
 #' This function uses the distances between a cell and each of its K nearest
 #' neighbors to estimate local density of each cell in a
-#' `tof_tbl` or `tibble` containing CyTOF data.
+#' `tof_tbl` or `tibble` containing high-dimensional cytometry data.
 #'
 #' @param tof_tibble A `tof_tbl` or a `tibble`.
 #'
@@ -948,15 +957,17 @@ tof_knn_density <-
     tof_tibble,
     distance_cols = where(tof_is_numeric),
     num_neighbors = min(15L, nrow(tof_tibble)),
-    distance_function = c("euclidean", "cosine"),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
     estimation_method = c("mean_distance", "sum_distance"),
     normalize = TRUE,
     ...
   ) {
 
-    # check method argument
+    # check arguments
     estimation_method <-
       rlang::arg_match(estimation_method, values = c("mean_distance", "sum_distance"))
+    distance_function <-
+      rlang::arg_match(distance_function)
 
     # compute knn information
     knn_result <-
@@ -998,7 +1009,7 @@ tof_knn_density <-
 #' Find if a vector is numeric
 #'
 #' This function takes an input vector `.vec` and checks if it is either an
-#' integer or a double (i.e. is the type of vector that might encode CyTOF
+#' integer or a double (i.e. is the type of vector that might encode high-dimensional cytometry
 #' measurements).
 #'
 #' @param .vec A vector.
@@ -1014,10 +1025,10 @@ tof_is_numeric <- function(.vec) {
 }
 
 
-#' Find the k-nearest neighbors of each cell in a CyTOF dataset.
+#' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
 #'
 #' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
-#' and each column represents a CyTOF measurement.
+#' and each column represents a high-dimensional cytometry measurement.
 #'
 #' @param k An integer indicating the number of nearest neighbors to return for
 #' each cell.
@@ -1026,7 +1037,7 @@ tof_is_numeric <- function(.vec) {
 #' for the nearest-neighbor calculation. Options include "euclidean"
 #' (the default) and "cosine" distances.
 #'
-#' @param ... Optional additional arguments to pass to RANN::nn2
+#' @param ... Optional additional arguments to pass to \code{\link[RANN]{nn2}}
 #'
 #' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
 #' both of which are n by k matrices (in which n is the number of cells in the
@@ -1053,12 +1064,11 @@ tof_is_numeric <- function(.vec) {
 #'     distance_function = "euclidean"
 #' )
 #'
-#' # Find the 10 approximate nearest neighbors (see RANN::nn2)
+#' # Find the 10 approximate nearest neighbors
 #' tof_find_knn(
 #'     .data = sim_data,
 #'     k = 10,
-#'     distance_function = "euclidean",
-#'     eps = 0.3
+#'     distance_function = "euclidean"
 #' )
 #'
 tof_find_knn <-
@@ -1094,15 +1104,248 @@ tof_find_knn <-
 
 
 
+
+
+#' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
+#'
+#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
+#' and each column represents a high-dimensional cytometry measurement.
+#'
+#' @param k An integer indicating the number of nearest neighbors to return for
+#' each cell.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
+#'
+#' @param ... Optional additional arguments to pass to RANN::nn2
+#'
+#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
+#' both of which are n by k matrices (in which n is the number of cells in the
+#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
+#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
+#' The [i,j]-th entry of "neighbor_distances" represents the distance between
+#' those two cells according to `distance_function`.
+#'
+#' @importFrom rlang check_installed
+#' @importFrom rlang is_installed
+#'
+#' @export
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' # Find the 10 nearest neighbors of each cell in the dataset
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean"
+#' )
+#'
+#' # Find the 10 approximate nearest neighbors
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean"
+#' )
+#'
+tof_find_knn_rann <-
+  function(
+    .data,
+    k = min(10, nrow(.data)),
+    distance_function = c("euclidean", "cosine"),
+    ...
+  ) {
+
+    # check for ConsensusClusterPlus package
+    rlang::check_installed(pkg = "RANN")
+
+    if (!rlang::is_installed(pkg = "RANN")) {
+      stop("tof_find_knn_rann requires the RANN package to be installed")
+    }
+
+    # check distance function
+    distance_function <-
+      match.arg(distance_function, choices = c("euclidean", "cosine"))
+
+    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
+    # distance between l2-normalized vectors will scale with
+    # cosine distance (and this allows us to us to proceed as normal)
+    if (distance_function == "cosine") {
+      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
+    }
+
+    # compute result
+    # have found that eps up to 0.4 will provide NN accuracy above 95%
+    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
+    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
+
+    # remove the first-closest neighbor (column), which is always the point itself
+    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
+    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
+
+    # return result
+    return(nn_result)
+  }
+
+
+
+#' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
+#'
+#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
+#' and each column represents a high-dimensional cytometry measurement.
+#'
+#' @param k An integer indicating the number of nearest neighbors to return for
+#' each cell.
+#'
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
+#'
+#' @param .query A set of cells to be queried against .data (i.e. a set of cells
+#' for which to find nearest neighbors within .data). Defaults to .data itself,
+#' i.e. finding nearest neighbors for all cells in .data.
+#'
+#' @param ... Optional additional arguments to pass to \code{\link[RcppHNSW]{hnsw_knn}}
+#'
+#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
+#' both of which are n by k matrices (in which n is the number of cells in the
+#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
+#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
+#' The [i,j]-th entry of "neighbor_distances" represents the distance between
+#' those two cells according to `distance_function`.
+#'
+#' @importFrom RcppHNSW hnsw_build
+#' @importFrom RcppHNSW hnsw_search
+#'
+#' @importFrom rlang arg_match
+#'
+#' @export
+#'
+#' @examples
+#' sim_data <-
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = rnorm(n = 1000),
+#'         cd34 = rnorm(n = 1000),
+#'         cd19 = rnorm(n = 1000)
+#'     )
+#'
+#' # Find the 10 nearest neighbors of each cell in the dataset
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean"
+#' )
+#'
+#' # Find the 10 approximate nearest neighbors
+#' tof_find_knn(
+#'     .data = sim_data,
+#'     k = 10,
+#'     distance_function = "euclidean",
+#' )
+#'
+#'
+tof_find_knn <-
+  function(
+    .data,
+    k = min(10, nrow(.data)),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
+    .query,
+    ...
+  ) {
+    # check distance function
+    distance_function <- rlang::arg_match(distance_function)
+
+    # compute result
+    hnsw_tree <-
+      RcppHNSW::hnsw_build(
+        X = as.matrix(.data),
+        distance = distance_function,
+        ...
+      )
+
+    if (missing(.query)) {
+      query <- .data
+    } else {
+      query <- .query
+    }
+
+    nn_result <-
+      RcppHNSW::hnsw_search(
+        X = as.matrix(query),
+        ann = hnsw_tree,
+        k = k + 1,
+        ...
+      )
+
+    # nn_result <-
+    #   RcppHNSW::hnsw_knn(
+    #     X = as.matrix(.data),
+    #     k = k + 1,
+    #     distance = distance_function,
+    #     ...
+    #   )
+
+    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
+
+    # remove the first-closest neighbor (column), which is always the point itself
+    if (missing(.query)) {
+      # remove the first-closest neighbor (column), which is always the point itself
+      nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
+      nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
+    } else {
+      # unless the query is a different set of cells than the dataset being
+      # searched, in which case discard the (unneeded) extra neighbor.
+      nn_result$neighbor_ids <- nn_result$neighbor_ids[, 1:k]
+      nn_result$neighbor_distances <- nn_result$neighbor_distances[, 1:k]
+    }
+
+    # return result
+    return(nn_result)
+  }
+
+
+
+#' Title
+#'
+#' @param tof_tibble A tibble or tof_tbl.
+#' @param knn_cols Unquoted column names indicating which columns in tof_tibble
+#' should be used for the KNN calculation.
+#' @param num_neighbors An integer number of neighbors to find for each cell (
+#' not including itself).
+#' @param distance_function A string indicating which distance function to use
+#' for the nearest-neighbor calculation. Options include "euclidean"
+#' (the default) and "cosine" distances.
+#' @param graph_type A string indicating if the graph's edges should have weights
+#' ("weighted"; the default) or not ("unweighted").
+#' @param ... Optional additional arguments to pass to \code{\link[tidytof]{tof_find_knn}}
+#'
+#' @return A \code{\link[tidygraph]{tbl_graph}}.
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+#'
 tof_make_knn_graph <-
   function(
     tof_tibble, # single-cell data
     knn_cols, # unquoted column names of columns to use in the knn calculation
     num_neighbors, # number of knn's
     distance_function = c("euclidean", "cosine"),
-    knn_error = 0, # eps value in RANN::nn2
-    graph_type = c("weighted", "unweighted") # weighted or unweighted graph
+    graph_type = c("weighted", "unweighted"), # weighted or unweighted graph
+    ... # additional arguments to tof_find_knn
   ) {
+    distance_function <- rlang::arg_match(distance_function)
+    graph_type <- rlang::arg_match(graph_type)
+
     knn_data <-
       tof_tibble |>
       # select only knn_cols
@@ -1110,7 +1353,7 @@ tof_make_knn_graph <-
       tof_find_knn(
         k = num_neighbors,
         distance_function = distance_function,
-        eps = knn_error
+        ...
       )
 
     # extract knn_ids and put them into long format
@@ -1204,7 +1447,7 @@ tof_rescale <-
   }
 
 
-#' Make a heatmap summarizing group marker expression patterns in CyTOF data
+#' Make a heatmap summarizing group marker expression patterns in high-dimensional cytometry data
 #'
 #' This function makes a heatmap of group-to-group marker expression patterns
 #' in single-cell data. Markers are plotted along the horizontal (x-) axis of

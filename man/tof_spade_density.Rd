@@ -7,7 +7,7 @@
 tof_spade_density(
   tof_tibble,
   distance_cols = where(tof_is_numeric),
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
   num_alpha_cells = 2000L,
   alpha_multiplier = 5,
   max_neighbors = round(0.01 * nrow(tof_tibble)),
@@ -57,7 +57,7 @@ local density estimates for each input cell in `tof_tibble`.
 \description{
 This function uses the algorithm described in
 \href{https://pubmed.ncbi.nlm.nih.gov/21964415/}{Qiu et al., (2011)} to estimate
-the local density of each cell in a `tof_tbl` or `tibble` containing CyTOF data.
+the local density of each cell in a `tof_tbl` or `tibble` containing high-dimensional cytometry data.
 Briefly, this algorithm involves counting the number of neighboring cells
 within  a sphere of radius alpha surrounding each cell. Here, we do so using
 the \code{\link[RANN]{nn2}} function.

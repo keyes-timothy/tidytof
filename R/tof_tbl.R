@@ -267,3 +267,392 @@ as_tof_tbl <- function(flow_data, sep = "|") {
   UseMethod("as_tof_tbl")
 }
 
+# for interoperability with Bioconductor ---------------------------------------
+
+#' Coerce an object into a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @examples
+#' NULL
+#'
+as_SingleCellExperiment <- function(x, ...) {
+  UseMethod("as_SingleCellExperiment")
+}
+
+
+
+#' Coerce a tof_tbl into a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @param x A tof_tbl
+#'
+#' @param channel_cols Unquoted column names representing columns that contain
+#' single-cell protein measurements. Supports tidyselect helpers.
+#' If nothing is specified, the default is all numeric columns.
+#'
+#' @param reduced_dimensions_cols Unquoted column names representing columns that contain
+#' dimensionality reduction embeddings, such as tSNE or UMAP embeddings.
+#' Supports tidyselect helpers.
+#'
+#' @param metadata_cols Unquoted column names representing columns that contain
+#' metadata about the samples from which each cell was collected. If nothing
+#' is specified, the default is all non-numeric columns.
+#'
+#' @param split_reduced_dimensions A boolean value indicating whether the
+#' dimensionality results in x should be split into separate slots in the resulting
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}}. If FALSE (the default),
+#' the split will not be performed and the
+#' \code{\link[SingleCellExperiment]{reducedDims}} slot in the result will have
+#' a single entry ("tidytof_reduced_dimensions"). If TRUE, the split will be
+#' performed and the \code{\link[SingleCellExperiment]{reducedDims}} slot in
+#' the result will have 1-4 entries depending on which dimensionality reduction
+#' results are present in x ("tidytof_pca", "tidytof_tsne", "tidytof_umap",
+#' and "tidytof_reduced_dimensions"). Note that "tidytof_reduced_dimensions" will
+#' include all dimensionality reduction results that are not named according to
+#' tidytof's pca, umap, and tsne conventions.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}}.
+#'
+#'
+#' @rdname as_SingleCellExperiment
+#'
+#' @export
+#'
+#'
+#' @examples
+#' NULL
+#'
+as_SingleCellExperiment.tof_tbl <-
+  function(
+    x,
+    channel_cols = where(tof_is_numeric),
+    reduced_dimensions_cols,
+    metadata_cols = where(\(.x) !tof_is_numeric(.x)),
+    split_reduced_dimensions = FALSE,
+    ...
+  ) {
+
+    # check to see if SingleCellExperiment is installed
+    rlang::check_installed(pkg = "SingleCellExperiment")
+
+    if (!requireNamespace(package = "SingleCellExperiment")) {
+      stop("as_SingleCellExperiment requires the SingleCellExperiment package to be installed from Bioconductor.")
+    }
+
+    # extract column names
+    channel_colnames <-
+      x |>
+      dplyr::select({{ channel_cols }}) |>
+      colnames()
+
+    reduced_dimensions_colnames <-
+      x |>
+      dplyr::select({{ reduced_dimensions_cols }}) |>
+      colnames()
+
+    metadata_colnames <-
+      x |>
+      dplyr::select( {{ metadata_cols }}) |>
+      colnames()
+
+    # extract embedding (reduced dimension) data
+    if (length(reduced_dimensions_colnames) > 1) {
+      cytometry_reduced_dimensions <-
+        x |>
+        dplyr::select({{ reduced_dimensions_cols }}) |>
+        as.matrix()
+
+    } else {
+      reduced_dimensions_colnames <-
+        x |>
+        dplyr::select(dplyr::matches("^.pc\\d+|^.tsne\\d+|^.umap\\d+")) |>
+        colnames()
+
+      if (length(reduced_dimensions_colnames) == 0) {
+        cytometry_reduced_dimensions <- NULL
+      } else {
+        cytometry_reduced_dimensions <-
+          x |>
+          dplyr::select(dplyr::any_of(reduced_dimensions_colnames)) |>
+          as.matrix()
+      }
+    }
+
+    # extract marker data
+    ## remove any dimensionality reduction columns from the cytometry assay
+    ## in the event that they were accidentally included.
+    channel_colnames <- setdiff(channel_colnames, reduced_dimensions_colnames)
+    cytometry_data <-
+      x |>
+      dplyr::select({{ channel_cols }}) |>
+      dplyr::select(dplyr::any_of(channel_colnames)) |>
+      as.matrix() |>
+      t()
+    row.names(cytometry_data) <- channel_colnames
+
+    # extract metadata
+    cytometry_metadata <-
+      x |>
+      dplyr::select({{ metadata_cols }}) |>
+      as.data.frame()
+
+    # assemble SCE object
+    tof_assays <- list(cytometry = cytometry_data)
+
+    if (is.null(cytometry_reduced_dimensions)) {
+      reduced_dims <- list()
+    } else {
+
+      reduced_dims <-
+        list(tidytof_reduced_dimensions = cytometry_reduced_dimensions)
+    }
+
+    row_data <- data.frame(marker_name = channel_colnames)
+
+    col_data <- cytometry_metadata
+    row.names(col_data) <- paste0("cell_", 1:nrow(col_data))
+
+    result <-
+      SingleCellExperiment::SingleCellExperiment(
+       assays = tof_assays,
+       rowData = row_data,
+       colData = col_data,
+       reducedDims = reduced_dims
+      )
+
+    if (split_reduced_dimensions) {
+      result <- tof_split_tidytof_reduced_dimensions(result)
+    }
+
+    return(result)
+  }
+
+
+#' Coerce an object into a \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @param x An object
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @examples
+#' NULL
+#'
+as_seurat <- function(x, ...) {
+  UseMethod("as_seurat")
+}
+
+
+
+#' Coerce a tof_tbl into a \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @param x A tof_tbl
+#'
+#' @param channel_cols Unquoted column names representing columns that contain
+#' single-cell protein measurements. Supports tidyselect helpers.
+#' If nothing is specified, the default is all numeric columns.
+#'
+#' @param reduced_dimensions_cols Unquoted column names representing columns that contain
+#' dimensionality reduction embeddings, such as tSNE or UMAP embeddings.
+#' Supports tidyselect helpers.
+#'
+#' @param metadata_cols Unquoted column names representing columns that contain
+#' metadata about the samples from which each cell was collected. If nothing
+#' is specified, the default is all non-numeric columns.
+#'
+#' @param split_reduced_dimensions A boolean value indicating whether the
+#' dimensionality results in x should be split into separate slots in the resulting
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}}. If FALSE (the default),
+#' the split will not be performed and the
+#' \code{\link[SingleCellExperiment]{reducedDims}} slot in the result will have
+#' a single entry ("tidytof_reduced_dimensions"). If TRUE, the split will be
+#' performed and the \code{\link[SingleCellExperiment]{reducedDims}} slot in
+#' the result will have 1-4 entries depending on which dimensionality reduction
+#' results are present in x ("tidytof_pca", "tidytof_tsne", "tidytof_umap",
+#' and "tidytof_reduced_dimensions"). Note that "tidytof_reduced_dimensions" will
+#' include all dimensionality reduction results that are not named according to
+#' tidytof's pca, umap, and tsne conventions.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[SeuratObject]{SeuratObject}}.
+#'
+#' @rdname as_seurat
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+#'
+as_seurat.tof_tbl <-
+  function(
+    x,
+    channel_cols = where(tof_is_numeric),
+    reduced_dimensions_cols,
+    metadata_cols = where(\(.x) !tof_is_numeric(.x)),
+    split_reduced_dimensions = FALSE,
+    ...
+  ) {
+
+    # check to see if SingleCellExperiment is installed
+    rlang::check_installed(pkg = "SingleCellExperiment")
+
+    if (!requireNamespace(package = "SingleCellExperiment")) {
+      stop("as_seurat requires the SingleCellExperiment package to be installed from Bioconductor.")
+    }
+
+    # check to see if Seurat is installed
+    rlang::check_installed(pkg = "Seurat")
+
+    if (!requireNamespace(package = "Seurat")) {
+      stop("as_seurat requires the Seurat package to be installed from CRAN.")
+    }
+
+    # check to see if SeuratObject is installed
+    rlang::check_installed(pkg = "SeuratObject")
+
+    if (!requireNamespace(package = "SeuratObject")) {
+      stop("as_seurat requires the SeuratObject package to be installed from CRAN.")
+    }
+
+
+    if (missing(reduced_dimensions_cols)) {
+      reduced_dimensions_cols <-
+        x |>
+        dplyr::select(dplyr::matches("^.pc\\d+|^.tsne\\d+|^.umap\\d+")) |>
+        colnames()
+    }
+
+      sce <-
+        x |>
+        as_SingleCellExperiment(
+          channel_cols = {{ channel_cols }},
+          reduced_dimensions_cols = {{ reduced_dimensions_cols }},
+          metadata_cols = {{ metadata_cols }}
+        )
+
+      if (split_reduced_dimensions) {
+        sce <-
+          sce |>
+          tof_split_tidytof_reduced_dimensions()
+      }
+
+
+    #}
+
+    suppressWarnings(suppressMessages(
+      result <-
+        sce |>
+        Seurat::as.Seurat(
+          counts = NULL,
+          data = "cytometry",
+          project = "cytometry"
+        )
+    ))
+    # refine the default coercion a bit to make the Seurat object more intuitive
+    # for the user
+
+    suppressWarnings(suppressMessages(
+      result <- SeuratObject::RenameAssays(result, originalexp = "cytometry")
+    ))
+
+    return(result)
+  }
+
+
+#' Split the dimensionality reduction data that tidytof combines during \code{\link[SingleCellExperiment]{SingleCellExperiment}} conversion
+#'
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} with an
+#' entry named "tidytof_reduced_dimensions" in its \code{\link[SingleCellExperiment]{reducedDims}} slot.
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}} with separate entries
+#' named "tidytof_pca", "tidytof_umap", and "tidytof_tsne" in its
+#' \code{\link[SingleCellExperiment]{reducedDims}} slots (one for each of the
+#' dimensionality reduction methods for which tidytof has native support).
+#'
+#'
+#' @importFrom rlang check_installed
+#' @importFrom rlang is_installed
+#'
+#' @importFrom purrr discard
+#'
+#' @examples
+#' NULL
+tof_split_tidytof_reduced_dimensions <- function(sce) {
+
+  # check to see if SingleCellExperiment is installed
+  rlang::check_installed(pkg = "SingleCellExperiment")
+
+  if (!requireNamespace(package = "SingleCellExperiment")) {
+    stop("as_seurat requires the SingleCellExperiment package to be installed from Bioconductor.")
+  }
+
+  sce_reduced_dimensions <-
+    sce |>
+    SingleCellExperiment::reducedDim("tidytof_reduced_dimensions")
+
+  sce_pca <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.pc\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_umap <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.umap\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_tsne <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.tsne\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_leftover <-
+    sce_reduced_dimensions[,
+                           !grepl(
+                             pattern = "^\\.pc\\d+|^\\.umap\\d+|^\\.tsne\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  result_list <-
+    list(
+      tidytof_pca = sce_pca,
+      tidytof_tsne = sce_tsne,
+      tidytof_umap = sce_umap,
+      tidytof_reduced_dimensions = sce_leftover
+    ) |>
+    purrr::discard(.p = \(.x) ncol(.x) == 0)
+
+  SingleCellExperiment::reducedDim(sce, "tidytof_reduced_dimensions") <- NULL
+
+  for (i in 1:length(result_list)) {
+    name <- names(result_list)[[i]]
+    result <- result_list[[i]]
+
+    SingleCellExperiment::reducedDim(sce, name) <- result
+  }
+  return(sce)
+
+}
+
+
