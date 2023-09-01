@@ -11,14 +11,6 @@ tof_find_knn(
   .query,
   ...
 )
-
-tof_find_knn(
-  .data,
-  k = min(10, nrow(.data)),
-  distance_function = c("euclidean", "cosine", "l2", "ip"),
-  .query,
-  ...
-)
 }
 \arguments{
 \item{.data}{A `tof_tibble` or `tibble` in which each row represents a cell
@@ -44,42 +36,11 @@ input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
 for the j-th nearest neighbor of the cell in the i-th row of `.data`.
 The [i,j]-th entry of "neighbor_distances" represents the distance between
 those two cells according to `distance_function`.
-
-A list with two elements: "neighbor_ids" and "neighbor_distances,"
-both of which are n by k matrices (in which n is the number of cells in the
-input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
-for the j-th nearest neighbor of the cell in the i-th row of `.data`.
-The [i,j]-th entry of "neighbor_distances" represents the distance between
-those two cells according to `distance_function`.
 }
 \description{
 Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
-
-Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
 }
 \examples{
-sim_data <-
-    dplyr::tibble(
-        cd45 = rnorm(n = 1000),
-        cd38 = rnorm(n = 1000),
-        cd34 = rnorm(n = 1000),
-        cd19 = rnorm(n = 1000)
-    )
-
-# Find the 10 nearest neighbors of each cell in the dataset
-tof_find_knn(
-    .data = sim_data,
-    k = 10,
-    distance_function = "euclidean"
-)
-
-# Find the 10 approximate nearest neighbors
-tof_find_knn(
-    .data = sim_data,
-    k = 10,
-    distance_function = "euclidean"
-)
-
 sim_data <-
     dplyr::tibble(
         cd45 = rnorm(n = 1000),

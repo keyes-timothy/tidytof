@@ -656,3 +656,311 @@ tof_split_tidytof_reduced_dimensions <- function(sce) {
 }
 
 
+
+
+#' Coerce an object into a \code{\link[flowCore]{flowFrame}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[flowCore]{flowFrame}}
+#'
+#' @examples
+#' NULL
+#'
+as_flowFrame <- function(x, ...) {
+  UseMethod("as_flowFrame")
+}
+
+
+#' Coerce a tof_tbl into a \code{\link[flowCore]{flowFrame}}
+#'
+#' @param x A tof_tbl.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[flowCore]{flowFrame}}. Note that all non-numeric
+#' columns in `x` will be removed.
+#'
+#' @rdname as_flowFrame
+#'
+#' @export
+#'
+#' @importFrom dplyr across
+#' @importFrom dplyr everything
+#' @importFrom dplyr rename_with
+#' @importFrom dplyr select
+#'
+#' @importFrom flowCore flowFrame
+#'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#'
+#' @examples
+#' NULL
+as_flowFrame.tof_tbl <- function(x, ...) {
+  tof_tibble <-
+    x |>
+    dplyr::select(where(tof_is_numeric))
+
+  maxes_and_mins <-
+    tof_tibble |>
+    dplyr::summarize(
+      dplyr::across(
+        dplyr::everything(),
+        .fns =
+          list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
+        # use the many underscores because it's unlikely this will come up
+        # in column names on their own
+        .names = "{.col}_____{.fn}"
+      )
+    ) |>
+    tidyr::pivot_longer(
+      cols = dplyr::everything(),
+      names_to = c("antigen", "value_type"),
+      values_to = "value",
+      names_sep = "_____"
+    )  |>
+    tidyr::pivot_wider(
+      names_from = "value_type",
+      values_from = "value"
+    )
+
+  # extract the names of all columns to used in the flowFrame
+  data_cols <- maxes_and_mins$antigen
+
+  # make the AnnotatedDataFrame flowCore needs
+  parameters <-
+    make_flowcore_annotated_data_frame(maxes_and_mins = maxes_and_mins)
+
+  # assemble flowFrame
+  result <-
+    tof_tibble |>
+    dplyr::rename_with(
+      .fn = stringr::str_replace,
+      pattern = "\\|",
+      replacement = "_"
+    ) |>
+    as.matrix() |>
+    flowCore::flowFrame(
+      parameters = parameters
+    )
+
+  return(result)
+}
+
+
+
+
+
+#' Coerce an object into a \code{\link[flowCore]{flowSet}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[flowCore]{flowSet}}
+#'
+#' @examples
+#' NULL
+#'
+as_flowSet <- function(x, ...) {
+  UseMethod("as_flowSet")
+}
+
+
+#' Coerce a tof_tbl into a \code{\link[flowCore]{flowSet}}
+#'
+#' @param x A tof_tbl.
+#'
+#' @param group_cols Unquoted names of the columns in `x` that should
+#' be used to group cells into separate \code{\link[flowCore]{flowFrame}}s.
+#' Supports tidyselect helpers. Defaults to
+#' NULL (all cells are written into a single \code{\link[flowCore]{flowFrame}}).
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[flowCore]{flowSet}}. Note that all non-numeric
+#' columns in `x` will be removed.
+#'
+#' @rdname as_flowSet
+#'
+#' @importFrom dplyr across
+#' @importFrom dplyr everything
+#' @importFrom dplyr mutate
+#' @importFrom dplyr rename_with
+#' @importFrom dplyr select
+#' @importFrom dplyr summarize
+#'
+#' @importFrom flowCore flowFrame
+#' @importFrom flowCore flowSet
+#' @importFrom flowCore phenoData
+#' @importFrom flowCore sampleNames
+#'
+#' @importFrom purrr map
+#'
+#' @importFrom stringr str_replace
+#'
+#' @importFrom tidyr nest
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+as_flowSet.tof_tbl <- function(x, group_cols, ...) {
+
+  if (missing(group_cols)) {
+    result <- as_flowFrame(x)
+
+  } else {
+    tof_tibble <-
+      x |>
+      dplyr::select({{group_cols}}, where(tof_is_numeric))
+
+    maxes_and_mins <-
+      tof_tibble |>
+      dplyr::summarize(
+        dplyr::across(
+          -{{group_cols}},
+          .fns =
+            list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
+          # use the many underscores because it's unlikely this will come up
+          # in column names on their own
+          .names = "{.col}_____{.fn}"
+        )
+      ) |>
+      tidyr::pivot_longer(
+        cols = dplyr::everything(),
+        names_to = c("antigen", "value_type"),
+        values_to = "value",
+        names_sep = "_____"
+      )  |>
+      tidyr::pivot_wider(
+        names_from = "value_type",
+        values_from = "value"
+      )
+
+    # extract the names of all non-grouping columns to be saved to the .fcs file
+    data_cols <- maxes_and_mins$antigen
+
+    tof_tibble <-
+      suppressWarnings(
+        tof_tibble |>
+          tidyr::nest(.by = {{group_cols}})
+       )
+
+    # make the AnnotatedDataFrame flowCore needs
+    parameters <-
+      make_flowcore_annotated_data_frame(maxes_and_mins = maxes_and_mins)
+
+    tof_tibble <-
+      tof_tibble |>
+      dplyr::mutate(
+        flowFrames =
+          purrr::map(
+            .x = data,
+            ~ flowCore::flowFrame(
+              exprs =
+                # have to change any instances of "|" in column names to another
+                # separator, as "|" has special meaning as an .fcs file delimiter
+                as.matrix(
+                  dplyr::rename_with(
+                    .x,
+                    stringr::str_replace,
+                    pattern = "\\|",
+                    replacement = "_"
+                  )
+                ),
+              parameters = parameters
+            )
+          )
+      ) |>
+      dplyr::select(
+        {{group_cols}},
+        "flowFrames"
+      )
+
+    metadata_frame <-
+      tof_tibble |>
+      dplyr::select({{group_cols}}) |>
+      as.data.frame()
+
+    # store group_cols metadata in an annotated data frame for the flowSet
+    row.names(metadata_frame) <- paste0('Sample_', 1:nrow(metadata_frame))
+    annotated_metadata_frame <- as(metadata_frame, "AnnotatedDataFrame")
+
+    result <- flowCore::flowSet(tof_tibble$flowFrames)
+    flowCore::sampleNames(result) <- paste0('Sample_', 1:length(result))
+
+    flowCore::phenoData(result) <- annotated_metadata_frame
+
+  }
+
+  return(result)
+}
+
+
+
+
+#' Make the AnnotatedDataFrame needed for the flowFrame class
+#'
+#' @param maxes_and_mins a data.frame containing information about the max
+#' and min values of each channel to be saved in the flowFrame.
+#'
+#' @return An AnnotatedDataFrame.
+#'
+#' @importFrom dplyr transmute
+#'
+#' @importFrom methods new
+#'
+#' @importFrom stringr str_replace
+#' @importFrom stringr str_c
+#'
+#' @examples
+#' NULL
+make_flowcore_annotated_data_frame <- function(maxes_and_mins) {
+  fcs_varMetadata <-
+    data.frame(
+      labelDescription =
+        c(
+          "Name of Parameter",
+          "Description of Parameter",
+          "Range of Parameter",
+          "Minimum Parameter Value after Transformation",
+          "Maximum Parameter Value after Transformation"
+        )
+    )
+
+  fcs_data <-
+    maxes_and_mins |>
+    dplyr::transmute(
+      # have to change any instances of "|" in column names to another
+      # separator, as "|" has special meaning as an .fcs file delimiter
+      name = stringr::str_replace(.data$antigen, "\\|", "_"),
+      desc = stringr::str_replace(.data$antigen, "\\|", "_"),
+      range = max - min,
+      minRange = min,
+      maxRange = max
+    ) |>
+    as.data.frame()
+
+  row.names(fcs_data) <- stringr::str_c("$", "P", 1:nrow(fcs_data))
+
+  # make the AnnotatedDataFrame
+  parameters <-
+    methods::new(
+      "AnnotatedDataFrame",
+      data = fcs_data,
+      varMetadata = fcs_varMetadata
+    )
+
+  return(parameters)
+}
+

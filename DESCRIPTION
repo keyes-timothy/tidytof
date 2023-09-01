@@ -1,6 +1,6 @@
 Type: Package
 Package: tidytof
-Title: Analyze Mass Cytometry Data Using Tidy Data Principles
+Title: Analyze High-dimensional Cytometry Data Using Tidy Data Principles
 Version: 0.0.0
 Authors@R: 
     c(person(given = "Timothy",
@@ -80,7 +80,6 @@ Suggests:
     SingleCellExperiment,
     Seurat,
     SeuratObject,
-    RANN,
     embed
 Config/testthat/edition: 3
 Encoding: UTF-8

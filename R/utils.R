@@ -859,7 +859,6 @@ tof_spade_density <-
     normalize = TRUE,
     ...
   ) {
-
     distance_function <- rlang::arg_match(distance_function)
 
     # estimate alpha -----------------------------------------------------------
@@ -884,19 +883,17 @@ tof_spade_density <-
     spade_neighbors <-
       tof_tibble |>
       dplyr::select({{distance_cols}}) |>
-      tof_find_knn_rann(
+      tof_find_knn(
         k = max_neighbors,
-        distance_function = distance_function,
-        searchtype = "radius",
-        radius = alpha
+        distance_function = distance_function
       )
 
     # calculate densities equal to the number of neighbors
     # (up to max_neighbors) that each cell has
-    num_zeros <-
-      (spade_neighbors$neighbor_ids == 0) |>
-      rowSums()
-    densities <- (max_neighbors) - num_zeros
+      num_neighbors_within_radius <-
+        (spade_neighbors$neighbor_distances <= alpha) |>
+        rowSums()
+    densities <- num_neighbors_within_radius
 
     if (normalize) {
       # normalize densities
@@ -1023,177 +1020,6 @@ tof_knn_density <-
 tof_is_numeric <- function(.vec) {
   return(purrr::is_integer(.vec) | purrr::is_double(.vec))
 }
-
-
-#' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
-#'
-#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
-#' and each column represents a high-dimensional cytometry measurement.
-#'
-#' @param k An integer indicating the number of nearest neighbors to return for
-#' each cell.
-#'
-#' @param distance_function A string indicating which distance function to use
-#' for the nearest-neighbor calculation. Options include "euclidean"
-#' (the default) and "cosine" distances.
-#'
-#' @param ... Optional additional arguments to pass to \code{\link[RANN]{nn2}}
-#'
-#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
-#' both of which are n by k matrices (in which n is the number of cells in the
-#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
-#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
-#' The [i,j]-th entry of "neighbor_distances" represents the distance between
-#' those two cells according to `distance_function`.
-#'
-#' @export
-#'
-#' @examples
-#' sim_data <-
-#'     dplyr::tibble(
-#'         cd45 = rnorm(n = 1000),
-#'         cd38 = rnorm(n = 1000),
-#'         cd34 = rnorm(n = 1000),
-#'         cd19 = rnorm(n = 1000)
-#'     )
-#'
-#' # Find the 10 nearest neighbors of each cell in the dataset
-#' tof_find_knn(
-#'     .data = sim_data,
-#'     k = 10,
-#'     distance_function = "euclidean"
-#' )
-#'
-#' # Find the 10 approximate nearest neighbors
-#' tof_find_knn(
-#'     .data = sim_data,
-#'     k = 10,
-#'     distance_function = "euclidean"
-#' )
-#'
-tof_find_knn <-
-  function(
-    .data,
-    k = min(10, nrow(.data)),
-    distance_function = c("euclidean", "cosine"),
-    ...
-  ) {
-    # check distance function
-    distance_function <-
-      match.arg(distance_function, choices = c("euclidean", "cosine"))
-
-    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
-    # distance between l2-normalized vectors will scale with
-    # cosine distance (and this allows us to us to proceed as normal)
-    if (distance_function == "cosine") {
-      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
-    }
-
-    # compute result
-    # have found that eps up to 0.4 will provide NN accuracy above 95%
-    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
-    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
-
-    # remove the first-closest neighbor (column), which is always the point itself
-    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
-    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
-
-    # return result
-    return(nn_result)
-  }
-
-
-
-
-
-#' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
-#'
-#' @param .data A `tof_tibble` or `tibble` in which each row represents a cell
-#' and each column represents a high-dimensional cytometry measurement.
-#'
-#' @param k An integer indicating the number of nearest neighbors to return for
-#' each cell.
-#'
-#' @param distance_function A string indicating which distance function to use
-#' for the nearest-neighbor calculation. Options include "euclidean"
-#' (the default) and "cosine" distances.
-#'
-#' @param ... Optional additional arguments to pass to RANN::nn2
-#'
-#' @return A list with two elements: "neighbor_ids" and "neighbor_distances,"
-#' both of which are n by k matrices (in which n is the number of cells in the
-#' input `.data`. The [i,j]-th entry of "neighbor_ids" represents the row index
-#' for the j-th nearest neighbor of the cell in the i-th row of `.data`.
-#' The [i,j]-th entry of "neighbor_distances" represents the distance between
-#' those two cells according to `distance_function`.
-#'
-#' @importFrom rlang check_installed
-#' @importFrom rlang is_installed
-#'
-#' @export
-#'
-#' @examples
-#' sim_data <-
-#'     dplyr::tibble(
-#'         cd45 = rnorm(n = 1000),
-#'         cd38 = rnorm(n = 1000),
-#'         cd34 = rnorm(n = 1000),
-#'         cd19 = rnorm(n = 1000)
-#'     )
-#'
-#' # Find the 10 nearest neighbors of each cell in the dataset
-#' tof_find_knn(
-#'     .data = sim_data,
-#'     k = 10,
-#'     distance_function = "euclidean"
-#' )
-#'
-#' # Find the 10 approximate nearest neighbors
-#' tof_find_knn(
-#'     .data = sim_data,
-#'     k = 10,
-#'     distance_function = "euclidean"
-#' )
-#'
-tof_find_knn_rann <-
-  function(
-    .data,
-    k = min(10, nrow(.data)),
-    distance_function = c("euclidean", "cosine"),
-    ...
-  ) {
-
-    # check for ConsensusClusterPlus package
-    rlang::check_installed(pkg = "RANN")
-
-    if (!rlang::is_installed(pkg = "RANN")) {
-      stop("tof_find_knn_rann requires the RANN package to be installed")
-    }
-
-    # check distance function
-    distance_function <-
-      match.arg(distance_function, choices = c("euclidean", "cosine"))
-
-    # if nns in cosine distance wanted, l2 normalize all rows, as the euclidean
-    # distance between l2-normalized vectors will scale with
-    # cosine distance (and this allows us to us to proceed as normal)
-    if (distance_function == "cosine") {
-      .data <- t(apply(X = .data, MARGIN = 1, FUN = l2_normalize))
-    }
-
-    # compute result
-    # have found that eps up to 0.4 will provide NN accuracy above 95%
-    nn_result <- RANN::nn2(data = .data, k = k + 1, ...)
-    names(nn_result) <- c("neighbor_ids", "neighbor_distances")
-
-    # remove the first-closest neighbor (column), which is always the point itself
-    nn_result$neighbor_ids <- nn_result$neighbor_ids[, 2:(k + 1)]
-    nn_result$neighbor_distances <- nn_result$neighbor_distances[, 2:(k + 1)]
-
-    # return result
-    return(nn_result)
-  }
-
 
 
 #' Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
