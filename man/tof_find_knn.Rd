@@ -2,18 +2,19 @@
 % Please edit documentation in R/utils.R
 \name{tof_find_knn}
 \alias{tof_find_knn}
-\title{Find the k-nearest neighbors of each cell in a CyTOF dataset.}
+\title{Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.}
 \usage{
 tof_find_knn(
   .data,
   k = min(10, nrow(.data)),
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
+  .query,
   ...
 )
 }
 \arguments{
 \item{.data}{A `tof_tibble` or `tibble` in which each row represents a cell
-and each column represents a CyTOF measurement.}
+and each column represents a high-dimensional cytometry measurement.}
 
 \item{k}{An integer indicating the number of nearest neighbors to return for
 each cell.}
@@ -22,7 +23,11 @@ each cell.}
 for the nearest-neighbor calculation. Options include "euclidean"
 (the default) and "cosine" distances.}
 
-\item{...}{Optional additional arguments to pass to RANN::nn2}
+\item{.query}{A set of cells to be queried against .data (i.e. a set of cells
+for which to find nearest neighbors within .data). Defaults to .data itself,
+i.e. finding nearest neighbors for all cells in .data.}
+
+\item{...}{Optional additional arguments to pass to \code{\link[RcppHNSW]{hnsw_knn}}}
 }
 \value{
 A list with two elements: "neighbor_ids" and "neighbor_distances,"
@@ -33,7 +38,7 @@ The [i,j]-th entry of "neighbor_distances" represents the distance between
 those two cells according to `distance_function`.
 }
 \description{
-Find the k-nearest neighbors of each cell in a CyTOF dataset.
+Find the k-nearest neighbors of each cell in a high-dimensional cytometry dataset.
 }
 \examples{
 sim_data <-
@@ -51,12 +56,12 @@ tof_find_knn(
     distance_function = "euclidean"
 )
 
-# Find the 10 approximate nearest neighbors (see RANN::nn2)
+# Find the 10 approximate nearest neighbors
 tof_find_knn(
     .data = sim_data,
     k = 10,
     distance_function = "euclidean",
-    eps = 0.3
 )
+
 
 }

@@ -92,17 +92,17 @@ tof_plot_cells_density <-
   ) {
     # collect marker column name as a string
     marker_colname <-
-      tof_tibble %>%
-      dplyr::select({{marker_col}}) %>%
+      tof_tibble |>
+      dplyr::select({{marker_col}}) |>
       colnames()
 
     # calculate the density for each group independently
     # ggplot2 can do this, but will store every cell in the resulting plot
     # so this is more memory (and therefore speed) efficient
     marker_tibble <-
-      tof_tibble %>%
-      dplyr::select({{marker_col}}, {{group_col}}) %>%
-      tidyr::nest(data = {{marker_col}}) %>%
+      tof_tibble |>
+      dplyr::select({{marker_col}}, {{group_col}}) |>
+      tidyr::nest(data = {{marker_col}}) |>
       dplyr::mutate(
         densities =
           purrr::map(
@@ -112,8 +112,8 @@ tof_plot_cells_density <-
           ),
         expression = purrr::map(.x = .data$densities, .f = ~ .x$x),
         density = purrr::map(.x = .data$densities, .f = ~ .x$y)
-      ) %>%
-      dplyr::select({{group_col}}, "expression", "density") %>%
+      ) |>
+      dplyr::select({{group_col}}, "expression", "density") |>
       tidyr::unnest(cols = tidyselect::everything())
 
     # if ggridges requested
@@ -301,7 +301,7 @@ tof_plot_cells_scatter <-
 
     # create plot
     result <-
-      plot_tibble %>%
+      plot_tibble |>
       ggplot2::ggplot(
         ggplot2::aes(x = {{x_col}}, y = {{y_col}}, fill = {{color_col}})
       ) +
@@ -456,11 +456,11 @@ tof_plot_cells_embedding <-
     } else {
       # check embedding_cols - there should only be two
       embed_tibble <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::select({{embedding_cols}})
 
       num_embed_cols <-
-        embed_tibble %>%
+        embed_tibble |>
         ncol()
 
       if (num_embed_cols != 2) {
@@ -547,14 +547,6 @@ tof_plot_cells_embedding <-
 #' in computing the cell-to-cell distances. Valid options include "euclidean"
 #' (the default) and "cosine".
 #'
-#' @param knn_error A value > 0 used in the k-nearest-neighbor approximation.
-#' `knn_error` is an error bound such that the ratio between the a cell's reported
-#' ith nearest neighbor and its true ith nearest neighbor will be at most
-#' 1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
-#' Will generally be between 0 and 1. Larger values will result in more
-#' approximate KNN calculations (i.e. a higher likelihood of small errors) but
-#' will also decrease the computational time of the algorithm significantly.
-#'
 #' @param edge_alpha A numeric value between 0 and 1 specifying the transparency
 #' of the edges drawn in the force-directed layout. Defaults to 0.25.
 #'
@@ -564,8 +556,7 @@ tof_plot_cells_embedding <-
 #' @param theme A ggplot2 theme to apply to the force-directed layout.
 #' Defaults to \code{\link[ggplot2]{theme_void}}
 #'
-#' @param ... Optional additional arguments to pass to
-#' \code{\link[ggraph]{ggraph}}
+#' @param ... \code{\link[RcppHNSW]{hnsw_knn}}
 #'
 #' @return A ggraph/ggplot object.
 #'
@@ -630,7 +621,6 @@ tof_plot_cells_layout <-
     graph_type = c("weighted", "unweighted"),
     graph_layout = "fr",
     distance_function = c("euclidean", "cosine"),
-    knn_error = 0,
     edge_alpha = 0.25,
     node_size = 2,
     theme = ggplot2::theme_void(),
@@ -649,23 +639,23 @@ tof_plot_cells_layout <-
     }
 
     knn_graph <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_make_knn_graph(
         knn_cols = {{knn_cols}},
         num_neighbors = num_neighbors,
         distance_function = distance_function,
-        knn_error = knn_error,
-        graph_type = graph_type
+        graph_type = graph_type,
+        ...
       )
 
     # retain only the needed columns for memory purposes
     if (missing(facet_cols)) {
     plot_graph <-
-      knn_graph %>%
+      knn_graph |>
       tidygraph::select({{color_col}})
     } else {
       plot_graph <-
-        knn_graph %>%
+        knn_graph |>
         tidygraph::select({{color_col}}, {{facet_cols}})
     }
 
@@ -675,8 +665,8 @@ tof_plot_cells_layout <-
         ggraph::ggraph(
           graph = plot_graph,
           layout = graph_layout,
-          weights = .data$weight,
-          ...
+          weights = .data$weight#,
+          # ...
         )
     } else if (graph_type == "unweighted") {
       knn_plot <-
@@ -760,14 +750,6 @@ tof_plot_cells_layout <-
 #' in computing the cluster-to-clusters distances in constructing the MST.
 #' Valid options include "euclidean" (the default) and "cosine".
 #'
-#' @param knn_error A value > 0 used in the k-nearest-neighbor approximation.
-#' `knn_error` is an error bound such that the ratio between the a cell's reported
-#' ith nearest neighbor and its true ith nearest neighbor will be at most
-#' 1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
-#' Will generally be between 0 and 1. Larger values will result in more
-#' approximate KNN calculations (i.e. a higher likelihood of small errors) but
-#' will also decrease the computational time of the algorithm significantly.
-#'
 #' @param edge_alpha A numeric value between 0 and 1 specifying the transparency
 #' of the edges drawn in the force-directed layout. Defaults to 0.25.
 #'
@@ -779,7 +761,7 @@ tof_plot_cells_layout <-
 #' @param theme A ggplot2 theme to apply to the force-directed layout.
 #' Defaults to \code{\link[ggplot2]{theme_void}}
 #'
-#' @param ... Not currently used.
+#' @param ... Optional additional arguments to \code{\link[RcppHNSW]{hnsw_knn}}
 #'
 #' @return A ggraph/ggplot object.
 #'
@@ -839,7 +821,6 @@ tof_plot_clusters_mst <-
     graph_layout = "nicely",
     central_tendency_function = stats::median,
     distance_function = c("euclidean", "cosine"),
-    knn_error = 0,
     edge_alpha = 0.4,
     node_size = "cluster_size",
     theme = ggplot2::theme_void(),
@@ -867,12 +848,12 @@ tof_plot_clusters_mst <-
 
       # compute cluster-wise summary statistics
       cluster_tibble <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::select(
           {{ cluster_col }},
           {{ color_col }},
           {{ knn_cols }}
-        ) %>%
+        ) |>
         # compute one summary statistic for each cluster across all knn_cols
         tof_summarize_clusters(
           cluster_col = {{cluster_col}},
@@ -882,7 +863,7 @@ tof_plot_clusters_mst <-
 
       # compute the size of each cluster
       cluster_sizes <-
-        tof_tibble %>%
+        tof_tibble |>
         dplyr::count(
           {{cluster_col}},
           name = ".cluster_size"
@@ -892,8 +873,8 @@ tof_plot_clusters_mst <-
     } else if (is.character(color_vector) | is.factor(color_vector)) {
       # check that each cluster maps to exactly one color
       cluster_groups <-
-        tof_tibble %>%
-        dplyr::distinct({{cluster_col}}, {{color_col}}) %>%
+        tof_tibble |>
+        dplyr::distinct({{cluster_col}}, {{color_col}}) |>
         dplyr::count({{cluster_col}})
 
       if (any(cluster_groups$n > 1)) {
@@ -906,12 +887,12 @@ tof_plot_clusters_mst <-
 
         # compute summary statistics
         cluster_tibble <-
-          tof_tibble %>%
+          tof_tibble |>
           dplyr::select(
             {{cluster_col}},
             {{color_col}},
             {{knn_cols}}
-          ) %>%
+          ) |>
           # compute one summary statistic for each cluster across all knn_cols
           # but also hold onto each cluster's color_col for plotting
           tof_summarize_clusters(
@@ -924,7 +905,7 @@ tof_plot_clusters_mst <-
 
         # compute cluster sizes
         cluster_sizes <-
-          tof_tibble %>%
+          tof_tibble |>
           dplyr::count(
             {{cluster_col}},
             {{color_col}},
@@ -935,14 +916,14 @@ tof_plot_clusters_mst <-
 
     # save the names of the clusters to use for calculating each cluster's KNNs
     knn_names <-
-      cluster_tibble %>%
-      dplyr::select({{knn_cols}}) %>%
+      cluster_tibble |>
+      dplyr::select({{knn_cols}}) |>
       colnames()
 
     # add the sizes of each cluster to the summary statistics for each cluster
     cluster_tibble <-
       suppressMessages(
-        cluster_tibble %>%
+        cluster_tibble |>
           dplyr::left_join(cluster_sizes)
       )
 
@@ -964,7 +945,7 @@ tof_plot_clusters_mst <-
 
       # find columns that are shared between the original layout and cluster_tibble
       common_columns <-
-        intersect(colnames(cluster_tibble), colnames(graph_layout$data)) %>%
+        intersect(colnames(cluster_tibble), colnames(graph_layout$data)) |>
         purrr::discard(.p = ~ .x %in% c(cluster_colname))
 
       # join any new columns in the cluster_tibble that weren't in the original
@@ -973,22 +954,22 @@ tof_plot_clusters_mst <-
         attributes(graph_layout$data)
 
       new_layout <-
-        graph_layout$data %>%
-        dplyr::select(-dplyr::any_of(common_columns)) %>%
+        graph_layout$data |>
+        dplyr::select(-dplyr::any_of(common_columns)) |>
         # join
         dplyr::left_join(cluster_tibble, by = cluster_colname)
 
       # use the new layout to create a new knn_graph from the old one, plus
       # any new information
       knn_graph <-
-        layout_attributes[["graph"]] %>%
+        layout_attributes[["graph"]] |>
         tidygraph::activate("nodes")
 
       if (color_colname %in% colnames(tidygraph::as_tibble(knn_graph)) &
           color_colname %in% colnames(new_layout)) {
         # avoid duplicating the color_col - introduces a bug in the discrete case
         knn_graph <-
-          knn_graph %>%
+          knn_graph |>
           tidygraph::select(-{{color_col}})
 
       }
@@ -1000,24 +981,24 @@ tof_plot_clusters_mst <-
       }
 
       graph_cluster_vector <-
-        knn_graph %>%
+        knn_graph |>
         tidygraph::pull({{cluster_col}})
 
       if (!is.character(graph_cluster_vector)) {
         knn_graph <-
-          knn_graph %>%
+          knn_graph |>
           tidygraph::mutate(
             "{{cluster_col}}" := as.character({{cluster_col}})
           )
       }
 
       knn_graph <-
-        knn_graph %>%
+        knn_graph |>
         tidygraph::select(
           {{cluster_col}},
-        ) %>%
+        ) |>
         tidygraph::left_join(
-          new_layout %>%
+          new_layout |>
             dplyr::select(
               -"x",
               -"y",
@@ -1029,26 +1010,26 @@ tof_plot_clusters_mst <-
         )
 
       graph_layout <-
-        knn_graph %>%
-        tidygraph::activate("nodes") %>%
-        tidygraph::as_tibble() %>%
+        knn_graph |>
+        tidygraph::activate("nodes") |>
+        tidygraph::as_tibble() |>
         dplyr::left_join(
-          new_layout %>%
+          new_layout |>
             dplyr::select({{cluster_col}}, "x", "y"),
           by = cluster_colname
-        ) %>%
+        ) |>
         dplyr::select("x", "y")
 
     } else {
       #calculate the KNN graph from scratch
       knn_graph <-
-        cluster_tibble %>%
+        cluster_tibble |>
         tof_make_knn_graph(
           knn_cols = dplyr::any_of(knn_names),
           num_neighbors = num_neighbors,
           distance_function = distance_function,
-          knn_error = knn_error,
-          graph_type = graph_type
+          graph_type = graph_type,
+          ...
         )
     }
 
@@ -1057,24 +1038,24 @@ tof_plot_clusters_mst <-
     # create the edges depending on whether the graph is weighted or unweighted
     if (graph_type == "weighted") {
       mst <-
-        knn_graph %>%
+        knn_graph |>
         tidygraph::convert(
           .f = tidygraph::to_minimum_spanning_tree,
           weights = .data$weight
         )
 
       mst_plot <-
-        mst %>%
+        mst |>
         ggraph::ggraph(layout = graph_layout, weights = .data$weight) +
         ggraph::geom_edge_link(alpha = edge_alpha)
 
     } else if (graph_type == "unweighted") {
       mst <-
-        knn_graph %>%
+        knn_graph |>
         tidygraph::convert(.f = tidygraph::to_minimum_spanning_tree)
 
       mst_plot <-
-        mst %>%
+        mst |>
         ggraph::ggraph(layout = graph_layout) +
         ggraph::geom_edge_link(alpha = edge_alpha)
     }
@@ -1219,8 +1200,8 @@ tof_plot_clusters_volcano <-
     # if there are multiple results, plot the omnibus
     if("dea_results" %in% colnames(dea_result)) {
       plot_tibble <-
-        dea_result %>%
-        dplyr::filter(.data$tested_effect == "omnibus") %>%
+        dea_result |>
+        dplyr::filter(.data$tested_effect == "omnibus") |>
         tidyr::unnest(cols = "dea_results")
     } else {
       plot_tibble <- dea_result
@@ -1242,7 +1223,7 @@ tof_plot_clusters_volcano <-
 
     if (dea_method %in% c("lmm", "t_unpaired", "t_paired")) {
       plot_tibble <-
-        plot_tibble %>%
+        plot_tibble |>
         dplyr::transmute(
           .data$cluster,
           .data$marker,
@@ -1258,7 +1239,7 @@ tof_plot_clusters_volcano <-
         )
     } else if (dea_method %in% "diffcyt_limma") {
       plot_tibble <-
-        plot_tibble %>%
+        plot_tibble |>
         dplyr::transmute(
           .data$cluster,
           .data$marker,
@@ -1277,12 +1258,12 @@ tof_plot_clusters_volcano <-
     }
 
     plot_tibble <-
-      plot_tibble %>%
-      dplyr::arrange(-.data$log_p) %>%
+      plot_tibble |>
+      dplyr::arrange(-.data$log_p) |>
       dplyr::mutate(label = paste(.data$marker, .data$cluster, sep = "@"))
 
     volcano_plot <-
-      plot_tibble %>%
+      plot_tibble |>
       ggplot2::ggplot(aes(x = .data$log2_fc, y = .data$log_p, fill = .data$direction)) +
       ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
       ggplot2::geom_hline(yintercept = -log(alpha), linetype = "dashed", color = "red") +
@@ -1423,7 +1404,7 @@ tof_plot_clusters_heatmap <-
   ) {
 
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_plot_heatmap(
         y_col = {{cluster_col}},
         marker_cols = {{marker_cols}},
@@ -1513,7 +1494,7 @@ tof_plot_sample_heatmap <-
     theme = ggplot2::theme_minimal()
   ) {
     result <-
-      tof_tibble %>%
+      tof_tibble |>
       tof_plot_heatmap(
         y_col = {{sample_col}},
         marker_cols = {{marker_cols}},
@@ -1609,7 +1590,7 @@ tof_plot_sample_features <-
     }
 
     result <-
-      feature_tibble %>%
+      feature_tibble |>
       tof_plot_heatmap(
         y_col = {{sample_col}},
         marker_cols = {{feature_cols}},
@@ -1795,8 +1776,8 @@ tof_plot_model_linear <-
           tof_model$tuning_metrics
 
         plot_df <-
-          plot_df %>%
-          tidyr::unnest(cols = ".predictions") %>%
+          plot_df |>
+          tidyr::unnest(cols = ".predictions") |>
           dplyr::mutate(predictions = .data$response)
       }
     } else {
@@ -1815,11 +1796,11 @@ tof_plot_model_linear <-
     }
 
     correlation <-
-      stats::cor(plot_df$truth, plot_df$predictions) %>%
+      stats::cor(plot_df$truth, plot_df$predictions) |>
       round(3)
 
     result <-
-      plot_df %>%
+      plot_df |>
       ggplot2::ggplot(ggplot2::aes(x = .data$truth, y = .data$predictions)) +
       ggplot2::geom_smooth(method = "lm", se = FALSE, ) +
       ggplot2::geom_point() +
@@ -1861,13 +1842,13 @@ tof_plot_model_logistic <-
       tof_assess_model(tof_model = tof_model, new_data = new_data)
 
     roc_auc <-
-      assessment$model_metrics %>%
-      dplyr::filter(.data$metric == "roc_auc") %>%
-      dplyr::pull(.data$value) %>%
+      assessment$model_metrics |>
+      dplyr::filter(.data$metric == "roc_auc") |>
+      dplyr::pull(.data$value) |>
       round(3)
 
     result <-
-      assessment$roc_curve %>%
+      assessment$roc_curve |>
       ggplot2::ggplot(ggplot2::aes(x = .data$fpr, y = .data$tpr)) +
       ggplot2::geom_abline(slope = 1, linetype = "dotted", alpha = 0.8) +
       ggplot2::geom_path() +
@@ -1914,13 +1895,13 @@ tof_plot_model_multinomial <-
       tof_assess_model(tof_model = tof_model, new_data = new_data)
 
     roc_auc <-
-      assessment$model_metrics %>%
-      dplyr::filter(.data$metric == "roc_auc") %>%
-      dplyr::pull(.data$value) %>%
+      assessment$model_metrics |>
+      dplyr::filter(.data$metric == "roc_auc") |>
+      dplyr::pull(.data$value) |>
       round(3)
 
     result <-
-      assessment$roc_curve %>%
+      assessment$roc_curve |>
       ggplot2::ggplot(ggplot2::aes(x = .data$fpr, y = .data$tpr)) +
       ggplot2::geom_abline(slope = 1, linetype = "dotted", alpha = 0.8) +
       ggplot2::geom_path() +
@@ -1975,26 +1956,26 @@ tof_plot_model_survival <-
       tof_assess_model(tof_model = tof_model, new_data = new_data)
 
     p_value <-
-      assessment$model_metrics %>%
-      dplyr::filter(.data$metric == "log_rank_p_value") %>%
-      dplyr::pull(.data$value) %>%
+      assessment$model_metrics |>
+      dplyr::filter(.data$metric == "log_rank_p_value") |>
+      dplyr::pull(.data$value) |>
       round(3)
 
     km_curves <-
-      assessment$survival_curves %>%
-      dplyr::group_by(.data$risk_group) %>%
-      tidyr::nest() %>%
-      dplyr::mutate(km_curves = purrr::map(.x = data, .f = tof_compute_km_curve)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-"data") %>%
+      assessment$survival_curves |>
+      dplyr::group_by(.data$risk_group) |>
+      tidyr::nest() |>
+      dplyr::mutate(km_curves = purrr::map(.x = data, .f = tof_compute_km_curve)) |>
+      dplyr::ungroup() |>
+      dplyr::select(-"data") |>
       tidyr::unnest(cols = "km_curves")
 
     censor_dat <-
-      km_curves %>%
+      km_curves |>
       dplyr::filter(.data$is_censored)
 
     result <-
-      km_curves %>%
+      km_curves |>
       ggplot2::ggplot(
         ggplot2::aes(
           x = .data$time_to_event,

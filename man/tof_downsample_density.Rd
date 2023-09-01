@@ -12,7 +12,7 @@ tof_downsample_density(
   target_prop_cells,
   target_percentile = 0.03,
   outlier_percentile = 0.01,
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
   density_estimation_method = c("mean_distance", "sum_distance", "spade"),
   ...
 )

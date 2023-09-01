@@ -323,7 +323,6 @@ test_that("layout visualizations run and return ggplot objects", {
     tt |>
       tof_plot_clusters_mst(
         cluster_col = .flowsom_cluster,
-        group_cols = .phenograph_metacluster,
         color_col = .phenograph_metacluster,
         graph_type = "unweighted",
         node_size = "cluster_size"

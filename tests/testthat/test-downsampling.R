@@ -10,7 +10,7 @@ data(phenograph_data)
 
 test_that("Output shape is correct.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_constant(num_cells = 100L)
 
   # number of columns is unchanged
@@ -24,11 +24,11 @@ test_that("Output shape is correct.", {
 
 test_that("Output shape is correct.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_constant(group_cols = sample_name, num_cells = 100L)
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_constant(
       group_cols = c(sample_name, phenograph_cluster),
       num_cells = 100L
@@ -51,7 +51,7 @@ test_that("Output shape is correct.", {
 
 test_that("Output shape is correct.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_prop(prop_cells = 0.1)
 
   # number of columns is unchanged
@@ -65,11 +65,11 @@ test_that("Output shape is correct.", {
 
 test_that("Output shape is correct.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_prop(group_cols = sample_name, prop_cells = 0.1)
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_prop(
       group_cols = c(sample_name, phenograph_cluster),
       prop_cells = 0.1
@@ -93,15 +93,15 @@ test_that("Output shape is correct.", {
 
 test_that("Output shape is correct using KNN density estimation.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_percentile = 0.05, density_cols = c(cd19, cd11b))
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_num_cells = 100L)
 
   result_3 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_prop_cells = 0.1, density_estimation_method = "sum_distance")
 
   # number of columns is unchanged
@@ -119,15 +119,15 @@ test_that("Output shape is correct using KNN density estimation.", {
 
 test_that("Output shape is correct using KNN density estimation.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_percentile = 0.05, density_cols = c(cd19, cd11b))
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_num_cells = 100L)
 
   result_3 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(target_prop_cells = 0.1, density_estimation_method = "sum_distance")
 
   # number of columns is unchanged
@@ -147,7 +147,7 @@ test_that("Output shape is correct using KNN density estimation.", {
 
 test_that("Output shape is correct using KNN density estimation.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = sample_name,
       target_percentile = 0.05,
@@ -155,7 +155,7 @@ test_that("Output shape is correct using KNN density estimation.", {
     )
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = c(sample_name, phenograph_cluster),
       target_prop_cells = 0.1,
@@ -164,7 +164,7 @@ test_that("Output shape is correct using KNN density estimation.", {
     )
 
   result_3 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = c(sample_name, phenograph_cluster),
       target_num_cells = 100L,
@@ -190,7 +190,7 @@ test_that("Output shape is correct using KNN density estimation.", {
 
 test_that("Output shape is correct with SPADE density estimation.", {
   result <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = sample_name,
       density_cols = c(cd19, cd11b),
@@ -199,7 +199,7 @@ test_that("Output shape is correct with SPADE density estimation.", {
     )
 
   result_2 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = c(sample_name, phenograph_cluster),
       target_prop_cells = 0.1,
@@ -207,7 +207,7 @@ test_that("Output shape is correct with SPADE density estimation.", {
     )
 
   result_3 <-
-    phenograph_data %>%
+    phenograph_data |>
     tof_downsample_density(
       group_cols = c(sample_name, phenograph_cluster),
       target_num_cells = 100L,
@@ -232,7 +232,7 @@ test_that("Output shape is correct with SPADE density estimation.", {
   # expect error when arguments for a different density estimation method
   # are provided
   expect_error(
-      phenograph_data %>%
+      phenograph_data |>
       tof_downsample_density(
         group_cols = sample_name,
         target_prop_cells = 0.1,

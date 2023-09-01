@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{tof_estimate_density}
 \alias{tof_estimate_density}
-\title{Estimate the local densities for all cells in a CyTOF dataset.}
+\title{Estimate the local densities for all cells in a high-dimensional cytometry dataset.}
 \usage{
 tof_estimate_density(
   tof_tibble,
   distance_cols = where(tof_is_numeric),
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
   normalize = TRUE,
   ...,
   augment = TRUE,
@@ -46,7 +46,7 @@ plus an additional column encoding the local density estimates.
 }
 \description{
 This function is a wrapper around {tidytof}'s tof_*_density() function family.
-It performs local density estimation on CyTOF data using a user-specified
+It performs local density estimation on high-dimensional cytometry data using a user-specified
 method (of 3 choices) and each method's corresponding input parameters.
 }
 \examples{

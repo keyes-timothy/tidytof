@@ -497,8 +497,18 @@ tof_assess_flow_rate <-
 #' sim_data_inner <-
 #'     dplyr::tibble(
 #'         cd45 = c(rnorm(n = 600), rnorm(n = 500, mean = -4)),
-#'         cd38 = c(rnorm(n = 100, sd = 0.5), rnorm(n = 500, mean = -3), rnorm(n = 500, mean = 8)),
-#'         cd34 = c(rnorm(n = 100, sd = 0.2, mean = -10), rnorm(n = 500, mean = 4), rnorm(n = 500, mean = 60)),
+#'         cd38 =
+#'           c(
+#'             rnorm(n = 100, sd = 0.5),
+#'             rnorm(n = 500, mean = -3),
+#'             rnorm(n = 500, mean = 8)
+#'           ),
+#'         cd34 =
+#'           c(
+#'             rnorm(n = 100, sd = 0.2, mean = -10),
+#'             rnorm(n = 500, mean = 4),
+#'             rnorm(n = 500, mean = 60)
+#'           ),
 #'         cd19 = c(rnorm(n = 100, sd = 0.3, mean = 10), rnorm(n = 1000)),
 #'         cluster_id = c(rep("a", 100), rep("b", 500), rep("c", 500)),
 #'         dataset = "inner"
@@ -845,7 +855,7 @@ tof_assess_clusters_knn <-
     cluster_col,
     marker_cols = where(tof_is_numeric),
     num_neighbors = min(10, nrow(tof_tibble)),
-    distance_function = c("euclidean", "cosine"),
+    distance_function = c("euclidean", "cosine", "l2", "ip"),
     augment = FALSE
   ) {
     result <-

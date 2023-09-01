@@ -55,8 +55,18 @@ formula to minimize the effect of outliers (Z = x - median(x) / mad(x)).
 sim_data_inner <-
     dplyr::tibble(
         cd45 = c(rnorm(n = 600), rnorm(n = 500, mean = -4)),
-        cd38 = c(rnorm(n = 100, sd = 0.5), rnorm(n = 500, mean = -3), rnorm(n = 500, mean = 8)),
-        cd34 = c(rnorm(n = 100, sd = 0.2, mean = -10), rnorm(n = 500, mean = 4), rnorm(n = 500, mean = 60)),
+        cd38 =
+          c(
+            rnorm(n = 100, sd = 0.5),
+            rnorm(n = 500, mean = -3),
+            rnorm(n = 500, mean = 8)
+          ),
+        cd34 =
+          c(
+            rnorm(n = 100, sd = 0.2, mean = -10),
+            rnorm(n = 500, mean = 4),
+            rnorm(n = 500, mean = 60)
+          ),
         cd19 = c(rnorm(n = 100, sd = 0.3, mean = 10), rnorm(n = 1000)),
         cluster_id = c(rep("a", 100), rep("b", 500), rep("c", 500)),
         dataset = "inner"

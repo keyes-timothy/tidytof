@@ -267,3 +267,700 @@ as_tof_tbl <- function(flow_data, sep = "|") {
   UseMethod("as_tof_tbl")
 }
 
+# for interoperability with Bioconductor ---------------------------------------
+
+#' Coerce an object into a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @examples
+#' NULL
+#'
+as_SingleCellExperiment <- function(x, ...) {
+  UseMethod("as_SingleCellExperiment")
+}
+
+
+
+#' Coerce a tof_tbl into a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'
+#' @param x A tof_tbl
+#'
+#' @param channel_cols Unquoted column names representing columns that contain
+#' single-cell protein measurements. Supports tidyselect helpers.
+#' If nothing is specified, the default is all numeric columns.
+#'
+#' @param reduced_dimensions_cols Unquoted column names representing columns that contain
+#' dimensionality reduction embeddings, such as tSNE or UMAP embeddings.
+#' Supports tidyselect helpers.
+#'
+#' @param metadata_cols Unquoted column names representing columns that contain
+#' metadata about the samples from which each cell was collected. If nothing
+#' is specified, the default is all non-numeric columns.
+#'
+#' @param split_reduced_dimensions A boolean value indicating whether the
+#' dimensionality results in x should be split into separate slots in the resulting
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}}. If FALSE (the default),
+#' the split will not be performed and the
+#' \code{\link[SingleCellExperiment]{reducedDims}} slot in the result will have
+#' a single entry ("tidytof_reduced_dimensions"). If TRUE, the split will be
+#' performed and the \code{\link[SingleCellExperiment]{reducedDims}} slot in
+#' the result will have 1-4 entries depending on which dimensionality reduction
+#' results are present in x ("tidytof_pca", "tidytof_tsne", "tidytof_umap",
+#' and "tidytof_reduced_dimensions"). Note that "tidytof_reduced_dimensions" will
+#' include all dimensionality reduction results that are not named according to
+#' tidytof's pca, umap, and tsne conventions.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}}.
+#'
+#'
+#' @rdname as_SingleCellExperiment
+#'
+#' @export
+#'
+#'
+#' @examples
+#' NULL
+#'
+as_SingleCellExperiment.tof_tbl <-
+  function(
+    x,
+    channel_cols = where(tof_is_numeric),
+    reduced_dimensions_cols,
+    metadata_cols = where(\(.x) !tof_is_numeric(.x)),
+    split_reduced_dimensions = FALSE,
+    ...
+  ) {
+
+    # check to see if SingleCellExperiment is installed
+    rlang::check_installed(pkg = "SingleCellExperiment")
+
+    if (!requireNamespace(package = "SingleCellExperiment")) {
+      stop("as_SingleCellExperiment requires the SingleCellExperiment package to be installed from Bioconductor.")
+    }
+
+    # extract column names
+    channel_colnames <-
+      x |>
+      dplyr::select({{ channel_cols }}) |>
+      colnames()
+
+    reduced_dimensions_colnames <-
+      x |>
+      dplyr::select({{ reduced_dimensions_cols }}) |>
+      colnames()
+
+    metadata_colnames <-
+      x |>
+      dplyr::select( {{ metadata_cols }}) |>
+      colnames()
+
+    # extract embedding (reduced dimension) data
+    if (length(reduced_dimensions_colnames) > 1) {
+      cytometry_reduced_dimensions <-
+        x |>
+        dplyr::select({{ reduced_dimensions_cols }}) |>
+        as.matrix()
+
+    } else {
+      reduced_dimensions_colnames <-
+        x |>
+        dplyr::select(dplyr::matches("^.pc\\d+|^.tsne\\d+|^.umap\\d+")) |>
+        colnames()
+
+      if (length(reduced_dimensions_colnames) == 0) {
+        cytometry_reduced_dimensions <- NULL
+      } else {
+        cytometry_reduced_dimensions <-
+          x |>
+          dplyr::select(dplyr::any_of(reduced_dimensions_colnames)) |>
+          as.matrix()
+      }
+    }
+
+    # extract marker data
+    ## remove any dimensionality reduction columns from the cytometry assay
+    ## in the event that they were accidentally included.
+    channel_colnames <- setdiff(channel_colnames, reduced_dimensions_colnames)
+    cytometry_data <-
+      x |>
+      dplyr::select({{ channel_cols }}) |>
+      dplyr::select(dplyr::any_of(channel_colnames)) |>
+      as.matrix() |>
+      t()
+    row.names(cytometry_data) <- channel_colnames
+
+    # extract metadata
+    cytometry_metadata <-
+      x |>
+      dplyr::select({{ metadata_cols }}) |>
+      as.data.frame()
+
+    # assemble SCE object
+    tof_assays <- list(cytometry = cytometry_data)
+
+    if (is.null(cytometry_reduced_dimensions)) {
+      reduced_dims <- list()
+    } else {
+
+      reduced_dims <-
+        list(tidytof_reduced_dimensions = cytometry_reduced_dimensions)
+    }
+
+    row_data <- data.frame(marker_name = channel_colnames)
+
+    col_data <- cytometry_metadata
+    row.names(col_data) <- paste0("cell_", 1:nrow(col_data))
+
+    result <-
+      SingleCellExperiment::SingleCellExperiment(
+       assays = tof_assays,
+       rowData = row_data,
+       colData = col_data,
+       reducedDims = reduced_dims
+      )
+
+    if (split_reduced_dimensions) {
+      result <- tof_split_tidytof_reduced_dimensions(result)
+    }
+
+    return(result)
+  }
+
+
+#' Coerce an object into a \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @param x An object
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @examples
+#' NULL
+#'
+as_seurat <- function(x, ...) {
+  UseMethod("as_seurat")
+}
+
+
+
+#' Coerce a tof_tbl into a \code{\link[SeuratObject]{SeuratObject}}
+#'
+#' @param x A tof_tbl
+#'
+#' @param channel_cols Unquoted column names representing columns that contain
+#' single-cell protein measurements. Supports tidyselect helpers.
+#' If nothing is specified, the default is all numeric columns.
+#'
+#' @param reduced_dimensions_cols Unquoted column names representing columns that contain
+#' dimensionality reduction embeddings, such as tSNE or UMAP embeddings.
+#' Supports tidyselect helpers.
+#'
+#' @param metadata_cols Unquoted column names representing columns that contain
+#' metadata about the samples from which each cell was collected. If nothing
+#' is specified, the default is all non-numeric columns.
+#'
+#' @param split_reduced_dimensions A boolean value indicating whether the
+#' dimensionality results in x should be split into separate slots in the resulting
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}}. If FALSE (the default),
+#' the split will not be performed and the
+#' \code{\link[SingleCellExperiment]{reducedDims}} slot in the result will have
+#' a single entry ("tidytof_reduced_dimensions"). If TRUE, the split will be
+#' performed and the \code{\link[SingleCellExperiment]{reducedDims}} slot in
+#' the result will have 1-4 entries depending on which dimensionality reduction
+#' results are present in x ("tidytof_pca", "tidytof_tsne", "tidytof_umap",
+#' and "tidytof_reduced_dimensions"). Note that "tidytof_reduced_dimensions" will
+#' include all dimensionality reduction results that are not named according to
+#' tidytof's pca, umap, and tsne conventions.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[SeuratObject]{SeuratObject}}.
+#'
+#' @rdname as_seurat
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+#'
+as_seurat.tof_tbl <-
+  function(
+    x,
+    channel_cols = where(tof_is_numeric),
+    reduced_dimensions_cols,
+    metadata_cols = where(\(.x) !tof_is_numeric(.x)),
+    split_reduced_dimensions = FALSE,
+    ...
+  ) {
+
+    # check to see if SingleCellExperiment is installed
+    rlang::check_installed(pkg = "SingleCellExperiment")
+
+    if (!requireNamespace(package = "SingleCellExperiment")) {
+      stop("as_seurat requires the SingleCellExperiment package to be installed from Bioconductor.")
+    }
+
+    # check to see if Seurat is installed
+    rlang::check_installed(pkg = "Seurat")
+
+    if (!requireNamespace(package = "Seurat")) {
+      stop("as_seurat requires the Seurat package to be installed from CRAN.")
+    }
+
+    # check to see if SeuratObject is installed
+    rlang::check_installed(pkg = "SeuratObject")
+
+    if (!requireNamespace(package = "SeuratObject")) {
+      stop("as_seurat requires the SeuratObject package to be installed from CRAN.")
+    }
+
+
+    if (missing(reduced_dimensions_cols)) {
+      reduced_dimensions_cols <-
+        x |>
+        dplyr::select(dplyr::matches("^.pc\\d+|^.tsne\\d+|^.umap\\d+")) |>
+        colnames()
+    }
+
+      sce <-
+        x |>
+        as_SingleCellExperiment(
+          channel_cols = {{ channel_cols }},
+          reduced_dimensions_cols = {{ reduced_dimensions_cols }},
+          metadata_cols = {{ metadata_cols }}
+        )
+
+      if (split_reduced_dimensions) {
+        sce <-
+          sce |>
+          tof_split_tidytof_reduced_dimensions()
+      }
+
+
+    #}
+
+    suppressWarnings(suppressMessages(
+      result <-
+        sce |>
+        Seurat::as.Seurat(
+          counts = NULL,
+          data = "cytometry",
+          project = "cytometry"
+        )
+    ))
+    # refine the default coercion a bit to make the Seurat object more intuitive
+    # for the user
+
+    suppressWarnings(suppressMessages(
+      result <- SeuratObject::RenameAssays(result, originalexp = "cytometry")
+    ))
+
+    return(result)
+  }
+
+
+#' Split the dimensionality reduction data that tidytof combines during \code{\link[SingleCellExperiment]{SingleCellExperiment}} conversion
+#'
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} with an
+#' entry named "tidytof_reduced_dimensions" in its \code{\link[SingleCellExperiment]{reducedDims}} slot.
+#'
+#' @return A \code{\link[SingleCellExperiment]{SingleCellExperiment}} with separate entries
+#' named "tidytof_pca", "tidytof_umap", and "tidytof_tsne" in its
+#' \code{\link[SingleCellExperiment]{reducedDims}} slots (one for each of the
+#' dimensionality reduction methods for which tidytof has native support).
+#'
+#'
+#' @importFrom rlang check_installed
+#' @importFrom rlang is_installed
+#'
+#' @importFrom purrr discard
+#'
+#' @examples
+#' NULL
+tof_split_tidytof_reduced_dimensions <- function(sce) {
+
+  # check to see if SingleCellExperiment is installed
+  rlang::check_installed(pkg = "SingleCellExperiment")
+
+  if (!requireNamespace(package = "SingleCellExperiment")) {
+    stop("as_seurat requires the SingleCellExperiment package to be installed from Bioconductor.")
+  }
+
+  sce_reduced_dimensions <-
+    sce |>
+    SingleCellExperiment::reducedDim("tidytof_reduced_dimensions")
+
+  sce_pca <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.pc\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_umap <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.umap\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_tsne <-
+    sce_reduced_dimensions[,
+                           grepl(
+                             pattern = "^\\.tsne\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  sce_leftover <-
+    sce_reduced_dimensions[,
+                           !grepl(
+                             pattern = "^\\.pc\\d+|^\\.umap\\d+|^\\.tsne\\d+",
+                             x = colnames(sce_reduced_dimensions)
+                           )
+    ]
+
+  result_list <-
+    list(
+      tidytof_pca = sce_pca,
+      tidytof_tsne = sce_tsne,
+      tidytof_umap = sce_umap,
+      tidytof_reduced_dimensions = sce_leftover
+    ) |>
+    purrr::discard(.p = \(.x) ncol(.x) == 0)
+
+  SingleCellExperiment::reducedDim(sce, "tidytof_reduced_dimensions") <- NULL
+
+  for (i in 1:length(result_list)) {
+    name <- names(result_list)[[i]]
+    result <- result_list[[i]]
+
+    SingleCellExperiment::reducedDim(sce, name) <- result
+  }
+  return(sce)
+
+}
+
+
+
+
+#' Coerce an object into a \code{\link[flowCore]{flowFrame}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[flowCore]{flowFrame}}
+#'
+#' @examples
+#' NULL
+#'
+as_flowFrame <- function(x, ...) {
+  UseMethod("as_flowFrame")
+}
+
+
+#' Coerce a tof_tbl into a \code{\link[flowCore]{flowFrame}}
+#'
+#' @param x A tof_tbl.
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[flowCore]{flowFrame}}. Note that all non-numeric
+#' columns in `x` will be removed.
+#'
+#' @rdname as_flowFrame
+#'
+#' @export
+#'
+#' @importFrom dplyr across
+#' @importFrom dplyr everything
+#' @importFrom dplyr rename_with
+#' @importFrom dplyr select
+#'
+#' @importFrom flowCore flowFrame
+#'
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#'
+#' @examples
+#' NULL
+as_flowFrame.tof_tbl <- function(x, ...) {
+  tof_tibble <-
+    x |>
+    dplyr::select(where(tof_is_numeric))
+
+  maxes_and_mins <-
+    tof_tibble |>
+    dplyr::summarize(
+      dplyr::across(
+        dplyr::everything(),
+        .fns =
+          list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
+        # use the many underscores because it's unlikely this will come up
+        # in column names on their own
+        .names = "{.col}_____{.fn}"
+      )
+    ) |>
+    tidyr::pivot_longer(
+      cols = dplyr::everything(),
+      names_to = c("antigen", "value_type"),
+      values_to = "value",
+      names_sep = "_____"
+    )  |>
+    tidyr::pivot_wider(
+      names_from = "value_type",
+      values_from = "value"
+    )
+
+  # extract the names of all columns to used in the flowFrame
+  data_cols <- maxes_and_mins$antigen
+
+  # make the AnnotatedDataFrame flowCore needs
+  parameters <-
+    make_flowcore_annotated_data_frame(maxes_and_mins = maxes_and_mins)
+
+  # assemble flowFrame
+  result <-
+    tof_tibble |>
+    dplyr::rename_with(
+      .fn = stringr::str_replace,
+      pattern = "\\|",
+      replacement = "_"
+    ) |>
+    as.matrix() |>
+    flowCore::flowFrame(
+      parameters = parameters
+    )
+
+  return(result)
+}
+
+
+
+
+
+#' Coerce an object into a \code{\link[flowCore]{flowSet}}
+#'
+#' @param x An object.
+#'
+#' @param ... Method-specific arguments
+#'
+#' @export
+#'
+#' @return A \code{\link[flowCore]{flowSet}}
+#'
+#' @examples
+#' NULL
+#'
+as_flowSet <- function(x, ...) {
+  UseMethod("as_flowSet")
+}
+
+
+#' Coerce a tof_tbl into a \code{\link[flowCore]{flowSet}}
+#'
+#' @param x A tof_tbl.
+#'
+#' @param group_cols Unquoted names of the columns in `x` that should
+#' be used to group cells into separate \code{\link[flowCore]{flowFrame}}s.
+#' Supports tidyselect helpers. Defaults to
+#' NULL (all cells are written into a single \code{\link[flowCore]{flowFrame}}).
+#'
+#' @param ... Unused.
+#'
+#' @return A \code{\link[flowCore]{flowSet}}. Note that all non-numeric
+#' columns in `x` will be removed.
+#'
+#' @rdname as_flowSet
+#'
+#' @importFrom dplyr across
+#' @importFrom dplyr everything
+#' @importFrom dplyr mutate
+#' @importFrom dplyr rename_with
+#' @importFrom dplyr select
+#' @importFrom dplyr summarize
+#'
+#' @importFrom flowCore flowFrame
+#' @importFrom flowCore flowSet
+#' @importFrom flowCore phenoData
+#' @importFrom flowCore sampleNames
+#'
+#' @importFrom purrr map
+#'
+#' @importFrom stringr str_replace
+#'
+#' @importFrom tidyr nest
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
+#'
+#' @export
+#'
+#' @examples
+#' NULL
+as_flowSet.tof_tbl <- function(x, group_cols, ...) {
+
+  if (missing(group_cols)) {
+    result <- as_flowFrame(x)
+
+  } else {
+    tof_tibble <-
+      x |>
+      dplyr::select({{group_cols}}, where(tof_is_numeric))
+
+    maxes_and_mins <-
+      tof_tibble |>
+      dplyr::summarize(
+        dplyr::across(
+          -{{group_cols}},
+          .fns =
+            list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
+          # use the many underscores because it's unlikely this will come up
+          # in column names on their own
+          .names = "{.col}_____{.fn}"
+        )
+      ) |>
+      tidyr::pivot_longer(
+        cols = dplyr::everything(),
+        names_to = c("antigen", "value_type"),
+        values_to = "value",
+        names_sep = "_____"
+      )  |>
+      tidyr::pivot_wider(
+        names_from = "value_type",
+        values_from = "value"
+      )
+
+    # extract the names of all non-grouping columns to be saved to the .fcs file
+    data_cols <- maxes_and_mins$antigen
+
+    tof_tibble <-
+      suppressWarnings(
+        tof_tibble |>
+          tidyr::nest(.by = {{group_cols}})
+       )
+
+    # make the AnnotatedDataFrame flowCore needs
+    parameters <-
+      make_flowcore_annotated_data_frame(maxes_and_mins = maxes_and_mins)
+
+    tof_tibble <-
+      tof_tibble |>
+      dplyr::mutate(
+        flowFrames =
+          purrr::map(
+            .x = data,
+            ~ flowCore::flowFrame(
+              exprs =
+                # have to change any instances of "|" in column names to another
+                # separator, as "|" has special meaning as an .fcs file delimiter
+                as.matrix(
+                  dplyr::rename_with(
+                    .x,
+                    stringr::str_replace,
+                    pattern = "\\|",
+                    replacement = "_"
+                  )
+                ),
+              parameters = parameters
+            )
+          )
+      ) |>
+      dplyr::select(
+        {{group_cols}},
+        "flowFrames"
+      )
+
+    metadata_frame <-
+      tof_tibble |>
+      dplyr::select({{group_cols}}) |>
+      as.data.frame()
+
+    # store group_cols metadata in an annotated data frame for the flowSet
+    row.names(metadata_frame) <- paste0('Sample_', 1:nrow(metadata_frame))
+    annotated_metadata_frame <- as(metadata_frame, "AnnotatedDataFrame")
+
+    result <- flowCore::flowSet(tof_tibble$flowFrames)
+    flowCore::sampleNames(result) <- paste0('Sample_', 1:length(result))
+
+    flowCore::phenoData(result) <- annotated_metadata_frame
+
+  }
+
+  return(result)
+}
+
+
+
+
+#' Make the AnnotatedDataFrame needed for the flowFrame class
+#'
+#' @param maxes_and_mins a data.frame containing information about the max
+#' and min values of each channel to be saved in the flowFrame.
+#'
+#' @return An AnnotatedDataFrame.
+#'
+#' @importFrom dplyr transmute
+#'
+#' @importFrom methods new
+#'
+#' @importFrom stringr str_replace
+#' @importFrom stringr str_c
+#'
+#' @examples
+#' NULL
+make_flowcore_annotated_data_frame <- function(maxes_and_mins) {
+  fcs_varMetadata <-
+    data.frame(
+      labelDescription =
+        c(
+          "Name of Parameter",
+          "Description of Parameter",
+          "Range of Parameter",
+          "Minimum Parameter Value after Transformation",
+          "Maximum Parameter Value after Transformation"
+        )
+    )
+
+  fcs_data <-
+    maxes_and_mins |>
+    dplyr::transmute(
+      # have to change any instances of "|" in column names to another
+      # separator, as "|" has special meaning as an .fcs file delimiter
+      name = stringr::str_replace(.data$antigen, "\\|", "_"),
+      desc = stringr::str_replace(.data$antigen, "\\|", "_"),
+      range = max - min,
+      minRange = min,
+      maxRange = max
+    ) |>
+    as.data.frame()
+
+  row.names(fcs_data) <- stringr::str_c("$", "P", 1:nrow(fcs_data))
+
+  # make the AnnotatedDataFrame
+  parameters <-
+    methods::new(
+      "AnnotatedDataFrame",
+      data = fcs_data,
+      varMetadata = fcs_varMetadata
+    )
+
+  return(parameters)
+}
+

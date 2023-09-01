@@ -1,6 +1,6 @@
 Type: Package
 Package: tidytof
-Title: Analyze Mass Cytometry Data Using Tidy Data Principles
+Title: Analyze High-dimensional Cytometry Data Using Tidy Data Principles
 Version: 0.0.0
 Authors@R: 
     c(person(given = "Timothy",
@@ -29,7 +29,6 @@ Depends:
 Imports:
     doParallel,
     dplyr,
-    embed,
     flowCore,
     foreach,
     ggplot2,
@@ -38,7 +37,6 @@ Imports:
     methods,
     parallel,
     purrr,
-    RANN,
     readr,
     recipes,
     rlang,
@@ -52,7 +50,8 @@ Imports:
     Rcpp,
     tibble,
     stats,
-    utils
+    utils,
+    RcppHNSW
 Suggests:
     ConsensusClusterPlus,
     Biobase,
@@ -77,7 +76,11 @@ Suggests:
     ggridges,
     spelling,
     scattermore,
-    preprocessCore
+    preprocessCore,
+    SingleCellExperiment,
+    Seurat,
+    SeuratObject,
+    embed
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: false

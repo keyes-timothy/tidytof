@@ -10,7 +10,7 @@ tof_upsample_neighbor(
   reference_cluster_col,
   upsample_cols = where(tof_is_numeric),
   num_neighbors = 1L,
-  distance_function = c("euclidean", "cosine")
+  distance_function = c("euclidean", "cosine", "l2", "ip")
 )
 }
 \arguments{

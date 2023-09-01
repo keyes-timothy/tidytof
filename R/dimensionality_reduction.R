@@ -211,7 +211,7 @@ tof_reduce_tsne <-
       purrr::pluck("Y") |>
       dplyr::as_tibble(.name_repair = "minimal")
 
-    colnames(result) <- paste0(".tsne_", 1:num_comp)
+    colnames(result) <- paste0(".tsne", 1:num_comp)
 
     return(result)
 
@@ -276,8 +276,6 @@ tof_reduce_tsne <-
 #' @importFrom dplyr rename_with
 #' @importFrom dplyr select
 #'
-#' @importFrom embed step_umap
-#'
 #' @examples
 #' # simulate single-cell data
 #' sim_data <-
@@ -322,6 +320,13 @@ tof_reduce_umap <-
     return_recipe = FALSE,
     ...
   ) {
+
+    # check for ConsensusClusterPlus package
+    rlang::check_installed(pkg = "embed")
+
+    if (!rlang::is_installed(pkg = "embed")) {
+      stop("tof_reduce_umap requires the embed package to be installed from CRAN.")
+    }
 
     suppressWarnings(
       umap_recipe <-

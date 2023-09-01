@@ -13,7 +13,6 @@ tof_plot_cells_layout(
   graph_type = c("weighted", "unweighted"),
   graph_layout = "fr",
   distance_function = c("euclidean", "cosine"),
-  knn_error = 0,
   edge_alpha = 0.25,
   node_size = 2,
   theme = ggplot2::theme_void(),
@@ -50,14 +49,6 @@ Defaults to "fr", the Fruchterman-Reingold algorithm. Other examples include
 in computing the cell-to-cell distances. Valid options include "euclidean"
 (the default) and "cosine".}
 
-\item{knn_error}{A value > 0 used in the k-nearest-neighbor approximation.
-`knn_error` is an error bound such that the ratio between the a cell's reported
-ith nearest neighbor and its true ith nearest neighbor will be at most
-1 + `knn_error`. Defaults to 0 (exact nearest neighbor calculation).
-Will generally be between 0 and 1. Larger values will result in more
-approximate KNN calculations (i.e. a higher likelihood of small errors) but
-will also decrease the computational time of the algorithm significantly.}
-
 \item{edge_alpha}{A numeric value between 0 and 1 specifying the transparency
 of the edges drawn in the force-directed layout. Defaults to 0.25.}
 
@@ -67,8 +58,7 @@ force-directed layout. Defaults to 2.}
 \item{theme}{A ggplot2 theme to apply to the force-directed layout.
 Defaults to \code{\link[ggplot2]{theme_void}}}
 
-\item{...}{Optional additional arguments to pass to
-\code{\link[ggraph]{ggraph}}}
+\item{...}{\code{\link[RcppHNSW]{hnsw_knn}}}
 }
 \value{
 A ggraph/ggplot object.

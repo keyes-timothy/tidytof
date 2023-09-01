@@ -236,8 +236,11 @@ tof_upsample_neighbor <-
     reference_cluster_col,
     upsample_cols = where(tof_is_numeric),
     num_neighbors = 1L,
-    distance_function = c("euclidean", "cosine")
+    distance_function = c("euclidean", "cosine", "l2", "ip")
     ) {
+
+    distance_function <- rlang::arg_match(distance_function)
+
     query_matrix <-
       tof_tibble |>
       dplyr::select({{upsample_cols}})  |>
@@ -249,7 +252,7 @@ tof_upsample_neighbor <-
       tof_find_knn(
         k = num_neighbors,
         distance_function = distance_function,
-        query = query_matrix
+        .query = query_matrix
       )
 
     nn_ids <- nn_result$neighbor_ids

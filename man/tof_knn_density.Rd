@@ -8,7 +8,7 @@ tof_knn_density(
   tof_tibble,
   distance_cols = where(tof_is_numeric),
   num_neighbors = min(15L, nrow(tof_tibble)),
-  distance_function = c("euclidean", "cosine"),
+  distance_function = c("euclidean", "cosine", "l2", "ip"),
   estimation_method = c("mean_distance", "sum_distance"),
   normalize = TRUE,
   ...
@@ -49,7 +49,7 @@ local density estimates for each input cell in `tof_tibble`.
 \description{
 This function uses the distances between a cell and each of its K nearest
 neighbors to estimate local density of each cell in a
-`tof_tbl` or `tibble` containing CyTOF data.
+`tof_tbl` or `tibble` containing high-dimensional cytometry data.
 }
 \seealso{
 Other local density estimation functions: 

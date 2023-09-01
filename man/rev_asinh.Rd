@@ -11,11 +11,11 @@ rev_asinh(x, shift_factor, scale_factor)
 \item{x}{A numeric vector.}
 
 \item{shift_factor}{The scalar value `a` in the following equation used to
-transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+transform high-dimensional cytometry raw data ion counts using the hyperbolic arcsinh function:
    `new_x <- asinh(a + b * x)`.}
 
 \item{scale_factor}{The scalar value `b` in the following equation used to
-transform CyTOF raw data ion counts using the hyperbolic arcsinh function:
+transform high-dimensional cytometry raw data ion counts using the hyperbolic arcsinh function:
    `new_x <- asinh(a + b * x)`.}
 }
 \value{
