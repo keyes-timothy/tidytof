@@ -4,13 +4,26 @@
 \alias{as_tof_tbl}
 \title{Coerce flowFrames or flowSets into tof_tbl's.}
 \usage{
-as_tof_tbl(flow_data, sep = "|")
+as_tof_tbl(
+  flow_data,
+  .name_method = c("tidytof", "featureNames", "colnames"),
+  sep = "|",
+  ...
+)
 }
 \arguments{
 \item{flow_data}{A flowFrame or flowSet}
 
+\item{.name_method}{A string indicating how tidytof should extract column
+names from `flow_data`. Available options are "tidytof" (the default), which
+uses tidytof's internal heuristic to name columns; "featureNames", which
+uses \code{\link[flowCore]{featureNames}} to name the columns; and "colnames",
+which uses \code{\link[flowCore]{colnames}} to name the columns.}
+
 \item{sep}{A string indicating which symbol should be used to separate
 antigen names and metal names in the columns of the output tof_tbl.}
+
+\item{...}{Optional method-specific arguments.}
 }
 \value{
 A tof_tbl.

@@ -55,7 +55,7 @@ new_tof_tibble <- function(x = dplyr::tibble(), panel = dplyr::tibble()) {
 #'
 tof_get_panel <- function(tof_tibble) {
   panel <-
-    tof_tibble %>%
+    tof_tibble |>
     attr(which = "panel")
 
   return(panel)
@@ -101,7 +101,7 @@ tof_set_panel <- function(tof_tibble, panel) {
 ## tidyr methods
 
 #' @export
-nest.tof_tbl <- function(.data, ..., .names_sep = NULL) {#, .key = deprecated()) {
+nest.tof_tbl <- function(.data, ..., .names_sep = NULL) {
   panel <- tof_get_panel(.data)
   return(new_tof_tibble(x = NextMethod(), panel = panel))
 }
@@ -168,89 +168,208 @@ ungroup.grouped_tof_tbl <- function(x, ...) {
 #'
 #' @param flow_data A FlowSet
 #'
+#' @param .name_method A string indicating how tidytof should extract column
+#' names from `flow_data`. Available options are "tidytof" (the default), which
+#' uses tidytof's internal heuristic to name columns; "featureNames", which
+#' uses \code{\link[flowCore]{featureNames}} to name the columns; and "colnames",
+#' which uses \code{\link[flowCore]{colnames}} to name the columns.
+#'
 #' @param sep A string to use to separate the antigen name and its associated
 #' metal in the column names of the output tibble. Defaults to "|".
 #'
+#' @param include_metadata A boolean value indicating if the metadata for each
+#' .fcs file read by flowCore should be included in the final result. Defaults to FALSE.
+#'
 #' @export
 #'
+#' @importFrom flowCore colnames
 #' @importFrom flowCore fsApply
+#' @importFrom flowCore featureNames
 #' @importFrom flowCore exprs
+#' @importFrom flowCore identifier
+#' @importFrom flowCore pData
 #'
 #' @importFrom dplyr as_tibble
+#' @importFrom dplyr left_join
+#' @importFrom dplyr mutate
+#' @importFrom dplyr rename
+#'
+#' @importFrom rlang arg_match
 #'
 #' @return a `tof_tbl`
 #'
 #'
-as_tof_tbl.flowSet <- function(flow_data, sep = "|") {
+as_tof_tbl.flowSet <- function(flow_data, .name_method = c("tidytof", "featureNames", "colnames"), sep = "|", include_metadata = FALSE) {
+
+  # check .name_method argument
+  .name_method <- rlang::arg_match(.name_method)
+
   # check if flowset is empty
   if (length(flow_data) < 1) {
     stop("This flowSet is empty.")
   }
+  # get panel information
   panel_info <-
-    flow_data[[1]] %>%
+    flow_data[[1]] |>
     tof_find_panel_info()
 
+  # get protein measurements for all cells
   flowset_exprs <-
-    flow_data %>%
-    flowCore::fsApply(FUN = flowCore::exprs) %>%
+    flow_data |>
+    flowCore::fsApply(FUN = flowCore::exprs) |>
     dplyr::as_tibble()
 
-  col_names <-
-    base::paste(panel_info$antigens, panel_info$metals, sep = sep)
+  if (include_metadata) {
+    # get metadata from each flowFrame's identifier and flowCore::pData
+    flowset_identifiers <-
+      flow_data |>
+      flowCore::fsApply(FUN = flowCore::identifier) |>
+      as.character()
 
-  # prevent repeating names twice when antigen and metal are identical
-  repeat_indices <-
-    which(panel_info$metals == panel_info$antigens)
-  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+    flowset_num_cells <-
+      flow_data |>
+      flowCore::fsApply(FUN = flowCore::nrow) |>
+      as.integer()
+
+    flowset_metadata <-
+      flow_data |>
+      flowCore::pData()
+
+    # experimental
+    if (!(".tidytof_unique_identifier" %in% colnames(flowset_metadata))) {
+      flowset_metadata <-
+        flowset_metadata |>
+        dplyr::mutate(.tidytof_unique_identifier = as.character(name))
+    }
+
+    result_metadata <-
+      data.frame(
+        .tidytof_unique_identifier = rep(flowset_identifiers, times = flowset_num_cells)
+      ) |>
+      # location of key mismatch
+      #dplyr::left_join(flowset_metadata, by = "name") |>
+      # TODO: This section is experimental. Test with repeated groupings and ungroupings
+      dplyr::left_join(flowset_metadata, by = c(".tidytof_unique_identifier")) |>
+      dplyr::rename(.flowCore_identifier = .tidytof_unique_identifier) |>
+      dplyr::select(-.flowCore_identifier)
+
+  }
+
+  if (.name_method == "tidytof") {
+    col_names <-
+      base::paste(panel_info$antigens, panel_info$metals, sep = sep)
+
+    # prevent repeating names twice when antigen and metal are identical
+    repeat_indices <-
+      which(panel_info$metals == panel_info$antigens)
+    col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+  } else if (.name_method == "featureNames") {
+    col_names <- flowCore::featureNames(flow_data[[1]])
+
+  } else if (.name_method == "colnames") {
+    col_names <- flowCore::colnames(flow_data)
+
+  } else {
+    stop("Not a valid .name_method.")
+  }
 
   colnames(flowset_exprs) <- col_names
 
   result <- new_tof_tibble(x = flowset_exprs, panel = panel_info)
 
+  if (include_metadata) {
+    result <- dplyr::bind_cols(result, result_metadata)
+  }
+
   return(result)
 }
 
 #' @export
 #'
 #' @importFrom dplyr as_tibble
+#' @importFrom flowCore colnames
 #' @importFrom flowCore exprs
+#' @importFrom flowCore featureNames
+#' @importFrom rlang arg_match
 #'
-as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
-  panel_info <-
-    flow_data %>%
-    tof_find_panel_info()
+as_tof_tbl.flowFrame <-
+  function(
+    flow_data,
+    .name_method = c("tidytof", "featureNames", "colnames"),
+    sep = "|"
+  ) {
 
-  col_names <-
-    #stringr::str_c(panel_info$antigens, panel_info$metals, sep = sep)
-    base::paste(panel_info$antigens, panel_info$metals, sep = sep)
+    # check .name_method argument
+    .name_method <- rlang::arg_match(.name_method)
 
-  # prevent repeating names twice when antigen and metal are identical
-  repeat_indices <-
-    which(panel_info$metals == panel_info$antigens)
-  col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+    panel_info <-
+      flow_data |>
+      tof_find_panel_info()
 
-  flowframe_exprs <-
-    setNames(
-      object = dplyr::as_tibble(flowCore::exprs(flow_data)),
-      nm = col_names
+    if (.name_method == "tidytof") {
+      col_names <-
+        base::paste(panel_info$antigens, panel_info$metals, sep = sep)
+
+      # prevent repeating names twice when antigen and metal are identical
+      repeat_indices <-
+        which(panel_info$metals == panel_info$antigens)
+      col_names[repeat_indices] <- panel_info$antigens[repeat_indices]
+
+    } else if (.name_method == "featureNames") {
+      col_names <- flowCore::featureNames(flow_data)
+
+    } else if (.name_method == "colnames") {
+      col_names <- flowCore::colnames(flow_data)
+
+    } else {
+      stop("Not a valid .name_method.")
+    }
+
+    flowframe_exprs <-
+      setNames(
+        object = dplyr::as_tibble(flowCore::exprs(flow_data)),
+        nm = col_names
+      )
+
+    result <-
+      new_tof_tibble(
+        x = flowframe_exprs,
+        panel = panel_info
+      )
+
+    return(result)
+
+  }
+
+#' @export
+as_tof_tbl.data.frame <-
+  function(
+    flow_data,
+    .name_method = c("tidytof", "featureNames", "colnames"),
+    sep = "|",
+    panel = dplyr::tibble()
+  ) {
+    result <- new_tof_tibble(
+      x = dplyr::as_tibble(flow_data),
+      panel = panel
     )
-
-  result <-
-    new_tof_tibble(
-      x = flowframe_exprs,
-      panel = panel_info
-    )
-
-  return(result)
-
-}
+    return(result)
+  }
 
 #' Coerce flowFrames or flowSets into tof_tbl's.
 #'
 #' @param flow_data A flowFrame or flowSet
 #'
+#' @param .name_method A string indicating how tidytof should extract column
+#' names from `flow_data`. Available options are "tidytof" (the default), which
+#' uses tidytof's internal heuristic to name columns; "featureNames", which
+#' uses \code{\link[flowCore]{featureNames}} to name the columns; and "colnames",
+#' which uses \code{\link[flowCore]{colnames}} to name the columns.
+#'
 #' @param sep A string indicating which symbol should be used to separate
 #' antigen names and metal names in the columns of the output tof_tbl.
+#' @param ... Optional method-specific arguments.
 #'
 #' @export
 #'
@@ -263,9 +382,15 @@ as_tof_tbl.flowFrame <- function(flow_data, sep = "|") {
 #'
 #' tof_tibble <- as_tof_tbl(input_flowframe)
 #'
-as_tof_tbl <- function(flow_data, sep = "|") {
-  UseMethod("as_tof_tbl")
-}
+as_tof_tbl <-
+  function(
+    flow_data,
+    .name_method = c("tidytof", "featureNames", "colnames"),
+    sep = "|",
+    ...
+  ) {
+    UseMethod("as_tof_tbl")
+  }
 
 # for interoperability with Bioconductor ---------------------------------------
 
@@ -675,6 +800,17 @@ as_flowFrame <- function(x, ...) {
   UseMethod("as_flowFrame")
 }
 
+#' @export
+as_flowFrame.data.frame <- function(x, ...) {
+  result <- as_flowFrame.tof_tbl(x, ...)
+  return(result)
+  }
+
+#' @export
+as_flowSet.data.frame <- function(x, group_cols, ...) {
+  result <- as_flowFrame.tof_tbl(x, group_cols, ...)
+  return(result)
+}
 
 #' Coerce a tof_tbl into a \code{\link[flowCore]{flowFrame}}
 #'
@@ -693,8 +829,11 @@ as_flowFrame <- function(x, ...) {
 #' @importFrom dplyr everything
 #' @importFrom dplyr rename_with
 #' @importFrom dplyr select
+#' @importFrom dplyr distinct
 #'
 #' @importFrom flowCore flowFrame
+#'
+#' @importFrom purrr map
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
@@ -704,7 +843,29 @@ as_flowFrame <- function(x, ...) {
 as_flowFrame.tof_tbl <- function(x, ...) {
   tof_tibble <-
     x |>
-    dplyr::select(where(tof_is_numeric))
+    dplyr::select(where(is.numeric))
+
+  # TODO: EXPERIMENTAL ------
+  tof_tibble_characters <-
+    x |>
+    dplyr::select(where(\(.x) !is.numeric(.x)))
+
+  character_codes <-
+    purrr::map(
+      .x = tof_tibble_characters,
+      .f = \(.x) data.frame(
+        original_value = unique(.x),
+        code = as.numeric(as.factor(unique(.x)))
+        )
+    )
+
+  tof_tibble_characters <-
+    tof_tibble_characters |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), \(.x) as.numeric(as.factor(.x))))
+
+  tof_tibble <-
+    dplyr::bind_cols(tof_tibble, tof_tibble_characters)
+  # --------
 
   maxes_and_mins <-
     tof_tibble |>
@@ -749,6 +910,12 @@ as_flowFrame.tof_tbl <- function(x, ...) {
       parameters = parameters
     )
 
+  # TODO: Experimental
+  for (i in 1:length(character_codes)) {
+    keyword_name <- paste0(names(character_codes)[[i]], "_codes")
+    flowCore::keyword(result)[[keyword_name]] <- character_codes[[i]]
+  }
+  # --------
   return(result)
 }
 
@@ -782,6 +949,9 @@ as_flowSet <- function(x, ...) {
 #' be used to group cells into separate \code{\link[flowCore]{flowFrame}}s.
 #' Supports tidyselect helpers. Defaults to
 #' NULL (all cells are written into a single \code{\link[flowCore]{flowFrame}}).
+#' Note that the metadata column name "name" is a special value in the
+#' \code{\link[flowCore]{flowSet}}) class, so if any of `group_cols` refers to
+#' a column named "name," an error will be thrown.
 #'
 #' @param ... Unused.
 #'
@@ -801,6 +971,7 @@ as_flowSet <- function(x, ...) {
 #' @importFrom flowCore flowSet
 #' @importFrom flowCore phenoData
 #' @importFrom flowCore sampleNames
+#' @importFrom flowCore keyword
 #'
 #' @importFrom purrr map
 #'
@@ -822,7 +993,36 @@ as_flowSet.tof_tbl <- function(x, group_cols, ...) {
   } else {
     tof_tibble <-
       x |>
-      dplyr::select({{group_cols}}, where(tof_is_numeric))
+      dplyr::select({{ group_cols }}, where(is.numeric))
+
+    # throw an error if `group_cols` includes a column named "name", which
+    # flowSets do not like.
+    if (any(colnames(tof_tibble) == "name")) {
+      stop("x cannot have a column named `name` because this is a special column name in flowSets. Rename this column and try again. See help file for details.")
+    }
+
+    # TODO: EXPERIMENTAL ------
+    tof_tibble_characters <-
+      x |>
+      dplyr::select(-{{ group_cols }}) |>
+      dplyr::select(where(\(.x) !is.numeric(.x)))
+
+    character_codes <-
+      purrr::map(
+        .x = tof_tibble_characters,
+        .f = \(.x) data.frame(
+          original_value = unique(.x),
+          code = as.numeric(as.factor(unique(.x)))
+        )
+      )
+
+    tof_tibble_characters <-
+      tof_tibble_characters |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), \(.x) as.numeric(as.factor(.x))))
+
+    tof_tibble <-
+      dplyr::bind_cols(tof_tibble, tof_tibble_characters)
+    # --------
 
     maxes_and_mins <-
       tof_tibble |>
@@ -830,7 +1030,11 @@ as_flowSet.tof_tbl <- function(x, group_cols, ...) {
         dplyr::across(
           -{{group_cols}},
           .fns =
-            list(max = ~ max(.x, na.rm = TRUE), min = ~ min(.x, na.rm = TRUE)),
+            # TODO: make sure this works
+            list(
+              max = ~ max(as.numeric(.x), na.rm = TRUE),
+              min = ~ min(as.numeric(.x), na.rm = TRUE)
+            ),
           # use the many underscores because it's unlikely this will come up
           # in column names on their own
           .names = "{.col}_____{.fn}"
@@ -892,14 +1096,33 @@ as_flowSet.tof_tbl <- function(x, group_cols, ...) {
       dplyr::select({{group_cols}}) |>
       as.data.frame()
 
-    # store group_cols metadata in an annotated data frame for the flowSet
-    row.names(metadata_frame) <- paste0('Sample_', 1:nrow(metadata_frame))
-    annotated_metadata_frame <- as(metadata_frame, "AnnotatedDataFrame")
+    # store group_cols metadata in a data.frame for the flowSet
+    row.names(metadata_frame) <- paste0('tidytof_id_', 1:nrow(metadata_frame))
+    metadata_frame$.tidytof_unique_identifier <- row.names(metadata_frame)
 
     result <- flowCore::flowSet(tof_tibble$flowFrames)
-    flowCore::sampleNames(result) <- paste0('Sample_', 1:length(result))
 
-    flowCore::phenoData(result) <- annotated_metadata_frame
+    # add the grouping columns' information to the flowSet as metadata
+    # access this using flowCore::pData()
+    flowCore::sampleNames(result) <- paste0('tidytof_id_', 1:length(result))
+    flowCore::pData(result)$name <- flowCore::sampleNames(result)
+    flowCore::pData(result)$.tidytof_unique_identifier <-
+      flowCore::sampleNames(result)
+
+    result_pData <-
+      flowCore::pData(result) |>
+      dplyr::left_join(metadata_frame, by = ".tidytof_unique_identifier")# |>
+      #dplyr::select(-name)
+    row.names(result_pData) <- result_pData$.tidytof_unique_identifier
+    flowCore::pData(result) <- result_pData
+
+    # TODO: Experimental ------------
+    for (j in 1:length(result)) {
+      for (i in 1:length(character_codes)) {
+        keyword_name <- paste0(names(character_codes)[[i]], "_codes")
+        flowCore::keyword(result[[j]])[[keyword_name]] <- character_codes[[i]]
+      }
+    }
 
   }
 

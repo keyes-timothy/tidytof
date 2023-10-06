@@ -17,7 +17,10 @@ as_flowSet(x, ...)
 \item{group_cols}{Unquoted names of the columns in `x` that should
 be used to group cells into separate \code{\link[flowCore]{flowFrame}}s.
 Supports tidyselect helpers. Defaults to
-NULL (all cells are written into a single \code{\link[flowCore]{flowFrame}}).}
+NULL (all cells are written into a single \code{\link[flowCore]{flowFrame}}).
+Note that the metadata column name "name" is a special value in the
+\code{\link[flowCore]{flowSet}}) class, so if any of `group_cols` refers to
+a column named "name," an error will be thrown.}
 }
 \value{
 A \code{\link[flowCore]{flowSet}}

@@ -4,13 +4,27 @@
 \alias{as_tof_tbl.flowSet}
 \title{Convert an object into a tof_tbl}
 \usage{
-\method{as_tof_tbl}{flowSet}(flow_data, sep = "|")
+\method{as_tof_tbl}{flowSet}(
+  flow_data,
+  .name_method = c("tidytof", "featureNames", "colnames"),
+  sep = "|",
+  include_metadata = FALSE
+)
 }
 \arguments{
 \item{flow_data}{A FlowSet}
 
+\item{.name_method}{A string indicating how tidytof should extract column
+names from `flow_data`. Available options are "tidytof" (the default), which
+uses tidytof's internal heuristic to name columns; "featureNames", which
+uses \code{\link[flowCore]{featureNames}} to name the columns; and "colnames",
+which uses \code{\link[flowCore]{colnames}} to name the columns.}
+
 \item{sep}{A string to use to separate the antigen name and its associated
 metal in the column names of the output tibble. Defaults to "|".}
+
+\item{include_metadata}{A boolean value indicating if the metadata for each
+.fcs file read by flowCore should be included in the final result. Defaults to FALSE.}
 }
 \value{
 a `tof_tbl`
