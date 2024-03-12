@@ -9,8 +9,8 @@
 ">
 <title>Dimensionality reduction • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Dimensionality reduction">
 <meta property="og:description" content="Read this vignette to learn how visualize single-cell phenotypes in  low-dimensional space using dimensionality reduction algorithms (PCA, UMAP, tSNE)
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>dimensionality-reduction.Rmd</code></div>
@@ -107,10 +110,10 @@ algorithms commonly used by biologists: Principal component analysis
 (PCA), t-distributed stochastic neighbor embedding (tSNE), and uniform
 manifold approximation and projection (UMAP). To apply these to a
 dataset, use <code><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions()</a></code>.</p>
-<div class="section level2">
-<h2 id="dimensionality-reduction-with-tof_reduce_dimensions-">Dimensionality reduction with
+<div class="section level3">
+<h3 id="dimensionality-reduction-with-tof_reduce_dimensions-">Dimensionality reduction with
 <code>tof_reduce_dimensions()</code>.<a class="anchor" aria-label="anchor" href="#dimensionality-reduction-with-tof_reduce_dimensions-"></a>
-</h2>
+</h3>
 <p>Here is an example call to <code><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions()</a></code> in
 which we use tSNE to visualize data in <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in
 <code>phenograph_data</code> dataset.</p>
@@ -118,25 +121,25 @@ which we use tSNE to visualize data in <a href="https://keyes-timothy.github.io/
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">phenograph_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># perform the dimensionality reduction</span></span>
-<span><span class="va">phenograph_tsne</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span></span>
+<span><span class="va">phenograph_tsne</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required namespace: Rtsne</span></span>
 <span></span>
 <span><span class="co"># select only the tsne embedding columns</span></span>
-<span><span class="va">phenograph_tsne</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">phenograph_tsne</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
-<span><span class="co">#&gt;   .tsne_1 .tsne_2</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   -<span style="color: #BB0000;">15.6</span>   -<span style="color: #BB0000;">4.63</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   -<span style="color: #BB0000;">17.0</span>    1.63</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   -<span style="color: #BB0000;">38.4</span>    5.37</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">18.1</span>   14.0 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>   -<span style="color: #BB0000;">18.1</span>   -<span style="color: #BB0000;">2.30</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>   -<span style="color: #BB0000;">24.4</span>    8.18</span></span></code></pre></div>
+<span><span class="co">#&gt;   .tsne1 .tsne2</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  -<span style="color: #BB0000;">16.7</span>  -<span style="color: #BB0000;">4.66</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  -<span style="color: #BB0000;">11.0</span>   4.30</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  -<span style="color: #BB0000;">10.6</span>  25.2 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  -<span style="color: #BB0000;">21.3</span>   8.86</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  -<span style="color: #BB0000;">20.0</span>  -<span style="color: #BB0000;">2.33</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  -<span style="color: #BB0000;">18.2</span>  14.2</span></span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add
 reduced-dimension feature embeddings to the input <code>tof_tbl</code>
 and return the augmented <code>tof_tbl</code> (that is, a
@@ -145,45 +148,45 @@ its result. To return only the features embeddings themselves, set
 <code>augment</code> to <code>FALSE</code> (as in
 <code>tof_cluster</code>).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
-<span><span class="co">#&gt;    .tsne_1 .tsne_2</span></span>
-<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   16.6    1.67 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   15.1   -<span style="color: #BB0000;">2.07</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>   32.3  -<span style="color: #BB0000;">11.1</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>   11.8  -<span style="color: #BB0000;">11.6</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   17.9   -<span style="color: #BB0000;">1.23</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   20.7  -<span style="color: #BB0000;">15.1</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   17.2   -<span style="color: #BB0000;">9.20</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   26.5  -<span style="color: #BB0000;">15.2</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   19.3  -<span style="color: #BB0000;">16.3</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    8.28   0.341</span></span>
+<span><span class="co">#&gt;    .tsne1 .tsne2</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   2.31   18.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   8.18   16.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  30.7    17.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  14.9    11.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   5.47   19.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  20.0    16.8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  10.3    17.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  22.4    19.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  15.6    13.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   1.38   12.6</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span></code></pre></div>
 <p>Changing the <code>method</code> argument results in different
 low-dimensional embeddings:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"umap"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"umap"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
 <span><span class="co">#&gt;    .umap1 .umap2</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   5.03  4.34 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   5.53  3.20 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>   5.12  0.665</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>   4.03 -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   4.83  4.21 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   1.10 -<span style="color: #BB0000;">2.42</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   4.52  3.86 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   3.40 -<span style="color: #BB0000;">0.513</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   6.48 -<span style="color: #BB0000;">0.610</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   7.23  4.83 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">9.80</span>  -<span style="color: #BB0000;">3.12</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">8.70</span>  -<span style="color: #BB0000;">2.54</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">6.65</span>  -<span style="color: #BB0000;">1.20</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">4.63</span>  -<span style="color: #BB0000;">0.820</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">9.81</span>  -<span style="color: #BB0000;">2.81</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.815</span>  2.98 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">9.71</span>  -<span style="color: #BB0000;">2.30</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">2.77</span>   1.44 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">5.01</span>  -<span style="color: #BB0000;">0.850</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">9.30</span>  -<span style="color: #BB0000;">4.89</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span>
 <span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"pca"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"pca"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 5</span></span></span>
 <span><span class="co">#&gt;       .pc1     .pc2   .pc3    .pc4   .pc5</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -199,9 +202,9 @@ low-dimensional embeddings:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.035</span><span style="color: #BB0000; text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.924</span>   -<span style="color: #BB0000;">0.692</span>  1.45    0.270</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="method-specifications-for-tof_reduce_-functions">Method specifications for <code>tof_reduce_*()</code> functions<a class="anchor" aria-label="anchor" href="#method-specifications-for-tof_reduce_-functions"></a>
-</h2>
+<div class="section level3">
+<h3 id="method-specifications-for-tof_reduce_-functions">Method specifications for <code>tof_reduce_*()</code> functions<a class="anchor" aria-label="anchor" href="#method-specifications-for-tof_reduce_-functions"></a>
+</h3>
 <p><code><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions()</a></code> provides a high-level API for
 three lower-level functions: <code><a href="../reference/tof_reduce_pca.html">tof_reduce_pca()</a></code>,
 <code><a href="../reference/tof_reduce_umap.html">tof_reduce_umap()</a></code>, and <code><a href="../reference/tof_reduce_tsne.html">tof_reduce_tsne()</a></code>. The
@@ -212,8 +215,8 @@ dimensionality reduction approaches. For example,
 determine how many principal components should be returned:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 2 principal components</span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_pca.html">tof_reduce_pca</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_pca.html">tof_reduce_pca</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
 <span><span class="co">#&gt;       .pc1     .pc2</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -230,8 +233,8 @@ determine how many principal components should be returned:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 3 principal components</span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_pca.html">tof_reduce_pca</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_pca.html">tof_reduce_pca</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 3</span></span></span>
 <span><span class="co">#&gt;       .pc1     .pc2   .pc3</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -249,9 +252,9 @@ determine how many principal components should be returned:</p>
 <p>see <code><a href="../reference/tof_reduce_pca.html">?tof_reduce_pca</a></code>, <code><a href="../reference/tof_reduce_umap.html">?tof_reduce_umap</a></code>, and
 <code><a href="../reference/tof_reduce_tsne.html">?tof_reduce_tsne</a></code> for additional details.</p>
 </div>
-<div class="section level2">
-<h2 id="visualization-using-tof_plot_cells_embedding">Visualization using <code>tof_plot_cells_embedding()</code><a class="anchor" aria-label="anchor" href="#visualization-using-tof_plot_cells_embedding"></a>
-</h2>
+<div class="section level3">
+<h3 id="visualization-using-tof_plot_cells_embedding">Visualization using <code>tof_plot_cells_embedding()</code><a class="anchor" aria-label="anchor" href="#visualization-using-tof_plot_cells_embedding"></a>
+</h3>
 <p>Regardless of the method used, reduced-dimension feature embeddings
 can be visualized using <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> (or any graphics
 package). <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> also provides some helper functions for
@@ -260,26 +263,96 @@ easily generating dimensionality reduction plots from a
 dimensions:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot the tsne embeddings using color to distinguish between clusters</span></span>
-<span><span class="va">phenograph_tsne</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
-<span>    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">".tsne"</span><span class="op">)</span>, </span>
-<span>    color_col <span class="op">=</span> <span class="va">phenograph_cluster</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">phenograph_tsne</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
+<span>        embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">".tsne"</span><span class="op">)</span>,</span>
+<span>        color_col <span class="op">=</span> <span class="va">phenograph_cluster</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># plot the tsne embeddings using color to represent CD11b expression</span></span>
-<span><span class="va">phenograph_tsne</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
-<span>    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">".tsne"</span><span class="op">)</span>, </span>
-<span>    color_col <span class="op">=</span> <span class="va">cd11b</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">phenograph_tsne</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
+<span>        embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">".tsne"</span><span class="op">)</span>,</span>
+<span>        color_col <span class="op">=</span> <span class="va">cd11b</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dimensionality-reduction_files/figure-html/unnamed-chunk-7-2.png" width="700"></p>
 <p>Such visualizations can be helpful in qualitatively describing the
 phenotypic differences between the clusters in a dataset. For example,
 in the example above, we can see that one of the clusters has high CD11b
 expression, whereas the others have lower CD11b expression.</p>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] ggplot2_3.5.0  dplyr_1.1.4    tidytof_0.99.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] gridExtra_2.3       rlang_1.1.3         magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;   [4] RcppAnnoy_0.0.22    matrixStats_1.2.0   compiler_4.3.3     </span></span>
+<span><span class="co">#&gt;   [7] png_0.1-8           systemfonts_1.0.6   vctrs_0.6.5        </span></span>
+<span><span class="co">#&gt;  [10] stringr_1.5.1       pkgconfig_2.0.3     shape_1.4.6.1      </span></span>
+<span><span class="co">#&gt;  [13] fastmap_1.1.1       ellipsis_0.3.2      labeling_0.4.3     </span></span>
+<span><span class="co">#&gt;  [16] ggraph_2.2.1        utf8_1.2.4          rmarkdown_2.26     </span></span>
+<span><span class="co">#&gt;  [19] prodlim_2023.08.28  tzdb_0.4.0          ragg_1.2.7         </span></span>
+<span><span class="co">#&gt;  [22] purrr_1.0.2         xfun_0.42           glmnet_4.1-8       </span></span>
+<span><span class="co">#&gt;  [25] cachem_1.0.8        jsonlite_1.8.8      recipes_1.0.10     </span></span>
+<span><span class="co">#&gt;  [28] highr_0.10          keras_2.13.0        tweenr_2.0.3       </span></span>
+<span><span class="co">#&gt;  [31] irlba_2.3.5.1       tensorflow_2.15.0   parallel_4.3.3     </span></span>
+<span><span class="co">#&gt;  [34] R6_2.5.1            bslib_0.6.1         stringi_1.8.3      </span></span>
+<span><span class="co">#&gt;  [37] reticulate_1.35.0   parallelly_1.37.1   rpart_4.1.23       </span></span>
+<span><span class="co">#&gt;  [40] lubridate_1.9.3     jquerylib_0.1.4     Rcpp_1.0.12        </span></span>
+<span><span class="co">#&gt;  [43] iterators_1.0.14    knitr_1.45          future.apply_1.11.1</span></span>
+<span><span class="co">#&gt;  [46] base64enc_0.1-3     readr_2.1.5         flowCore_2.14.1    </span></span>
+<span><span class="co">#&gt;  [49] Matrix_1.6-5        splines_4.3.3       nnet_7.3-19        </span></span>
+<span><span class="co">#&gt;  [52] igraph_2.0.2        timechange_0.3.0    tidyselect_1.2.0   </span></span>
+<span><span class="co">#&gt;  [55] yaml_2.3.8          viridis_0.6.5       timeDate_4032.109  </span></span>
+<span><span class="co">#&gt;  [58] doParallel_1.0.17   codetools_0.2-19    listenv_0.9.1      </span></span>
+<span><span class="co">#&gt;  [61] lattice_0.22-5      tibble_3.2.1        Biobase_2.62.0     </span></span>
+<span><span class="co">#&gt;  [64] withr_3.0.0         evaluate_0.23       Rtsne_0.17         </span></span>
+<span><span class="co">#&gt;  [67] future_1.33.1       desc_1.4.3          survival_3.5-8     </span></span>
+<span><span class="co">#&gt;  [70] polyclip_1.10-6     embed_1.1.3         pillar_1.9.0       </span></span>
+<span><span class="co">#&gt;  [73] whisker_0.4.1       foreach_1.5.2       stats4_4.3.3       </span></span>
+<span><span class="co">#&gt;  [76] generics_0.1.3      RcppHNSW_0.6.0      S4Vectors_0.40.2   </span></span>
+<span><span class="co">#&gt;  [79] hms_1.1.3           munsell_0.5.0       scales_1.3.0       </span></span>
+<span><span class="co">#&gt;  [82] globals_0.16.3      class_7.3-22        glue_1.7.0         </span></span>
+<span><span class="co">#&gt;  [85] tools_4.3.3         data.table_1.15.2   gower_1.0.1        </span></span>
+<span><span class="co">#&gt;  [88] fs_1.6.3            graphlayouts_1.1.1  tidygraph_1.3.1    </span></span>
+<span><span class="co">#&gt;  [91] grid_4.3.3          yardstick_1.3.0     tidyr_1.3.1        </span></span>
+<span><span class="co">#&gt;  [94] RProtoBufLib_2.14.0 ipred_0.9-14        colorspace_2.1-0   </span></span>
+<span><span class="co">#&gt;  [97] ggforce_0.4.2       cli_3.6.2           tfruns_1.5.2       </span></span>
+<span><span class="co">#&gt; [100] textshaping_0.3.7   fansi_1.0.6         cytolib_2.14.1     </span></span>
+<span><span class="co">#&gt; [103] viridisLite_0.4.2   lava_1.8.0          uwot_0.1.16        </span></span>
+<span><span class="co">#&gt; [106] gtable_0.3.4        zeallot_0.1.0       sass_0.4.8         </span></span>
+<span><span class="co">#&gt; [109] digest_0.6.34       BiocGenerics_0.48.1 ggrepel_0.9.5      </span></span>
+<span><span class="co">#&gt; [112] farver_2.1.1        memoise_2.0.1       htmltools_0.5.7    </span></span>
+<span><span class="co">#&gt; [115] pkgdown_2.0.7       lifecycle_1.0.4     hardhat_1.3.1      </span></span>
+<span><span class="co">#&gt; [118] MASS_7.3-60.0.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -58,6 +58,21 @@
     <loc>https://keyes-timothy.github.io/tidytof/index.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/as_SingleCellExperiment.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/as_flowFrame.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/as_flowSet.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/as_seurat.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/as_tof_tbl.flowSet.html</loc>
   </url>
   <url>
@@ -86,6 +101,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/magnitude.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/make_flowcore_annotated_data_frame.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/metal_masterlist.html</loc>
@@ -319,6 +337,9 @@
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_log_rank_test.html</loc>
   </url>
   <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_make_knn_graph.html</loc>
+  </url>
+  <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_make_roc_curve.html</loc>
   </url>
   <url>
@@ -428,6 +449,9 @@
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_split_data.html</loc>
+  </url>
+  <url>
+    <loc>https://keyes-timothy.github.io/tidytof/reference/tof_split_tidytof_reduced_dimensions.html</loc>
   </url>
   <url>
     <loc>https://keyes-timothy.github.io/tidytof/reference/tof_train_model.html</loc>

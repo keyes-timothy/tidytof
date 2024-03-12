@@ -9,8 +9,8 @@
 ">
 <title>Differential discovery analysis • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Differential discovery analysis">
 <meta property="og:description" content="Read this vignette to learn how to compare cluster abundance and marker  expression across experimental/clinical variables using various statistical tools.
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>differential-discovery-analysis.Rmd</code></div>
@@ -115,9 +118,9 @@ DEA</strong>). <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> pro
 <code><a href="../reference/tof_analyze_abundance.html">tof_analyze_abundance()</a></code> and
 <code><a href="../reference/tof_analyze_expression.html">tof_analyze_expression()</a></code> verbs for differential abundance
 and differential expression analyses, respectively.</p>
-<div class="section level2">
-<h2 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
-</h2>
+<div class="section level3">
+<h3 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
+</h3>
 <p>To demonstrate how to use these verbs, we’ll first download a dataset
 originally collected for the development of the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4084463/" class="external-link">CITRUS</a>
 algorithm. These data are available in the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>
@@ -125,10 +128,10 @@ package, which is available on Bioconductor and can be downloaded with
 the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></span></code></pre></div>
 <p>To load the CITRUS data into our current R session, we can call a
 function from the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>, which will provide it to us
 in a format from the <code>{flowCore}</code> package (called a
@@ -138,9 +141,9 @@ into <code>tof_tbl</code>’s .</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">citrus_raw</span> <span class="op">&lt;-</span> <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">Bodenmiller_BCR_XL_flowSet</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">citrus_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">citrus_raw</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span>sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">citrus_data</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">citrus_raw</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span>sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></span></code></pre></div>
 <p>Thus, we can see that <code>citrus_data</code> is a
 <code>tof_tbl</code> with 172791 cells (one in each row) and 39 pieces
 of information about each cell (one in each column).</p>
@@ -148,19 +151,19 @@ of information about each cell (one in each column).</p>
 our single-cell data using some functions from the
 <code>tidyverse</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">citrus_metadata</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">flowCore</span><span class="fu">::</span><span class="fu">pData</span><span class="op">(</span><span class="va">citrus_raw</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, </span>
-<span>    sample_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span>,</span>
-<span>    patient <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"patient[:digit:]"</span><span class="op">)</span>, </span>
-<span>    stimulation <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"(BCR-XL)|Reference"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    stimulation <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">stimulation</span> <span class="op">==</span> <span class="st">"Reference"</span>, <span class="st">"Basal"</span>, <span class="va">stimulation</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">citrus_metadata</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>        file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">flowCore</span><span class="fu">::</span><span class="fu">pData</span><span class="op">(</span><span class="va">citrus_raw</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        sample_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span>,</span>
+<span>        patient <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"patient[:digit:]"</span><span class="op">)</span>,</span>
+<span>        stimulation <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">file_name</span>, <span class="st">"(BCR-XL)|Reference"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        stimulation <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">stimulation</span> <span class="op">==</span> <span class="st">"Reference"</span>, <span class="st">"Basal"</span>, <span class="va">stimulation</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">citrus_metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">citrus_metadata</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
 <span><span class="co">#&gt;   file_name                          sample_id patient  stimulation</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
@@ -176,9 +179,9 @@ sample was collected from and which stimulation condition (“Basal” or
 <p>Finally, we can join this metadata with our single-cell
 <code>tof_tbl</code> to obtain the cleaned dataset.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">citrus_metadata</span>, by <span class="op">=</span> <span class="st">"sample_id"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">citrus_data</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">citrus_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">citrus_metadata</span>, by <span class="op">=</span> <span class="st">"sample_id"</span><span class="op">)</span></span></code></pre></div>
 <p>After these data cleaning steps, we now have
 <code>citrus_data</code>, a <code>tof_tbl</code> containing cells
 collected from 8 patients. Specifically, 2 samples were taken from each
@@ -192,10 +195,10 @@ labels that were applied to each cell using a combination of FlowSOM
 clustering and manual merging (for details, run
 <code><a href="https://rdrr.io/pkg/HDCytoData/man/Bodenmiller_BCR_XL_SE.html" class="external-link">?HDCytoData::Bodenmiller_BCR_XL</a></code> in the R console).</p>
 </div>
-<div class="section level2">
-<h2 id="differential-abundance-analysis-using-tof_analyze_abundance">Differential abundance analysis using
+<div class="section level3">
+<h3 id="differential-abundance-analysis-using-tof_analyze_abundance">Differential abundance analysis using
 <code>tof_analyze_abundance()</code><a class="anchor" aria-label="anchor" href="#differential-abundance-analysis-using-tof_analyze_abundance"></a>
-</h2>
+</h3>
 <p>We might wonder if there are certain clusters that expand or deplete
 within patients between the two stimulation conditions described above -
 this is a question that requires differential abundance analysis (DAA).
@@ -206,15 +209,15 @@ Because the setup described above uses a paired design and only has 2
 experimental conditions of interest (Basal vs. BCR-XL), we can use the
 paired t-test method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">daa_result</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_analyze_abundance.html">tof_analyze_abundance</a></span><span class="op">(</span></span>
-<span>    cluster_col <span class="op">=</span> <span class="va">population_id</span>, </span>
-<span>    effect_col <span class="op">=</span> <span class="va">stimulation</span>, </span>
-<span>    group_cols <span class="op">=</span> <span class="va">patient</span>, </span>
-<span>    test_type <span class="op">=</span> <span class="st">"paired"</span>, </span>
-<span>    method <span class="op">=</span> <span class="st">"ttest"</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">daa_result</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">citrus_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_analyze_abundance.html">tof_analyze_abundance</a></span><span class="op">(</span></span>
+<span>        cluster_col <span class="op">=</span> <span class="va">population_id</span>,</span>
+<span>        effect_col <span class="op">=</span> <span class="va">stimulation</span>,</span>
+<span>        group_cols <span class="op">=</span> <span class="va">patient</span>,</span>
+<span>        test_type <span class="op">=</span> <span class="st">"paired"</span>,</span>
+<span>        method <span class="op">=</span> <span class="st">"ttest"</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">daa_result</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 8</span></span></span>
@@ -236,62 +239,62 @@ the fold-changes of each cluster (within each patient) in the BCR-XL
 condition compared to the Basal condition using
 <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">daa_result</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span><span class="op">)</span>, </span>
-<span>    by <span class="op">=</span> <span class="st">"population_id"</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span>, name <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span></span>
-<span>    names_from <span class="op">=</span> <span class="va">stimulation</span>, </span>
-<span>    values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prop</span>, <span class="va">n</span><span class="op">)</span>, </span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    diff <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">-</span> <span class="va">prop_Basal</span>, </span>
-<span>    fc <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">/</span> <span class="va">prop_Basal</span>,</span>
-<span>    population_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">diff</span><span class="op">)</span>,</span>
-<span>    direction <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">mean_fc</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">significant</span> <span class="op">==</span> <span class="st">"*"</span> <span class="op">~</span> <span class="st">"increase"</span>,</span>
-<span>        <span class="va">mean_fc</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">significant</span> <span class="op">==</span> <span class="st">"*"</span> <span class="op">~</span> <span class="st">"decrease"</span>, </span>
-<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">citrus_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">daa_result</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span><span class="op">)</span>,</span>
+<span>        by <span class="op">=</span> <span class="st">"population_id"</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span>, <span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">mean_fc</span>, name <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">patient</span>, <span class="va">stimulation</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span></span>
+<span>        names_from <span class="op">=</span> <span class="va">stimulation</span>,</span>
+<span>        values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prop</span>, <span class="va">n</span><span class="op">)</span>,</span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        diff <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">-</span> <span class="va">prop_Basal</span>,</span>
+<span>        fc <span class="op">=</span> <span class="va">`prop_BCR-XL`</span> <span class="op">/</span> <span class="va">prop_Basal</span>,</span>
+<span>        population_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">diff</span><span class="op">)</span>,</span>
+<span>        direction <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>                <span class="va">mean_fc</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">significant</span> <span class="op">==</span> <span class="st">"*"</span> <span class="op">~</span> <span class="st">"increase"</span>,</span>
+<span>                <span class="va">mean_fc</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">significant</span> <span class="op">==</span> <span class="st">"*"</span> <span class="op">~</span> <span class="st">"decrease"</span>,</span>
+<span>                <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span></span>
+<span>            <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">significance_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">plot_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">direction</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span>, fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">significance_data</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">significant</span>, <span class="va">direction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span>, fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">plot_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">population_id</span>, y <span class="op">=</span> <span class="va">fc</span>, fill <span class="op">=</span> <span class="va">direction</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html" class="external-link">geom_violin</a></span><span class="op">(</span>trim <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"red"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">population_id</span>, y <span class="op">=</span> <span class="va">fc</span>, label <span class="op">=</span> <span class="va">significant</span><span class="op">)</span>, </span>
-<span>    data <span class="op">=</span> <span class="va">significance_data</span>, </span>
-<span>    size <span class="op">=</span> <span class="fl">8</span>, </span>
-<span>    nudge_x <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span>    nudge_y <span class="op">=</span> <span class="fl">0.06</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"decrease"</span> <span class="op">=</span> <span class="st">"#cd5241"</span>, <span class="st">"increase"</span> <span class="op">=</span> <span class="st">"#207394"</span><span class="op">)</span>,</span>
-<span>    na.translate <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="cn">NULL</span>, </span>
-<span>    y <span class="op">=</span> <span class="st">"Abundance fold-change (stimulated / basal)"</span>, </span>
-<span>    fill <span class="op">=</span> <span class="st">"Effect"</span>, </span>
-<span>    caption <span class="op">=</span> <span class="st">"Asterisks indicate significance at an adjusted p-value of 0.05"</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">population_id</span>, y <span class="op">=</span> <span class="va">fc</span>, fill <span class="op">=</span> <span class="va">direction</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html" class="external-link">geom_violin</a></span><span class="op">(</span>trim <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"red"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">population_id</span>, y <span class="op">=</span> <span class="va">fc</span>, label <span class="op">=</span> <span class="va">significant</span><span class="op">)</span>,</span>
+<span>        data <span class="op">=</span> <span class="va">significance_data</span>,</span>
+<span>        size <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>        nudge_x <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>        nudge_y <span class="op">=</span> <span class="fl">0.06</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"decrease"</span> <span class="op">=</span> <span class="st">"#cd5241"</span>, <span class="st">"increase"</span> <span class="op">=</span> <span class="st">"#207394"</span><span class="op">)</span>,</span>
+<span>        na.translate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>        y <span class="op">=</span> <span class="st">"Abundance fold-change (stimulated / basal)"</span>,</span>
+<span>        fill <span class="op">=</span> <span class="st">"Effect"</span>,</span>
+<span>        caption <span class="op">=</span> <span class="st">"Asterisks indicate significance at an adjusted p-value of 0.05"</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
@@ -308,10 +311,10 @@ can be found in the documentation for each
 <li><code>tof_analyze_abundance_ttest</code></li>
 </ul>
 </div>
-<div class="section level2">
-<h2 id="differential-expression-analysis-with-tof_analyze_expression">Differential expression analysis with
+<div class="section level3">
+<h3 id="differential-expression-analysis-with-tof_analyze_expression">Differential expression analysis with
 <code>tof_analyze_expression()</code><a class="anchor" aria-label="anchor" href="#differential-expression-analysis-with-tof_analyze_expression"></a>
-</h2>
+</h3>
 <p>Similarly, suppose we’re interested in how intracellular signaling
 proteins change their expression levels between our two stimulation
 conditions in each of our clusters. This is a Differential Expression
@@ -321,26 +324,26 @@ t-tests with multiple-hypothesis correction to to test for significant
 differences in each cluster’s expression of our signaling markers
 between stimulation conditions.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">signaling_markers</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"pNFkB_Nd142"</span>, <span class="st">"pStat5_Nd150"</span>, <span class="st">"pAkt_Sm152"</span>, <span class="st">"pStat1_Eu153"</span>, <span class="st">"pStat3_Gd158"</span>, </span>
-<span>    <span class="st">"pSlp76_Dy164"</span>, <span class="st">"pBtk_Er166"</span>, <span class="st">"pErk_Er168"</span>, <span class="st">"pS6_Yb172"</span>, <span class="st">"pZap70_Gd156"</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">signaling_markers</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>        <span class="st">"pNFkB_Nd142"</span>, <span class="st">"pStat5_Nd150"</span>, <span class="st">"pAkt_Sm152"</span>, <span class="st">"pStat1_Eu153"</span>, <span class="st">"pStat3_Gd158"</span>,</span>
+<span>        <span class="st">"pSlp76_Dy164"</span>, <span class="st">"pBtk_Er166"</span>, <span class="st">"pErk_Er168"</span>, <span class="st">"pS6_Yb172"</span>, <span class="st">"pZap70_Gd156"</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">dea_result</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">citrus_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>channel_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_analyze_expression.html">tof_analyze_expression</a></span><span class="op">(</span></span>
-<span>    method <span class="op">=</span> <span class="st">"ttest"</span>, </span>
-<span>    cluster_col <span class="op">=</span> <span class="va">population_id</span>, </span>
-<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>, </span>
-<span>    effect_col <span class="op">=</span> <span class="va">stimulation</span>,</span>
-<span>    group_cols <span class="op">=</span> <span class="va">patient</span>, </span>
-<span>    test_type <span class="op">=</span> <span class="st">"paired"</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">dea_result</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">citrus_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>channel_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_analyze_expression.html">tof_analyze_expression</a></span><span class="op">(</span></span>
+<span>        method <span class="op">=</span> <span class="st">"ttest"</span>,</span>
+<span>        cluster_col <span class="op">=</span> <span class="va">population_id</span>,</span>
+<span>        marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="va">signaling_markers</span><span class="op">)</span>,</span>
+<span>        effect_col <span class="op">=</span> <span class="va">stimulation</span>,</span>
+<span>        group_cols <span class="op">=</span> <span class="va">patient</span>,</span>
+<span>        test_type <span class="op">=</span> <span class="st">"paired"</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">dea_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">dea_result</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
 <span><span class="co">#&gt;   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -362,43 +365,43 @@ multiple-hypothesis-corrected p-value for each cluster-marker pair.</p>
 <p>This result can be used to make a volcano plot to visualize the
 results for all cluster-marker pairs:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">volcano_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">dea_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    log2_fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean_fc</span>, base <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>    log_p <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">p_adj</span><span class="op">)</span>, </span>
-<span>    significance <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"increased"</span>, </span>
-<span>        <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"decreased"</span>,</span>
-<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span></span>
-<span>      <span class="op">)</span>, </span>
-<span>    marker <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">marker</span>, <span class="st">".+_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="st">"_"</span><span class="op">)</span>, </span>
-<span>    pair <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">marker</span>, <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">population_id</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"@"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">volcano_data</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">dea_result</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        log2_fc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean_fc</span>, base <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>        log_p <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">p_adj</span><span class="op">)</span>,</span>
+<span>        significance <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>                <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"increased"</span>,</span>
+<span>                <span class="va">p_adj</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">mean_fc</span> <span class="op">&lt;</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"decreased"</span>,</span>
+<span>                <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        marker <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">marker</span>, <span class="st">".+_"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>                <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="st">"_"</span><span class="op">)</span>,</span>
+<span>        pair <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">marker</span>, <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"cluster "</span>, <span class="va">population_id</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"@"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">volcano_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">log2_fc</span>, y <span class="op">=</span> <span class="va">log_p</span>, fill <span class="op">=</span> <span class="va">significance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"gray50"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggrepel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggrepel/man/geom_text_repel.html" class="external-link">geom_text_repel</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">pair</span><span class="op">)</span>, </span>
-<span>    data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span><span class="va">volcano_data</span>, n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, </span>
-<span>    size <span class="op">=</span> <span class="fl">2</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"decreased"</span> <span class="op">=</span> <span class="st">"#cd5241"</span>, <span class="st">"increased"</span> <span class="op">=</span> <span class="st">"#207394"</span><span class="op">)</span>, </span>
-<span>    na.value <span class="op">=</span> <span class="st">"#cdcdcd"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="st">"log2(Fold-change)"</span>, </span>
-<span>    y <span class="op">=</span> <span class="st">"-log10(p-value)"</span>, </span>
-<span>    fill <span class="op">=</span> <span class="cn">NULL</span>, </span>
-<span>    caption <span class="op">=</span> <span class="st">"Labels indicate the 10 most significant marker-cluster pairs"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">volcano_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">log2_fc</span>, y <span class="op">=</span> <span class="va">log_p</span>, fill <span class="op">=</span> <span class="va">significance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"gray50"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">ggrepel</span><span class="fu">::</span><span class="fu"><a href="https://ggrepel.slowkow.com/reference/geom_text_repel.html" class="external-link">geom_text_repel</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">pair</span><span class="op">)</span>,</span>
+<span>        data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span><span class="va">volcano_data</span>, n <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>,</span>
+<span>        size <span class="op">=</span> <span class="fl">2</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"decreased"</span> <span class="op">=</span> <span class="st">"#cd5241"</span>, <span class="st">"increased"</span> <span class="op">=</span> <span class="st">"#207394"</span><span class="op">)</span>,</span>
+<span>        na.value <span class="op">=</span> <span class="st">"#cdcdcd"</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>        x <span class="op">=</span> <span class="st">"log2(Fold-change)"</span>,</span>
+<span>        y <span class="op">=</span> <span class="st">"-log10(p-value)"</span>,</span>
+<span>        fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>        caption <span class="op">=</span> <span class="st">"Labels indicate the 10 most significant marker-cluster pairs"</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="differential-discovery-analysis_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>As above, details can be found in the documentation for each
 <code>tof_analyze_expression_*</code> function family member:</p>
@@ -407,6 +410,111 @@ results for all cluster-marker pairs:</p>
 <li><code>tof_analyze_expression_lmm</code></li>
 <li><code>tof_analyze_expression_ttest</code></li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">#&gt; [8] base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] HDCytoData_1.22.0           flowCore_2.14.1            </span></span>
+<span><span class="co">#&gt;  [3] SummarizedExperiment_1.32.0 Biobase_2.62.0             </span></span>
+<span><span class="co">#&gt;  [5] GenomicRanges_1.54.1        GenomeInfoDb_1.38.7        </span></span>
+<span><span class="co">#&gt;  [7] IRanges_2.36.0              S4Vectors_0.40.2           </span></span>
+<span><span class="co">#&gt;  [9] MatrixGenerics_1.14.0       matrixStats_1.2.0          </span></span>
+<span><span class="co">#&gt; [11] ExperimentHub_2.10.0        AnnotationHub_3.10.0       </span></span>
+<span><span class="co">#&gt; [13] BiocFileCache_2.10.1        dbplyr_2.4.0               </span></span>
+<span><span class="co">#&gt; [15] BiocGenerics_0.48.1         forcats_1.0.0              </span></span>
+<span><span class="co">#&gt; [17] tidyr_1.3.1                 ggplot2_3.5.0              </span></span>
+<span><span class="co">#&gt; [19] stringr_1.5.1               dplyr_1.1.4                </span></span>
+<span><span class="co">#&gt; [21] tidytof_0.99.0             </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] jsonlite_1.8.8                shape_1.4.6.1                </span></span>
+<span><span class="co">#&gt;   [3] magrittr_2.0.3                farver_2.1.1                 </span></span>
+<span><span class="co">#&gt;   [5] rmarkdown_2.26                fs_1.6.3                     </span></span>
+<span><span class="co">#&gt;   [7] zlibbioc_1.48.0               ragg_1.2.7                   </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.6.5                   memoise_2.0.1                </span></span>
+<span><span class="co">#&gt;  [11] htmltools_0.5.7               S4Arrays_1.2.1               </span></span>
+<span><span class="co">#&gt;  [13] curl_5.2.1                    SparseArray_1.2.4            </span></span>
+<span><span class="co">#&gt;  [15] sass_0.4.8                    parallelly_1.37.1            </span></span>
+<span><span class="co">#&gt;  [17] bslib_0.6.1                   desc_1.4.3                   </span></span>
+<span><span class="co">#&gt;  [19] lubridate_1.9.3               cachem_1.0.8                 </span></span>
+<span><span class="co">#&gt;  [21] igraph_2.0.2                  mime_0.12                    </span></span>
+<span><span class="co">#&gt;  [23] lifecycle_1.0.4               iterators_1.0.14             </span></span>
+<span><span class="co">#&gt;  [25] pkgconfig_2.0.3               Matrix_1.6-5                 </span></span>
+<span><span class="co">#&gt;  [27] R6_2.5.1                      fastmap_1.1.1                </span></span>
+<span><span class="co">#&gt;  [29] shiny_1.8.0                   GenomeInfoDbData_1.2.11      </span></span>
+<span><span class="co">#&gt;  [31] future_1.33.1                 digest_0.6.34                </span></span>
+<span><span class="co">#&gt;  [33] colorspace_2.1-0              AnnotationDbi_1.64.1         </span></span>
+<span><span class="co">#&gt;  [35] textshaping_0.3.7             RSQLite_2.3.5                </span></span>
+<span><span class="co">#&gt;  [37] labeling_0.4.3                filelock_1.0.3               </span></span>
+<span><span class="co">#&gt;  [39] cytolib_2.14.1                fansi_1.0.6                  </span></span>
+<span><span class="co">#&gt;  [41] yardstick_1.3.0               timechange_0.3.0             </span></span>
+<span><span class="co">#&gt;  [43] httr_1.4.7                    polyclip_1.10-6              </span></span>
+<span><span class="co">#&gt;  [45] abind_1.4-5                   compiler_4.3.3               </span></span>
+<span><span class="co">#&gt;  [47] bit64_4.0.5                   withr_3.0.0                  </span></span>
+<span><span class="co">#&gt;  [49] doParallel_1.0.17             viridis_0.6.5                </span></span>
+<span><span class="co">#&gt;  [51] DBI_1.2.2                     highr_0.10                   </span></span>
+<span><span class="co">#&gt;  [53] ggforce_0.4.2                 MASS_7.3-60.0.1              </span></span>
+<span><span class="co">#&gt;  [55] lava_1.8.0                    rappdirs_0.3.3               </span></span>
+<span><span class="co">#&gt;  [57] DelayedArray_0.28.0           tools_4.3.3                  </span></span>
+<span><span class="co">#&gt;  [59] interactiveDisplayBase_1.40.0 httpuv_1.6.14                </span></span>
+<span><span class="co">#&gt;  [61] future.apply_1.11.1           nnet_7.3-19                  </span></span>
+<span><span class="co">#&gt;  [63] glue_1.7.0                    promises_1.2.1               </span></span>
+<span><span class="co">#&gt;  [65] grid_4.3.3                    generics_0.1.3               </span></span>
+<span><span class="co">#&gt;  [67] recipes_1.0.10                gtable_0.3.4                 </span></span>
+<span><span class="co">#&gt;  [69] tzdb_0.4.0                    class_7.3-22                 </span></span>
+<span><span class="co">#&gt;  [71] data.table_1.15.2             hms_1.1.3                    </span></span>
+<span><span class="co">#&gt;  [73] tidygraph_1.3.1               utf8_1.2.4                   </span></span>
+<span><span class="co">#&gt;  [75] XVector_0.42.0                ggrepel_0.9.5                </span></span>
+<span><span class="co">#&gt;  [77] BiocVersion_3.18.1            foreach_1.5.2                </span></span>
+<span><span class="co">#&gt;  [79] pillar_1.9.0                  RcppHNSW_0.6.0               </span></span>
+<span><span class="co">#&gt;  [81] later_1.3.2                   splines_4.3.3                </span></span>
+<span><span class="co">#&gt;  [83] tweenr_2.0.3                  lattice_0.22-5               </span></span>
+<span><span class="co">#&gt;  [85] survival_3.5-8                bit_4.0.5                    </span></span>
+<span><span class="co">#&gt;  [87] RProtoBufLib_2.14.0           tidyselect_1.2.0             </span></span>
+<span><span class="co">#&gt;  [89] Biostrings_2.70.2             knitr_1.45                   </span></span>
+<span><span class="co">#&gt;  [91] gridExtra_2.3                 xfun_0.42                    </span></span>
+<span><span class="co">#&gt;  [93] graphlayouts_1.1.1            hardhat_1.3.1                </span></span>
+<span><span class="co">#&gt;  [95] timeDate_4032.109             stringi_1.8.3                </span></span>
+<span><span class="co">#&gt;  [97] yaml_2.3.8                    evaluate_0.23                </span></span>
+<span><span class="co">#&gt;  [99] codetools_0.2-19              ggraph_2.2.1                 </span></span>
+<span><span class="co">#&gt; [101] tibble_3.2.1                  BiocManager_1.30.22          </span></span>
+<span><span class="co">#&gt; [103] cli_3.6.2                     rpart_4.1.23                 </span></span>
+<span><span class="co">#&gt; [105] xtable_1.8-4                  systemfonts_1.0.6            </span></span>
+<span><span class="co">#&gt; [107] munsell_0.5.0                 jquerylib_0.1.4              </span></span>
+<span><span class="co">#&gt; [109] Rcpp_1.0.12                   globals_0.16.3               </span></span>
+<span><span class="co">#&gt; [111] png_0.1-8                     parallel_4.3.3               </span></span>
+<span><span class="co">#&gt; [113] ellipsis_0.3.2                pkgdown_2.0.7                </span></span>
+<span><span class="co">#&gt; [115] gower_1.0.1                   readr_2.1.5                  </span></span>
+<span><span class="co">#&gt; [117] blob_1.2.4                    listenv_0.9.1                </span></span>
+<span><span class="co">#&gt; [119] glmnet_4.1-8                  viridisLite_0.4.2            </span></span>
+<span><span class="co">#&gt; [121] ipred_0.9-14                  scales_1.3.0                 </span></span>
+<span><span class="co">#&gt; [123] prodlim_2023.08.28            purrr_1.0.2                  </span></span>
+<span><span class="co">#&gt; [125] crayon_1.5.2                  rlang_1.1.3                  </span></span>
+<span><span class="co">#&gt; [127] KEGGREST_1.42.0</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

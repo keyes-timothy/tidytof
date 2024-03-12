@@ -9,8 +9,8 @@
 ">
 <title>Building predictive models • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Building predictive models">
 <meta property="og:description" content="Read this vignette to learn how to compute summary statistics like cluster  abundance and cluster marker expression using {tidytof} 
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>modeling.Rmd</code></div>
@@ -99,9 +102,9 @@ Keyes</h4>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span></code></pre></div>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> implements several functions for building
 predictive models using sample- or patient-level data.</p>
-<div class="section level2">
-<h2 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
-</h2>
+<div class="section level3">
+<h3 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
+</h3>
 <p>To illustrate how they work, first we download some patient-level
 data from <a href="https://pubmed.ncbi.nlm.nih.gov/29505032/" class="external-link">this
 paper</a> and combine it with sample-level clinical annotations in one
@@ -111,20 +114,20 @@ of <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s built-in da
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ddpr_metadata</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># link for downloading the sample-level data from the Nature Medicine website</span></span>
-<span><span class="va">data_link</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="st">"https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"</span></span>
+<span><span class="va">data_link</span> <span class="op">&lt;-</span></span>
+<span>    <span class="st">"https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"</span></span>
 <span></span>
 <span><span class="co"># download the data and combine it with clinical annotations</span></span>
-<span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="va">data_link</span>, skip <span class="op">=</span> <span class="fl">2L</span>, n_max <span class="op">=</span> <span class="fl">78L</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>patient_id <span class="op">=</span> <span class="va">Patient_ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">ddpr_metadata</span>, by <span class="op">=</span> <span class="st">"patient_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="st">"Healthy"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="va">data_link</span>, skip <span class="op">=</span> <span class="fl">2L</span>, n_max <span class="op">=</span> <span class="fl">78L</span>, show_col_types <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>patient_id <span class="op">=</span> <span class="va">Patient_ID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">ddpr_metadata</span>, by <span class="op">=</span> <span class="st">"patient_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="st">"Healthy"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># preview only the metadata (i.e. non-numeric) columns </span></span>
-<span><span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="../reference/where.html">where</a></span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># preview only the metadata (i.e. non-numeric) columns</span></span>
+<span><span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="../reference/where.html">where</a></span><span class="op">(</span><span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
 <span><span class="co">#&gt;   patient_id gender mrd_risk nci_rome_risk relapse_status type_of_relapse cohort</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
@@ -150,31 +153,31 @@ This information is stored in the <code>relapse_status</code> and
 perform now to save us some headaches when we’re fitting models
 later.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># convert the relapse_status variable to a factor</span></span>
-<span>  <span class="co"># and create the time_to_event and event columns for survival modeling</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    relapse_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span>, </span>
-<span>    time_to_event <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="va">time_to_relapse</span>, <span class="va">ccr</span><span class="op">)</span>,</span>
-<span>    event <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># convert the relapse_status variable to a factor</span></span>
+<span>    <span class="co"># and create the time_to_event and event columns for survival modeling</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        relapse_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span>,</span>
+<span>        time_to_event <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="va">time_to_relapse</span>, <span class="va">ccr</span><span class="op">)</span>,</span>
+<span>        event <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">relapse_status</span> <span class="op">==</span> <span class="st">"Yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>In the next part of this vignette, we’ll use this patient-level data
 to build some predictive models using resampling procedures like k-fold
 cross-validation and bootstrapping.</p>
 </div>
-<div class="section level2">
-<h2 id="building-a-classifier-using-elastic-net-regularized-logistic-regression">Building a classifier using elastic net-regularized logistic
+<div class="section level3">
+<h3 id="building-a-classifier-using-elastic-net-regularized-logistic-regression">Building a classifier using elastic net-regularized logistic
 regression<a class="anchor" aria-label="anchor" href="#building-a-classifier-using-elastic-net-regularized-logistic-regression"></a>
-</h2>
+</h3>
 <p>First, we can build an elastic net classifier to predict which
 patients will relapse and which patients won’t (ignoring time-to-event
 data for now). For this, we can use the <code>relapse_status</code>
 column in <code>ddpr_patients</code> as the outcome variable:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># find how many of each outcome we have in our cohort</span></span>
-<span><span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span></span>
+<span><span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
 <span><span class="co">#&gt;   relapse_status     n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -185,13 +188,13 @@ column in <code>ddpr_patients</code> as the outcome variable:</p>
 away all the samples that don’t have a clinical outcome associated with
 them.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ddpr_patients_unannotated</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ddpr_patients_unannotated</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ddpr_patients</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">relapse_status</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>In the original DDPR paper, 10-fold cross-validation was used to tune
 a glmnet model and to estimate the error of that model on new datasets.
 Here, we can use the <code><a href="../reference/tof_split_data.html">tof_split_data()</a></code> function to split our
@@ -202,13 +205,13 @@ methods (like bootstrapping).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">3000L</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">training_split</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">ddpr_patients</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span></span>
-<span>    split_method <span class="op">=</span> <span class="st">"k-fold"</span>, </span>
-<span>    num_cv_folds <span class="op">=</span> <span class="fl">10</span>, </span>
-<span>    strata <span class="op">=</span> <span class="va">relapse_status</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">training_split</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">ddpr_patients</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_split_data.html">tof_split_data</a></span><span class="op">(</span></span>
+<span>        split_method <span class="op">=</span> <span class="st">"k-fold"</span>,</span>
+<span>        num_cv_folds <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>        strata <span class="op">=</span> <span class="va">relapse_status</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">training_split</span></span>
 <span><span class="co">#&gt; #  10-fold cross-validation using stratification </span></span>
@@ -251,9 +254,9 @@ to see what they contain:</p>
 <code><a href="https://rsample.tidymodels.org/reference/initial_split.html" class="external-link">rsample::testing</a></code> to return the training and test
 observations from each resampling:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_resample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">rsample</span><span class="fu">::</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/initial_split.html" class="external-link">training</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_resample</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">rsample</span><span class="fu">::</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/initial_split.html" class="external-link">training</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1,854</span></span></span>
 <span><span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -271,9 +274,9 @@ observations from each resampling:</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   HLADR_Pop1 &lt;dbl&gt;, p4EBP1_FC_Basal_Pop1 &lt;dbl&gt;, pSTAT5_FC_Basal_Pop1 &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pPLCg1_2_FC_Basal_Pop1 &lt;dbl&gt;, pAkt_FC_Basal_Pop1 &lt;dbl&gt;, …</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_resample</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">rsample</span><span class="fu">::</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/initial_split.html" class="external-link">testing</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_resample</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">rsample</span><span class="fu">::</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/initial_split.html" class="external-link">testing</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 1,854</span></span></span>
 <span><span class="co">#&gt;   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -305,16 +308,16 @@ a bit of computational power as a result).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hyperparams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span>mixture_values <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">class_mod</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">training_split</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span></span>
-<span>    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>    response_col <span class="op">=</span> <span class="va">relapse_status</span>,</span>
-<span>    model_type <span class="op">=</span> <span class="st">"two-class"</span>, </span>
-<span>    hyperparameter_grid <span class="op">=</span> <span class="va">hyperparams</span>, </span>
-<span>    impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>    remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">class_mod</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">training_split</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span></span>
+<span>        predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        response_col <span class="op">=</span> <span class="va">relapse_status</span>,</span>
+<span>        model_type <span class="op">=</span> <span class="st">"two-class"</span>,</span>
+<span>        hyperparameter_grid <span class="op">=</span> <span class="va">hyperparams</span>,</span>
+<span>        impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>The output of <code>tof_train_model</code> is a
 <code>tof_model</code>, an object containing information about the
 trained model (and that can be passed to the <code>tof_predict</code>
@@ -345,9 +348,9 @@ works when applied directly back to the data it was trained on (the
 model’s “training data”). To do so, we can use the
 <code><a href="../reference/tof_assess_model.html">tof_assess_model()</a></code> function with no arguments:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">training_classifier_metrics</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">training_classifier_metrics</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">class_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/tof_assess_model.html">tof_assess_model()</a></code> returns a list of several model
 assessment metrics that differ depending on the kind of
 <code>tof_model</code> you trained. For two-class classifier models,
@@ -369,8 +372,8 @@ data themselves!). You can also visualize the model’s performance using
 the <code><a href="../reference/tof_plot_model.html">tof_plot_model()</a></code> verb, which in the case of a two-class
 model will give us a Receiver-Operating Characteristic (ROC) curve:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">class_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="modeling_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>As shown above, <code><a href="../reference/tof_plot_model.html">tof_plot_model()</a></code> will return a
 receiver-operating curve for a two-class model. While it’s unusual to
@@ -387,12 +390,12 @@ error by calling <code><a href="../reference/tof_assess_model.html">tof_assess_m
 <code><a href="../reference/tof_plot_model.html">tof_plot_model()</a></code> with the <code>new_data</code> argument
 set to “tuning”.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv_classifier_metrics</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cv_classifier_metrics</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">class_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">class_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">class_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="modeling_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>In this case, we plot an ROC Curve using the predictions for each
 observation when it was <strong>excluded</strong> from model training
@@ -400,10 +403,10 @@ during cross-validation, an approach that gives a more accurate estimate
 of a model’s performance on new data than simple evaluation on the
 training dataset.</p>
 </div>
-<div class="section level2">
-<h2 id="building-a-survival-model-using-elastic-net-regularized-cox-regression">Building a survival model using elastic net-regularized cox
+<div class="section level3">
+<h3 id="building-a-survival-model-using-elastic-net-regularized-cox-regression">Building a survival model using elastic net-regularized cox
 regression<a class="anchor" aria-label="anchor" href="#building-a-survival-model-using-elastic-net-regularized-cox-regression"></a>
-</h2>
+</h3>
 <p>Building off of the ideas above, a more sophisticated way to model
 our data is not simply to predict who will relapse and who won’t, but to
 build a time-to-event model that estimates patients’ probabilities of
@@ -424,17 +427,17 @@ censored from the analysis.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hyperparams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tof_create_grid.html">tof_create_grid</a></span><span class="op">(</span>mixture_values <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">survival_mod</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">training_split</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span></span>
-<span>    predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>    time_col <span class="op">=</span> <span class="va">time_to_event</span>, </span>
-<span>    event_col <span class="op">=</span> <span class="va">event</span>, </span>
-<span>    model_type <span class="op">=</span> <span class="st">"survival"</span>, </span>
-<span>    hyperparameter_grid <span class="op">=</span> <span class="va">hyperparams</span>, </span>
-<span>    impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>    remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">survival_mod</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">training_split</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_train_model.html">tof_train_model</a></span><span class="op">(</span></span>
+<span>        predictor_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Pop2"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        time_col <span class="op">=</span> <span class="va">time_to_event</span>,</span>
+<span>        event_col <span class="op">=</span> <span class="va">event</span>,</span>
+<span>        model_type <span class="op">=</span> <span class="st">"survival"</span>,</span>
+<span>        hyperparameter_grid <span class="op">=</span> <span class="va">hyperparams</span>,</span>
+<span>        impute_missing_predictors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        remove_zv_predictors <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># often a smart decision</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survival_mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span></span>
@@ -463,9 +466,9 @@ split points in the dataset with <code><a href="../reference/tof_assess_model.ht
 addition, it will return the predicted survival curve for each patient
 over time:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survival_metrics</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">survival_metrics</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">survival_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">survival_metrics</span></span>
 <span><span class="co">#&gt; $model_metrics</span></span>
@@ -494,17 +497,85 @@ over time:</p>
 <p>For survival models, <code><a href="../reference/tof_plot_model.html">tof_plot_model()</a></code> plots the average
 survival curves for both the low- and high-risk groups:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">survival_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="modeling_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_survival_metrics</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="va">survival_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_model.html">tof_assess_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survival_mod</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">survival_mod</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_model.html">tof_plot_model</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="st">"tuning"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="modeling_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] stringr_1.5.1  tidytof_0.99.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] gridExtra_2.3       rlang_1.1.3         magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;   [4] furrr_0.3.1         matrixStats_1.2.0   compiler_4.3.3     </span></span>
+<span><span class="co">#&gt;   [7] systemfonts_1.0.6   vctrs_0.6.5         crayon_1.5.2       </span></span>
+<span><span class="co">#&gt;  [10] pkgconfig_2.0.3     shape_1.4.6.1       fastmap_1.1.1      </span></span>
+<span><span class="co">#&gt;  [13] ellipsis_0.3.2      labeling_0.4.3      ggraph_2.2.1       </span></span>
+<span><span class="co">#&gt;  [16] utf8_1.2.4          rmarkdown_2.26      prodlim_2023.08.28 </span></span>
+<span><span class="co">#&gt;  [19] tzdb_0.4.0          ragg_1.2.7          bit_4.0.5          </span></span>
+<span><span class="co">#&gt;  [22] purrr_1.0.2         xfun_0.42           glmnet_4.1-8       </span></span>
+<span><span class="co">#&gt;  [25] cachem_1.0.8        jsonlite_1.8.8      recipes_1.0.10     </span></span>
+<span><span class="co">#&gt;  [28] highr_0.10          tweenr_2.0.3        parallel_4.3.3     </span></span>
+<span><span class="co">#&gt;  [31] R6_2.5.1            rsample_1.2.0       bslib_0.6.1        </span></span>
+<span><span class="co">#&gt;  [34] stringi_1.8.3       parallelly_1.37.1   rpart_4.1.23       </span></span>
+<span><span class="co">#&gt;  [37] lubridate_1.9.3     jquerylib_0.1.4     Rcpp_1.0.12        </span></span>
+<span><span class="co">#&gt;  [40] iterators_1.0.14    knitr_1.45          future.apply_1.11.1</span></span>
+<span><span class="co">#&gt;  [43] readr_2.1.5         flowCore_2.14.1     Matrix_1.6-5       </span></span>
+<span><span class="co">#&gt;  [46] splines_4.3.3       nnet_7.3-19         igraph_2.0.2       </span></span>
+<span><span class="co">#&gt;  [49] timechange_0.3.0    tidyselect_1.2.0    yaml_2.3.8         </span></span>
+<span><span class="co">#&gt;  [52] viridis_0.6.5       timeDate_4032.109   doParallel_1.0.17  </span></span>
+<span><span class="co">#&gt;  [55] codetools_0.2-19    curl_5.2.1          listenv_0.9.1      </span></span>
+<span><span class="co">#&gt;  [58] lattice_0.22-5      tibble_3.2.1        Biobase_2.62.0     </span></span>
+<span><span class="co">#&gt;  [61] withr_3.0.0         evaluate_0.23       future_1.33.1      </span></span>
+<span><span class="co">#&gt;  [64] desc_1.4.3          survival_3.5-8      polyclip_1.10-6    </span></span>
+<span><span class="co">#&gt;  [67] pillar_1.9.0        foreach_1.5.2       stats4_4.3.3       </span></span>
+<span><span class="co">#&gt;  [70] generics_0.1.3      vroom_1.6.5         RcppHNSW_0.6.0     </span></span>
+<span><span class="co">#&gt;  [73] S4Vectors_0.40.2    hms_1.1.3           ggplot2_3.5.0      </span></span>
+<span><span class="co">#&gt;  [76] munsell_0.5.0       scales_1.3.0        globals_0.16.3     </span></span>
+<span><span class="co">#&gt;  [79] class_7.3-22        glue_1.7.0          tools_4.3.3        </span></span>
+<span><span class="co">#&gt;  [82] data.table_1.15.2   gower_1.0.1         fs_1.6.3           </span></span>
+<span><span class="co">#&gt;  [85] graphlayouts_1.1.1  tidygraph_1.3.1     grid_4.3.3         </span></span>
+<span><span class="co">#&gt;  [88] yardstick_1.3.0     tidyr_1.3.1         RProtoBufLib_2.14.0</span></span>
+<span><span class="co">#&gt;  [91] ipred_0.9-14        colorspace_2.1-0    ggforce_0.4.2      </span></span>
+<span><span class="co">#&gt;  [94] cli_3.6.2           textshaping_0.3.7   fansi_1.0.6        </span></span>
+<span><span class="co">#&gt;  [97] cytolib_2.14.1      viridisLite_0.4.2   lava_1.8.0         </span></span>
+<span><span class="co">#&gt; [100] dplyr_1.1.4         gtable_0.3.4        sass_0.4.8         </span></span>
+<span><span class="co">#&gt; [103] digest_0.6.34       BiocGenerics_0.48.1 ggrepel_0.9.5      </span></span>
+<span><span class="co">#&gt; [106] farver_2.1.1        memoise_2.0.1       htmltools_0.5.7    </span></span>
+<span><span class="co">#&gt; [109] pkgdown_2.0.7       lifecycle_1.0.4     hardhat_1.3.1      </span></span>
+<span><span class="co">#&gt; [112] bit64_4.0.5         MASS_7.3-60.0.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

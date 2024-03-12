@@ -9,8 +9,8 @@
 ">
 <title>Preprocessing • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Preprocessing">
 <meta property="og:description" content="Read this vignette to learn how to clean and preprocess CyTOF data using  {tidytof}.
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>preprocessing.Rmd</code></div>
@@ -97,9 +100,9 @@ Keyes</h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://keyes-timothy.github.io/tidytof">tidytof</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="preprocessing-with-tof_preprocess">Preprocessing with tof_preprocess<a class="anchor" aria-label="anchor" href="#preprocessing-with-tof_preprocess"></a>
-</h2>
+<div class="section level3">
+<h3 id="preprocessing-with-tof_preprocess">Preprocessing with tof_preprocess<a class="anchor" aria-label="anchor" href="#preprocessing-with-tof_preprocess"></a>
+</h3>
 <p>Generally speaking, the raw ion counts measured for each analyte on a
 mass cytometer (the content of raw FCS files obtained directly from a
 mass cytometer) need to be transformed before CyTOF data analysis.
@@ -121,9 +124,9 @@ first few measurements change before and after.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">phenograph_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># before preprocessing</span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;    cd45   cd34  cd38</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -133,12 +136,12 @@ first few measurements change before and after.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431.  0.363 13.3 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># perform preprocessing</span></span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># inspect new values</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># perform preprocessing</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># inspect new values</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;    cd45    cd34  cd38</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -155,12 +158,12 @@ that should be used to transform each of the <code>channel_cols</code>.
 For example, suppose we want to center and scale each of our numeric
 columns instead of arcsinh-transforming them:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># preprocess</span></span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>transform_fun <span class="op">=</span> <span class="va">scale</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># inspect new values</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># preprocess</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span>transform_fun <span class="op">=</span> <span class="va">scale</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># inspect new values</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;   cd45[,1] cd34[,1] cd38[,1]</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -173,9 +176,9 @@ columns instead of arcsinh-transforming them:</p>
 working with a dataset that does not have this noise), set the
 <code>undo_noise</code> argument to <code>FALSE</code>.</p>
 </div>
-<div class="section level2">
-<h2 id="postprocessing-with-tof_postprocess">Postprocessing with tof_postprocess<a class="anchor" aria-label="anchor" href="#postprocessing-with-tof_postprocess"></a>
-</h2>
+<div class="section level3">
+<h3 id="postprocessing-with-tof_postprocess">Postprocessing with tof_postprocess<a class="anchor" aria-label="anchor" href="#postprocessing-with-tof_postprocess"></a>
+</h3>
 <p>As a final note, note that the built-in function
 <code>tof_postprocess</code> works nearly identically
 <code>tof_preprocess</code>, but provides different default behavior
@@ -183,9 +186,9 @@ working with a dataset that does not have this noise), set the
 5 to all numeric columns. See <code><a href="../reference/tof_postprocess.html">?tof_postprocess</a></code> for
 details).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">phenograph_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">phenograph_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 25</span></span></span>
 <span><span class="co">#&gt;   sample_name  phenograph_cluster    cd19 cd11b   cd34  cd45  cd123   cd33  cd47</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -207,21 +210,86 @@ details).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431.  0.363 13.3 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more rows</span></span></span>
 <span></span>
-<span><span class="co"># after preprocessing and post-processing, the data are the same </span></span>
-<span><span class="co"># except that the re-added noise component is different for each value </span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_postprocess.html">tof_postprocess</a></span><span class="op">(</span>redo_noise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># after preprocessing and post-processing, the data are the same</span></span>
+<span><span class="co"># except that the re-added noise component is different for each value</span></span>
+<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_postprocess.html">tof_postprocess</a></span><span class="op">(</span>redo_noise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
-<span><span class="co">#&gt;    cd45   cd34  cd38</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  2.68   1.05</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  230. -<span style="color: #BB0000;">0.975</span> 11.2 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  5.14   1.20</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.236</span> 12.8 </span></span>
+<span><span class="co">#&gt;    cd45   cd34   cd38</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  131.  3.22   0.936</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  230. -<span style="color: #BB0000;">0.611</span> 10.8  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  4.54   1.40 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.599</span> 12.6  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more rows</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] dplyr_1.1.4    tidytof_0.99.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] tidyselect_1.2.0    viridisLite_0.4.2   timeDate_4032.109  </span></span>
+<span><span class="co">#&gt;   [4] farver_2.1.1        viridis_0.6.5       ggraph_2.2.1       </span></span>
+<span><span class="co">#&gt;   [7] fastmap_1.1.1       tweenr_2.0.3        rpart_4.1.23       </span></span>
+<span><span class="co">#&gt;  [10] digest_0.6.34       timechange_0.3.0    lifecycle_1.0.4    </span></span>
+<span><span class="co">#&gt;  [13] yardstick_1.3.0     survival_3.5-8      magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;  [16] compiler_4.3.3      rlang_1.1.3         sass_0.4.8         </span></span>
+<span><span class="co">#&gt;  [19] tools_4.3.3         igraph_2.0.2        utf8_1.2.4         </span></span>
+<span><span class="co">#&gt;  [22] yaml_2.3.8          data.table_1.15.2   knitr_1.45         </span></span>
+<span><span class="co">#&gt;  [25] graphlayouts_1.1.1  withr_3.0.0         purrr_1.0.2        </span></span>
+<span><span class="co">#&gt;  [28] RProtoBufLib_2.14.0 BiocGenerics_0.48.1 desc_1.4.3         </span></span>
+<span><span class="co">#&gt;  [31] nnet_7.3-19         grid_4.3.3          polyclip_1.10-6    </span></span>
+<span><span class="co">#&gt;  [34] stats4_4.3.3        fansi_1.0.6         RcppHNSW_0.6.0     </span></span>
+<span><span class="co">#&gt;  [37] future_1.33.1       colorspace_2.1-0    ggplot2_3.5.0      </span></span>
+<span><span class="co">#&gt;  [40] globals_0.16.3      scales_1.3.0        iterators_1.0.14   </span></span>
+<span><span class="co">#&gt;  [43] MASS_7.3-60.0.1     cli_3.6.2           rmarkdown_2.26     </span></span>
+<span><span class="co">#&gt;  [46] ragg_1.2.7          generics_0.1.3      future.apply_1.11.1</span></span>
+<span><span class="co">#&gt;  [49] tzdb_0.4.0          cachem_1.0.8        flowCore_2.14.1    </span></span>
+<span><span class="co">#&gt;  [52] ggforce_0.4.2       stringr_1.5.1       splines_4.3.3      </span></span>
+<span><span class="co">#&gt;  [55] parallel_4.3.3      matrixStats_1.2.0   vctrs_0.6.5        </span></span>
+<span><span class="co">#&gt;  [58] hardhat_1.3.1       glmnet_4.1-8        Matrix_1.6-5       </span></span>
+<span><span class="co">#&gt;  [61] jsonlite_1.8.8      cytolib_2.14.1      hms_1.1.3          </span></span>
+<span><span class="co">#&gt;  [64] S4Vectors_0.40.2    ggrepel_0.9.5       listenv_0.9.1      </span></span>
+<span><span class="co">#&gt;  [67] systemfonts_1.0.6   foreach_1.5.2       gower_1.0.1        </span></span>
+<span><span class="co">#&gt;  [70] tidyr_1.3.1         jquerylib_0.1.4     recipes_1.0.10     </span></span>
+<span><span class="co">#&gt;  [73] parallelly_1.37.1   glue_1.7.0          pkgdown_2.0.7      </span></span>
+<span><span class="co">#&gt;  [76] codetools_0.2-19    stringi_1.8.3       lubridate_1.9.3    </span></span>
+<span><span class="co">#&gt;  [79] gtable_0.3.4        shape_1.4.6.1       munsell_0.5.0      </span></span>
+<span><span class="co">#&gt;  [82] tibble_3.2.1        pillar_1.9.0        htmltools_0.5.7    </span></span>
+<span><span class="co">#&gt;  [85] ipred_0.9-14        lava_1.8.0          R6_2.5.1           </span></span>
+<span><span class="co">#&gt;  [88] textshaping_0.3.7   doParallel_1.0.17   tidygraph_1.3.1    </span></span>
+<span><span class="co">#&gt;  [91] evaluate_0.23       Biobase_2.62.0      lattice_0.22-5     </span></span>
+<span><span class="co">#&gt;  [94] readr_2.1.5         memoise_2.0.1       bslib_0.6.1        </span></span>
+<span><span class="co">#&gt;  [97] class_7.3-22        Rcpp_1.0.12         prodlim_2023.08.28 </span></span>
+<span><span class="co">#&gt; [100] gridExtra_2.3       xfun_0.42           fs_1.6.3           </span></span>
+<span><span class="co">#&gt; [103] pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -9,8 +9,8 @@
 ">
 <title>Getting started with tidytof • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting started with tidytof">
 <meta property="og:description" content="Read this vignette if this is your first time using tidytof. You'll  learn about tidytof's basic design schema, its main capabilities,  and where to find more information. 
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>tidytof.Rmd</code></div>
@@ -116,9 +119,9 @@ common <a href="https://r4ds.had.co.nz/tidy-data.html" class="external-link">“
 interface. This vignette introduces you to the tidytof’s high-level API
 and shows quick examples of how they can be applied to high-dimensional
 cytometry datasets.</p>
-<div class="section level2">
-<h2 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
-</h2>
+<div class="section level3">
+<h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
+</h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> makes heavy use of two concepts that may be
 unfamiliar to R beginners. The first is the pipe (<code>|&gt;</code>),
 which you can read about <a href="https://r4ds.had.co.nz/pipes.html" class="external-link">here</a>. The second is
@@ -135,9 +138,9 @@ R code, you should read <a href="https://r4ds.had.co.nz/workflow-basics.html" cl
 <a href="https://r4ds.had.co.nz/index.html" class="external-link">R for Data Science</a> by
 Hadley Wickham.</p>
 </div>
-<div class="section level2">
-<h2 id="workflow-basics">Workflow basics<a class="anchor" aria-label="anchor" href="#workflow-basics"></a>
-</h2>
+<div class="section level3">
+<h3 id="workflow-basics">Workflow basics<a class="anchor" aria-label="anchor" href="#workflow-basics"></a>
+</h3>
 <p>Broadly speaking, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>’s functionality is organized
 to support the 3 levels of analysis inherent to single-cell data
 described above:</p>
@@ -228,9 +231,9 @@ trained <code>tof_model</code>
 </li>
 </ul>
 </div>
-<div class="section level2">
-<h2 id="tidytof-verb-syntax">{tidytof} verb syntax<a class="anchor" aria-label="anchor" href="#tidytof-verb-syntax"></a>
-</h2>
+<div class="section level3">
+<h3 id="tidytof-verb-syntax">{tidytof} verb syntax<a class="anchor" aria-label="anchor" href="#tidytof-verb-syntax"></a>
+</h3>
 <p>With very few exceptions, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> functions follow a
 specific, shared syntax that involves 3 types of arguments that always
 occur in the same order. These argument types are as follows:</p>
@@ -279,33 +282,33 @@ explicitly pointed out:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">777L</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ddpr_data</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
-<span>    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
-<span>    method <span class="op">=</span> <span class="st">"phenograph"</span>, <span class="co"># method specification, </span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_metacluster.html">tof_metacluster</a></span><span class="op">(</span></span>
-<span>    cluster_col <span class="op">=</span> <span class="va">.phenograph_cluster</span>, <span class="co"># column specification</span></span>
-<span>    num_metaclusters <span class="op">=</span> <span class="fl">4</span>, <span class="co"># method specification</span></span>
-<span>    method <span class="op">=</span> <span class="st">"kmeans"</span> <span class="co"># method specification</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
-<span>    group_cols <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
-<span>    num_cells <span class="op">=</span> <span class="fl">200</span>, <span class="co"># method specification</span></span>
-<span>    method <span class="op">=</span> <span class="st">"constant"</span> <span class="co"># method specification</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_layout.html">tof_plot_cells_layout</a></span><span class="op">(</span></span>
-<span>    knn_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
-<span>    color_col <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
-<span>    num_neighbors <span class="op">=</span> <span class="fl">7L</span>, <span class="co"># method specification</span></span>
-<span>    node_size <span class="op">=</span> <span class="fl">2L</span> <span class="co"># method specification</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">ddpr_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
+<span>        cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
+<span>        method <span class="op">=</span> <span class="st">"phenograph"</span>, <span class="co"># method specification,</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_metacluster.html">tof_metacluster</a></span><span class="op">(</span></span>
+<span>        cluster_col <span class="op">=</span> <span class="va">.phenograph_cluster</span>, <span class="co"># column specification</span></span>
+<span>        num_metaclusters <span class="op">=</span> <span class="fl">4</span>, <span class="co"># method specification</span></span>
+<span>        method <span class="op">=</span> <span class="st">"kmeans"</span> <span class="co"># method specification</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
+<span>        group_cols <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
+<span>        num_cells <span class="op">=</span> <span class="fl">200</span>, <span class="co"># method specification</span></span>
+<span>        method <span class="op">=</span> <span class="st">"constant"</span> <span class="co"># method specification</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_layout.html">tof_plot_cells_layout</a></span><span class="op">(</span></span>
+<span>        knn_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, <span class="co"># column specification</span></span>
+<span>        color_col <span class="op">=</span> <span class="va">.kmeans_metacluster</span>, <span class="co"># column specification</span></span>
+<span>        num_neighbors <span class="op">=</span> <span class="fl">7L</span>, <span class="co"># method specification</span></span>
+<span>        node_size <span class="op">=</span> <span class="fl">2L</span> <span class="co"># method specification</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="pipelines">Pipelines<a class="anchor" aria-label="anchor" href="#pipelines"></a>
-</h2>
+<div class="section level3">
+<h3 id="pipelines">Pipelines<a class="anchor" aria-label="anchor" href="#pipelines"></a>
+</h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> verbs can be used on their own or in
 combination with one another using the pipe (<code>|&gt;</code>)
 operator. For example, here is a multistep “pipeline” that takes a
@@ -324,36 +327,36 @@ tSNE</p></li>
 embedding</p></li>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ddpr_data</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># step 1</span></span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># step 2</span></span>
-<span>  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
-<span>    cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, </span>
-<span>    method <span class="op">=</span> <span class="st">"phenograph"</span>, </span>
-<span>    <span class="co">#num_metaclusters = 4L, </span></span>
-<span>    seed <span class="op">=</span> <span class="fl">2020L</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># step 3</span></span>
-<span>  <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
-<span>    group_cols <span class="op">=</span> <span class="va">.phenograph_cluster</span>, </span>
-<span>    method <span class="op">=</span> <span class="st">"constant"</span>, </span>
-<span>    num_cells <span class="op">=</span> <span class="fl">400</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># step 4</span></span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># step 5</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
-<span>    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,</span>
-<span>    color_col <span class="op">=</span> <span class="va">.phenograph_cluster</span> </span>
-<span>  <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ddpr_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># step 1</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># step 2</span></span>
+<span>    <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
+<span>        cluster_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,</span>
+<span>        method <span class="op">=</span> <span class="st">"phenograph"</span>,</span>
+<span>        <span class="co"># num_metaclusters = 4L,</span></span>
+<span>        seed <span class="op">=</span> <span class="fl">2020L</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># step 3</span></span>
+<span>    <span class="fu"><a href="../reference/tof_downsample.html">tof_downsample</a></span><span class="op">(</span></span>
+<span>        group_cols <span class="op">=</span> <span class="va">.phenograph_cluster</span>,</span>
+<span>        method <span class="op">=</span> <span class="st">"constant"</span>,</span>
+<span>        num_cells <span class="op">=</span> <span class="fl">400</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># step 4</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># step 5</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
+<span>        embedding_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span>,</span>
+<span>        color_col <span class="op">=</span> <span class="va">.phenograph_cluster</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required namespace: Rtsne</span></span></code></pre></div>
 <p><img src="tidytof_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="other-tips">Other tips<a class="anchor" aria-label="anchor" href="#other-tips"></a>
-</h2>
+<div class="section level3">
+<h3 id="other-tips">Other tips<a class="anchor" aria-label="anchor" href="#other-tips"></a>
+</h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> was designed by a multidisciplinary team of
 wet-lab biologists, bioinformaticians, and physician-scientists who
 analyze high-dimensional cytometry and other kinds of single-cell data
@@ -405,6 +408,72 @@ costs. Ultimately, this means that <a href="https://keyes-timothy.github.io/tidy
 optimal tool for every high-dimensional cytometry analysis, though
 hopefully its general framework will provide most users with some useful
 functionality.</p>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] tidytof_0.99.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] gridExtra_2.3       rlang_1.1.3         magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;   [4] matrixStats_1.2.0   compiler_4.3.3      systemfonts_1.0.6  </span></span>
+<span><span class="co">#&gt;   [7] vctrs_0.6.5         stringr_1.5.1       pkgconfig_2.0.3    </span></span>
+<span><span class="co">#&gt;  [10] shape_1.4.6.1       fastmap_1.1.1       labeling_0.4.3     </span></span>
+<span><span class="co">#&gt;  [13] ggraph_2.2.1        utf8_1.2.4          rmarkdown_2.26     </span></span>
+<span><span class="co">#&gt;  [16] prodlim_2023.08.28  tzdb_0.4.0          ragg_1.2.7         </span></span>
+<span><span class="co">#&gt;  [19] purrr_1.0.2         xfun_0.42           glmnet_4.1-8       </span></span>
+<span><span class="co">#&gt;  [22] cachem_1.0.8        jsonlite_1.8.8      recipes_1.0.10     </span></span>
+<span><span class="co">#&gt;  [25] highr_0.10          tweenr_2.0.3        parallel_4.3.3     </span></span>
+<span><span class="co">#&gt;  [28] R6_2.5.1            bslib_0.6.1         stringi_1.8.3      </span></span>
+<span><span class="co">#&gt;  [31] parallelly_1.37.1   rpart_4.1.23        lubridate_1.9.3    </span></span>
+<span><span class="co">#&gt;  [34] jquerylib_0.1.4     Rcpp_1.0.12         iterators_1.0.14   </span></span>
+<span><span class="co">#&gt;  [37] knitr_1.45          future.apply_1.11.1 readr_2.1.5        </span></span>
+<span><span class="co">#&gt;  [40] flowCore_2.14.1     Matrix_1.6-5        splines_4.3.3      </span></span>
+<span><span class="co">#&gt;  [43] nnet_7.3-19         igraph_2.0.2        timechange_0.3.0   </span></span>
+<span><span class="co">#&gt;  [46] tidyselect_1.2.0    yaml_2.3.8          viridis_0.6.5      </span></span>
+<span><span class="co">#&gt;  [49] timeDate_4032.109   doParallel_1.0.17   codetools_0.2-19   </span></span>
+<span><span class="co">#&gt;  [52] listenv_0.9.1       lattice_0.22-5      tibble_3.2.1       </span></span>
+<span><span class="co">#&gt;  [55] Biobase_2.62.0      withr_3.0.0         Rtsne_0.17         </span></span>
+<span><span class="co">#&gt;  [58] evaluate_0.23       future_1.33.1       desc_1.4.3         </span></span>
+<span><span class="co">#&gt;  [61] survival_3.5-8      polyclip_1.10-6     pillar_1.9.0       </span></span>
+<span><span class="co">#&gt;  [64] foreach_1.5.2       stats4_4.3.3        generics_0.1.3     </span></span>
+<span><span class="co">#&gt;  [67] RcppHNSW_0.6.0      S4Vectors_0.40.2    hms_1.1.3          </span></span>
+<span><span class="co">#&gt;  [70] ggplot2_3.5.0       munsell_0.5.0       scales_1.3.0       </span></span>
+<span><span class="co">#&gt;  [73] globals_0.16.3      class_7.3-22        glue_1.7.0         </span></span>
+<span><span class="co">#&gt;  [76] tools_4.3.3         data.table_1.15.2   gower_1.0.1        </span></span>
+<span><span class="co">#&gt;  [79] fs_1.6.3            graphlayouts_1.1.1  tidygraph_1.3.1    </span></span>
+<span><span class="co">#&gt;  [82] grid_4.3.3          yardstick_1.3.0     tidyr_1.3.1        </span></span>
+<span><span class="co">#&gt;  [85] RProtoBufLib_2.14.0 ipred_0.9-14        colorspace_2.1-0   </span></span>
+<span><span class="co">#&gt;  [88] ggforce_0.4.2       cli_3.6.2           textshaping_0.3.7  </span></span>
+<span><span class="co">#&gt;  [91] fansi_1.0.6         cytolib_2.14.1      viridisLite_0.4.2  </span></span>
+<span><span class="co">#&gt;  [94] lava_1.8.0          dplyr_1.1.4         gtable_0.3.4       </span></span>
+<span><span class="co">#&gt;  [97] sass_0.4.8          digest_0.6.34       BiocGenerics_0.48.1</span></span>
+<span><span class="co">#&gt; [100] ggrepel_0.9.5       farver_2.1.1        memoise_2.0.1      </span></span>
+<span><span class="co">#&gt; [103] htmltools_0.5.7     pkgdown_2.0.7       lifecycle_1.0.4    </span></span>
+<span><span class="co">#&gt; [106] hardhat_1.3.1       MASS_7.3-60.0.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

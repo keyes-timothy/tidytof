@@ -9,8 +9,8 @@
 ">
 <title>Reading and writing data • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Reading and writing data">
 <meta property="og:description" content="Read this vignette to learn how to read data from FCS and CSV files on disk and how to write data to FCS and CSV files on disk. 
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>reading-and-writing-data.Rmd</code></div>
@@ -100,9 +103,9 @@ Keyes</h4>
 <p>This vignette teaches you how to read CyTOF data into an R session
 from two common file formats in which CyTOF data is typically stored:
 Flow Cytometry Standard (FCS) and Comma-Separated Value (CSV) files.</p>
-<div class="section level2">
-<h2 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
-</h2>
+<div class="section level3">
+<h3 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
+</h3>
 <p><a href="https://keyes-timothy.github.io/tidytof">tidytof</a> comes bundled with several example mass
 cytometry datasets. To access the raw FCS and CSV files containing these
 data, use the <code>tidytof_example_data</code> function. When called
@@ -163,9 +166,9 @@ data, we would use the following command:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/tidytof/extdata/phenograph"</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="reading-data-with-tof_read_data">Reading Data with <code>tof_read_data</code><a class="anchor" aria-label="anchor" href="#reading-data-with-tof_read_data"></a>
-</h2>
+<div class="section level3">
+<h3 id="reading-data-with-tof_read_data">Reading Data with <code>tof_read_data</code><a class="anchor" aria-label="anchor" href="#reading-data-with-tof_read_data"></a>
+</h3>
 <p>Using one of these directories (or any other directory containing
 CyTOF data on your local machine), we can use <code>tof_read_data</code>
 to read CyTOF data from raw files. Acceptable formats include FCS files
@@ -178,12 +181,12 @@ files in the “phenograph” example dataset bundled into
 <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> and store it in the <code>phenograph</code>
 variable.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"</span></span></code></pre></div>
 <p>Regardless of the input data file type, <a href="https://keyes-timothy.github.io/tidytof">tidytof</a> reads
 data into an extended <code>tibble</code> class called a
@@ -197,8 +200,8 @@ compare which metals are associated with particular markers across
 panels. To retrieve this panel information from a <code>tof_tbl</code>,
 use <code>tof_get_panel</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 44 × 2</span></span></span>
 <span><span class="co">#&gt;   metals      antigens   </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
@@ -221,9 +224,9 @@ class, all methods available to tibbles are also available to
 <code>tof_tbl</code>s.</li>
 </ul>
 </div>
-<div class="section level2">
-<h2 id="using-tibble-methods-with-tidytof-tibbles">Using tibble methods with <code>{tidytof}</code> tibbles<a class="anchor" aria-label="anchor" href="#using-tibble-methods-with-tidytof-tibbles"></a>
-</h2>
+<div class="section level3">
+<h3 id="using-tibble-methods-with-tidytof-tibbles">Using tibble methods with <code>{tidytof}</code> tibbles<a class="anchor" aria-label="anchor" href="#using-tibble-methods-with-tidytof-tibbles"></a>
+</h3>
 <p>As an extension of the <code>tbl_df</code> class,
 <code>tof_tbl</code>s get access to all <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a> and
 <a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a> for free. These can be useful for performing a
@@ -237,18 +240,18 @@ Thus, <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a>’s 
 applied to <code>phenograph</code> to convert those two columns into
 character vectors.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># mutate the input tof_tbl</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    PhenoGraph <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">PhenoGraph</span><span class="op">)</span>, </span>
-<span>    Condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">Condition</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># mutate the input tof_tbl</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        PhenoGraph <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">PhenoGraph</span><span class="op">)</span>,</span>
+<span>        Condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">Condition</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># use dplyr's select method to show </span></span>
-<span>  <span class="co"># that the columns have been changed</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="../reference/where.html">where</a></span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># use dplyr's select method to show</span></span>
+<span>    <span class="co"># that the columns have been changed</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="../reference/where.html">where</a></span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 3</span></span></span>
 <span><span class="co">#&gt;   file_name                  PhenoGraph Condition</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
@@ -260,8 +263,8 @@ character vectors.</p>
 <p>And note that the <code>tof_tbl</code> class is preserved even after
 these transformations.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"</span></span></code></pre></div>
 <p>Importantly, <code>tof_read_data</code> uses an opinionated heuristic
 to mine different keyword slots of input FCS file(s) and guess which
@@ -273,20 +276,20 @@ the columns they contain).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># when csv files are read, the tof_tibble's "panel"</span></span>
 <span><span class="co"># attribute will be empty by default</span></span>
-<span><span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph_csv"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph_csv"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 0</span></span></span>
 <span></span>
-<span><span class="co"># to add a panel manually, provide it as a tibble </span></span>
+<span><span class="co"># to add a panel manually, provide it as a tibble</span></span>
 <span><span class="co"># to tof_read_data</span></span>
-<span><span class="va">phenograph_panel</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">phenograph_panel</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">phenograph</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph_csv"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span>panel_info <span class="op">=</span> <span class="va">phenograph_panel</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/tidytof_example_data.html">tidytof_example_data</a></span><span class="op">(</span><span class="st">"phenograph_csv"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_read_data.html">tof_read_data</a></span><span class="op">(</span>panel_info <span class="op">=</span> <span class="va">phenograph_panel</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_get_panel.html">tof_get_panel</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 44 × 2</span></span></span>
 <span><span class="co">#&gt;   antigens    metals     </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
@@ -296,9 +299,9 @@ the columns they contain).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> DNA2        Ir193      </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 40 more rows</span></span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="writing-data-from-a-tof_tbl-to-disk">Writing data from a <code>tof_tbl</code> to disk<a class="anchor" aria-label="anchor" href="#writing-data-from-a-tof_tbl-to-disk"></a>
-</h2>
+<div class="section level3">
+<h3 id="writing-data-from-a-tof_tbl-to-disk">Writing data from a <code>tof_tbl</code> to disk<a class="anchor" aria-label="anchor" href="#writing-data-from-a-tof_tbl-to-disk"></a>
+</h3>
 <p>Users may wish to store CyTOF data as FCS or CSV files after
 transformation, concatenation, filtering, or other data processing. To
 write single-cell data from a <code>tof_tbl</code> into FCS or CSV
@@ -322,16 +325,16 @@ verb, we use the <a href="https://keyes-timothy.github.io/tidytof">tidytof</a>�
 <span><span class="co">#&gt; <span style="color: #949494;">#   pampk &lt;dbl&gt;, p4ebp1 &lt;dbl&gt;, ps6 &lt;dbl&gt;, pcreb &lt;dbl&gt;, `pzap70-syk` &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   prb &lt;dbl&gt;, `perk1-2` &lt;dbl&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># when copying and pasting this code, feel free to change this path </span></span>
+<code class="sourceCode R"><span><span class="co"># when copying and pasting this code, feel free to change this path</span></span>
 <span><span class="co"># to wherever you'd like to save your output files</span></span>
 <span><span class="va">my_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~"</span>, <span class="st">"Desktop"</span>, <span class="st">"tidytof_vignette_files"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span></span>
-<span>    group_cols <span class="op">=</span> <span class="va">phenograph_cluster</span>, </span>
-<span>    out_path <span class="op">=</span> <span class="va">my_path</span>,</span>
-<span>    format <span class="op">=</span> <span class="st">"fcs"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span></span>
+<span>        group_cols <span class="op">=</span> <span class="va">phenograph_cluster</span>,</span>
+<span>        out_path <span class="op">=</span> <span class="va">my_path</span>,</span>
+<span>        format <span class="op">=</span> <span class="st">"fcs"</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><code>tof_write_data</code>’s trickiest argument is
 <code>group_cols</code>, the argument used to specify which columns in
 <code>tof_tibble</code> should be used to group cells (the rows of
@@ -352,8 +355,8 @@ column):</p>
 <p>Note that these file names match the distinct values in our
 <code>group_cols</code> column (<code>phenograph_cluster</code>):</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">phenograph_cluster</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 1</span></span></span>
 <span><span class="co">#&gt;   phenograph_cluster</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
@@ -368,17 +371,17 @@ new column in <code>phenograph_data</code> that breaks cells into high-
 and low-<code>pstat5</code> expression groups, then add this column to
 our <code>group_cols</code> specification:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="co"># create a variable representing if a cell is above or below </span></span>
-<span>  <span class="co"># the median expression level of pstat5</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    expression_group <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span></span>
-<span>    group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">expression_group</span><span class="op">)</span>, </span>
-<span>    out_path <span class="op">=</span> <span class="va">my_path</span>, </span>
-<span>    format <span class="op">=</span> <span class="st">"fcs"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="co"># create a variable representing if a cell is above or below</span></span>
+<span>    <span class="co"># the median expression level of pstat5</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        expression_group <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/tof_write_data.html">tof_write_data</a></span><span class="op">(</span></span>
+<span>        group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">expression_group</span><span class="op">)</span>,</span>
+<span>        out_path <span class="op">=</span> <span class="va">my_path</span>,</span>
+<span>        format <span class="op">=</span> <span class="st">"fcs"</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>This will write 6 files with the following names (derived from the
 values in <code>phenograph_cluster</code> and
 <code>expression_group</code>).</p>
@@ -394,11 +397,11 @@ values in <code>phenograph_cluster</code> and
 <code>group_cols</code> columns (<code>phenograph_cluster</code> and
 <code>expression_group</code>):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    expression_group <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">expression_group</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">phenograph_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        expression_group <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">pstat5</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">pstat5</span><span class="op">)</span>, <span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">phenograph_cluster</span>, <span class="va">expression_group</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">#&gt;   phenograph_cluster expression_group</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span></span>
@@ -413,6 +416,72 @@ the specified <code>group_cols</code> <em>regardless of how many unique
 files those cells came from</em>. This allows for easy concatenation of
 FCS or CSV files containing data from a single sample acquired over
 multiple CyTOF runs, for example.</p>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] dplyr_1.1.4    tidytof_0.99.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] gridExtra_2.3       rlang_1.1.3         magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;   [4] matrixStats_1.2.0   compiler_4.3.3      systemfonts_1.0.6  </span></span>
+<span><span class="co">#&gt;   [7] vctrs_0.6.5         stringr_1.5.1       crayon_1.5.2       </span></span>
+<span><span class="co">#&gt;  [10] pkgconfig_2.0.3     shape_1.4.6.1       fastmap_1.1.1      </span></span>
+<span><span class="co">#&gt;  [13] ggraph_2.2.1        utf8_1.2.4          rmarkdown_2.26     </span></span>
+<span><span class="co">#&gt;  [16] prodlim_2023.08.28  tzdb_0.4.0          ragg_1.2.7         </span></span>
+<span><span class="co">#&gt;  [19] bit_4.0.5           purrr_1.0.2         xfun_0.42          </span></span>
+<span><span class="co">#&gt;  [22] glmnet_4.1-8        cachem_1.0.8        jsonlite_1.8.8     </span></span>
+<span><span class="co">#&gt;  [25] recipes_1.0.10      tweenr_2.0.3        parallel_4.3.3     </span></span>
+<span><span class="co">#&gt;  [28] R6_2.5.1            bslib_0.6.1         stringi_1.8.3      </span></span>
+<span><span class="co">#&gt;  [31] parallelly_1.37.1   rpart_4.1.23        lubridate_1.9.3    </span></span>
+<span><span class="co">#&gt;  [34] jquerylib_0.1.4     Rcpp_1.0.12         iterators_1.0.14   </span></span>
+<span><span class="co">#&gt;  [37] knitr_1.45          future.apply_1.11.1 readr_2.1.5        </span></span>
+<span><span class="co">#&gt;  [40] flowCore_2.14.1     Matrix_1.6-5        splines_4.3.3      </span></span>
+<span><span class="co">#&gt;  [43] nnet_7.3-19         igraph_2.0.2        timechange_0.3.0   </span></span>
+<span><span class="co">#&gt;  [46] tidyselect_1.2.0    yaml_2.3.8          viridis_0.6.5      </span></span>
+<span><span class="co">#&gt;  [49] timeDate_4032.109   doParallel_1.0.17   codetools_0.2-19   </span></span>
+<span><span class="co">#&gt;  [52] listenv_0.9.1       lattice_0.22-5      tibble_3.2.1       </span></span>
+<span><span class="co">#&gt;  [55] Biobase_2.62.0      withr_3.0.0         evaluate_0.23      </span></span>
+<span><span class="co">#&gt;  [58] future_1.33.1       desc_1.4.3          survival_3.5-8     </span></span>
+<span><span class="co">#&gt;  [61] polyclip_1.10-6     pillar_1.9.0        foreach_1.5.2      </span></span>
+<span><span class="co">#&gt;  [64] stats4_4.3.3        generics_0.1.3      vroom_1.6.5        </span></span>
+<span><span class="co">#&gt;  [67] RcppHNSW_0.6.0      S4Vectors_0.40.2    hms_1.1.3          </span></span>
+<span><span class="co">#&gt;  [70] ggplot2_3.5.0       munsell_0.5.0       scales_1.3.0       </span></span>
+<span><span class="co">#&gt;  [73] globals_0.16.3      class_7.3-22        glue_1.7.0         </span></span>
+<span><span class="co">#&gt;  [76] tools_4.3.3         data.table_1.15.2   gower_1.0.1        </span></span>
+<span><span class="co">#&gt;  [79] fs_1.6.3            graphlayouts_1.1.1  tidygraph_1.3.1    </span></span>
+<span><span class="co">#&gt;  [82] grid_4.3.3          yardstick_1.3.0     tidyr_1.3.1        </span></span>
+<span><span class="co">#&gt;  [85] RProtoBufLib_2.14.0 ipred_0.9-14        colorspace_2.1-0   </span></span>
+<span><span class="co">#&gt;  [88] ggforce_0.4.2       cli_3.6.2           textshaping_0.3.7  </span></span>
+<span><span class="co">#&gt;  [91] fansi_1.0.6         cytolib_2.14.1      viridisLite_0.4.2  </span></span>
+<span><span class="co">#&gt;  [94] lava_1.8.0          gtable_0.3.4        sass_0.4.8         </span></span>
+<span><span class="co">#&gt;  [97] digest_0.6.34       BiocGenerics_0.48.1 ggrepel_0.9.5      </span></span>
+<span><span class="co">#&gt; [100] farver_2.1.1        memoise_2.0.1       htmltools_0.5.7    </span></span>
+<span><span class="co">#&gt; [103] pkgdown_2.0.7       lifecycle_1.0.4     hardhat_1.3.1      </span></span>
+<span><span class="co">#&gt; [106] bit64_4.0.5         MASS_7.3-60.0.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

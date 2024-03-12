@@ -9,8 +9,8 @@
 ">
 <title>Quality control • tidytof</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Quality control">
 <meta property="og:description" content="Read this vignette to learn how to perform basic quality control analyses on  high-dimensional cytometry data with {tidytof}. 
@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,9 @@
     <a class="dropdown-item" href="../articles/modeling.html">Building predictive models</a>
   </div>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -86,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2023-05-08</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       
       <div class="d-none name"><code>quality-control.Rmd</code></div>
@@ -115,9 +118,9 @@ cluster/cell population to which they have been assigned</li>
 population is ambiguous (i.e. is intermediate between several
 clusters/cell populations)</li>
 </ul>
-<div class="section level2">
-<h2 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
-</h2>
+<div class="section level3">
+<h3 id="accessing-the-data-for-this-vignette">Accessing the data for this vignette<a class="anchor" aria-label="anchor" href="#accessing-the-data-for-this-vignette"></a>
+</h3>
 <p>To demonstrate how to use {tidytof}’s quality control verbs, we will
 use a combination of simulated and real data in this vignette. Simulated
 data will be generated on-the-fly in the sections below, but we will
@@ -129,10 +132,10 @@ package, which is available on Bioconductor and can be downloaded with
 the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"HDCytoData"</span><span class="op">)</span></span></code></pre></div>
 <p>To load the PhenoGraph data into our current R session, we can call a
 function from the <a href="https://github.com/lmweber/HDCytoData" class="external-link">HDCytoData</a>, which will provide it to us
 in a format from the <code>{flowCore}</code> package (called a
@@ -143,27 +146,27 @@ into <code>tof_tbl</code>’s. We also add a few lines of
 standard arcsinh transformation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">levine</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Levine_32dim_SE.html" class="external-link">Levine_32dim_flowSet</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># a bit of data cleaning</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename_with</a></span><span class="op">(</span></span>
-<span>    .fn <span class="op">=</span> \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/case.html" class="external-link">str_to_lower</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"\\|.+"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">file_number</span>, <span class="va">population_id</span><span class="op">)</span>, <span class="va">as.character</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># arcsinh transformation</span></span>
-<span>  <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span></span>
-<span>    channel_cols <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">time</span>, <span class="op">-</span><span class="va">cell_length</span>, <span class="op">-</span><span class="va">event_number</span>, <span class="op">-</span><span class="va">file_number</span>, <span class="op">-</span><span class="va">population_id</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu">HDCytoData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HDCytoData/man/Levine_32dim_SE.html" class="external-link">Levine_32dim_flowSet</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/as_tof_tbl.html">as_tof_tbl</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># a bit of data cleaning</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename_with</a></span><span class="op">(</span></span>
+<span>        .fn <span class="op">=</span> \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/case.html" class="external-link">str_to_lower</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"\\|.+"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">file_number</span>, <span class="va">population_id</span><span class="op">)</span>, <span class="va">as.character</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># arcsinh transformation</span></span>
+<span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span></span>
+<span>        channel_cols <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">time</span>, <span class="op">-</span><span class="va">cell_length</span>, <span class="op">-</span><span class="va">event_number</span>, <span class="op">-</span><span class="va">file_number</span>, <span class="op">-</span><span class="va">population_id</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>Thus, we can see that <code>levine</code> is a <code>tof_tbl</code>
 with 265627 cells (one in each row) and 40 pieces of information about
 each cell (one in each column).</p>
 </div>
-<div class="section level2">
-<h2 id="detect-low-expression-i-e--potentially-failed-channels-with-tof_assess_channels">Detect low-expression (i.e. potentially failed) channels with
+<div class="section level3">
+<h3 id="detect-low-expression-i-e--potentially-failed-channels-with-tof_assess_channels">Detect low-expression (i.e. potentially failed) channels with
 <code>tof_assess_channels()</code><a class="anchor" aria-label="anchor" href="#detect-low-expression-i-e--potentially-failed-channels-with-tof_assess_channels"></a>
-</h2>
+</h3>
 <p>After data collection, we might wonder which of our channels to
 include in downstream analyses. In particular, we might want to exclude
 channels with very few positive values, a situation that indicates that
@@ -178,13 +181,13 @@ cells (<code>negative_proportion_flag</code>).</p>
 more than 97.5% of cells below a threshold of 5 ion counts:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># convert 5 counts to asinh value with a cofactor of 5</span></span>
-<span><span class="va">threshold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></span><span class="op">(</span><span class="fl">5</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">threshold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">asinh</a></span><span class="op">(</span><span class="fl">5</span> <span class="op">/</span> <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">levine</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_channels.html">tof_assess_channels</a></span><span class="op">(</span></span>
-<span>    negative_threshold <span class="op">=</span> <span class="va">threshold</span>, </span>
-<span>    negative_proportion_flag <span class="op">=</span> <span class="fl">0.975</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_channels.html">tof_assess_channels</a></span><span class="op">(</span></span>
+<span>        negative_threshold <span class="op">=</span> <span class="va">threshold</span>,</span>
+<span>        negative_proportion_flag <span class="op">=</span> <span class="fl">0.975</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 38 × 3</span></span></span>
 <span><span class="co">#&gt;    channel negative_proportion flagged_channel</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          </span></span>
@@ -207,18 +210,18 @@ In this case, we can visualize the marker with the most negative cells
 to manually inspect it (as we would recommend with all flagged
 channels).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_density.html">tof_plot_cells_density</a></span><span class="op">(</span>marker_col <span class="op">=</span> <span class="va">cd14</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_density.html">tof_plot_cells_density</a></span><span class="op">(</span>marker_col <span class="op">=</span> <span class="va">cd14</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <p>In this case, it looks like a small population of cells is slightly
 positive for cd14, but this could simply be measurement
 noise/nonspecific binding of the antibody. It would be up to user
 whether or not to include cd14 in downstream analyses.</p>
 </div>
-<div class="section level2">
-<h2 id="identify-time-periods-of-abnormally-low-or-high-flow-rate-during-data-acquisition-using-tof_assess_flow_rate">Identify time periods of abnormally low or high flow rate during
+<div class="section level3">
+<h3 id="identify-time-periods-of-abnormally-low-or-high-flow-rate-during-data-acquisition-using-tof_assess_flow_rate">Identify time periods of abnormally low or high flow rate during
 data acquisition using <code>tof_assess_flow_rate()</code><a class="anchor" aria-label="anchor" href="#identify-time-periods-of-abnormally-low-or-high-flow-rate-during-data-acquisition-using-tof_assess_flow_rate"></a>
-</h2>
+</h3>
 <p>Large changes in the flow rate of a cytometer can impact the quality
 of the signal acquired during data collection: for example, abnormally
 low flow rates can be caused by partial occlusions of a cytometer’s flow
@@ -240,32 +243,18 @@ are flagged.</p>
 <p>We can apply <code><a href="../reference/tof_assess_flow_rate.html">tof_assess_flow_rate()</a></code> to the
 <code>levine</code> dataset below, using</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_flow_rate.html">tof_assess_flow_rate</a></span><span class="op">(</span></span>
-<span>    time_col <span class="op">=</span> <span class="va">time</span>, </span>
-<span>    num_timesteps <span class="op">=</span> <span class="fl">200</span>, </span>
-<span>    <span class="co"># flag timepoints in which flow rates are high or low at a signicance level </span></span>
-<span>    <span class="co"># of p = 0.01</span></span>
-<span>    alpha_threshold <span class="op">=</span> <span class="fl">0.01</span>, </span>
-<span>    <span class="co"># plot the number of cells in each timestep, and whether or not the </span></span>
-<span>    <span class="co"># rates were flagged as too high or too low </span></span>
-<span>    visualize <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_flow_rate.html">tof_assess_flow_rate</a></span><span class="op">(</span></span>
+<span>        time_col <span class="op">=</span> <span class="va">time</span>,</span>
+<span>        num_timesteps <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>        <span class="co"># flag timepoints in which flow rates are high or low at a signicance level</span></span>
+<span>        <span class="co"># of p = 0.01</span></span>
+<span>        alpha_threshold <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>        <span class="co"># plot the number of cells in each timestep, and whether or not the</span></span>
+<span>        <span class="co"># rates were flagged as too high or too low</span></span>
+<span>        visualize <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 265,627 × 3</span></span></span>
-<span><span class="co">#&gt;     time timestep flagged_window</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>693        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   850        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">3</span>002        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">3</span>082        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">3</span>248        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">3</span>363        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">3</span>521        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">1</span>680        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">3</span>072        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">3</span>339        1 FALSE         </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 265,617 more rows</span></span></span></code></pre>
 <p>In the result above, we can see that the last several timesteps have
 been flagged as having potentially low flow rates. The decision to
 include or exclude these cells from further analyses is left to the
@@ -273,36 +262,22 @@ user.</p>
 <p>The <code>group_cols</code> argument can also be used to analyze the
 flow rates of samples, patients, mass cytometry barcode plates, etc.
 separately.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_assess_flow_rate.html">tof_assess_flow_rate</a></span><span class="op">(</span></span>
-<span>    time_col <span class="op">=</span> <span class="va">time</span>, </span>
-<span>    <span class="co"># analyze two files in the levine dataset separately </span></span>
-<span>    group_cols <span class="op">=</span> <span class="va">file_number</span>, </span>
-<span>    alpha_threshold <span class="op">=</span> <span class="fl">0.01</span>, </span>
-<span>    visualize <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_flow_rate.html">tof_assess_flow_rate</a></span><span class="op">(</span></span>
+<span>        time_col <span class="op">=</span> <span class="va">time</span>,</span>
+<span>        <span class="co"># analyze two files in the levine dataset separately</span></span>
+<span>        group_cols <span class="op">=</span> <span class="va">file_number</span>,</span>
+<span>        alpha_threshold <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>        visualize <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 265,627 × 4</span></span></span>
-<span><span class="co">#&gt;    file_number  time timestep flagged_window</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 94            850        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 94           <span style="text-decoration: underline;">1</span>680        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 94            856        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 94           <span style="text-decoration: underline;">1</span>982        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 94           <span style="text-decoration: underline;">2</span>163        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 94            689        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 94           <span style="text-decoration: underline;">1</span>353        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 94            176        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 94            193        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 94            468        1 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 265,617 more rows</span></span></span></code></pre>
 </div>
-<div class="section level2">
-<h2 id="flag-cells-that-are-unusually-far-from-the-centroid-of-a-cluster-to-which-they-have-been-assigned-with-tof_assess_clusters_distance">Flag cells that are unusually far from the centroid of a cluster to
+<div class="section level3">
+<h3 id="flag-cells-that-are-unusually-far-from-the-centroid-of-a-cluster-to-which-they-have-been-assigned-with-tof_assess_clusters_distance">Flag cells that are unusually far from the centroid of a cluster to
 which they have been assigned with
 <code>tof_assess_clusters_distance()</code><a class="anchor" aria-label="anchor" href="#flag-cells-that-are-unusually-far-from-the-centroid-of-a-cluster-to-which-they-have-been-assigned-with-tof_assess_clusters_distance"></a>
-</h2>
+</h3>
 <p>After using your favorite clustering algorithm to define cell
 subpopulations (for example, using <code><a href="../reference/tof_cluster.html">tof_cluster()</a></code>), you may
 wonder how well the clustering procedure worked. For example, there may
@@ -321,85 +296,85 @@ with simulated data. We simulate data with 3 clusters, each of which has
 a large population of cells that “truly” belong in that cluster as well
 as a small population of outliers cells that have been erroneously
 assigned to the same cluster.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2020L</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># simulate large population of cells that truly belong in their assigned cluster</span></span>
 <span><span class="va">sim_data_base</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">600</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    cd38 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">3</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd34 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.2</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.3</span>, mean <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">500</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">500</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    dataset <span class="op">=</span> <span class="st">"non-outlier"</span></span>
-<span>  <span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">600</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        cd38 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd34 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.2</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">500</span>, mean <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.3</span>, mean <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">500</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">500</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        dataset <span class="op">=</span> <span class="st">"non-outlier"</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># simulate outlier cells that do not belong in their assigned cluster</span></span>
 <span><span class="va">sim_data_outlier</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    cd38 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd34 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.2</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">15</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">70</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.3</span>, mean <span class="op">=</span> <span class="fl">19</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">50</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    dataset <span class="op">=</span> <span class="st">"outlier"</span></span>
-<span>  <span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>        cd45 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        cd38 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd34 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.2</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">15</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span>, mean <span class="op">=</span> <span class="fl">70</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd19 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">0.3</span>, mean <span class="op">=</span> <span class="fl">19</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">50</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        dataset <span class="op">=</span> <span class="st">"outlier"</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># bind simulated data together</span></span>
 <span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">sim_data_base</span>, <span class="va">sim_data_outlier</span><span class="op">)</span></span></code></pre></div>
 <p>The following plots visualize the simulated data as described
 above:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">cluster_id</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">cluster_id</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">dataset</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">dataset</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>Using this dataset, we see that
 <code><a href="../reference/tof_assess_clusters_distance.html">tof_assess_clusters_distance()</a></code> can successfully flag the
 majority of the outlier cells in each cluster.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_assess_clusters_distance.html">tof_assess_clusters_distance</a></span><span class="op">(</span></span>
-<span>    cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
-<span>    <span class="co"># flag cells with a mahalanobis distance z-score over 3</span></span>
-<span>    z_threshold <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>    augment <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># visualize result as above</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">z_score</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>flagged_cell <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">flagged_cell</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="../reference/tof_generate_palette.html">tof_generate_palette</a></span><span class="op">(</span>num_colors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="../reference/tof_assess_clusters_distance.html">tof_assess_clusters_distance</a></span><span class="op">(</span></span>
+<span>        cluster_col <span class="op">=</span> <span class="va">cluster_id</span>,</span>
+<span>        <span class="co"># flag cells with a mahalanobis distance z-score over 3</span></span>
+<span>        z_threshold <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>        augment <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># visualize result as above</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">z_score</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>flagged_cell <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">flagged_cell</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>color_col <span class="op">=</span> <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="../reference/tof_generate_palette.html">tof_generate_palette</a></span><span class="op">(</span>num_colors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="flag-cells-whose-cluster-assignment-is-ambiguous-with-tof_assess_clusters_entropy">Flag cells whose cluster assignment is ambiguous with
+<div class="section level3">
+<h3 id="flag-cells-whose-cluster-assignment-is-ambiguous-with-tof_assess_clusters_entropy">Flag cells whose cluster assignment is ambiguous with
 <code>tof_assess_clusters_entropy()</code><a class="anchor" aria-label="anchor" href="#flag-cells-whose-cluster-assignment-is-ambiguous-with-tof_assess_clusters_entropy"></a>
-</h2>
+</h3>
 <p>We may also wish to evaluate a clustering result not based on a
 cell’s absolute distance to the centroid of the cluster to which it was
 assigned, but based on the <em>relative</em> distances of that cell to
@@ -420,50 +395,50 @@ entropy will be low (close to 0) when we are confident in a cell’s
 cluster assignment, and high (near or above 1) when it is equally close
 to multiple cluster centroids. We demonstrate the use of this function
 on both simulated data and the <code>levine</code> dataset below.</p>
-<div class="section level3">
-<h3 id="simulated-data">Simulated data<a class="anchor" aria-label="anchor" href="#simulated-data"></a>
-</h3>
+<div class="section level4">
+<h4 id="simulated-data">Simulated data<a class="anchor" aria-label="anchor" href="#simulated-data"></a>
+</h4>
 <p>First, we simulate some a fake dataset with 3000 cells and 4
 channels.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    cd45 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd38 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd34 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cd19 <span class="op">=</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>        cd45 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd38 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd34 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cd19 <span class="op">=</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>        cluster_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>In this simulated dataset, we have two well-defined clusters (“b” and
 “c”) and a more dispersed cluster that is intermediate between the
 others (“a”). These data are visualized below:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
-<span>    embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>,</span>
-<span>    color_col <span class="op">=</span> <span class="va">cluster_id</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span></span>
+<span>        embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>,</span>
+<span>        color_col <span class="op">=</span> <span class="va">cluster_id</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>With this dataset, we can imagine that our first analysis approach
 might involve clustering the cells into 2 distinct clusters. Because
@@ -471,38 +446,38 @@ these data are simulated, we already know that this number of clusters
 is too small - but can calculating the entropy of the cells in the
 resulting clusters help us to realize this without prior knowledge?</p>
 <p>To check, we can use <code><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy()</a></code>:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">17L</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">entropy_result</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">sim_data</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># cluster into 2 clusters</span></span>
-<span>  <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
-<span>    num_clusters <span class="op">=</span> <span class="fl">2</span>, </span>
-<span>    method <span class="op">=</span> <span class="st">"kmeans"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="co"># calculate the entropy of all cells</span></span>
-<span>  <span class="fu"><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy</a></span><span class="op">(</span></span>
-<span>    cluster_col <span class="op">=</span> <span class="va">.kmeans_cluster</span>, </span>
-<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, </span>
-<span>    entropy_quantile <span class="op">=</span> <span class="fl">0.8</span>, </span>
-<span>    augment <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span> </span>
+<span><span class="va">entropy_result</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">sim_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># cluster into 2 clusters</span></span>
+<span>    <span class="fu"><a href="../reference/tof_cluster.html">tof_cluster</a></span><span class="op">(</span></span>
+<span>        num_clusters <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>        method <span class="op">=</span> <span class="st">"kmeans"</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># calculate the entropy of all cells</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy</a></span><span class="op">(</span></span>
+<span>        cluster_col <span class="op">=</span> <span class="va">.kmeans_cluster</span>,</span>
+<span>        marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,</span>
+<span>        entropy_quantile <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>        augment <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># plot the clusters in PCA space</span></span>
-<span><span class="va">entropy_result</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">.kmeans_cluster</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">entropy_result</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">.kmeans_cluster</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># show the entropy values for each cell</span></span>
-<span><span class="va">entropy_result</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">entropy</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">entropy_result</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span>, <span class="op">-</span><span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">entropy</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-14-2.png" width="700"></p>
 <p>In the plots above, we can see that cells in the middle of the 2
 k-means clusters (which correspond well to the ground-truth clusters “b”
@@ -515,44 +490,44 @@ values are over the 75th percentile (a user-specified parameter) of all
 entropy values in the dataset. It is then up to the user if they wish to
 recluster the dataset, filter out the anomalous cells, or other
 processing steps.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">entropy_result</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">entropy_result</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">".mahala"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>pca_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"pca"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_embedding.html">tof_plot_cells_embedding</a></span><span class="op">(</span>embedding_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.pc1</span>, <span class="va">.pc2</span><span class="op">)</span>, color_col <span class="op">=</span> <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>And we can see that, as expected, the intermediate cluster (“a”) has
 higher entropies than either of the more distinct clusters (“b” and
 “c”).</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">entropy_result</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">entropy</span>, fill <span class="op">=</span> <span class="va">cluster_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">entropy</span>, fill <span class="op">=</span> <span class="va">cluster_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
 </div>
-<div class="section level3">
-<h3 id="real-data">Real data<a class="anchor" aria-label="anchor" href="#real-data"></a>
-</h3>
+<div class="section level4">
+<h4 id="real-data">Real data<a class="anchor" aria-label="anchor" href="#real-data"></a>
+</h4>
 <p>We can also apply <code><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy()</a></code> to a
 dataset derived from the <code>levine</code> data. Suppose we take the 5
 largest clusters in <code>levine</code> and save the result in the
 <code>small_levine</code> tof_tbl.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clusters_to_keep</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span>order_by <span class="op">=</span> <span class="va">n</span>, n <span class="op">=</span> <span class="fl">5L</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span></span>
+<span>    <span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span>order_by <span class="op">=</span> <span class="va">n</span>, n <span class="op">=</span> <span class="fl">5L</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">smallest_cluster</span> <span class="op">&lt;-</span> <span class="va">clusters_to_keep</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">largest_cluster</span> <span class="op">&lt;-</span> <span class="va">clusters_to_keep</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">clusters_to_keep</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">small_levine</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">population_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">clusters_to_keep</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="va">levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">population_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">clusters_to_keep</span><span class="op">)</span></span></code></pre></div>
 <p>From here, we can perturb the dataset by replacing the labels for the
 cells in the smallest cluster (cluster 9) with random labels. This
 effectively creates a population of cells in the dataset whose “true”
@@ -562,63 +537,168 @@ remaining clusters, whereas the unperturbed cells will be relatively
 close to their own cluster centroid (the correct centroid). Thus, we can
 test if <code><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy()</a></code> successfully flags
 cells from the perturbed cluster relative to the others:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># perform the perturbation</span></span>
 <span><span class="va">small_levine</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">small_levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    new_population_id <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span></span>
-<span>        <span class="va">population_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">smallest_cluster</span>,</span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
-<span>          <span class="va">clusters_to_keep</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">clusters_to_keep</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">smallest_cluster</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>          size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">small_levine</span><span class="op">)</span>,</span>
-<span>          replace <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>        <span class="op">)</span>,</span>
-<span>        <span class="va">population_id</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<span>    <span class="va">small_levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        new_population_id <span class="op">=</span></span>
+<span>            <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span></span>
+<span>                <span class="va">population_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">smallest_cluster</span>,</span>
+<span>                <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
+<span>                    <span class="va">clusters_to_keep</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">clusters_to_keep</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">smallest_cluster</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>                    size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">small_levine</span><span class="op">)</span>,</span>
+<span>                    replace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>                <span class="op">)</span>,</span>
+<span>                <span class="va">population_id</span></span>
+<span>            <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span></span>
-<span><span class="co"># perform the entropy assessment </span></span>
+<span><span class="co"># perform the entropy assessment</span></span>
 <span><span class="va">entropy_levine</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">small_levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy</a></span><span class="op">(</span></span>
-<span>    cluster_col <span class="op">=</span> <span class="va">new_population_id</span>,</span>
-<span>    marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,</span>
-<span>    augment <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>    <span class="va">small_levine</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy</a></span><span class="op">(</span></span>
+<span>        cluster_col <span class="op">=</span> <span class="va">new_population_id</span>,</span>
+<span>        marker_cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"cd"</span><span class="op">)</span>,</span>
+<span>        augment <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p>From the plot below, we can see that the cells from cluster 9 have
 larger entropy values than cells from other clusters, as expected.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">entropy_levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">entropy</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/tof_plot_cells_density.html">tof_plot_cells_density</a></span><span class="op">(</span></span>
-<span>    marker_col <span class="op">=</span> <span class="va">entropy</span>,</span>
-<span>    group_col <span class="op">=</span> <span class="va">population_id</span>,</span>
-<span>    use_ggridges <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    scale <span class="op">=</span> <span class="fl">0.1</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Entropy"</span>, y <span class="op">=</span> <span class="st">"Cluster ID"</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>population_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">entropy</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/tof_plot_cells_density.html">tof_plot_cells_density</a></span><span class="op">(</span></span>
+<span>        marker_col <span class="op">=</span> <span class="va">entropy</span>,</span>
+<span>        group_col <span class="op">=</span> <span class="va">population_id</span>,</span>
+<span>        use_ggridges <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        scale <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Entropy"</span>, y <span class="op">=</span> <span class="st">"Cluster ID"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="quality-control_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
 <p>Similarly, we can see that the majority of the cells from 9 are
 successfully flagged by <code><a href="../reference/tof_assess_clusters_entropy.html">tof_assess_clusters_entropy()</a></code> using
 an entropy quantile threshold of 0.9. Conversely, no cells from any
 other cluster (other than cluster 15) flagged.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">entropy_levine</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>flagged_cell <span class="op">=</span> <span class="va">entropy</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">entropy</span>, prob <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">flagged_cell</span><span class="op">)</span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>flagged_cell <span class="op">=</span> <span class="va">entropy</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">entropy</span>, prob <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">population_id</span>, <span class="va">flagged_cell</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">population_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">flagged_cell</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
 <span><span class="co">#&gt;   population_id flagged_cell     n   prop</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 15            TRUE         <span style="text-decoration: underline;">12</span>888 0.079<span style="text-decoration: underline;">8</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 9             TRUE         <span style="text-decoration: underline;">11</span>666 0.706</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
+</h2>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">#&gt; [8] base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] HDCytoData_1.22.0           flowCore_2.14.1            </span></span>
+<span><span class="co">#&gt;  [3] SummarizedExperiment_1.32.0 Biobase_2.62.0             </span></span>
+<span><span class="co">#&gt;  [5] GenomicRanges_1.54.1        GenomeInfoDb_1.38.7        </span></span>
+<span><span class="co">#&gt;  [7] IRanges_2.36.0              S4Vectors_0.40.2           </span></span>
+<span><span class="co">#&gt;  [9] MatrixGenerics_1.14.0       matrixStats_1.2.0          </span></span>
+<span><span class="co">#&gt; [11] ExperimentHub_2.10.0        AnnotationHub_3.10.0       </span></span>
+<span><span class="co">#&gt; [13] BiocFileCache_2.10.1        dbplyr_2.4.0               </span></span>
+<span><span class="co">#&gt; [15] BiocGenerics_0.48.1         forcats_1.0.0              </span></span>
+<span><span class="co">#&gt; [17] ggplot2_3.5.0               dplyr_1.1.4                </span></span>
+<span><span class="co">#&gt; [19] tidytof_0.99.0             </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] jsonlite_1.8.8                shape_1.4.6.1                </span></span>
+<span><span class="co">#&gt;   [3] magrittr_2.0.3                farver_2.1.1                 </span></span>
+<span><span class="co">#&gt;   [5] rmarkdown_2.26                fs_1.6.3                     </span></span>
+<span><span class="co">#&gt;   [7] zlibbioc_1.48.0               ragg_1.2.7                   </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.6.5                   memoise_2.0.1                </span></span>
+<span><span class="co">#&gt;  [11] htmltools_0.5.7               S4Arrays_1.2.1               </span></span>
+<span><span class="co">#&gt;  [13] curl_5.2.1                    SparseArray_1.2.4            </span></span>
+<span><span class="co">#&gt;  [15] sass_0.4.8                    parallelly_1.37.1            </span></span>
+<span><span class="co">#&gt;  [17] bslib_0.6.1                   desc_1.4.3                   </span></span>
+<span><span class="co">#&gt;  [19] lubridate_1.9.3               cachem_1.0.8                 </span></span>
+<span><span class="co">#&gt;  [21] igraph_2.0.2                  mime_0.12                    </span></span>
+<span><span class="co">#&gt;  [23] lifecycle_1.0.4               iterators_1.0.14             </span></span>
+<span><span class="co">#&gt;  [25] pkgconfig_2.0.3               Matrix_1.6-5                 </span></span>
+<span><span class="co">#&gt;  [27] R6_2.5.1                      fastmap_1.1.1                </span></span>
+<span><span class="co">#&gt;  [29] shiny_1.8.0                   GenomeInfoDbData_1.2.11      </span></span>
+<span><span class="co">#&gt;  [31] future_1.33.1                 digest_0.6.34                </span></span>
+<span><span class="co">#&gt;  [33] colorspace_2.1-0              AnnotationDbi_1.64.1         </span></span>
+<span><span class="co">#&gt;  [35] textshaping_0.3.7             RSQLite_2.3.5                </span></span>
+<span><span class="co">#&gt;  [37] labeling_0.4.3                filelock_1.0.3               </span></span>
+<span><span class="co">#&gt;  [39] cytolib_2.14.1                fansi_1.0.6                  </span></span>
+<span><span class="co">#&gt;  [41] yardstick_1.3.0               timechange_0.3.0             </span></span>
+<span><span class="co">#&gt;  [43] httr_1.4.7                    polyclip_1.10-6              </span></span>
+<span><span class="co">#&gt;  [45] abind_1.4-5                   compiler_4.3.3               </span></span>
+<span><span class="co">#&gt;  [47] bit64_4.0.5                   withr_3.0.0                  </span></span>
+<span><span class="co">#&gt;  [49] doParallel_1.0.17             viridis_0.6.5                </span></span>
+<span><span class="co">#&gt;  [51] DBI_1.2.2                     highr_0.10                   </span></span>
+<span><span class="co">#&gt;  [53] ggforce_0.4.2                 MASS_7.3-60.0.1              </span></span>
+<span><span class="co">#&gt;  [55] lava_1.8.0                    rappdirs_0.3.3               </span></span>
+<span><span class="co">#&gt;  [57] DelayedArray_0.28.0           tools_4.3.3                  </span></span>
+<span><span class="co">#&gt;  [59] interactiveDisplayBase_1.40.0 httpuv_1.6.14                </span></span>
+<span><span class="co">#&gt;  [61] future.apply_1.11.1           nnet_7.3-19                  </span></span>
+<span><span class="co">#&gt;  [63] glue_1.7.0                    promises_1.2.1               </span></span>
+<span><span class="co">#&gt;  [65] grid_4.3.3                    generics_0.1.3               </span></span>
+<span><span class="co">#&gt;  [67] recipes_1.0.10                gtable_0.3.4                 </span></span>
+<span><span class="co">#&gt;  [69] tzdb_0.4.0                    class_7.3-22                 </span></span>
+<span><span class="co">#&gt;  [71] tidyr_1.3.1                   data.table_1.15.2            </span></span>
+<span><span class="co">#&gt;  [73] hms_1.1.3                     tidygraph_1.3.1              </span></span>
+<span><span class="co">#&gt;  [75] utf8_1.2.4                    XVector_0.42.0               </span></span>
+<span><span class="co">#&gt;  [77] ggrepel_0.9.5                 BiocVersion_3.18.1           </span></span>
+<span><span class="co">#&gt;  [79] foreach_1.5.2                 pillar_1.9.0                 </span></span>
+<span><span class="co">#&gt;  [81] stringr_1.5.1                 RcppHNSW_0.6.0               </span></span>
+<span><span class="co">#&gt;  [83] later_1.3.2                   splines_4.3.3                </span></span>
+<span><span class="co">#&gt;  [85] tweenr_2.0.3                  lattice_0.22-5               </span></span>
+<span><span class="co">#&gt;  [87] survival_3.5-8                bit_4.0.5                    </span></span>
+<span><span class="co">#&gt;  [89] RProtoBufLib_2.14.0           tidyselect_1.2.0             </span></span>
+<span><span class="co">#&gt;  [91] Biostrings_2.70.2             knitr_1.45                   </span></span>
+<span><span class="co">#&gt;  [93] gridExtra_2.3                 xfun_0.42                    </span></span>
+<span><span class="co">#&gt;  [95] graphlayouts_1.1.1            hardhat_1.3.1                </span></span>
+<span><span class="co">#&gt;  [97] timeDate_4032.109             stringi_1.8.3                </span></span>
+<span><span class="co">#&gt;  [99] yaml_2.3.8                    evaluate_0.23                </span></span>
+<span><span class="co">#&gt; [101] codetools_0.2-19              ggraph_2.2.1                 </span></span>
+<span><span class="co">#&gt; [103] tibble_3.2.1                  BiocManager_1.30.22          </span></span>
+<span><span class="co">#&gt; [105] cli_3.6.2                     rpart_4.1.23                 </span></span>
+<span><span class="co">#&gt; [107] xtable_1.8-4                  systemfonts_1.0.6            </span></span>
+<span><span class="co">#&gt; [109] munsell_0.5.0                 jquerylib_0.1.4              </span></span>
+<span><span class="co">#&gt; [111] Rcpp_1.0.12                   globals_0.16.3               </span></span>
+<span><span class="co">#&gt; [113] png_0.1-8                     parallel_4.3.3               </span></span>
+<span><span class="co">#&gt; [115] ellipsis_0.3.2                pkgdown_2.0.7                </span></span>
+<span><span class="co">#&gt; [117] gower_1.0.1                   readr_2.1.5                  </span></span>
+<span><span class="co">#&gt; [119] blob_1.2.4                    listenv_0.9.1                </span></span>
+<span><span class="co">#&gt; [121] glmnet_4.1-8                  viridisLite_0.4.2            </span></span>
+<span><span class="co">#&gt; [123] ipred_0.9-14                  ggridges_0.5.6               </span></span>
+<span><span class="co">#&gt; [125] scales_1.3.0                  prodlim_2023.08.28           </span></span>
+<span><span class="co">#&gt; [127] purrr_1.0.2                   crayon_1.5.2                 </span></span>
+<span><span class="co">#&gt; [129] rlang_1.1.3                   KEGGREST_1.42.0</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
