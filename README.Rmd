@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidytof: A user-friendly framework for interactive and highly reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 
 <!-- badges: start -->
@@ -25,7 +25,6 @@ knitr::opts_chunk$set(
 [![R-CMD-check-bioc](https://github.com/keyes-timothy/tidytof/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/keyes-timothy/tidytof/actions)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
-[![R-CMD-check](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `{tidytof}` is an R package that implements an open-source, integrated "grammar" of single-cell data analysis for high-dimensional cytometry data (i.e. [mass cytometry](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4860251/), full-spectrum flow cytometry, and sequence-based cytometry). Specifically, `{tidytof}` provides an easy-to-use pipeline for handling high-dimensional cytometry data at multiple levels of observation - the single-cell level, the cell subpopulation (or cluster) level, and the whole-sample level - by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. 
@@ -372,14 +371,14 @@ Regardless of the method used, reduced-dimension feature embeddings can be visua
 ```{r}
 # plot the tsne embeddings using color to distinguish between clusters
 phenograph_tsne |>
-    ggplot(aes(x = .tsne_1, y = .tsne_2, fill = phenograph_cluster)) +
+    ggplot(aes(x = .tsne1, y = .tsne2, fill = phenograph_cluster)) +
     geom_point(shape = 21) +
     theme_bw() +
     labs(fill = NULL)
 
 # plot the tsne embeddings using color to represent CD11b expression
 phenograph_tsne |>
-    ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) +
+    ggplot(aes(x = .tsne1, y = .tsne2, fill = cd11b)) +
     geom_point(shape = 21) +
     scale_fill_viridis_c() +
     theme_bw() +
@@ -422,7 +421,7 @@ We can also extract some metadata from the raw data and join it with our single-
 citrus_metadata <-
     tibble(
         file_name = as.character(flowCore::pData(citrus_raw)[[1]]),
-        sample_id = 1:length(file_name),
+        sample_id = seq_along(file_name),
         patient = str_extract(file_name, "patient[:digit:]"),
         stimulation = str_extract(file_name, "(BCR-XL)|Reference")
     ) |>

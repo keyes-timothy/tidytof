@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tidytof: A user-friendly framework for interactive and highly reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
+# tidytof: A user-friendly framework for interactive and reproducible cytometry data analysis <a href='https://keyes-timothy.github.io/tidytof/index.html'><img src='man/figures/tidytof_logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -11,7 +11,6 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test
 coverage](https://codecov.io/gh/keyes-timothy/tidytof/branch/main/graph/badge.svg)](https://app.codecov.io/gh/keyes-timothy/tidytof?branch=main)
-[![R-CMD-check](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/keyes-timothy/tidytof/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `{tidytof}` is an R package that implements an open-source, integrated
@@ -68,7 +67,7 @@ You can install the development version of tidytof from GitHub with the
 following command:
 
 ``` r
-if(!require(devtools)) install.packages("devtools") 
+if (!require(devtools)) install.packages("devtools")
 devtools::install_github("keyes-timothy/tidytof")
 ```
 
@@ -83,10 +82,10 @@ In addition, we can install and load the other packages we need for this
 vignette:
 
 ``` r
-if(!require(FlowSOM)) BiocManager::install("FlowSOM")
+if (!require(FlowSOM)) BiocManager::install("FlowSOM")
 library(FlowSOM)
 
-if(!require(tidyverse)) install.packages("tidyverse")
+if (!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 ```
 
@@ -133,12 +132,12 @@ Here, we can use `tof_read_data` to read in all of the .fcs files in the
 the `phenograph` variable.
 
 ``` r
-phenograph <- 
-  tidytof_example_data("phenograph") |> 
-  tof_read_data()
+phenograph <-
+    tidytof_example_data("phenograph") |>
+    tof_read_data()
 
-phenograph |> 
-  class()
+phenograph |>
+    class()
 #> [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"
 ```
 
@@ -167,18 +166,18 @@ A few notes about `tof_tbl`s:
   codes in the uncleaned dataset).
 
 ``` r
-phenograph <- 
-  phenograph |> 
-  # mutate the input tof_tbl
-  mutate(
-    PhenoGraph = as.character(PhenoGraph), 
-    Condition = as.character(Condition)
-  )
+phenograph <-
+    phenograph |>
+    # mutate the input tof_tbl
+    mutate(
+        PhenoGraph = as.character(PhenoGraph),
+        Condition = as.character(Condition)
+    )
 
-phenograph |> 
-  # use dplyr's select method to show that the columns have been changed
-  select(where(is.character)) |> 
-  head()
+phenograph |>
+    # use dplyr's select method to show that the columns have been changed
+    select(where(is.character)) |>
+    head()
 #> # A tibble: 6 × 3
 #>   file_name                  PhenoGraph Condition
 #>   <chr>                      <chr>      <chr>    
@@ -193,8 +192,8 @@ phenograph |>
 The `tof_tbl` class is preserved even after these transformations.
 
 ``` r
-phenograph |> 
-  class()
+phenograph |>
+    class()
 #> [1] "tof_tbl"    "tbl_df"     "tbl"        "data.frame"
 ```
 
@@ -202,9 +201,9 @@ Finally, to retrieve panel information from a `tof_tbl`, use
 `tof_get_panel`:
 
 ``` r
-phenograph |> 
-  tof_get_panel() |> 
-  head()
+phenograph |>
+    tof_get_panel() |>
+    head()
 #> # A tibble: 6 × 2
 #>   metals      antigens   
 #>   <chr>       <chr>      
@@ -245,9 +244,9 @@ see how our first few measurements change before and after.
 
 ``` r
 # before preprocessing
-phenograph |> 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
-  head()
+phenograph |>
+    select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |>
+    head()
 #> # A tibble: 6 × 3
 #>   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`
 #>          <dbl>        <dbl>        <dbl>
@@ -261,14 +260,14 @@ phenograph |>
 
 ``` r
 # perform preprocessing
-phenograph <- 
-  phenograph |> 
-  tof_preprocess()
+phenograph <-
+    phenograph |>
+    tof_preprocess()
 
 # inspect new values
-phenograph |> 
-  select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |> 
-  head()
+phenograph |>
+    select(`CD45|Sm154`, `CD34|Nd148`, `CD38|Er167`) |>
+    head()
 #> # A tibble: 6 × 3
 #>   `CD45|Sm154` `CD34|Nd148` `CD38|Er167`
 #>          <dbl>        <dbl>        <dbl>
@@ -309,8 +308,8 @@ cells in total:
 ``` r
 data(phenograph_data)
 
-phenograph_data |> 
-  count(phenograph_cluster)
+phenograph_data |>
+    count(phenograph_cluster)
 #> # A tibble: 3 × 2
 #>   phenograph_cluster     n
 #>   <chr>              <int>
@@ -323,15 +322,15 @@ To randomly sample 200 cells per cluster, we can use `tof_downsample`
 using the “constant” `method`:
 
 ``` r
-phenograph_data |> 
-  # downsample 
-  tof_downsample(
-    method = "constant", 
-    group_cols = phenograph_cluster, 
-    num_cells = 200
-  ) |> 
-  # count the number of downsampled cells in each cluster
-  count(phenograph_cluster)
+phenograph_data |>
+    # downsample
+    tof_downsample(
+        method = "constant",
+        group_cols = phenograph_cluster,
+        num_cells = 200
+    ) |>
+    # count the number of downsampled cells in each cluster
+    count(phenograph_cluster)
 #> # A tibble: 3 × 2
 #>   phenograph_cluster     n
 #>   <chr>              <int>
@@ -344,15 +343,15 @@ Alternatively, if we wanted to sample 50% of the cells in each cluster,
 we could use the “prop” `method`:
 
 ``` r
-phenograph_data |> 
-  # downsample
-  tof_downsample(
-    method = "prop",
-    group_cols = phenograph_cluster, 
-    prop_cells = 0.5
-  ) |> 
-  # count the number of downsampled cells in each cluster
-  count(phenograph_cluster)
+phenograph_data |>
+    # downsample
+    tof_downsample(
+        method = "prop",
+        group_cols = phenograph_cluster,
+        prop_cells = 0.5
+    ) |>
+    # count the number of downsampled cells in each cluster
+    count(phenograph_cluster)
 #> # A tibble: 3 × 2
 #>   phenograph_cluster     n
 #>   <chr>              <int>
@@ -369,15 +368,15 @@ are certain areas of phenotypic density in `phenograph_data` that
 contain more cells than others along the `cd34`/`cd38` axes:
 
 ``` r
-phenograph_data |> 
-  # preprocess all numeric columns in the dataset
-  tof_preprocess(undo_noise = FALSE) |> 
-  # make a scatterplot
-  ggplot(aes(x = cd34, y = cd38)) + 
-  geom_point(alpha = 0.5) + 
-  scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4)) + 
-  theme_bw()
+phenograph_data |>
+    # preprocess all numeric columns in the dataset
+    tof_preprocess(undo_noise = FALSE) |>
+    # make a scatterplot
+    ggplot(aes(x = cd34, y = cd38)) +
+    geom_point(alpha = 0.5) +
+    scale_x_continuous(limits = c(NA, 1.5)) +
+    scale_y_continuous(limits = c(NA, 4)) +
+    theme_bw()
 ```
 
 <img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
@@ -387,18 +386,18 @@ around each cell in our dataset is relatively constant, we can use the
 “density” `method` of `tof_downsample`:
 
 ``` r
-phenograph_data |> 
-  tof_preprocess(undo_noise = FALSE) |> 
-  tof_downsample(
-    density_cols = c(cd34, cd38), 
-    target_prop_cells = 0.25, 
-    method = "density", 
-  ) |> 
-  ggplot(aes(x = cd34, y = cd38)) + 
-  geom_point(alpha = 0.5) + 
-  scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4)) + 
-  theme_bw()
+phenograph_data |>
+    tof_preprocess(undo_noise = FALSE) |>
+    tof_downsample(
+        density_cols = c(cd34, cd38),
+        target_prop_cells = 0.25,
+        method = "density",
+    ) |>
+    ggplot(aes(x = cd34, y = cd38)) +
+    geom_point(alpha = 0.5) +
+    scale_x_continuous(limits = c(NA, 1.5)) +
+    scale_y_continuous(limits = c(NA, 4)) +
+    theme_bw()
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
@@ -420,16 +419,16 @@ write single-cell data from a `tof_tbl` into .fcs or .csv files, use
 `tof_write_data`.
 
 ``` r
-# when copying and pasting this code, feel free to change this path 
+# when copying and pasting this code, feel free to change this path
 # to wherever you'd like to save your output files
 my_path <- file.path("~", "Desktop", "tidytof_vignette_files")
 
-phenograph_data |> 
-  tof_write_data(
-    group_cols = phenograph_cluster, 
-    out_path = my_path,
-    format = "fcs"
-  )
+phenograph_data |>
+    tof_write_data(
+        group_cols = phenograph_cluster,
+        out_path = my_path,
+        format = "fcs"
+    )
 ```
 
 `tof_write_data`’s trickiest argument is `group_cols`, the argument used
@@ -455,15 +454,15 @@ cells into high- and low-`pstat5` expression groups, then add this
 column to our `group_cols` specification:
 
 ``` r
-phenograph_data |> 
-  # create a variable representing if a cell is above or below the median 
-  # expression level of pstat5
-  mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) |> 
-  tof_write_data(
-    group_cols = c(phenograph_cluster, expression_group), 
-    out_path = my_path, 
-    format = "fcs"
-  )
+phenograph_data |>
+    # create a variable representing if a cell is above or below the median
+    # expression level of pstat5
+    mutate(expression_group = if_else(pstat5 > median(pstat5), "high", "low")) |>
+    tof_write_data(
+        group_cols = c(phenograph_cluster, expression_group),
+        out_path = my_path,
+        format = "fcs"
+    )
 ```
 
 This will write 6 files with the following names (derived from the
@@ -502,23 +501,23 @@ total cells (2000 each from 3 clusters identified in the [original
 PhenoGraph publication](https://pubmed.ncbi.nlm.nih.gov/26095251/)).
 
 ``` r
-phenograph_clusters <- 
-  phenograph_data |> 
-  tof_preprocess() |> 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
+phenograph_clusters <-
+    phenograph_data |>
+    tof_preprocess() |>
+    tof_cluster(method = "flowsom", cluster_cols = contains("cd"))
 
-phenograph_clusters |> 
-  select(sample_name, .flowsom_metacluster, everything()) |> 
-  head()
+phenograph_clusters |>
+    select(sample_name, .flowsom_metacluster, everything()) |>
+    head()
 #> # A tibble: 6 × 26
 #>   sample_name      .flowsom_metacluster phenograph_cluster    cd19 cd11b    cd34
 #>   <chr>            <chr>                <chr>                <dbl> <dbl>   <dbl>
-#> 1 H1_PhenoGraph_c… 3                    cluster1           -0.0336 2.46   0.608 
-#> 2 H1_PhenoGraph_c… 7                    cluster1            0.324  0.856 -0.116 
-#> 3 H1_PhenoGraph_c… 3                    cluster1            0.532  2.67   0.909 
-#> 4 H1_PhenoGraph_c… 2                    cluster1            0.0163 2.97   0.0725
-#> 5 H1_PhenoGraph_c… 4                    cluster1            0.144  2.98   0.128 
-#> 6 H1_PhenoGraph_c… 2                    cluster1            0.742  3.41   0.336 
+#> 1 H1_PhenoGraph_c… 13                   cluster1           -0.0336 2.46   0.608 
+#> 2 H1_PhenoGraph_c… 18                   cluster1            0.324  0.856 -0.116 
+#> 3 H1_PhenoGraph_c… 10                   cluster1            0.532  2.67   0.909 
+#> 4 H1_PhenoGraph_c… 8                    cluster1            0.0163 2.97   0.0725
+#> 5 H1_PhenoGraph_c… 13                   cluster1            0.144  2.98   0.128 
+#> 6 H1_PhenoGraph_c… 8                    cluster1            0.742  3.41   0.336 
 #> # ℹ 20 more variables: cd45 <dbl>, cd123 <dbl>, cd33 <dbl>, cd47 <dbl>,
 #> #   cd7 <dbl>, cd44 <dbl>, cd38 <dbl>, cd3 <dbl>, cd117 <dbl>, cd64 <dbl>,
 #> #   cd41 <dbl>, pstat3 <dbl>, pstat5 <dbl>, pampk <dbl>, p4ebp1 <dbl>,
@@ -537,22 +536,22 @@ Because the output of `tof_cluster` is a `tof_tbl`, we can use `dplyr`’s
 to the original clustering from the PhenoGraph paper.
 
 ``` r
-phenograph_clusters |> 
-  count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
-#> # A tibble: 24 × 3
+phenograph_clusters |>
+    count(phenograph_cluster, .flowsom_metacluster, sort = TRUE)
+#> # A tibble: 23 × 3
 #>    phenograph_cluster .flowsom_metacluster     n
 #>    <chr>              <chr>                <int>
-#>  1 cluster2           13                     483
-#>  2 cluster3           18                     418
-#>  3 cluster3           11                     300
-#>  4 cluster2           20                     215
-#>  5 cluster1           3                      213
-#>  6 cluster3           12                     182
-#>  7 cluster1           4                      177
-#>  8 cluster1           1                      167
-#>  9 cluster1           2                      165
-#> 10 cluster2           19                     124
-#> # ℹ 14 more rows
+#>  1 cluster3           12                     323
+#>  2 cluster3           15                     318
+#>  3 cluster2           3                      309
+#>  4 cluster1           17                     234
+#>  5 cluster2           2                      218
+#>  6 cluster2           4                      206
+#>  7 cluster1           8                      182
+#>  8 cluster1           18                     167
+#>  9 cluster1           9                      162
+#> 10 cluster3           20                     162
+#> # ℹ 13 more rows
 ```
 
 Here, we can see that the FlowSOM algorithm groups most cells from the
@@ -567,19 +566,19 @@ added as a new column to the input `tof_tbl`), set `augment` to `FALSE`.
 
 ``` r
 # will result in a tibble with only 1 column (the cluster labels)
-phenograph_data |> 
-  tof_preprocess() |> 
-  tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) |> 
-  head()
+phenograph_data |>
+    tof_preprocess() |>
+    tof_cluster(method = "flowsom", cluster_cols = contains("cd"), augment = FALSE) |>
+    head()
 #> # A tibble: 6 × 1
 #>   .flowsom_metacluster
 #>   <chr>               
-#> 1 11                  
-#> 2 7                   
-#> 3 11                  
-#> 4 16                  
-#> 5 4                   
-#> 6 16
+#> 1 13                  
+#> 2 3                   
+#> 3 10                  
+#> 4 11                  
+#> 5 10                  
+#> 6 11
 ```
 
 #### Dimensionality reduction with `tof_reduce_dimensions()`
@@ -597,23 +596,23 @@ approximation and projection (UMAP). To apply these to a dataset, use
 
 ``` r
 # perform the dimensionality reduction
-phenograph_tsne <- 
-  phenograph_clusters |> 
-  tof_reduce_dimensions(method = "tsne")
+phenograph_tsne <-
+    phenograph_clusters |>
+    tof_reduce_dimensions(method = "tsne")
 
 # select only the tsne embedding columns using a tidyselect helper (contains)
-phenograph_tsne |> 
-  select(contains("tsne")) |> 
-  head()
+phenograph_tsne |>
+    select(contains("tsne")) |>
+    head()
 #> # A tibble: 6 × 2
-#>   .tsne_1 .tsne_2
-#>     <dbl>   <dbl>
-#> 1   7.44    -5.16
-#> 2   5.64    -9.25
-#> 3 -10.9    -25.6 
-#> 4   0.781  -17.2 
-#> 5   3.50    -7.82
-#> 6   2.82   -24.9
+#>   .tsne1 .tsne2
+#>    <dbl>  <dbl>
+#> 1  -8.41   17.2
+#> 2   1.91   13.6
+#> 3  23.9    20.1
+#> 4   4.79   22.3
+#> 5  -4.99   22.4
+#> 6  11.0    20.2
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature
@@ -627,11 +626,11 @@ be visualized using `{ggplot2}` (or any graphics package):
 
 ``` r
 # plot the tsne embeddings using color to distinguish between clusters
-phenograph_tsne |> 
-  ggplot(aes(x = .tsne_1, y = .tsne_2, fill = phenograph_cluster)) + 
-  geom_point(shape = 21) + 
-  theme_bw() + 
-  labs(fill = NULL)
+phenograph_tsne |>
+    ggplot(aes(x = .tsne1, y = .tsne2, fill = phenograph_cluster)) +
+    geom_point(shape = 21) +
+    theme_bw() +
+    labs(fill = NULL)
 ```
 
 <img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
@@ -639,12 +638,12 @@ phenograph_tsne |>
 ``` r
 
 # plot the tsne embeddings using color to represent CD11b expression
-phenograph_tsne |> 
-  ggplot(aes(x = .tsne_1, y = .tsne_2, fill = cd11b)) + 
-  geom_point(shape = 21) + 
-  scale_fill_viridis_c() +
-  theme_bw() + 
-  labs(fill = "CD11b expression")
+phenograph_tsne |>
+    ggplot(aes(x = .tsne1, y = .tsne2, fill = cd11b)) +
+    geom_point(shape = 21) +
+    scale_fill_viridis_c() +
+    theme_bw() +
+    labs(fill = "CD11b expression")
 ```
 
 <img src="man/figures/README-unnamed-chunk-24-2.png" width="100%" />
@@ -678,8 +677,9 @@ is available on Bioconductor and can be downloaded with the following
 command:
 
 ``` r
-if (!requireNamespace("BiocManager", quietly = TRUE))
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
     install.packages("BiocManager")
+}
 
 BiocManager::install("HDCytoData")
 ```
@@ -693,9 +693,9 @@ converting flowCore objects into `tof_tbl`’s .
 ``` r
 citrus_raw <- HDCytoData::Bodenmiller_BCR_XL_flowSet()
 
-citrus_data <- 
-  citrus_raw |> 
-  as_tof_tbl(sep = "_")
+citrus_data <-
+    citrus_raw |>
+    as_tof_tbl(sep = "_")
 ```
 
 Thus, we can see that `citrus_data` is a `tof_tbl` with 172791 cells
@@ -706,19 +706,19 @@ We can also extract some metadata from the raw data and join it with our
 single-cell data using some functions from the `tidyverse`:
 
 ``` r
-citrus_metadata <- 
-  tibble(
-    file_name = as.character(flowCore::pData(citrus_raw)[[1]]), 
-    sample_id = 1:length(file_name),
-    patient = str_extract(file_name, "patient[:digit:]"), 
-    stimulation = str_extract(file_name, "(BCR-XL)|Reference")
-  ) |> 
-  mutate(
-    stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
-  )
+citrus_metadata <-
+    tibble(
+        file_name = as.character(flowCore::pData(citrus_raw)[[1]]),
+        sample_id = seq_along(file_name),
+        patient = str_extract(file_name, "patient[:digit:]"),
+        stimulation = str_extract(file_name, "(BCR-XL)|Reference")
+    ) |>
+    mutate(
+        stimulation = if_else(stimulation == "Reference", "Basal", stimulation)
+    )
 
 citrus_metadata |>
-  head()
+    head()
 #> # A tibble: 6 × 4
 #>   file_name                          sample_id patient  stimulation
 #>   <chr>                                  <int> <chr>    <chr>      
@@ -738,9 +738,9 @@ Finally, we can join this metadata with our single-cell `tof_tbl` to
 obtain the cleaned dataset.
 
 ``` r
-citrus_data <- 
-  citrus_data |> 
-  left_join(citrus_metadata, by = "sample_id")
+citrus_data <-
+    citrus_data |>
+    left_join(citrus_metadata, by = "sample_id")
 ```
 
 After these data cleaning steps, we now have `citrus_data`, a `tof_tbl`
@@ -764,15 +764,15 @@ above uses a paired design and only has 2 experimental conditions of
 interest (Basal vs. BCR-XL), we can use the paired t-test method:
 
 ``` r
-daa_result <- 
-  citrus_data |> 
-  tof_analyze_abundance(
-    cluster_col = population_id, 
-    effect_col = stimulation, 
-    group_cols = patient, 
-    test_type = "paired", 
-    method = "ttest"
-  )
+daa_result <-
+    citrus_data |>
+    tof_analyze_abundance(
+        cluster_col = population_id,
+        effect_col = stimulation,
+        group_cols = patient,
+        test_type = "paired",
+        method = "ttest"
+    )
 
 daa_result
 #> # A tibble: 8 × 8
@@ -796,62 +796,62 @@ each patient) in the BCR-XL condition compared to the Basal condition
 using `{ggplot2}`:
 
 ``` r
-plot_data <- 
-  citrus_data |> 
-  mutate(population_id = as.character(population_id)) |>
-  left_join(
-    select(daa_result, population_id, significant, mean_fc), 
-    by = "population_id"
-  ) |> 
-  dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") |> 
-  group_by(patient, stimulation) |> 
-  mutate(prop = n / sum(n)) |> 
-  ungroup() |> 
-  pivot_wider(
-    names_from = stimulation, 
-    values_from = c(prop, n), 
-  ) |> 
-  mutate(
-    diff = `prop_BCR-XL` - prop_Basal, 
-    fc = `prop_BCR-XL` / prop_Basal,
-    population_id = fct_reorder(population_id, diff),
-    direction = 
-      case_when(
-        mean_fc > 1 & significant == "*" ~ "increase",
-        mean_fc < 1 & significant == "*" ~ "decrease", 
-        TRUE ~ NA_character_
-      )
-  )
+plot_data <-
+    citrus_data |>
+    mutate(population_id = as.character(population_id)) |>
+    left_join(
+        select(daa_result, population_id, significant, mean_fc),
+        by = "population_id"
+    ) |>
+    dplyr::count(patient, stimulation, population_id, significant, mean_fc, name = "n") |>
+    group_by(patient, stimulation) |>
+    mutate(prop = n / sum(n)) |>
+    ungroup() |>
+    pivot_wider(
+        names_from = stimulation,
+        values_from = c(prop, n),
+    ) |>
+    mutate(
+        diff = `prop_BCR-XL` - prop_Basal,
+        fc = `prop_BCR-XL` / prop_Basal,
+        population_id = fct_reorder(population_id, diff),
+        direction =
+            case_when(
+                mean_fc > 1 & significant == "*" ~ "increase",
+                mean_fc < 1 & significant == "*" ~ "decrease",
+                TRUE ~ NA_character_
+            )
+    )
 
-significance_data <- 
-  plot_data |> 
-  group_by(population_id, significant, direction) |> 
-  summarize(diff = max(diff), fc = max(fc)) |> 
-  ungroup()
+significance_data <-
+    plot_data |>
+    group_by(population_id, significant, direction) |>
+    summarize(diff = max(diff), fc = max(fc)) |>
+    ungroup()
 
-plot_data |> 
-  ggplot(aes(x = population_id, y = fc, fill = direction)) + 
-  geom_violin(trim = FALSE) +
-  geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) + 
-  geom_point() + 
-  geom_text(
-    aes(x = population_id, y = fc, label = significant), 
-    data = significance_data, 
-    size = 8, 
-    nudge_x = 0.2,
-    nudge_y = 0.06
-  ) +
-  scale_x_discrete(labels = function(x) str_c("cluster ", x)) + 
-  scale_fill_manual(
-    values = c("decrease" = "#cd5241", "increase" = "#207394"),
-    na.translate = FALSE
-  ) +
-  labs(
-    x = NULL, 
-    y = "Abundance fold-change (stimulated / basal)", 
-    fill = "Effect", 
-    caption = "Asterisks indicate significance at an adjusted p-value of 0.05"
-  )
+plot_data |>
+    ggplot(aes(x = population_id, y = fc, fill = direction)) +
+    geom_violin(trim = FALSE) +
+    geom_hline(yintercept = 1, color = "red", linetype = "dotted", size = 0.5) +
+    geom_point() +
+    geom_text(
+        aes(x = population_id, y = fc, label = significant),
+        data = significance_data,
+        size = 8,
+        nudge_x = 0.2,
+        nudge_y = 0.06
+    ) +
+    scale_x_discrete(labels = function(x) str_c("cluster ", x)) +
+    scale_fill_manual(
+        values = c("decrease" = "#cd5241", "increase" = "#207394"),
+        na.translate = FALSE
+    ) +
+    labs(
+        x = NULL,
+        y = "Abundance fold-change (stimulated / basal)",
+        fill = "Effect",
+        caption = "Asterisks indicate significance at an adjusted p-value of 0.05"
+    )
 ```
 
 <img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
@@ -875,26 +875,26 @@ each cluster’s expression of our signaling markers between stimulation
 conditions.
 
 ``` r
-signaling_markers <- 
-  c(
-    "pNFkB_Nd142", "pStat5_Nd150", "pAkt_Sm152", "pStat1_Eu153", "pStat3_Gd158", 
-    "pSlp76_Dy164", "pBtk_Er166", "pErk_Er168", "pS6_Yb172", "pZap70_Gd156"
-  )
+signaling_markers <-
+    c(
+        "pNFkB_Nd142", "pStat5_Nd150", "pAkt_Sm152", "pStat1_Eu153", "pStat3_Gd158",
+        "pSlp76_Dy164", "pBtk_Er166", "pErk_Er168", "pS6_Yb172", "pZap70_Gd156"
+    )
 
-dea_result <- 
-  citrus_data |> 
-  tof_preprocess(channel_cols = any_of(signaling_markers)) |> 
-  tof_analyze_expression(
-    cluster_col = population_id, 
-    marker_cols = any_of(signaling_markers), 
-    effect_col = stimulation,
-    group_cols = patient, 
-    test_type = "paired", 
-    method = "ttest"
-  )
+dea_result <-
+    citrus_data |>
+    tof_preprocess(channel_cols = any_of(signaling_markers)) |>
+    tof_analyze_expression(
+        cluster_col = population_id,
+        marker_cols = any_of(signaling_markers),
+        effect_col = stimulation,
+        group_cols = patient,
+        test_type = "paired",
+        method = "ttest"
+    )
 
-dea_result |> 
-  head()
+dea_result |>
+    head()
 #> # A tibble: 6 × 9
 #>   population_id marker   p_val   p_adj significant     t    df mean_diff mean_fc
 #>   <chr>         <chr>    <dbl>   <dbl> <chr>       <dbl> <dbl>     <dbl>   <dbl>
@@ -920,11 +920,11 @@ This result can be used to make a volcano plot to visualize the results
 for all cluster-marker pairs:
 
 ``` r
-volcano_plot <- 
-  dea_result |> 
-  tof_plot_clusters_volcano(
-    use_ggrepel = TRUE
-  ) 
+volcano_plot <-
+    dea_result |>
+    tof_plot_clusters_volcano(
+        use_ggrepel = TRUE
+    )
 
 volcano_plot
 ```
@@ -959,17 +959,17 @@ the `group_cols` argument):
 
 ``` r
 # preprocess the numeric columns in the citrus dataset
-citrus_data <- 
-  citrus_data |> 
-  mutate(cluster = str_c("cluster", population_id)) |> 
-  tof_preprocess()
+citrus_data <-
+    citrus_data |>
+    mutate(cluster = str_c("cluster", population_id)) |>
+    tof_preprocess()
 
-citrus_data |> 
-  tof_extract_proportion(
-    cluster_col = cluster, 
-    group_cols = c(patient, stimulation)
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_proportion(
+        cluster_col = cluster,
+        group_cols = c(patient, stimulation)
+    ) |>
+    head()
 #> # A tibble: 6 × 10
 #>   patient  stimulation `prop@cluster1` `prop@cluster2` `prop@cluster3`
 #>   <chr>    <chr>                 <dbl>           <dbl>           <dbl>
@@ -991,13 +991,13 @@ the 8 clusters in `citrus_data`). These values can also be returned in
 “long” format by changing the `format` argument:
 
 ``` r
-citrus_data |> 
-  tof_extract_proportion(
-    cluster_col = cluster, 
-    group_cols = c(patient, stimulation), 
-    format = "long"
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_proportion(
+        cluster_col = cluster,
+        group_cols = c(patient, stimulation),
+        format = "long"
+    ) |>
+    head()
 #> # A tibble: 6 × 4
 #>   patient  stimulation cluster     prop
 #>   <chr>    <chr>       <chr>      <dbl>
@@ -1014,14 +1014,14 @@ Another member of the same function family,
 or median) of user-specified markers in each cluster.
 
 ``` r
-citrus_data |> 
-  tof_extract_central_tendency(
-    cluster_col = cluster, 
-    group_cols = c(patient, stimulation), 
-    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    central_tendency_function = mean
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_central_tendency(
+        cluster_col = cluster,
+        group_cols = c(patient, stimulation),
+        marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")),
+        central_tendency_function = mean
+    ) |>
+    head()
 #> # A tibble: 6 × 26
 #>   patient  stimulation `CD45_In115@cluster1_ct` `CD4_Nd145@cluster1_ct`
 #>   <chr>    <chr>                          <dbl>                   <dbl>
@@ -1045,14 +1045,14 @@ but calculates the proportion of cells above a user-specified expression
 value for each marker instead of a measure of central tendency:
 
 ``` r
-citrus_data |> 
-  tof_extract_threshold(
-    cluster_col = cluster, 
-    group_cols = c(patient, stimulation), 
-    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    threshold = 5
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_threshold(
+        cluster_col = cluster,
+        group_cols = c(patient, stimulation),
+        marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")),
+        threshold = 5
+    ) |>
+    head()
 #> # A tibble: 6 × 26
 #>   patient  stimulation `CD45_In115@cluster1_threshold` CD4_Nd145@cluster1_thre…¹
 #>   <chr>    <chr>                                 <dbl>                     <dbl>
@@ -1088,15 +1088,15 @@ higher-resolution) than simply comparing measures of central tendency.
 
 ``` r
 # Earth-mover's distance
-citrus_data |> 
-  tof_extract_emd(
-    cluster_col = cluster, 
-    group_cols = patient, 
-    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    emd_col = stimulation, 
-    reference_level = "Basal"
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_emd(
+        cluster_col = cluster,
+        group_cols = patient,
+        marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")),
+        emd_col = stimulation,
+        reference_level = "Basal"
+    ) |>
+    head()
 #> # A tibble: 6 × 25
 #>   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³
 #>   <chr>                      <dbl>                  <dbl>                  <dbl>
@@ -1117,15 +1117,15 @@ citrus_data |>
 
 ``` r
 # Jensen-Shannon Divergence
-citrus_data |> 
-  tof_extract_jsd(
-    cluster_col = cluster, 
-    group_cols = patient,  
-    marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")), 
-    jsd_col = stimulation, 
-    reference_level = "Basal"
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_jsd(
+        cluster_col = cluster,
+        group_cols = patient,
+        marker_cols = any_of(c("CD45_In115", "CD4_Nd145", "CD20_Sm147")),
+        jsd_col = stimulation,
+        reference_level = "Basal"
+    ) |>
+    head()
 #> # A tibble: 6 × 25
 #>   patient  BCR-XL_CD45_In115@clu…¹ BCR-XL_CD4_Nd145@clu…² BCR-XL_CD20_Sm147@cl…³
 #>   <chr>                      <dbl>                  <dbl>                  <dbl>
@@ -1152,17 +1152,17 @@ and EMD between the basal condition and stimulated condition in each
 cluster for all patients in `citrus_data`.
 
 ``` r
-citrus_data |> 
-  tof_extract_features(
-    cluster_col = cluster, 
-    group_cols = patient, 
-    stimulation_col = stimulation,
-    lineage_cols = any_of(c("CD45_In115", "CD20_Sm147", "CD33_Nd148")), 
-    signaling_cols = any_of(signaling_markers), 
-    signaling_method = "emd", 
-    basal_level = "Basal"
-  ) |> 
-  head()
+citrus_data |>
+    tof_extract_features(
+        cluster_col = cluster,
+        group_cols = patient,
+        stimulation_col = stimulation,
+        lineage_cols = any_of(c("CD45_In115", "CD20_Sm147", "CD33_Nd148")),
+        signaling_cols = any_of(signaling_markers),
+        signaling_method = "emd",
+        basal_level = "Basal"
+    ) |>
+    head()
 ```
 
 #### Outcomes modeling with `tof_model`
@@ -1181,19 +1181,19 @@ objects (`ddpr_metadata`).
 data(ddpr_metadata)
 
 # link for downloading the sample-level data from the Nature Medicine website
-data_link <- 
-  "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"
+data_link <-
+    "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"
 
 # downloading the data and combining it with clinical annotations
-ddpr_patients <- 
-  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) |> 
-  dplyr::rename(patient_id = Patient_ID) |> 
-  left_join(ddpr_metadata, by = "patient_id") |> 
-  dplyr::filter(!str_detect(patient_id, "Healthy"))
+ddpr_patients <-
+    readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) |>
+    dplyr::rename(patient_id = Patient_ID) |>
+    left_join(ddpr_metadata, by = "patient_id") |>
+    dplyr::filter(!str_detect(patient_id, "Healthy"))
 
-ddpr_patients |> 
-  select(where(~ !is.numeric(.x))) |> 
-  head()
+ddpr_patients |>
+    select(where(~ !is.numeric(.x))) |>
+    head()
 #> # A tibble: 6 × 8
 #>   patient_id gender mrd_risk nci_rome_risk relapse_status type_of_relapse cohort
 #>   <chr>      <chr>  <chr>    <chr>         <chr>          <chr>           <chr> 
@@ -1217,16 +1217,16 @@ There are also a few preprocessing steps that we might want to perform
 now to save us some headaches when we’re fitting models later.
 
 ``` r
-ddpr_patients <- 
-  ddpr_patients |> 
-  # convert the relapse_status variable to a factor first, 
-  # which is something we'll want for fitting the model later
-  # and create the time_to_event and event columns for survival modeling
-  mutate(
-    relapse_status = as.factor(relapse_status), 
-    time_to_event = if_else(relapse_status == "Yes", time_to_relapse, ccr),
-    event = if_else(relapse_status == "Yes", 1, 0)
-  )
+ddpr_patients <-
+    ddpr_patients |>
+    # convert the relapse_status variable to a factor first,
+    # which is something we'll want for fitting the model later
+    # and create the time_to_event and event columns for survival modeling
+    mutate(
+        relapse_status = as.factor(relapse_status),
+        time_to_event = if_else(relapse_status == "Yes", time_to_relapse, ccr),
+        event = if_else(relapse_status == "Yes", 1, 0)
+    )
 ```
 
 ##### Separating the training and validation cohorts
@@ -1237,13 +1237,13 @@ separate our training and validation cohorts using the `cohort` variable
 in `ddpr_patients`
 
 ``` r
-ddpr_training <- 
-  ddpr_patients |> 
-  dplyr::filter(cohort == "Training") 
+ddpr_training <-
+    ddpr_patients |>
+    dplyr::filter(cohort == "Training")
 
-ddpr_validation <- 
-  ddpr_patients |> 
-  dplyr::filter(cohort == "Validation")
+ddpr_validation <-
+    ddpr_patients |>
+    dplyr::filter(cohort == "Validation")
 ```
 
 ``` r
@@ -1263,8 +1263,8 @@ now). For this, we can use the `relapse_status` column in
 
 ``` r
 # find how many of each outcome we have in our cohort
-ddpr_training |> 
-  dplyr::count(relapse_status)
+ddpr_training |>
+    dplyr::count(relapse_status)
 #> # A tibble: 2 × 2
 #>   relapse_status     n
 #>   <fct>          <int>
@@ -1279,13 +1279,13 @@ In this case, we use 5-fold cross-validation, but reading the
 documentation of `tof_split_data` demonstrates how to use other methods.
 
 ``` r
-training_split <- 
-  ddpr_training |> 
-  tof_split_data(
-    split_method = "k-fold", 
-    num_cv_folds = 5, 
-    strata = relapse_status
-  )
+training_split <-
+    ddpr_training |>
+    tof_split_data(
+        split_method = "k-fold",
+        num_cv_folds = 5,
+        strata = relapse_status
+    )
 
 training_split
 #> #  5-fold cross-validation using stratification 
@@ -1327,18 +1327,18 @@ Note that you can use `rsample::training` and `rsample::testing` to
 return the training and test obeservations from each resampling:
 
 ``` r
-my_resample |> 
-  rsample::training() |> 
-  head()
+my_resample |>
+    rsample::training() |>
+    head()
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1-Rx        0.0395    0.618     0.0634    0.572       2.93     0.944
-#> 2 UPN2           0.139     0.0662    0.0221    0.0825      2.25     0.454
-#> 3 UPN3           0.633     0.0234    0.0165    0.0327      2.25     0.226
-#> 4 UPN7           0.474     0.966     0.124     1.24        2.59     0.243
-#> 5 UPN8           0.951     0.958     0.161     0.556       3.18     0.556
-#> 6 UPN9          15.6       0.446     0.0445    0.163       2.86     0.434
+#> 1 UPN1          3.06       0.583   0.00449     0.164       1.94     0.416
+#> 2 UPN1-Rx       0.0395     0.618   0.0634      0.572       2.93     0.944
+#> 3 UPN3          0.633      0.0234  0.0165      0.0327      2.25     0.226
+#> 4 UPN8          0.951      0.958   0.161       0.556       3.18     0.556
+#> 5 UPN10         0.00374    0.761   0.000696    0.829       3.19     0.886
+#> 6 UPN10-Rx      0.00240    0.167   0.203       0.802       2.57     0.822
 #> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1347,18 +1347,18 @@ my_resample |>
 #> #   HLADR_Pop1 <dbl>, p4EBP1_FC_Basal_Pop1 <dbl>, pSTAT5_FC_Basal_Pop1 <dbl>,
 #> #   pPLCg1_2_FC_Basal_Pop1 <dbl>, pAkt_FC_Basal_Pop1 <dbl>, …
 
-my_resample |> 
-  rsample::testing() |> 
-  head()
+my_resample |>
+    rsample::testing() |>
+    head()
 #> # A tibble: 6 × 1,854
 #>   patient_id Pop_P_Pop1 CD19_Pop1 CD20_Pop1 CD24_Pop1 CD34_Pop1 CD38_Pop1
 #>   <chr>           <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 UPN1          3.06       0.583   0.00449      0.164      1.94     0.416
-#> 2 UPN6          5.62       0.550   0.00374      0.622      2.86     0.342
-#> 3 UPN10         0.00374    0.761   0.000696     0.829      3.19     0.886
-#> 4 UPN13         0.0634     0.0300  0.0219       0.109      2.34     0.314
-#> 5 UPN22         3.29       1.63    0.128        0.525      3.38     0.688
-#> 6 UPN22-Rx      0.0643     1.68    0.0804       1.56       3.06     0.529
+#> 1 UPN2           0.139     0.0662   0.0221     0.0825      2.25     0.454
+#> 2 UPN6           5.62      0.550    0.00374    0.622       2.86     0.342
+#> 3 UPN7           0.474     0.966    0.124      1.24        2.59     0.243
+#> 4 UPN9          15.6       0.446    0.0445     0.163       2.86     0.434
+#> 5 UPN12          0.0565    0.185    0.0115     0.142       2.49     0.254
+#> 6 UPN17          1.40      1.52     0.0128     0.284       3.46     0.656
 #> # ℹ 1,847 more variables: CD127_Pop1 <dbl>, CD179a_Pop1 <dbl>,
 #> #   CD179b_Pop1 <dbl>, IgMi_Pop1 <dbl>, IgMs_Pop1 <dbl>, TdT_Pop1 <dbl>,
 #> #   CD22_Pop1 <dbl>, tIkaros_Pop1 <dbl>, CD79b_Pop1 <dbl>, Ki67_Pop1 <dbl>,
@@ -1381,16 +1381,16 @@ model to perform as well as the one in the original paper (which select
 from many more features).
 
 ``` r
-class_mod <- 
-  training_split |> 
-  tof_train_model(
-    predictor_cols = contains("Pop2"), 
-    response_col = relapse_status,
-    model_type = "two-class", 
-    hyperparameter_grid = tof_create_grid(mixture_values = 1), 
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE # often a smart decision
-  )
+class_mod <-
+    training_split |>
+    tof_train_model(
+        predictor_cols = contains("Pop2"),
+        response_col = relapse_status,
+        model_type = "two-class",
+        hyperparameter_grid = tof_create_grid(mixture_values = 1),
+        impute_missing_predictors = TRUE,
+        remove_zv_predictors = TRUE # often a smart decision
+    )
 ```
 
 The output of `tof_train_model` is a `tof_model`, an object containing
@@ -1401,7 +1401,7 @@ and so is a table of the nonzero model coefficients in the model.
 
 ``` r
 print(class_mod)
-#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-10 
+#> A two-class `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e-05 
 #> # A tibble: 25 × 2
 #>    feature             coefficient
 #>    <chr>                     <dbl>
@@ -1422,14 +1422,14 @@ We can then use the trained model to make predictions on the validation
 data that we set aside earlier:
 
 ``` r
-class_predictions <- 
-  class_mod |> 
-  tof_predict(new_data = ddpr_validation, prediction_type = "class")
+class_predictions <-
+    class_mod |>
+    tof_predict(new_data = ddpr_validation, prediction_type = "class")
 
-class_predictions |> 
-  dplyr::mutate(
-    truth = ddpr_validation$relapse_status
-  )
+class_predictions |>
+    dplyr::mutate(
+        truth = ddpr_validation$relapse_status
+    )
 #> # A tibble: 12 × 2
 #>    .pred truth
 #>    <chr> <fct>
@@ -1455,9 +1455,9 @@ We can also assess the model directly using `tof_assess_model`
 ``` r
 # calling the function with no new_data evaluates the
 # the nodel using its training data
-training_assessment <- 
-  class_mod |> 
-  tof_assess_model()
+training_assessment <-
+    class_mod |>
+    tof_assess_model()
 
 training_assessment
 #> $model_metrics
@@ -1500,9 +1500,9 @@ training_assessment
 And we can make an ROC curve using our metrics:
 
 ``` r
-class_mod |> 
-  tof_plot_model() + 
-  labs(subtitle = "ROC Curve (Training data)")
+class_mod |>
+    tof_plot_model() +
+    labs(subtitle = "ROC Curve (Training data)")
 ```
 
 <img src="man/figures/README-unnamed-chunk-52-1.png" width="100%" />
@@ -1510,9 +1510,9 @@ class_mod |>
 We can then assess the model on the validation data…
 
 ``` r
-validation_assessment <- 
-  class_mod |> 
-  tof_assess_model(new_data = ddpr_validation)
+validation_assessment <-
+    class_mod |>
+    tof_assess_model(new_data = ddpr_validation)
 
 validation_assessment
 #> $model_metrics
@@ -1556,9 +1556,9 @@ validation_assessment
 ```
 
 ``` r
-class_mod |> 
-  tof_plot_model(new_data = ddpr_validation) + 
-  labs(subtitle = "ROC Curve (Validation data)")
+class_mod |>
+    tof_plot_model(new_data = ddpr_validation) +
+    labs(subtitle = "ROC Curve (Validation data)")
 ```
 
 <img src="man/figures/README-unnamed-chunk-54-1.png" width="100%" />
@@ -1627,26 +1627,26 @@ input_path <- tidytof_example_data("phenograph")
 
 set.seed(0012)
 
-input_path |> 
-  # step 1
-  tof_read_data() |> 
-  # step 2
-  tof_preprocess() |> 
-  # step 3
-  tof_cluster(method = "phenograph") |>
-  # step 4
-  tof_downsample(
-    group_cols = .phenograph_cluster, 
-    num_cells = 100,
-    method = "constant" 
-  ) |> 
-  # step 5
-  tof_reduce_dimensions(perplexity = 50, method = "tsne") |> 
-  # step 6
-  tof_plot_cells_embedding(
-    embedding_cols = starts_with(".tsne"),
-    color_col = .phenograph_cluster
-  ) 
+input_path |>
+    # step 1
+    tof_read_data() |>
+    # step 2
+    tof_preprocess() |>
+    # step 3
+    tof_cluster(method = "phenograph") |>
+    # step 4
+    tof_downsample(
+        group_cols = .phenograph_cluster,
+        num_cells = 100,
+        method = "constant"
+    ) |>
+    # step 5
+    tof_reduce_dimensions(perplexity = 50, method = "tsne") |>
+    # step 6
+    tof_plot_cells_embedding(
+        embedding_cols = starts_with(".tsne"),
+        color_col = .phenograph_cluster
+    )
 ```
 
 <img src="man/figures/README-unnamed-chunk-55-1.png" width="100%" />
