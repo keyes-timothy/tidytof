@@ -19,10 +19,10 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        r-version: [3.5, 3.6]
+        r-version: [4.3]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
         with:
