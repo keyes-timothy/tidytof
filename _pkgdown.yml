@@ -90,6 +90,9 @@ reference:
   - tof_log_rank_test
   - tof_make_roc_curve
   - tof_generate_palette
+  - tof_make_knn_graph
+  - tof_split_tidytof_reduced_dimensions
+  - make_flowcore_annotated_data_frame
 - title: "Built-in data"
   desc: "Example cytometry datasets built into {tidytof}"
   contents:
@@ -97,6 +100,13 @@ reference:
   - ddpr_metadata
   - phenograph_data
   - metal_masterlist
+- title: "Integration with Bioconductor Data Structures"
+  desc: "Adapter functions for interoperability with Bioconductor"
+  contents:
+  - as_flowFrame
+  - as_flowSet
+  - as_seurat
+  - as_SingleCellExperiment
 articles:
 - title: "Contributing"
   navbar: "Extending {tidytof}"
@@ -120,4 +130,5 @@ articles:
   navbar: "Sample-level operations"
   contents:
   - modeling
+
 
