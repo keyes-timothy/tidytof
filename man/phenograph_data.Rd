@@ -40,6 +40,9 @@ A data frame with 6000 rows and 26 variables:
 \usage{
 data(phenograph_data)
 }
+\value{
+A data.frame
+}
 \description{
 A dataset containing CyTOF measurements from healthy control cells originally studied
 in the following paper:  \cr \cr

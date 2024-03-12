@@ -75,63 +75,62 @@
 #' tof_metacluster_hierarchical(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 tof_metacluster_hierarchical <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    num_metaclusters = 10L,
-    distance_function = c("euclidean", "manhattan", "minkowski", "maximum", "canberra", "binary"),
-    agglomeration_method = c("complete", "single", "average", "median", "centroid", "ward.D", "ward.D2", "mcquitty")
-  ) {
-    # check arguments
-    distance_function <- rlang::arg_match(distance_function)
-    agglomeration_method <- rlang::arg_match(agglomeration_method)
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        num_metaclusters = 10L,
+        distance_function = c("euclidean", "manhattan", "minkowski", "maximum", "canberra", "binary"),
+        agglomeration_method = c("complete", "single", "average", "median", "centroid", "ward.D", "ward.D2", "mcquitty")) {
+        # check arguments
+        distance_function <- rlang::arg_match(distance_function)
+        agglomeration_method <- rlang::arg_match(agglomeration_method)
 
-    if (missing(cluster_col)) {
-      stop("cluster_col must be specified")
+        if (missing(cluster_col)) {
+            stop("cluster_col must be specified")
+        }
+
+        # extract metacluster colnames
+        metacluster_colnames <-
+            tof_tibble |>
+            dplyr::select({{ metacluster_cols }}) |>
+            colnames()
+
+        # find centroids of all input clusters in tof_tibble
+        meta_tibble <-
+            tof_tibble |>
+            tof_summarize_clusters(
+                cluster_col = {{ cluster_col }},
+                metacluster_cols = dplyr::any_of(metacluster_colnames),
+                central_tendency_function = central_tendency_function
+            )
+
+        # distance object
+        dist_object <-
+            meta_tibble |>
+            dplyr::select(-{{ cluster_col }}) |>
+            as.matrix() |>
+            stats::dist(method = distance_function)
+
+        # hierarchical clustering
+        hclust_object <-
+            stats::hclust(d = dist_object, method = agglomeration_method)
+        hclusts <-
+            stats::cutree(tree = hclust_object, k = num_metaclusters) |>
+            as.character()
+
+        # return result
+        result <-
+            tof_tibble |>
+            tof_join_metacluster(
+                cluster_col = {{ cluster_col }},
+                meta_tibble = meta_tibble,
+                metacluster_vector = hclusts
+            ) |>
+            dplyr::rename(.hierarchical_metacluster = ".metacluster")
+        return(result)
     }
-
-    # extract metacluster colnames
-    metacluster_colnames <-
-      tof_tibble |>
-      dplyr::select({{metacluster_cols}}) |>
-      colnames()
-
-    # find centroids of all input clusters in tof_tibble
-    meta_tibble <-
-      tof_tibble |>
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = dplyr::any_of(metacluster_colnames),
-        central_tendency_function = central_tendency_function
-      )
-
-    # distance object
-    dist_object <-
-      meta_tibble |>
-      dplyr::select(-{{cluster_col}}) |>
-      as.matrix() |>
-      stats::dist(method = distance_function)
-
-    # hierarchical clustering
-    hclust_object <-
-      stats::hclust(d = dist_object, method = agglomeration_method)
-    hclusts <-
-      stats::cutree(tree = hclust_object, k = num_metaclusters) |>
-      as.character()
-
-    # return result
-    result <-
-      tof_tibble |>
-      tof_join_metacluster(
-        cluster_col = {{cluster_col}},
-        meta_tibble = meta_tibble,
-        metacluster_vector = hclusts
-      ) |>
-      dplyr::rename(.hierarchical_metacluster = ".metacluster")
-    return(result)
-  }
 
 # tof_metacluster_kmeans--------------------------------------------------------
 
@@ -193,56 +192,54 @@ tof_metacluster_hierarchical <-
 #' tof_metacluster_kmeans(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 tof_metacluster_kmeans <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    num_metaclusters = 10L,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        num_metaclusters = 10L,
+        ...) {
+        if (missing(cluster_col)) {
+            stop("cluster_col must be specified")
+        }
 
-    if (missing(cluster_col)) {
-      stop("cluster_col must be specified")
+        # extract metacluster colnames
+        metacluster_colnames <-
+            tof_tibble |>
+            dplyr::select({{ metacluster_cols }}) |>
+            colnames()
+
+        # find centroids of all input clusters in tof_tibble
+        meta_tibble <-
+            tof_tibble |>
+            tof_summarize_clusters(
+                cluster_col = {{ cluster_col }},
+                metacluster_cols = dplyr::any_of(metacluster_colnames),
+                central_tendency_function = central_tendency_function
+            )
+
+        # k-means clustering
+        kmeans_metaclusters <-
+            meta_tibble |>
+            tof_cluster_kmeans(
+                cluster_cols = dplyr::any_of(metacluster_colnames),
+                num_clusters = num_metaclusters,
+                ...
+            ) |>
+            dplyr::pull(.data$.kmeans_cluster)
+
+        # return result
+        result <-
+            tof_tibble |>
+            tof_join_metacluster(
+                meta_tibble = meta_tibble,
+                cluster_col = {{ cluster_col }},
+                metacluster_vector = kmeans_metaclusters
+            ) |>
+            dplyr::rename(.kmeans_metacluster = ".metacluster")
+
+        return(result)
     }
-
-    # extract metacluster colnames
-    metacluster_colnames <-
-      tof_tibble |>
-      dplyr::select({{metacluster_cols}}) |>
-      colnames()
-
-    # find centroids of all input clusters in tof_tibble
-    meta_tibble <-
-      tof_tibble |>
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = dplyr::any_of(metacluster_colnames),
-        central_tendency_function = central_tendency_function
-      )
-
-    # k-means clustering
-    kmeans_metaclusters <-
-      meta_tibble |>
-      tof_cluster_kmeans(
-        cluster_cols = dplyr::any_of(metacluster_colnames),
-        num_clusters = num_metaclusters,
-        ...
-      ) |>
-      dplyr::pull(.data$.kmeans_cluster)
-
-    # return result
-    result <-
-      tof_tibble |>
-      tof_join_metacluster(
-        meta_tibble = meta_tibble,
-        cluster_col = {{cluster_col}},
-        metacluster_vector = kmeans_metaclusters
-      ) |>
-      dplyr::rename(.kmeans_metacluster = ".metacluster")
-
-    return(result)
-  }
 
 # tof_metacluster_phenograph ---------------------------------------------------
 
@@ -306,57 +303,54 @@ tof_metacluster_kmeans <-
 #' tof_metacluster_phenograph(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
 tof_metacluster_phenograph <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    num_neighbors = 5L,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        num_neighbors = 5L,
+        ...) {
+        if (missing(cluster_col)) {
+            stop("cluster_col must be specified")
+        }
 
-    if (missing(cluster_col)) {
-      stop("cluster_col must be specified")
+        # extract metacluster colnames
+        metacluster_colnames <-
+            tof_tibble |>
+            dplyr::select({{ metacluster_cols }}) |>
+            colnames()
+
+        # find centroids of all input clusters in tof_tibble
+        meta_tibble <-
+            tof_tibble |>
+            tof_summarize_clusters(
+                cluster_col = {{ cluster_col }},
+                metacluster_cols = dplyr::any_of(metacluster_colnames),
+                central_tendency_function = central_tendency_function
+            )
+
+        # phenograph metaclustering
+        pheno_metaclusters <-
+            meta_tibble |>
+            tof_cluster_phenograph(
+                cluster_cols = dplyr::any_of(metacluster_colnames),
+                num_neighbors = num_neighbors,
+                ...
+            ) |>
+            dplyr::pull(.data$.phenograph_cluster)
+
+        # return result
+        result <-
+            tof_tibble |>
+            tof_join_metacluster(
+                meta_tibble = meta_tibble,
+                cluster_col = {{ cluster_col }},
+                metacluster_vector = pheno_metaclusters
+            ) |>
+            dplyr::rename(.phenograph_metacluster = ".metacluster")
+
+        return(result)
     }
-
-    # extract metacluster colnames
-    metacluster_colnames <-
-      tof_tibble |>
-      dplyr::select({{metacluster_cols}}) |>
-      colnames()
-
-    # find centroids of all input clusters in tof_tibble
-    meta_tibble <-
-      tof_tibble |>
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = dplyr::any_of(metacluster_colnames),
-        central_tendency_function = central_tendency_function
-      )
-
-    # phenograph metaclustering
-    pheno_metaclusters <-
-      meta_tibble |>
-      tof_cluster_phenograph(
-        cluster_cols = dplyr::any_of(metacluster_colnames),
-        num_neighbors = num_neighbors,
-        ...
-      ) |>
-      dplyr::pull(.data$.phenograph_cluster)
-
-    # return result
-    result <-
-      tof_tibble |>
-      tof_join_metacluster(
-        meta_tibble = meta_tibble,
-        cluster_col = {{cluster_col}},
-        metacluster_vector = pheno_metaclusters
-      ) |>
-      dplyr::rename(.phenograph_metacluster = ".metacluster")
-
-    return(result)
-
-  }
 
 # tof_metacluster_consensus ----------------------------------------------------
 
@@ -447,97 +441,94 @@ tof_metacluster_phenograph <-
 #'
 #' tof_metacluster_consensus(tof_tibble = sim_data, cluster_col = cluster_id)
 #'
-#'
 tof_metacluster_consensus <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    num_metaclusters = 10L,
-    proportion_clusters = 0.9,
-    proportion_features = 1,
-    num_reps = 20L,
-    clustering_algorithm = c("hierarchical", "pam", "kmeans"),
-    distance_function = c("euclidean", "minkowski", "pearson", "spearman", "maximum", "binary", "canberra"),
-    ... # optional additional arguments to add to CCP
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        num_metaclusters = 10L,
+        proportion_clusters = 0.9,
+        proportion_features = 1,
+        num_reps = 20L,
+        clustering_algorithm = c("hierarchical", "pam", "kmeans"),
+        distance_function = c("euclidean", "minkowski", "pearson", "spearman", "maximum", "binary", "canberra"),
+        ... # optional additional arguments to add to CCP
+        ) {
+        # check for ConsensusClusterPlus package
+        rlang::check_installed(pkg = "ConsensusClusterPlus")
 
-    # check for ConsensusClusterPlus package
-    rlang::check_installed(pkg = "ConsensusClusterPlus")
+        if (!rlang::is_installed(pkg = "ConsensusClusterPlus")) {
+            stop("tof_metacluster_consensus requires the ConsensusClusterPlus package to be installed")
+        }
 
-    if (!rlang::is_installed(pkg = "ConsensusClusterPlus")) {
-      stop("tof_metacluster_consensus requires the ConsensusClusterPlus package to be installed")
+        # check arguments
+        distance_function <- rlang::arg_match(distance_function)
+        clustering_algorithm <- rlang::arg_match(clustering_algorithm)
+
+        if (missing(cluster_col)) {
+            stop("cluster_col must be specified")
+        }
+
+        # convert clustering_algorithm string to something CCP will understand
+        clustering_algorithm <-
+            switch(clustering_algorithm,
+                "hierarchical" = "hc",
+                "pam" = "pam",
+                "kmeans" = "km"
+            )
+
+        # find centroids of all input clusters in tof_tibble
+        meta_tibble <-
+            tof_tibble |>
+            tof_summarize_clusters(
+                cluster_col = {{ cluster_col }},
+                metacluster_cols = {{ metacluster_cols }},
+                central_tendency_function = central_tendency_function
+            )
+
+        # data_matrix object
+        data_matrix <-
+            meta_tibble |>
+            dplyr::select(-{{ cluster_col }}) |>
+            as.matrix() |>
+            t()
+        colnames(data_matrix) <- dplyr::pull(meta_tibble, {{ cluster_col }})
+
+        # consensus clustering
+        ## create a temporary file to dump the CCP plot result, which cannot
+        ## be disabled, into
+        temp_file <- tempdir()
+        ccp_object <-
+            suppressMessages(
+                ConsensusClusterPlus::ConsensusClusterPlus(
+                    d = data_matrix,
+                    maxK = num_metaclusters,
+                    reps = num_reps,
+                    pItem = proportion_clusters,
+                    pFeature = proportion_features,
+                    clusterAlg = clustering_algorithm,
+                    title = temp_file,
+                    plot = "pdf",
+                    distance = distance_function,
+                    ...
+                )
+            )
+        ccp_metaclusters <-
+            ccp_object[[num_metaclusters]]$consensusClass |>
+            as.character()
+
+        # return result
+        result <-
+            tof_tibble |>
+            tof_join_metacluster(
+                cluster_col = {{ cluster_col }},
+                meta_tibble = meta_tibble,
+                metacluster_vector = ccp_metaclusters
+            ) |>
+            dplyr::rename(.consensus_metacluster = ".metacluster")
+        return(result)
     }
-
-    # check arguments
-    distance_function <- rlang::arg_match(distance_function)
-    clustering_algorithm <- rlang::arg_match(clustering_algorithm)
-
-    if (missing(cluster_col)) {
-      stop("cluster_col must be specified")
-    }
-
-    # convert clustering_algorithm string to something CCP will understand
-    clustering_algorithm <-
-      switch(
-        clustering_algorithm,
-        "hierarchical" = "hc",
-        "pam" = "pam",
-        "kmeans" = "km"
-      )
-
-    # find centroids of all input clusters in tof_tibble
-    meta_tibble <-
-      tof_tibble |>
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = {{metacluster_cols}},
-        central_tendency_function = central_tendency_function
-      )
-
-    # data_matrix object
-    data_matrix <-
-      meta_tibble |>
-      dplyr::select(-{{cluster_col}}) |>
-      as.matrix() |>
-      t()
-    colnames(data_matrix) <- dplyr::pull(meta_tibble, {{cluster_col}})
-
-    # consensus clustering
-    ## create a temporary file to dump the CCP plot result, which cannot
-    ## be disabled, into
-    temp_file <- tempdir()
-    ccp_object <-
-      suppressMessages(
-        ConsensusClusterPlus::ConsensusClusterPlus(
-          d = data_matrix,
-          maxK = num_metaclusters,
-          reps = num_reps,
-          pItem = proportion_clusters,
-          pFeature = proportion_features,
-          clusterAlg = clustering_algorithm,
-          title = temp_file,
-          plot = "pdf",
-          distance = distance_function,
-          ...
-        )
-      )
-    ccp_metaclusters <-
-      ccp_object[[num_metaclusters]]$consensusClass |>
-      as.character()
-
-    # return result
-    result <-
-      tof_tibble |>
-      tof_join_metacluster(
-        cluster_col = {{cluster_col}},
-        meta_tibble = meta_tibble,
-        metacluster_vector = ccp_metaclusters
-      ) |>
-      dplyr::rename(.consensus_metacluster = ".metacluster")
-    return(result)
-  }
 
 # tof_metacluster_flowsom ------------------------------------------------------
 
@@ -626,77 +617,74 @@ tof_metacluster_consensus <-
 #'     clustering_algorithm = "som"
 #' )
 #'
-#'
 tof_metacluster_flowsom <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    num_metaclusters = 10L,
-    clustering_algorithm = c("consensus", "hierarchical", "kmeans", "som"),
-    ...
-  ) {
-    # check that FlowSOM is installed
-    rlang::check_installed(pkg = "FlowSOM")
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        num_metaclusters = 10L,
+        clustering_algorithm = c("consensus", "hierarchical", "kmeans", "som"),
+        ...) {
+        # check that FlowSOM is installed
+        rlang::check_installed(pkg = "FlowSOM")
 
-    if (!rlang::is_installed(pkg = "FlowSOM")) {
-      stop("tof_metacluster_flowsom() requires the FlowSOM package")
+        if (!rlang::is_installed(pkg = "FlowSOM")) {
+            stop("tof_metacluster_flowsom() requires the FlowSOM package")
+        }
+
+        # check arguments
+        clustering_algorithm <- rlang::arg_match(clustering_algorithm)
+
+        if (missing(cluster_col)) {
+            stop("cluster_col must be specified")
+        }
+
+        # convert clustering_algorithm string to something CCP will understand
+        clustering_algorithm <-
+            switch(clustering_algorithm,
+                "consensus" = "metaClustering_consensus",
+                "hierarchical" = "tof_metaClustering_hclust",
+                "kmeans" = "tof_metaClustering_kmeans",
+                "som" = "tof_metaClustering_som"
+            )
+
+        # find centroids of all input clusters in tof_tibble
+        meta_tibble <-
+            tof_tibble |>
+            tof_summarize_clusters(
+                cluster_col = {{ cluster_col }},
+                metacluster_cols = {{ metacluster_cols }},
+                central_tendency_function = central_tendency_function
+            )
+
+        # data_matrix
+        data_matrix <-
+            meta_tibble |>
+            dplyr::select(-{{ cluster_col }}) |>
+            as.matrix()
+
+        # perform metaclustering
+        flowsom_metaclusters <-
+            MetaClustering(
+                data = data_matrix,
+                method = clustering_algorithm,
+                max = num_metaclusters,
+                ...
+            ) |>
+            as.character()
+
+        # return result
+        result <-
+            tof_tibble |>
+            tof_join_metacluster(
+                meta_tibble = meta_tibble,
+                cluster_col = {{ cluster_col }},
+                metacluster_vector = flowsom_metaclusters
+            ) |>
+            dplyr::rename(.flowsom_metacluster = ".metacluster")
+        return(result)
     }
-
-    # check arguments
-    clustering_algorithm <- rlang::arg_match(clustering_algorithm)
-
-    if (missing(cluster_col)) {
-      stop("cluster_col must be specified")
-    }
-
-    # convert clustering_algorithm string to something CCP will understand
-    clustering_algorithm <-
-      switch(
-        clustering_algorithm,
-        "consensus" = "metaClustering_consensus",
-        "hierarchical" = "tof_metaClustering_hclust",
-        "kmeans" = "tof_metaClustering_kmeans",
-        "som" = "tof_metaClustering_som"
-      )
-
-    # find centroids of all input clusters in tof_tibble
-    meta_tibble <-
-      tof_tibble |>
-      tof_summarize_clusters(
-        cluster_col = {{cluster_col}},
-        metacluster_cols = {{metacluster_cols}},
-        central_tendency_function = central_tendency_function
-      )
-
-    # data_matrix
-    data_matrix <-
-      meta_tibble |>
-      dplyr::select(-{{cluster_col}}) |>
-      as.matrix()
-
-    # perform metaclustering
-    flowsom_metaclusters <-
-      MetaClustering(
-        data = data_matrix,
-        method = clustering_algorithm,
-        max = num_metaclusters,
-        ...
-      ) |>
-      as.character()
-
-    # return result
-    result <-
-      tof_tibble |>
-      tof_join_metacluster(
-        meta_tibble = meta_tibble,
-        cluster_col = {{cluster_col}},
-        metacluster_vector = flowsom_metaclusters
-      ) |>
-      dplyr::rename(.flowsom_metacluster = ".metacluster")
-    return(result)
-  }
 
 # tof_metacluster --------------------------------------------------------------
 
@@ -772,74 +760,72 @@ tof_metacluster_flowsom <-
 #' )
 #'
 tof_metacluster <-
-  function(
-    tof_tibble,
-    cluster_col,
-    metacluster_cols = where(tof_is_numeric),
-    central_tendency_function = stats::median,
-    ...,
-    augment = TRUE,
-    method = c("consensus", "hierarchical", "kmeans", "phenograph", "flowsom")
-  ) {
-    # check arguments
-    method <- rlang::arg_match(method)
+    function(
+        tof_tibble,
+        cluster_col,
+        metacluster_cols = where(tof_is_numeric),
+        central_tendency_function = stats::median,
+        ...,
+        augment = TRUE,
+        method = c("consensus", "hierarchical", "kmeans", "phenograph", "flowsom")) {
+        # check arguments
+        method <- rlang::arg_match(method)
 
-    if (method == "consensus") {
-      metaclusters <-
-        tof_metacluster_consensus(
-          tof_tibble = tof_tibble,
-          cluster_col = {{cluster_col}},
-          metacluster_cols = {{metacluster_cols}},
-          central_tendency_function = central_tendency_function,
-          ...
-        )
-    } else if (method == "hierarchical") {
-      metaclusters <-
-        tof_metacluster_hierarchical(
-          tof_tibble = tof_tibble,
-          cluster_col = {{cluster_col}},
-          metacluster_cols = {{metacluster_cols}},
-          central_tendency_function = central_tendency_function,
-          ...
-        )
-    } else if (method == "kmeans") {
-      metaclusters <-
-        tof_metacluster_kmeans(
-          tof_tibble = tof_tibble,
-          cluster_col = {{cluster_col}},
-          metacluster_cols = {{metacluster_cols}},
-          central_tendency_function = central_tendency_function,
-          ...
-        )
-    } else if (method == "phenograph") {
-      metaclusters <-
-        tof_metacluster_phenograph(
-          tof_tibble = tof_tibble,
-          cluster_col = {{cluster_col}},
-          metacluster_cols = {{metacluster_cols}},
-          central_tendency_function = central_tendency_function,
-          ...
-        )
-    } else if (method == "flowsom") {
-      metaclusters <-
-        tof_metacluster_flowsom(
-          tof_tibble = tof_tibble,
-          cluster_col = {{cluster_col}},
-          metacluster_cols = {{metacluster_cols}},
-          central_tendency_function = central_tendency_function,
-          ...
-        )
-    } else {
-      stop("Not a valid metaclustering method.")
+        if (method == "consensus") {
+            metaclusters <-
+                tof_metacluster_consensus(
+                    tof_tibble = tof_tibble,
+                    cluster_col = {{ cluster_col }},
+                    metacluster_cols = {{ metacluster_cols }},
+                    central_tendency_function = central_tendency_function,
+                    ...
+                )
+        } else if (method == "hierarchical") {
+            metaclusters <-
+                tof_metacluster_hierarchical(
+                    tof_tibble = tof_tibble,
+                    cluster_col = {{ cluster_col }},
+                    metacluster_cols = {{ metacluster_cols }},
+                    central_tendency_function = central_tendency_function,
+                    ...
+                )
+        } else if (method == "kmeans") {
+            metaclusters <-
+                tof_metacluster_kmeans(
+                    tof_tibble = tof_tibble,
+                    cluster_col = {{ cluster_col }},
+                    metacluster_cols = {{ metacluster_cols }},
+                    central_tendency_function = central_tendency_function,
+                    ...
+                )
+        } else if (method == "phenograph") {
+            metaclusters <-
+                tof_metacluster_phenograph(
+                    tof_tibble = tof_tibble,
+                    cluster_col = {{ cluster_col }},
+                    metacluster_cols = {{ metacluster_cols }},
+                    central_tendency_function = central_tendency_function,
+                    ...
+                )
+        } else if (method == "flowsom") {
+            metaclusters <-
+                tof_metacluster_flowsom(
+                    tof_tibble = tof_tibble,
+                    cluster_col = {{ cluster_col }},
+                    metacluster_cols = {{ metacluster_cols }},
+                    central_tendency_function = central_tendency_function,
+                    ...
+                )
+        } else {
+            stop("Not a valid metaclustering method.")
+        }
+
+        # return result
+        if (augment) {
+            result <- dplyr::bind_cols(tof_tibble, metaclusters)
+        } else {
+            result <- metaclusters
+        }
+
+        return(result)
     }
-
-    # return result
-    if (augment) {
-      result <- dplyr::bind_cols(tof_tibble, metaclusters)
-    } else {
-      result <- metaclusters
-    }
-
-    return(result)
-  }
-

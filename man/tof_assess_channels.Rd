@@ -41,11 +41,11 @@ Detect low-expression (i.e. potentially failed) channels in high-dimensional cyt
 \examples{
 # simulate some data
 sim_data <-
-   data.frame(
-   cd4 = rnorm(n = 100, mean = 5, sd = 0.5),
-   cd8 = rnorm(n = 100, mean = 0, sd = 0.1),
-   cd33 = rnorm(n = 100, mean = 10, sd = 0.1)
-)
+    data.frame(
+        cd4 = rnorm(n = 100, mean = 5, sd = 0.5),
+        cd8 = rnorm(n = 100, mean = 0, sd = 0.1),
+        cd33 = rnorm(n = 100, mean = 10, sd = 0.1)
+    )
 
 tof_assess_channels(tof_tibble = sim_data)
 

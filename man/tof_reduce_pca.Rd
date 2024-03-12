@@ -75,7 +75,6 @@ pca_recipe <- tof_reduce_pca(tof_tibble = sim_data, return_recipe = TRUE)
 # apply recipe to new data
 recipes::bake(pca_recipe, new_data = new_data)
 
-
 }
 \seealso{
 Other dimensionality reduction functions: 

@@ -16,8 +16,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 
 options(tibble.print_min = 4L, tibble.print_max = 4L)
@@ -90,28 +90,28 @@ data(ddpr_data)
 
 set.seed(777L)
 
-ddpr_data |> 
-  tof_preprocess() |>
-  tof_cluster(
-    cluster_cols = starts_with("cd"), # column specification
-    method = "phenograph", # method specification, 
-  ) |> 
-  tof_metacluster(
-    cluster_col = .phenograph_cluster, # column specification
-    num_metaclusters = 4, # method specification
-    method = "kmeans" # method specification
-  ) |> 
-  tof_downsample(
-    group_cols = .kmeans_metacluster, # column specification
-    num_cells = 200, # method specification
-    method = "constant" # method specification
-  ) |>
-  tof_plot_cells_layout(
-    knn_cols = starts_with("cd"), # column specification
-    color_col = .kmeans_metacluster, # column specification
-    num_neighbors = 7L, # method specification
-    node_size = 2L # method specification
-  )
+ddpr_data |>
+    tof_preprocess() |>
+    tof_cluster(
+        cluster_cols = starts_with("cd"), # column specification
+        method = "phenograph", # method specification,
+    ) |>
+    tof_metacluster(
+        cluster_col = .phenograph_cluster, # column specification
+        num_metaclusters = 4, # method specification
+        method = "kmeans" # method specification
+    ) |>
+    tof_downsample(
+        group_cols = .kmeans_metacluster, # column specification
+        num_cells = 200, # method specification
+        method = "constant" # method specification
+    ) |>
+    tof_plot_cells_layout(
+        knn_cols = starts_with("cd"), # column specification
+        color_col = .kmeans_metacluster, # column specification
+        num_neighbors = 7L, # method specification
+        node_size = 2L # method specification
+    )
 ```
 
 ## Pipelines
@@ -129,30 +129,30 @@ ddpr_data |>
 5.  Visualize the clusters using a low-dimensional tSNE embedding
 
 ```{r}
-ddpr_data |> 
-  # step 1
-  tof_preprocess() |> 
-  # step 2
-  tof_cluster(
-    cluster_cols = starts_with("cd"), 
-    method = "phenograph", 
-    #num_metaclusters = 4L, 
-    seed = 2020L
-  ) |>
-  # step 3
-  tof_downsample(
-    group_cols = .phenograph_cluster, 
-    method = "constant", 
-    num_cells = 400
-  ) |> 
-  # step 4
-  tof_reduce_dimensions(method = "tsne") |> 
-  # step 5
-  tof_plot_cells_embedding(
-    embedding_cols = contains("tsne"),
-    color_col = .phenograph_cluster 
-  ) + 
-  ggplot2::theme(legend.position = "none")
+ddpr_data |>
+    # step 1
+    tof_preprocess() |>
+    # step 2
+    tof_cluster(
+        cluster_cols = starts_with("cd"),
+        method = "phenograph",
+        # num_metaclusters = 4L,
+        seed = 2020L
+    ) |>
+    # step 3
+    tof_downsample(
+        group_cols = .phenograph_cluster,
+        method = "constant",
+        num_cells = 400
+    ) |>
+    # step 4
+    tof_reduce_dimensions(method = "tsne") |>
+    # step 5
+    tof_plot_cells_embedding(
+        embedding_cols = contains("tsne"),
+        color_col = .phenograph_cluster
+    ) +
+    ggplot2::theme(legend.position = "none")
 ```
 
 
@@ -167,3 +167,11 @@ First, it means that `{tidytof}` was designed with a few quality-of-life feature
 Second, it means that `{tidytof}` functions *should* be relatively intuitive to use due to their shared logic - in other words, if you understand how to use one `{tidytof}` function, you should understand how to use most of the others. An example of shared logic across `{tidytof}` functions is the argument `group_cols`, which shows up in multiple verbs (`tof_downsample`, `tof_cluster`, `tof_daa`, `tof_dea`, `tof_extract_features`, and `tof_write_data`). In each case, `group_cols` works the same way: it accepts an unquoted vector of column names (specified manually or using [tidyselection](https://r4ds.had.co.nz/transform.html#select)) that should be used to group cells before an operation is performed. This idea generalizes throughout `{tidytof}`: if you see an argument in one place, it will behave identically (or at least very similarly) wherever else you encounter it.
 
 Finally, it means that `{tidytof}` is optimized first for ease-of-use, then for performance. Because humans and computers interact with data differently, there is always a trade-off between choosing a data representation that is intuitive to a human user vs. choosing a data representation optimized for computational speed and memory efficiency. When these design choices conflict with one another, our team tends to err on the side of choosing a representation that is easy-to-understand for users even at the expense of small performance costs. Ultimately, this means that `{tidytof}` may not be the optimal tool for every high-dimensional cytometry analysis, though hopefully its general framework will provide most users with some useful functionality.
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+

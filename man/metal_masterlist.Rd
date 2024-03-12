@@ -19,6 +19,9 @@ of example .fcs files sampled from the studies linked below.
 \usage{
 data(metal_masterlist)
 }
+\value{
+A named character vector.
+}
 \description{
 A character vector used by `tof_read_fcs` and `tof_read_data` to detect and
 parse which CyTOF metals correspond to each channel in an input .fcs file.

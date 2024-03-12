@@ -40,36 +40,32 @@ unsupervised algorithms.
 \examples{
 
 sim_data <-
-  dplyr::tibble(
-    cd45 = rnorm(n = 1000),
-    cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
-    cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
-    cd19 = rnorm(n = 1000),
-    cluster_id = c(rep("a", 500), rep("b", 500))
-  )
+    dplyr::tibble(
+        cd45 = rnorm(n = 1000),
+        cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+        cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+        cd19 = rnorm(n = 1000),
+        cluster_id = c(rep("a", 500), rep("b", 500))
+    )
 
 # using named character vector
 sim_data |>
-  tof_annotate_clusters(
-    cluster_col = cluster_id,
-    annotations = c("macrophage" = "a", "dendritic cell" = "b")
-  )
+    tof_annotate_clusters(
+        cluster_col = cluster_id,
+        annotations = c("macrophage" = "a", "dendritic cell" = "b")
+    )
 
 # using two-column data.frame
 annotation_data_frame <-
-  data.frame(
-    cluster_id = c("a", "b"),
-    cluster_annotation = c("macrophage", "dendritic cell")
-  )
+    data.frame(
+        cluster_id = c("a", "b"),
+        cluster_annotation = c("macrophage", "dendritic cell")
+    )
 
 sim_data |>
-  tof_annotate_clusters(
-    cluster_col = cluster_id,
-    annotations = annotation_data_frame
-  )
-
-
-
-
+    tof_annotate_clusters(
+        cluster_col = cluster_id,
+        annotations = annotation_data_frame
+    )
 
 }

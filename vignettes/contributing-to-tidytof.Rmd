@@ -11,8 +11,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -81,62 +81,60 @@ To extend an existing `{tidytof}` verb, write a function whose name fits the pat
 For example, suppose I wanted to write a `{tidytof}`-style interface for my new clustering algorithm "supercluster", which performs k-means clustering on a dataset twice and then outputs a final cluster assignment equal to the two k-means cluster assignments spliced together. To add the supercluster algorithm to `{tidytof}`, I might write a function like this: 
 
 ```{r}
-#' Perform superclustering on high-dimensional cytometry data. 
-#' 
-#' This function applies the silly, hypothetical clustering algorithm 
-#' "supercluster" to high-dimensional cytometry data using user-specified 
+#' Perform superclustering on high-dimensional cytometry data.
+#'
+#' This function applies the silly, hypothetical clustering algorithm
+#' "supercluster" to high-dimensional cytometry data using user-specified
 #' input variables/cytometry measurements.
 #'
 #' @param tof_tibble A `tof_tbl` or `tibble`.
-#' 
-#' @param cluster_cols Unquoted column names indicating which columns in 
-#' `tof_tibble` to use in computing the supercluster clusters. 
+#'
+#' @param cluster_cols Unquoted column names indicating which columns in
+#' `tof_tibble` to use in computing the supercluster clusters.
 #' Supports tidyselect helpers.
-#' 
-#' @param num_kmeans_clusters An integer indicating how many clusters should be 
-#' used for the two k-means clustering steps. 
-#' 
+#'
+#' @param num_kmeans_clusters An integer indicating how many clusters should be
+#' used for the two k-means clustering steps.
+#'
 #' @param sep A string to use when splicing the 2 k-means clustering assignments
-#' to one another. 
-#' 
-#' @param ... Optional additional parameters to pass to 
+#' to one another.
+#'
+#' @param ... Optional additional parameters to pass to
 #' \code{\link[tidytof]{tof_cluster_kmeans}}
 #'
 #' @return A tibble with one column named `.supercluster_cluster` containing
-#' a character vector of length `nrow(tof_tibble)` indicating the id of the 
-#' supercluster cluster to which each cell (i.e. each row) in `tof_tibble` was 
+#' a character vector of length `nrow(tof_tibble)` indicating the id of the
+#' supercluster cluster to which each cell (i.e. each row) in `tof_tibble` was
 #' assigned.
-#' 
+#'
 #' @importFrom dplyr tibble
 #'
-tof_cluster_supercluster <- 
-  function(tof_tibble, cluster_cols, num_kmeans_clusters = 10L, sep = "_", ...) { 
-    kmeans_1 <- 
-      tof_tibble |> 
-      tof_cluster_kmeans(
-        cluster_cols = {{cluster_cols}}, 
-        num_clusters = num_kmeans_clusters, 
-        ...
-      )
-    
-    kmeans_2 <- 
-      tof_tibble  |> 
-      tof_cluster_kmeans(
-        cluster_cols = {{cluster_cols}}, 
-        num_clusters = num_kmeans_clusters, 
-        ...
-      )
-    
-    final_result <- 
-      dplyr::tibble(
-        .supercluster_cluster = 
-          paste(kmeans_1$.kmeans_cluster, kmeans_2$.kmeans_cluster, sep = sep)
-      )
-    
-    return(final_result)
-    
-  }
+tof_cluster_supercluster <-
+    function(tof_tibble, cluster_cols, num_kmeans_clusters = 10L, sep = "_", ...) {
+        kmeans_1 <-
+            tof_tibble |>
+            tof_cluster_kmeans(
+                cluster_cols = {{ cluster_cols }},
+                num_clusters = num_kmeans_clusters,
+                ...
+            )
 
+        kmeans_2 <-
+            tof_tibble |>
+            tof_cluster_kmeans(
+                cluster_cols = {{ cluster_cols }},
+                num_clusters = num_kmeans_clusters,
+                ...
+            )
+
+        final_result <-
+            dplyr::tibble(
+                .supercluster_cluster =
+                    paste(kmeans_1$.kmeans_cluster, kmeans_2$.kmeans_cluster, sep = sep)
+            )
+
+        return(final_result)
+    }
 ```
 
 In the example above, note that `tof_cluster_supercluster` is named using the `tof_{verb name}_*` style, that the function definition uses the same `tof_tibble` and `cluster_cols` arguments as `tof_cluster`, and that the returned output object is a `tof_tbl` with a single column encoding the cluster ids for each of the cells in `tof_tibble`. 
@@ -153,4 +151,10 @@ At this point in its development, we don't recommend extending `{tidytof}`'s mod
 
 For general questions/comments/concerns about `{tidytof}`, feel free to reach out to our team on GitHub [here](https://github.com/kara-davis-lab). 
 
+
+# Session info
+
+```{r}
+sessionInfo()
+```
 

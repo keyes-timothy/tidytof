@@ -61,8 +61,6 @@ sim_data <-
         cluster_id = c(rep("a", 500), rep("b", 500))
     )
 
-
-
 }
 \seealso{
 Other visualization functions: 

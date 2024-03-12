@@ -34,47 +34,45 @@
 #' NULL
 #'
 tof_batch_correct_quantile_tibble <-
-  function(tof_tibble, channel_cols, augment = TRUE) {
+    function(tof_tibble, channel_cols, augment = TRUE) {
+        # check to see if preprocessCore is installed
+        rlang::check_installed(pkg = "preprocessCore")
 
-    # check to see if preprocessCore is installed
-    rlang::check_installed(pkg = "preprocessCore")
+        if (!requireNamespace(package = "preprocessCore")) {
+            stop("Quantile normalization requires the preprocessCore package to be installed from Bioconductor.")
+        }
 
-    if (!requireNamespace(package = "preprocessCore")) {
-      stop("Quantile normalization requires the preprocessCore package to be installed from Bioconductor.")
+        col_order <- colnames(tof_tibble)
+        channel_names <-
+            tof_tibble |>
+            dplyr::select({{ channel_cols }}) |>
+            colnames()
+
+        unchanged_cols <-
+            tof_tibble |>
+            dplyr::select(-{{ channel_cols }})
+
+        result <-
+            tof_tibble |>
+            dplyr::select({{ channel_cols }}) |>
+            as.matrix() |>
+            t() |>
+            preprocessCore::normalize.quantiles(
+                copy = FALSE
+            ) |>
+            t() |>
+            dplyr::as_tibble()
+
+        colnames(result) <- channel_names
+
+        if (augment) {
+            result <-
+                dplyr::bind_cols(result, unchanged_cols) |>
+                dplyr::relocate(dplyr::all_of(col_order))
+        }
+
+        return(result)
     }
-
-    col_order <- colnames(tof_tibble)
-    channel_names <-
-      tof_tibble |>
-      dplyr::select({{channel_cols}}) |>
-      colnames()
-
-    unchanged_cols <-
-      tof_tibble |>
-      dplyr::select(-{{channel_cols}})
-
-    result <-
-      tof_tibble |>
-      dplyr::select({{channel_cols}}) |>
-      as.matrix() |>
-      t() |>
-      preprocessCore::normalize.quantiles(
-        copy = FALSE
-      ) |>
-      t() |>
-      dplyr::as_tibble()
-
-    colnames(result) <- channel_names
-
-    if (augment) {
-      result <-
-        dplyr::bind_cols(result, unchanged_cols) |>
-        dplyr::relocate(dplyr::all_of(col_order))
-    }
-
-    return(result)
-
-  }
 
 
 
@@ -117,50 +115,46 @@ tof_batch_correct_quantile_tibble <-
 #' NULL
 #'
 tof_batch_correct_quantile <-
-  function(tof_tibble, channel_cols, group_cols, augment = TRUE) {
-    # check to see if preprocessCore is installed
-    rlang::check_installed(pkg = "preprocessCore")
+    function(tof_tibble, channel_cols, group_cols, augment = TRUE) {
+        # check to see if preprocessCore is installed
+        rlang::check_installed(pkg = "preprocessCore")
 
-    if (!requireNamespace(package = "preprocessCore")) {
-      stop("Quantile normalization requires the preprocessCore package to be installed from Bioconductor.")
-    }
+        if (!requireNamespace(package = "preprocessCore")) {
+            stop("Quantile normalization requires the preprocessCore package to be installed from Bioconductor.")
+        }
 
-    if (missing(group_cols)) {
-      result <-
-        tof_tibble |>
-        tof_batch_correct_quantile_tibble(
-          channel_cols = {{channel_cols}},
-          augment = augment
-        )
-
-    } else {
-
-      result <-
-        tof_tibble |>
-        tidyr::nest(
-          data = -{{group_cols}}
-        ) |>
-        dplyr::mutate(
-          data =
-            purrr::map(
-              .x = .data$data,
-              .f =
-                \(x) {
-                  tof_batch_correct_quantile_tibble(
-                    tof_tibble = x,
-                    channel_cols = {{channel_cols}},
+        if (missing(group_cols)) {
+            result <-
+                tof_tibble |>
+                tof_batch_correct_quantile_tibble(
+                    channel_cols = {{ channel_cols }},
                     augment = augment
-                  )
-                }
-            )
-        ) |>
-        tidyr::unnest(cols = .data$data)
+                )
+        } else {
+            result <-
+                tof_tibble |>
+                tidyr::nest(
+                    data = -{{ group_cols }}
+                ) |>
+                dplyr::mutate(
+                    data =
+                        purrr::map(
+                            .x = .data$data,
+                            .f =
+                                \(x) {
+                                    tof_batch_correct_quantile_tibble(
+                                        tof_tibble = x,
+                                        channel_cols = {{ channel_cols }},
+                                        augment = augment
+                                    )
+                                }
+                        )
+                ) |>
+                tidyr::unnest(cols = .data$data)
+        }
 
+        return(result)
     }
-
-    return(result)
-
-  }
 
 
 
@@ -204,27 +198,26 @@ tof_batch_correct_quantile <-
 #' NULL
 #'
 tof_batch_correct_rescale <-
-  function(tof_tibble, channel_cols, group_cols, augment = TRUE) {
+    function(tof_tibble, channel_cols, group_cols, augment = TRUE) {
+        result <-
+            tof_tibble |>
+            dplyr::group_by({{ group_cols }}) |>
+            dplyr::mutate(
+                dplyr::across(
+                    .cols = {{ channel_cols }},
+                    tof_rescale
+                )
+            ) |>
+            dplyr::ungroup()
 
-    result <-
-      tof_tibble |>
-      dplyr::group_by({{group_cols}}) |>
-      dplyr::mutate(
-        dplyr::across(
-          .cols = {{channel_cols}},
-          tof_rescale
-        )
-      ) |>
-      dplyr::ungroup()
+        if (!augment) {
+            result <-
+                result |>
+                dplyr::select({{ group_cols }}, {{ channel_cols }})
+        }
 
-    if (!augment) {
-      result <-
-        result |>
-        dplyr::select({{group_cols}}, {{channel_cols}})
+        return(result)
     }
-
-    return(result)
-}
 
 
 
@@ -265,50 +258,34 @@ tof_batch_correct_rescale <-
 #' NULL
 #'
 tof_batch_correct <-
-  function(
-    tof_tibble,
-    channel_cols,
-    group_cols,
-    augment = TRUE,
-    method = c("rescale", "quantile")
-  ) {
+    function(
+        tof_tibble,
+        channel_cols,
+        group_cols,
+        augment = TRUE,
+        method = c("rescale", "quantile")) {
+        # check method
 
-    # check method
+        # perform batch correction
+        if (method == "rescale") {
+            result <-
+                tof_tibble |>
+                tof_batch_correct_rescale(
+                    channel_cols = {{ channel_cols }},
+                    group_cols = {{ group_cols }},
+                    augment = augment
+                )
+        } else if (method == "quantile") {
+            result <-
+                tof_tibble |>
+                tof_batch_correct_quantile(
+                    channel_cols = {{ channel_cols }},
+                    group_cols = {{ group_cols }},
+                    augment = augment
+                )
+        } else {
+            stop("Not a valid method")
+        }
 
-    # perform batch correction
-    if (method == "rescale") {
-
-      result <-
-        tof_tibble |>
-        tof_batch_correct_rescale(
-          channel_cols = {{channel_cols}},
-          group_cols = {{group_cols}},
-          augment = augment
-        )
-
-
-    } else if (method == "quantile") {
-      result <-
-        tof_tibble |>
-        tof_batch_correct_quantile(
-          channel_cols = {{channel_cols}},
-          group_cols = {{group_cols}},
-          augment = augment
-        )
-
-    } else {
-      stop("Not a valid method")
+        return(result)
     }
-
-    return(result)
-  }
-
-
-
-
-
-
-
-
-
-

@@ -2,7 +2,7 @@
 % Please edit documentation in R/patient-level_modeling.R
 \name{tof_train_model}
 \alias{tof_train_model}
-\title{Train an elastic net model to predict sample-level phenomena using CyTOF data.}
+\title{Train an elastic net model to predict sample-level phenomena using high-dimensional cytometry data.}
 \usage{
 tof_train_model(
   split_data,
@@ -158,7 +158,7 @@ feature_tibble <-
             ),
         event = c(rep(0, times = 30), rep(1, times = 70)),
         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
-   )
+    )
 
 split_data <- tof_split_data(feature_tibble, split_method = "simple")
 
@@ -186,7 +186,6 @@ tof_train_model(
     event_col = event,
     model_type = "survival"
 )
-
 
 }
 \seealso{

@@ -45,13 +45,12 @@ sim_data <-
 tof_cluster_kmeans(tof_tibble = sim_data)
 tof_cluster_kmeans(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 
-
 }
 \seealso{
 Other clustering functions: 
+\code{\link{tof_cluster}()},
 \code{\link{tof_cluster_ddpr}()},
 \code{\link{tof_cluster_flowsom}()},
-\code{\link{tof_cluster_phenograph}()},
-\code{\link{tof_cluster}()}
+\code{\link{tof_cluster_phenograph}()}
 }
 \concept{clustering functions}

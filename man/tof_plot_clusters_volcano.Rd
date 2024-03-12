@@ -89,10 +89,9 @@ sim_dea_result <-
         significant = dplyr::if_else(p_adj < 0.05, "*", "")
     )
 
- attr(sim_dea_result, which = "dea_method") <- "t_unpaired"
+attr(sim_dea_result, which = "dea_method") <- "t_unpaired"
 
- # create the volcano plot
- volcano <- tof_plot_clusters_volcano(dea_result = sim_dea_result)
-
+# create the volcano plot
+volcano <- tof_plot_clusters_volcano(dea_result = sim_dea_result)
 
 }

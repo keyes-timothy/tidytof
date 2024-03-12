@@ -38,6 +38,9 @@ A data frame with 10000 rows and 24 variables:
 \usage{
 data(ddpr_data)
 }
+\value{
+A data.frame
+}
 \description{
 A dataset containing CyTOF measurements from immune cells originally studied
 in the following paper:  \cr \cr

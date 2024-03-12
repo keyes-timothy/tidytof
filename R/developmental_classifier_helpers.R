@@ -36,45 +36,44 @@
 #'
 #'
 tof_build_classifier <- function(
-  healthy_tibble = NULL,
-  healthy_cell_labels = NULL,
-  classifier_markers = where(tof_is_numeric),
-  verbose = FALSE
-) {
-  if (verbose) {
-    message("Building classifier from healthy cells...")
+    healthy_tibble = NULL,
+    healthy_cell_labels = NULL,
+    classifier_markers = where(tof_is_numeric),
+    verbose = FALSE) {
+    if (verbose) {
+        message("Building classifier from healthy cells...")
 
-    message("Reshaping healthy data...")
-  }
+        message("Reshaping healthy data...")
+    }
 
-  healthy_tibble <-
-    healthy_tibble %>%
-    dplyr::mutate(population = healthy_cell_labels) %>%
-    dplyr::select({{classifier_markers}}, "population") %>%
-    dplyr::group_by(.data$population) %>%
-    tidyr::nest()
+    healthy_tibble <-
+        healthy_tibble |>
+        dplyr::mutate(population = healthy_cell_labels) |>
+        dplyr::select({{ classifier_markers }}, "population") |>
+        dplyr::group_by(.data$population) |>
+        tidyr::nest()
 
-  # Calculate mean and covariance matrix for each population
-  if (verbose) {
-    message("Calculating mean and covariance matrix for all healthy populations")
-  }
-  classifier_fit <-
-    healthy_tibble %>%
-    dplyr::transmute(
-      .data$population,
-      centroid =
-        purrr::map(
-          data,
-          ~ dplyr::summarize(.x, dplyr::across(dplyr::everything(), mean)) %>%
-            tidyr::pivot_longer(tidyr::everything()) %>%
-            deframe()
-        ),
-      covariance_matrix = purrr::map(data, cov)
-    )
-  if (verbose) {
-    message("Done! Returning classifier_fit object")
-  }
-  return(classifier_fit)
+    # Calculate mean and covariance matrix for each population
+    if (verbose) {
+        message("Calculating mean and covariance matrix for all healthy populations")
+    }
+    classifier_fit <-
+        healthy_tibble |>
+        dplyr::transmute(
+            .data$population,
+            centroid =
+                purrr::map(
+                    data,
+                    ~ dplyr::summarize(.x, dplyr::across(dplyr::everything(), mean)) |>
+                        tidyr::pivot_longer(tidyr::everything()) |>
+                        deframe()
+                ),
+            covariance_matrix = purrr::map(data, cov)
+        )
+    if (verbose) {
+        message("Done! Returning classifier_fit object")
+    }
+    return(classifier_fit)
 }
 
 
@@ -101,89 +100,85 @@ tof_build_classifier <- function(
 #' classified into.
 #'
 tof_classify_cells <-
-  function(
-    classifier_fit,
-    cancer_data,
-    distance_function = c("mahalanobis", "cosine", "pearson")
-  ){
+    function(
+        classifier_fit,
+        cancer_data,
+        distance_function = c("mahalanobis", "cosine", "pearson")) {
+        distance_function <-
+            match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
 
-    distance_function <-
-      match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
+        # Calculate distance to each population
+        if (distance_function == "mahalanobis") {
+            classifications <-
+                classifier_fit |>
+                dplyr::transmute(
+                    classification_data =
+                        purrr::map2(
+                            .x = .data$centroid,
+                            .y = .data$covariance_matrix,
+                            .f = ~ mahalanobis(cancer_data, center = .x, cov = .y)
+                        )
+                ) |>
+                dplyr::pull(.data$classification_data) |>
+                purrr::quietly(dplyr::bind_cols)() |>
+                purrr::pluck("result")
+        } else if (distance_function == "cosine") {
+            classifications <-
+                classifier_fit |>
+                dplyr::transmute(
+                    classification_data =
+                        purrr::map(
+                            .x = .data$centroid,
+                            .f =
+                                ~ tof_cosine_dist(
+                                    matrix = as.matrix(cancer_data),
+                                    vector = .x
+                                )
+                        )
+                ) |>
+                pull(.data$classification_data) |>
+                purrr::quietly(dplyr::bind_cols)() |>
+                purrr::pluck("result")
+        } else if (distance_function == "pearson") {
+            classifications <-
+                classifier_fit |>
+                dplyr::mutate(
+                    classification_data =
+                        purrr::map(
+                            .x = .data$centroid,
+                            .f = ~ 1 - cor(x = t(as.matrix(cancer_data)), y = .x)
+                        )
+                ) |>
+                dplyr::pull(.data$classification_data) |>
+                purrr::quietly(dplyr::bind_cols)() |>
+                purrr::pluck("result")
+        }
 
-    # Calculate distance to each population
-    if (distance_function == "mahalanobis") {
-      classifications <-
-        classifier_fit %>%
-        dplyr::transmute(
-          classification_data =
-            purrr::map2(
-              .x = .data$centroid,
-              .y = .data$covariance_matrix,
-              .f = ~ mahalanobis(cancer_data, center = .x, cov = .y)
-            )
-        ) %>%
-        dplyr::pull(.data$classification_data) %>%
-        purrr::quietly(dplyr::bind_cols)() %>%
-        purrr::pluck("result")
+        colnames(classifications) <- as.character(classifier_fit$population)
+        if (distance_function == "pearson") {
+            classifications <- dplyr::as_tibble(as.matrix(classifications))
+        }
 
-    } else if (distance_function == "cosine") {
-      classifications <-
-        classifier_fit %>%
-        dplyr::transmute(
-          classification_data =
-            purrr::map(
-              .x = .data$centroid,
-              .f =
-                ~ tof_cosine_dist(
-                  matrix = as.matrix(cancer_data),
-                  vector = .x
-                )
-            )
-        ) %>%
-        pull(.data$classification_data) %>%
-        purrr::quietly(dplyr::bind_cols)() %>%
-        purrr::pluck("result")
+        population_names <-
+            classifications |>
+            dplyr::mutate(..cell_id = seq_len(length.out = nrow(classifications))) |>
+            tidyr::pivot_longer(
+                cols = -"..cell_id",
+                names_to = "cluster",
+                values_to = "distance"
+            ) |>
+            dplyr::group_by(.data$..cell_id) |>
+            dplyr::filter(.data$distance == min(.data$distance)) |>
+            dplyr::select(-"distance")
 
-    } else if (distance_function == "pearson") {
-      classifications <-
-        classifier_fit %>%
-        dplyr::mutate(
-          classification_data =
-            purrr::map(
-              .x = .data$centroid,
-              .f = ~ 1 - cor(x = t(as.matrix(cancer_data)), y = .x)
-            )
-        ) %>%
-        dplyr::pull(.data$classification_data) %>%
-        purrr::quietly(dplyr::bind_cols)() %>%
-        purrr::pluck("result")
+        classifications <-
+            classifications |>
+            dplyr::mutate(..cell_id = seq_len(length.out = nrow(classifications))) |>
+            dplyr::left_join(population_names, by = "..cell_id") |>
+            dplyr::select(-"..cell_id")
+
+        return(classifications)
     }
-
-    colnames(classifications) <- as.character(classifier_fit$population)
-    if (distance_function == "pearson") {
-      classifications <- dplyr::as_tibble(as.matrix(classifications))
-    }
-
-    population_names <-
-      classifications %>%
-      dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
-      tidyr::pivot_longer(
-        cols = -"..cell_id",
-        names_to = "cluster",
-        values_to = "distance"
-      ) %>%
-      dplyr::group_by(.data$..cell_id) %>%
-      dplyr::filter(.data$distance == min(.data$distance)) %>%
-      dplyr::select(-"distance")
-
-    classifications <-
-      classifications %>%
-      dplyr::mutate(..cell_id = 1:nrow(classifications)) %>%
-      dplyr::left_join(population_names, by = "..cell_id") %>%
-      dplyr::select(-"..cell_id")
-
-    return(classifications)
-  }
 
 
 #' A function for finding the cosine distance between each of the rows of a numeric
@@ -200,20 +195,19 @@ tof_classify_cells <-
 #' @examples
 #' NULL
 tof_cosine_dist <-
-  function(matrix, vector) {
+    function(matrix, vector) {
+        diag_matrix_matrix_t <- rep(0, nrow(matrix))
+        for (i in seq_len(nrow(matrix))) {
+            diag_matrix_matrix_t[[i]] <- crossprod(matrix[i, ])
+        }
+        distances <-
+            (matrix %*% vector) /
+                (as.vector(sqrt(crossprod(vector))) * sqrt(diag_matrix_matrix_t))
 
-    diag_matrix_matrix_t <- rep(0, nrow(matrix))
-    for (i in 1:nrow(matrix)) {
-      diag_matrix_matrix_t[[i]] <- crossprod(matrix[i , ])
+        distances <- as.numeric(1 - distances)
+
+        return(distances)
     }
-    distances <-
-      (matrix %*% vector) /
-      (as.vector(sqrt(crossprod(vector))) * sqrt(diag_matrix_matrix_t))
-
-    distances <- as.numeric(1 - distances)
-
-    return(distances)
-  }
 
 
 #' Perform developmental clustering on CyTOF data using a pre-fit classifier
@@ -247,98 +241,96 @@ tof_cosine_dist <-
 #' NULL
 #'
 tof_apply_classifier <- function(
-  cancer_tibble = NULL,
-  classifier_fit = NULL,
-  distance_function = c("mahalanobis", "cosine", "pearson"),
-  num_cores = 1,
-  parallel_vars
-) {
+    cancer_tibble = NULL,
+    classifier_fit = NULL,
+    distance_function = c("mahalanobis", "cosine", "pearson"),
+    num_cores = 1,
+    parallel_vars) {
+    # check distance function
+    distance_function <-
+        match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
 
-  # check distance function
-  distance_function <-
-    match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
+    classifier_markers <- colnames(classifier_fit$covariance_matrix[[1]])
 
-  classifier_markers <- colnames(classifier_fit$covariance_matrix[[1]])
+    # If no variable over which to parallelize was specified
+    if (missing(parallel_vars)) {
+        classification_data <-
+            tof_classify_cells(
+                classifier_fit = classifier_fit,
+                cancer_data =
+                    dplyr::select(cancer_tibble, dplyr::any_of(classifier_markers)),
+                distance_function = distance_function
+            ) |>
+            dplyr::rename_with(function(x) stringr::str_c(distance_function, x, sep = "_"), .cols = everything())
 
-  # If no variable over which to parallelize was specified
-  if (missing(parallel_vars)) {
-    classification_data <-
-      tof_classify_cells(
-        classifier_fit = classifier_fit,
-        cancer_data =
-          dplyr::select(cancer_tibble, dplyr::any_of(classifier_markers)),
-        distance_function = distance_function
-      ) %>%
-      dplyr::rename_with(function(x) stringr::str_c(distance_function, x, sep = "_"), .cols = everything())
+        # otherwise,
+    } else {
+        # initialize values related to parallel processing
+        `%my_do%` <- `%do%`
+        my_cluster <- NULL
 
-    # otherwise,
-  } else {
-    # initialize values related to parallel processing
-    `%my_do%` <- `%do%`
-    my_cluster <- NULL
+        # nest cancer data
+        cancer_tibble <-
+            cancer_tibble |>
+            dplyr::select(
+                {{ parallel_vars }},
+                dplyr::any_of(classifier_markers)
+            ) |>
+            mutate(
+                ..cell_id = seq_len(nrow(cancer_tibble))
+            ) |>
+            # check this
+            tidyr::nest(data = -{{ parallel_vars }}, ..cell_ids = "..cell_id") |>
+            dplyr::ungroup()
 
-    # nest cancer data
-    cancer_tibble <-
-      cancer_tibble %>%
-      dplyr::select(
-        {{parallel_vars}},
-        dplyr::any_of(classifier_markers)
-      ) %>%
-      mutate(
-        ..cell_id = 1:nrow(cancer_tibble)
-      ) %>%
-      # check this
-      tidyr::nest(data = -{{parallel_vars}}, ..cell_ids = "..cell_id") %>%
-      dplyr::ungroup()
+        # set up parallel back-end
+        if (num_cores != 1) {
+            my_cluster <- parallel::makeCluster(num_cores)
+            doParallel::registerDoParallel(my_cluster)
+            `%my_do%` <- `%dopar%`
+        }
 
-    # set up parallel back-end
-    if (num_cores != 1) {
-      my_cluster <- parallel::makeCluster(num_cores)
-      doParallel::registerDoParallel(my_cluster)
-      `%my_do%` <- `%dopar%`
+        # hack-y way to get around R CMD check note for expression matrix
+        # not having a visible global binding due to NSE
+        if (is.null(cancer_tibble)) {
+            expression_matrix <- NULL
+        }
+
+        # cluster each value of parallel_vars on a difference core simultaneously
+        classification_data <-
+            foreach::foreach(
+                expression_matrix = cancer_tibble$data,
+                .combine = list,
+                .packages = c("dplyr", "purrr", "tidyr"),
+                .export = c("tof_classify_cells", "tof_cosine_dist"),
+                .multicombine = TRUE,
+                .maxcombine = nrow(cancer_tibble)
+            ) %my_do%
+            tof_classify_cells(
+                classifier_fit = classifier_fit,
+                cancer_data = dplyr::select(expression_matrix, -"..cell_id"),
+                distance_function = distance_function
+            )
+
+        # stop cluster if it was set up
+        if (!is.null(my_cluster)) {
+            parallel::stopCluster(my_cluster)
+        }
+
+        # unnest final classification data and return it
+        classification_data <-
+            dplyr::tibble(
+                classification_data = classification_data,
+                ..cell_ids = cancer_tibble$..cell_ids
+            ) |>
+            tidyr::unnest(cols = c("classification_data", "..cell_ids")) |>
+            dplyr::arrange(.data$..cell_id) |>
+            dplyr::select(-"..cell_id") |>
+            dplyr::rename_with(
+                function(x) stringr::str_c(distance_function, x, sep = "_"),
+                .cols = tidyselect::everything()
+            )
     }
 
-    # hack-y way to get around R CMD check note for expression matrix
-    # not having a visible global binding due to NSE
-    if (is.null(cancer_tibble)) {
-      expression_matrix <- NULL
-    }
-
-    # cluster each value of parallel_vars on a difference core simultaneously
-    classification_data <-
-      foreach::foreach(
-        expression_matrix = cancer_tibble$data,
-        .combine = list,
-        .packages = c("dplyr", "purrr", "tidyr"),
-        .export = c("tof_classify_cells", "tof_cosine_dist"),
-        .multicombine = TRUE,
-        .maxcombine = nrow(cancer_tibble)
-      ) %my_do%
-      tof_classify_cells(
-        classifier_fit = classifier_fit,
-        cancer_data = dplyr::select(expression_matrix, -"..cell_id"),
-        distance_function = distance_function
-      )
-
-    # stop cluster if it was set up
-    if (!is.null(my_cluster)) {
-      parallel::stopCluster(my_cluster)
-    }
-
-    # unnest final classification data and return it
-    classification_data <-
-      dplyr::tibble(
-        classification_data = classification_data,
-        ..cell_ids = cancer_tibble$..cell_ids
-      ) %>%
-      tidyr::unnest(cols = c("classification_data", "..cell_ids")) %>%
-      dplyr::arrange(.data$..cell_id) %>%
-      dplyr::select(-"..cell_id") %>%
-      dplyr::rename_with(
-        function(x) stringr::str_c(distance_function, x, sep = "_"),
-        .cols = tidyselect::everything()
-      )
-  }
-
-  return(classification_data)
+    return(classification_data)
 }

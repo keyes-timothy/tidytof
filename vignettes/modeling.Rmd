@@ -14,8 +14,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -36,20 +36,20 @@ To illustrate how they work, first we download some patient-level data from [thi
 data(ddpr_metadata)
 
 # link for downloading the sample-level data from the Nature Medicine website
-data_link <- 
-  "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"
+data_link <-
+    "https://static-content.springer.com/esm/art%3A10.1038%2Fnm.4505/MediaObjects/41591_2018_BFnm4505_MOESM3_ESM.csv"
 
 # download the data and combine it with clinical annotations
-ddpr_patients <- 
-  readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) %>% 
-  dplyr::rename(patient_id = Patient_ID) %>% 
-  dplyr::left_join(ddpr_metadata, by = "patient_id") %>% 
-  dplyr::filter(!str_detect(patient_id, "Healthy"))
+ddpr_patients <-
+    readr::read_csv(data_link, skip = 2L, n_max = 78L, show_col_types = FALSE) |>
+    dplyr::rename(patient_id = Patient_ID) |>
+    dplyr::left_join(ddpr_metadata, by = "patient_id") |>
+    dplyr::filter(!str_detect(patient_id, "Healthy"))
 
-# preview only the metadata (i.e. non-numeric) columns 
-ddpr_patients %>% 
-  dplyr::select(where(~ !is.numeric(.x))) %>% 
-  head()
+# preview only the metadata (i.e. non-numeric) columns
+ddpr_patients |>
+    dplyr::select(where(~ !is.numeric(.x))) |>
+    head()
 ```
 
 The data processing steps above result in a tibble called `ddpr_patients`. The numeric columns in `ddpr_patients` represent aggregated cell population features for each sample (see [Supplementary Table 5 in this paper](https://www.nature.com/articles/nm.4505#MOESM3) for details). The non-numeric columns represent clinical metadata about each sample (run `?ddpr_metadata` for more information). Of the metadata columns, the most important are the ones that indicate if a patient will develop refractory disease ("relapse"), and when/if that will happen. This information is stored in the `relapse_status` and `time_to_relapse` columns, respectively. 
@@ -57,15 +57,15 @@ The data processing steps above result in a tibble called `ddpr_patients`. The n
 There are also a few preprocessing steps that we might want to perform now to save us some headaches when we're fitting models later. 
 
 ```{r}
-ddpr_patients <- 
-  ddpr_patients %>% 
-  # convert the relapse_status variable to a factor
-  # and create the time_to_event and event columns for survival modeling
-  dplyr::mutate(
-    relapse_status = as.factor(relapse_status), 
-    time_to_event = dplyr::if_else(relapse_status == "Yes", time_to_relapse, ccr),
-    event = dplyr::if_else(relapse_status == "Yes", 1, 0)
-  )
+ddpr_patients <-
+    ddpr_patients |>
+    # convert the relapse_status variable to a factor
+    # and create the time_to_event and event columns for survival modeling
+    dplyr::mutate(
+        relapse_status = as.factor(relapse_status),
+        time_to_event = dplyr::if_else(relapse_status == "Yes", time_to_relapse, ccr),
+        event = dplyr::if_else(relapse_status == "Yes", 1, 0)
+    )
 ```
 
 In the next part of this vignette, we'll use this patient-level data to build some 
@@ -78,20 +78,20 @@ First, we can build an elastic net classifier to predict which patients will rel
 
 ```{r}
 # find how many of each outcome we have in our cohort
-ddpr_patients %>% 
-  dplyr::count(relapse_status)
+ddpr_patients |>
+    dplyr::count(relapse_status)
 ```
 
 We can see that not all of our samples are annotated, so we can throw away all the samples that don't have a clinical outcome associated with them. 
 
 ```{r}
-ddpr_patients_unannotated <- 
-  ddpr_patients %>% 
-  dplyr::filter(is.na(relapse_status))
+ddpr_patients_unannotated <-
+    ddpr_patients |>
+    dplyr::filter(is.na(relapse_status))
 
-ddpr_patients <- 
-  ddpr_patients %>% 
-  dplyr::filter(!is.na(relapse_status))
+ddpr_patients <-
+    ddpr_patients |>
+    dplyr::filter(!is.na(relapse_status))
 ```
 
 In the original DDPR paper, 10-fold cross-validation was used to tune a glmnet 
@@ -100,13 +100,13 @@ model and to estimate the error of that model on new datasets. Here, we can use 
 ```{r}
 set.seed(3000L)
 
-training_split <- 
-  ddpr_patients %>% 
-  tof_split_data(
-    split_method = "k-fold", 
-    num_cv_folds = 10, 
-    strata = relapse_status
-  )
+training_split <-
+    ddpr_patients |>
+    tof_split_data(
+        split_method = "k-fold",
+        num_cv_folds = 10,
+        strata = relapse_status
+    )
 
 training_split
 ```
@@ -122,21 +122,20 @@ We can inspect one of the resamples in the `splits` column to see what they cont
 my_resample <- training_split$splits[[1]]
 
 print(my_resample)
-
 ```
 
 Note that you can use `rsample::training` and `rsample::testing` to return the training and test observations from each resampling: 
 
 ```{r}
-my_resample %>% 
-  rsample::training() %>% 
-  head()
+my_resample |>
+    rsample::training() |>
+    head()
 ```
 
 ```{r}
-my_resample %>% 
-  rsample::testing() %>% 
-  head()
+my_resample |>
+    rsample::testing() |>
+    head()
 ```
 
 From here, we can feed  `training_split` into the `tof_train_model` function to [tune](https://www.tmwr.org/tuning.html) a logistic regression model that predicts the relapse_status of a leukemia patient. Be sure to check out the `tof_create_grid` documentation to learn how to make a hyperparameter search grid for model tuning (in this case, we limit the mixture parameter to a value of 1, which fits a sparse lasso model).
@@ -146,16 +145,16 @@ Also note that, in this case, for illustrative purposes we're only incorporating
 ```{r, warning = FALSE}
 hyperparams <- tof_create_grid(mixture_values = 1)
 
-class_mod <- 
-  training_split %>% 
-  tof_train_model(
-    predictor_cols = c(contains("Pop2")), 
-    response_col = relapse_status,
-    model_type = "two-class", 
-    hyperparameter_grid = hyperparams, 
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE # often a smart decision
-  )
+class_mod <-
+    training_split |>
+    tof_train_model(
+        predictor_cols = c(contains("Pop2")),
+        response_col = relapse_status,
+        model_type = "two-class",
+        hyperparameter_grid = hyperparams,
+        impute_missing_predictors = TRUE,
+        remove_zv_predictors = TRUE # often a smart decision
+    )
 ```
 
 The output of `tof_train_model` is a `tof_model`, an object containing information about the trained model (and that can be passed to the `tof_predict` and `tof_assess_model` verbs). When a `tof_model` is printed, some information about the optimal hyperparamters is printed, and so is a table of the nonzero model coefficients in the model. 
@@ -167,9 +166,9 @@ print(class_mod)
 After training our model, we might be interested in seeing how it performs. One way to assess a classification model is to see how well it works when applied directly back to the data it was trained on (the model's "training data"). To do so, we can use the `tof_assess_model()` function with no arguments:
 
 ```{r}
-training_classifier_metrics <- 
-  class_mod %>% 
-  tof_assess_model()
+training_classifier_metrics <-
+    class_mod |>
+    tof_assess_model()
 ```
 
 `tof_assess_model()` returns a list of several model assessment metrics that differ depending on the kind of `tof_model` you trained. For two-class classifier models, among the most useful of these is the `confusion_matrix`, which shows how your classifier classified each observation relative to its true class assignment.
@@ -181,8 +180,8 @@ training_classifier_metrics$confusion_matrix
 In this case, we can see that our model performed perfectly on its training data (which is expected, as the model was optimized using these data themselves!). You can also visualize the model's performance using the `tof_plot_model()` verb, which in the case of a two-class model will give us a Receiver-Operating Characteristic (ROC) curve: 
 
 ```{r}
-class_mod %>% 
-  tof_plot_model()
+class_mod |>
+    tof_plot_model()
 ```
 
 As shown above, `tof_plot_model()` will return a receiver-operating curve for a two-class model. While it's unusual to get an AUC of 1 in the machine learning world, we can note that in this case, our classification problem wasn't particularly difficult (and we had a lot of input features to work with).
@@ -190,12 +189,12 @@ As shown above, `tof_plot_model()` will return a receiver-operating curve for a 
 After training a model, it generally isn't sufficient to evaluate how a model performs on the training data alone, as doing so will provide an overly-optimistic representation of how the model would perform on data it's never seen before (this problem is often called "overfitting" the model to the training data). To get a fairer estimate of our model's performance on new datasets, we can also evaluate its cross-validation error by calling `tof_assess_model()` and `tof_plot_model()` with the `new_data` argument set to "tuning".
 
 ```{r}
-cv_classifier_metrics <- 
-  class_mod %>% 
-  tof_assess_model(new_data = "tuning")
+cv_classifier_metrics <-
+    class_mod |>
+    tof_assess_model(new_data = "tuning")
 
-class_mod %>% 
-  tof_plot_model(new_data = "tuning")
+class_mod |>
+    tof_plot_model(new_data = "tuning")
 ```
 
 In this case, we plot an ROC Curve using the predictions for each observation when it was **excluded** from model training during cross-validation, an approach that gives a more accurate estimate of a model's performance on new data than simple evaluation on the training dataset.
@@ -209,17 +208,17 @@ To build a survival model using `{tidytof}`, use the `tof_train_model()` verb wh
 ```{r, warning = FALSE}
 hyperparams <- tof_create_grid(mixture_values = 1)
 
-survival_mod <- 
-  training_split %>% 
-  tof_train_model(
-    predictor_cols = c(contains("Pop2")), 
-    time_col = time_to_event, 
-    event_col = event, 
-    model_type = "survival", 
-    hyperparameter_grid = hyperparams, 
-    impute_missing_predictors = TRUE, 
-    remove_zv_predictors = TRUE # often a smart decision
-  )
+survival_mod <-
+    training_split |>
+    tof_train_model(
+        predictor_cols = c(contains("Pop2")),
+        time_col = time_to_event,
+        event_col = event,
+        model_type = "survival",
+        hyperparameter_grid = hyperparams,
+        impute_missing_predictors = TRUE,
+        remove_zv_predictors = TRUE # often a smart decision
+    )
 
 print(survival_mod)
 ```
@@ -227,9 +226,9 @@ print(survival_mod)
 Once a survival model is trained, it can be used to predict a patient's probability of the event-of-interest at different times post-diagnosis. However, the most common way that survival models are applied in practice is to use each patient's predicted relative risk of the event-of-interest to divide patients into low- and high-risk subgroups. `{tidytof}` can do this automatically according to the most optimal split obtained using the log-rank test of all possible split points in the dataset with `tof_assess_model()`. In addition, it will return the predicted survival curve for each patient over time: 
 
 ```{r}
-survival_metrics <- 
-  survival_mod %>% 
-  tof_assess_model()
+survival_metrics <-
+    survival_mod |>
+    tof_assess_model()
 
 survival_metrics
 ```
@@ -237,28 +236,31 @@ survival_metrics
 For survival models, `tof_plot_model()` plots the average survival curves for both the low- and high-risk groups: 
 
 ```{r}
-survival_mod %>% 
-  tof_plot_model() 
+survival_mod |>
+    tof_plot_model()
 ```
 
 
 
 ```{r}
 cv_survival_metrics <-
-  survival_mod %>%
-  tof_assess_model(new_data = "tuning")
+    survival_mod |>
+    tof_assess_model(new_data = "tuning")
 ```
 
 
 ```{r}
-survival_mod %>% 
-  tof_plot_model(new_data = "tuning")
+survival_mod |>
+    tof_plot_model(new_data = "tuning")
 ```
 
 
 
+# Session info
 
-
+```{r}
+sessionInfo()
+```
 
 
 

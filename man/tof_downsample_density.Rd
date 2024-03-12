@@ -106,12 +106,11 @@ tof_downsample_density(
     density_estimation_method = "mean_distance"
 )
 
-
 }
 \seealso{
 Other downsampling functions: 
+\code{\link{tof_downsample}()},
 \code{\link{tof_downsample_constant}()},
-\code{\link{tof_downsample_prop}()},
-\code{\link{tof_downsample}()}
+\code{\link{tof_downsample_prop}()}
 }
 \concept{downsampling functions}

@@ -54,19 +54,19 @@ cell's own cluster assignment, the cell is flagged as potentially anomalous.
 }
 \examples{
 sim_data <-
-  dplyr::tibble(
-    cd45 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd38 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd34 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd19 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cluster_id = c(rep("a", 1000), rep("b", 1000), rep("c", 1000))
-  )
+    dplyr::tibble(
+        cd45 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd38 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd34 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd19 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cluster_id = c(rep("a", 1000), rep("b", 1000), rep("c", 1000))
+    )
 
 knn_result <-
-  sim_data |>
-  tof_assess_clusters_knn(
-    cluster_col = cluster_id,
-    num_neighbors = 10
-  )
+    sim_data |>
+    tof_assess_clusters_knn(
+        cluster_col = cluster_id,
+        num_neighbors = 10
+    )
 
 }

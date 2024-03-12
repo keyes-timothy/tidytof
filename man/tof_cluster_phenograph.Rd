@@ -58,9 +58,9 @@ tof_cluster_phenograph(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 }
 \seealso{
 Other clustering functions: 
+\code{\link{tof_cluster}()},
 \code{\link{tof_cluster_ddpr}()},
 \code{\link{tof_cluster_flowsom}()},
-\code{\link{tof_cluster_kmeans}()},
-\code{\link{tof_cluster}()}
+\code{\link{tof_cluster_kmeans}()}
 }
 \concept{clustering functions}

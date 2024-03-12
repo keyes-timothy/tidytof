@@ -75,83 +75,81 @@
 #' )
 #'
 tof_extract_proportion <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    format = c("wide", "long")
-  ) {
-    # check format argument
-    format <- rlang::arg_match(format)
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        format = c("wide", "long")) {
+        # check format argument
+        format <- rlang::arg_match(format)
 
-    group_colnames <-
-      tof_tibble |>
-      dplyr::select({{group_cols}}) |>
-      colnames()
+        group_colnames <-
+            tof_tibble |>
+            dplyr::select({{ group_cols }}) |>
+            colnames()
 
-      my_sep <- "________"
+        my_sep <- "________"
 
-      if (length(group_colnames) != 0) {
+        if (length(group_colnames) != 0) {
+            abundances <-
+                tof_tibble |>
+                tidyr::unite(
+                    col = ".group",
+                    {{ group_cols }},
+                    sep = my_sep
+                ) |>
+                dplyr::mutate(.group = as.factor(.data$.group))
+        } else {
+            group_cols <- NULL
+
+            abundances <-
+                tof_tibble |>
+                dplyr::mutate(.group = 1)
+        }
+
         abundances <-
-          tof_tibble |>
-          tidyr::unite(
-            col = ".group",
-            {{group_cols}},
-            sep = my_sep
-          ) |>
-          dplyr::mutate(.group = as.factor(.data$.group))
+            abundances |>
+            dplyr::mutate(
+                group = as.factor(.data$.group),
+                "{{cluster_col}}" := as.factor({{ cluster_col }})
+            ) |>
+            dplyr::count(.data$.group, {{ cluster_col }}, .drop = FALSE, name = "abundance") |>
+            dplyr::group_by(.data$.group) |>
+            dplyr::mutate(
+                prop = .data$abundance / sum(.data$abundance),
+                "{{cluster_col}}" := as.character({{ cluster_col }})
+            ) |>
+            dplyr::ungroup()
 
-      } else {
-        group_cols <- NULL
-
+        if (length(group_colnames) != 0) {
+            abundances <-
+                abundances |>
+                tidyr::separate(col = .data$.group, into = group_colnames, sep = my_sep)
+        } else {
+            abundances <-
+                abundances |>
+                dplyr::select(-".group")
+        }
         abundances <-
-          tof_tibble |>
-          dplyr::mutate(.group = 1)
-      }
+            abundances |>
+            dplyr::select({{ group_cols }}, {{ cluster_col }}, "prop")
 
-      abundances <-
-        abundances |>
-        dplyr::mutate(
-          group = as.factor(.data$.group),
-          "{{cluster_col}}" := as.factor({{cluster_col}})
-        ) |>
-        dplyr::count(.data$.group, {{cluster_col}}, .drop = FALSE, name = "abundance") |>
-        dplyr::group_by(.data$.group) |>
-        dplyr::mutate(
-          prop = .data$abundance / sum(.data$abundance),
-          "{{cluster_col}}" := as.character({{cluster_col}})
-        ) |>
-        dplyr::ungroup()
+        if (format == "wide") {
+            abundances <-
+                abundances |>
+                dplyr::filter(.data$prop != 0) |>
+                tidyr::pivot_wider(
+                    names_from = {{ cluster_col }},
+                    values_from = "prop",
+                    names_prefix = "prop@",
+                    # note that if a cluster is not present for a given group, it will
+                    # be filled in as having a relative abundance of 0.
+                    values_fill = 0
+                )
+        }
 
-      if (length(group_colnames) != 0) {
-        abundances <-
-          abundances |>
-          tidyr::separate(col = .data$.group, into = group_colnames, sep = my_sep)
-      } else {
-        abundances <-
-          abundances |>
-          dplyr::select(-".group")
-      }
-      abundances <-
-        abundances |>
-        dplyr::select({{group_cols}}, {{cluster_col}}, "prop")
-
-      if (format == "wide") {
-      abundances <-
-        abundances |>
-        dplyr::filter(.data$prop != 0) |>
-        tidyr::pivot_wider(
-          names_from = {{cluster_col}},
-          values_from = "prop",
-          names_prefix = "prop@",
-          # note that if a cluster is not present for a given group, it will
-          # be filled in as having a relative abundance of 0.
-          values_fill = 0
-        )
-      }
-
-      return(dplyr::ungroup(abundances))
-  }
+        return(dplyr::ungroup(abundances))
+    }
 
 # tof_extract_central_tendency -------------------------------------------------
 
@@ -246,56 +244,54 @@ tof_extract_proportion <-
 #' )
 #'
 tof_extract_central_tendency <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    marker_cols = where(tof_is_numeric),
-    stimulation_col = NULL,
-    central_tendency_function = stats::median,
-    format = c("wide", "long")
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        marker_cols = where(tof_is_numeric),
+        stimulation_col = NULL,
+        central_tendency_function = stats::median,
+        format = c("wide", "long")) {
+        # check format argument
+        format <- rlang::arg_match(format)
 
-    # check format argument
-    format <- rlang::arg_match(format)
+        central_tendencies <-
+            tof_tibble |>
+            # if cluster_col isn't a character vector, make it one
+            dplyr::mutate("{{cluster_col}}" := as.character({{ cluster_col }})) |>
+            dplyr::group_by(dplyr::across({{ group_cols }}), {{ cluster_col }}, {{ stimulation_col }}) |>
+            dplyr::summarize(dplyr::across({{ marker_cols }}, central_tendency_function)) |>
+            tidyr::pivot_longer(
+                cols = {{ marker_cols }},
+                names_to = "channel",
+                values_to = "values"
+            )
 
-    central_tendencies <-
-      tof_tibble |>
-      # if cluster_col isn't a character vector, make it one
-      dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) |>
-      dplyr::group_by(dplyr::across({{group_cols}}), {{cluster_col}}, {{stimulation_col}}) |>
-      dplyr::summarize(dplyr::across({{marker_cols}}, central_tendency_function)) |>
-      tidyr::pivot_longer(
-        cols = {{marker_cols}},
-        names_to = "channel",
-        values_to = "values"
-      )
+        if (format == "wide") {
+            central_tendencies <-
+                central_tendencies |>
+                dplyr::group_by(dplyr::across({{ group_cols }})) |>
+                dplyr::transmute(
+                    col_names =
+                        stringr::str_c(
+                            {{ stimulation_col }},
+                            "_",
+                            .data$channel,
+                            "@",
+                            {{ cluster_col }},
+                            "_ct"
+                        ) |>
+                            stringr::str_remove("^_"),
+                    .data$values
+                ) |>
+                tidyr::pivot_wider(
+                    names_from = "col_names",
+                    values_from = "values"
+                )
+        }
 
-    if (format == "wide") {
-      central_tendencies <-
-        central_tendencies |>
-        dplyr::group_by(dplyr::across({{group_cols}})) |>
-        dplyr::transmute(
-          col_names =
-            stringr::str_c(
-              {{stimulation_col}},
-              "_",
-              .data$channel,
-              "@",
-              {{cluster_col}},
-              "_ct"
-            ) |>
-            stringr::str_remove("^_"),
-          .data$values
-        ) |>
-        tidyr::pivot_wider(
-          names_from = "col_names",
-          values_from = "values"
-        )
+        return(dplyr::ungroup(central_tendencies))
     }
-
-    return(dplyr::ungroup(central_tendencies))
-  }
 
 
 
@@ -389,60 +385,58 @@ tof_extract_central_tendency <-
 #' )
 #'
 tof_extract_threshold <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    marker_cols = where(tof_is_numeric),
-    stimulation_col = NULL,
-    threshold = asinh(10 / 5),
-    format = c("wide", "long")
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        marker_cols = where(tof_is_numeric),
+        stimulation_col = NULL,
+        threshold = asinh(10 / 5),
+        format = c("wide", "long")) {
+        # check format argument
+        format <- rlang::arg_match(format)
 
-    # check format argument
-    format <- rlang::arg_match(format)
-
-    threshold_features <-
-      tof_tibble |>
-      # if the cluster column isn't a character vector, make it one
-      dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) |>
-      dplyr::group_by(
-        dplyr::across({{group_cols}}), {{cluster_col}}, {{stimulation_col}}
-      ) |>
-      dplyr::summarize(
-        dplyr::across({{marker_cols}}, ~ mean(.x > threshold))
-      ) |>
-      tidyr::pivot_longer(
-        cols = {{marker_cols}},
-        names_to = "channel",
-        values_to = "values"
-      )
-
-    if (format == "wide") {
-      threshold_features <-
-        threshold_features |>
-        dplyr::group_by(dplyr::across({{group_cols}})) |>
-        dplyr::transmute(
-          col_names =
-            stringr::str_c(
-              {{stimulation_col}},
-              "_",
-              .data$channel,
-              "@",
-              {{cluster_col}},
-              "_threshold"
+        threshold_features <-
+            tof_tibble |>
+            # if the cluster column isn't a character vector, make it one
+            dplyr::mutate("{{cluster_col}}" := as.character({{ cluster_col }})) |>
+            dplyr::group_by(
+                dplyr::across({{ group_cols }}), {{ cluster_col }}, {{ stimulation_col }}
             ) |>
-            stringr::str_remove("^_"),
-          .data$values
-        ) |>
-        tidyr::pivot_wider(
-          names_from = "col_names",
-          values_from = "values"
-        )
-    }
+            dplyr::summarize(
+                dplyr::across({{ marker_cols }}, ~ mean(.x > threshold))
+            ) |>
+            tidyr::pivot_longer(
+                cols = {{ marker_cols }},
+                names_to = "channel",
+                values_to = "values"
+            )
 
-    return(dplyr::ungroup(threshold_features))
-  }
+        if (format == "wide") {
+            threshold_features <-
+                threshold_features |>
+                dplyr::group_by(dplyr::across({{ group_cols }})) |>
+                dplyr::transmute(
+                    col_names =
+                        stringr::str_c(
+                            {{ stimulation_col }},
+                            "_",
+                            .data$channel,
+                            "@",
+                            {{ cluster_col }},
+                            "_threshold"
+                        ) |>
+                            stringr::str_remove("^_"),
+                    .data$values
+                ) |>
+                tidyr::pivot_wider(
+                    names_from = "col_names",
+                    values_from = "values"
+                )
+        }
+
+        return(dplyr::ungroup(threshold_features))
+    }
 
 
 
@@ -561,125 +555,124 @@ tof_extract_threshold <-
 #' )
 #'
 tof_extract_emd <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    marker_cols = where(tof_is_numeric),
-    emd_col,
-    reference_level,
-    format = c("wide", "long"),
-    num_bins = 100
-  ) {
-    # check format argument
-    format <- rlang::arg_match(format)
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        marker_cols = where(tof_is_numeric),
+        emd_col,
+        reference_level,
+        format = c("wide", "long"),
+        num_bins = 100) {
+        # check format argument
+        format <- rlang::arg_match(format)
 
-    # make sure that stimulation information is provided
-    if (missing(emd_col)) {
-      stop("`emd_col` must be provided.")
-    } else if (missing(reference_level)) {
-      stop("`reference_level` must be provided.")
-    }
+        # make sure that stimulation information is provided
+        if (missing(emd_col)) {
+            stop("`emd_col` must be provided.")
+        } else if (missing(reference_level)) {
+            stop("`reference_level` must be provided.")
+        }
 
-    # check that the emd_col is not one of the group_cols
-    emd_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(emd_col),
-        data = tof_tibble
-      ) |>
-      names()
+        # check that the emd_col is not one of the group_cols
+        emd_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(emd_col),
+                data = tof_tibble
+            ) |>
+            names()
 
-    group_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(group_cols),
-        data = tof_tibble
-      ) |>
-      names()
+        group_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(group_cols),
+                data = tof_tibble
+            ) |>
+            names()
 
-    if (emd_colname %in% group_colnames) {
-      stop("`emd_col` should not be one of the `group_cols`")
-    }
+        if (emd_colname %in% group_colnames) {
+            stop("`emd_col` should not be one of the `group_cols`")
+        }
 
-    # extract the stimulation "levels" present in the original tof_tibble
-    stim_levels <-
-      tof_tibble |>
-      dplyr::pull({{emd_col}}) |>
-      unique()
+        # extract the stimulation "levels" present in the original tof_tibble
+        stim_levels <-
+            tof_tibble |>
+            dplyr::pull({{ emd_col }}) |>
+            unique()
 
-    non_basal_stim_levels <-
-      setdiff(stim_levels, reference_level)
+        non_basal_stim_levels <-
+            setdiff(stim_levels, reference_level)
 
-    # nest data
-    nested_data <-
-      tof_tibble |>
-      dplyr::select({{group_cols}}, {{cluster_col}}, {{emd_col}}, {{marker_cols}}) |>
-      tidyr::pivot_longer(
-        cols = {{marker_cols}},
-        names_to = "marker",
-        values_to = "expression"
-      ) |>
-      tidyr::nest(data = "expression") |>
-      tidyr::pivot_wider(names_from = {{emd_col}}, values_from = data) |>
-      # filter out any rows that don't have a basal stimulation condition,
-      # as this means that emd to basal is undefined
-      dplyr::filter(
-        purrr::map_lgl(.x = .data[[reference_level]], .f = ~!is.null(.x))
-      ) |>
-      # convert each column corresponding to a stimulation condition into a vector
-      dplyr::mutate(
-        dplyr::across(
-          tidyselect::all_of(stim_levels),
-          ~ purrr::map(
-            .x = .x,
-            .f = ~ pull_unless_null(.x, expression)
-          )
-        )
-      )
-
-    emd_tibble <-
-      nested_data |>
-      dplyr::transmute(
-        dplyr::across({{group_cols}}),
-        {{cluster_col}},
-        .data$marker,
-        dplyr::across(
-          tidyselect::all_of(non_basal_stim_levels),
-          .fns = ~ purrr::map2_dbl(
-            .x = .x,
-            .y = .data[[reference_level]],
-            .f = ~ tof_find_emd(.y, .x, num_bins = num_bins)
-          )
-        )
-      ) |>
-      tidyr::pivot_longer(
-        cols = tidyselect::all_of(non_basal_stim_levels),
-        names_to = "stimulation",
-        values_to = "emd"
-      )
-
-    if (format == "wide") {
-      emd_tibble <-
-        emd_tibble |>
-        dplyr::mutate(
-          col_name =
-            stringr::str_c(
-              .data$stimulation,
-              "_",
-              .data$marker,
-              "@",
-              {{cluster_col}},
-              "_emd"
+        # nest data
+        nested_data <-
+            tof_tibble |>
+            dplyr::select({{ group_cols }}, {{ cluster_col }}, {{ emd_col }}, {{ marker_cols }}) |>
+            tidyr::pivot_longer(
+                cols = {{ marker_cols }},
+                names_to = "marker",
+                values_to = "expression"
+            ) |>
+            tidyr::nest(data = "expression") |>
+            tidyr::pivot_wider(names_from = {{ emd_col }}, values_from = data) |>
+            # filter out any rows that don't have a basal stimulation condition,
+            # as this means that emd to basal is undefined
+            dplyr::filter(
+                purrr::map_lgl(.x = .data[[reference_level]], .f = ~ !is.null(.x))
+            ) |>
+            # convert each column corresponding to a stimulation condition into a vector
+            dplyr::mutate(
+                dplyr::across(
+                    tidyselect::all_of(stim_levels),
+                    ~ purrr::map(
+                        .x = .x,
+                        .f = ~ pull_unless_null(.x, expression)
+                    )
+                )
             )
-        ) |>
-        dplyr::select({{group_cols}}, "emd", "col_name") |>
-        tidyr::pivot_wider(
-          names_from = "col_name",
-          values_from = "emd"
-        )
-    }
 
-    return(emd_tibble)
-  }
+        emd_tibble <-
+            nested_data |>
+            dplyr::transmute(
+                dplyr::across({{ group_cols }}),
+                {{ cluster_col }},
+                .data$marker,
+                dplyr::across(
+                    tidyselect::all_of(non_basal_stim_levels),
+                    .fns = ~ purrr::map2_dbl(
+                        .x = .x,
+                        .y = .data[[reference_level]],
+                        .f = ~ tof_find_emd(.y, .x, num_bins = num_bins)
+                    )
+                )
+            ) |>
+            tidyr::pivot_longer(
+                cols = tidyselect::all_of(non_basal_stim_levels),
+                names_to = "stimulation",
+                values_to = "emd"
+            )
+
+        if (format == "wide") {
+            emd_tibble <-
+                emd_tibble |>
+                dplyr::mutate(
+                    col_name =
+                        stringr::str_c(
+                            .data$stimulation,
+                            "_",
+                            .data$marker,
+                            "@",
+                            {{ cluster_col }},
+                            "_emd"
+                        )
+                ) |>
+                dplyr::select({{ group_cols }}, "emd", "col_name") |>
+                tidyr::pivot_wider(
+                    names_from = "col_name",
+                    values_from = "emd"
+                )
+        }
+
+        return(emd_tibble)
+    }
 
 
 
@@ -789,121 +782,120 @@ tof_extract_emd <-
 #' )
 #'
 tof_extract_jsd <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    marker_cols = where(tof_is_numeric),
-    jsd_col,
-    reference_level,
-    format = c("wide", "long"),
-    num_bins = 100
-  ) {
-    # check format argument
-    format <- rlang::arg_match(format)
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        marker_cols = where(tof_is_numeric),
+        jsd_col,
+        reference_level,
+        format = c("wide", "long"),
+        num_bins = 100) {
+        # check format argument
+        format <- rlang::arg_match(format)
 
-    # make sure that stimulation information is provided
-    if (missing(jsd_col)) {
-      stop("`jsd_col` must be provided.")
-    } else if (missing(reference_level)) {
-      stop("`reference_level` must be provided.")
-    }
+        # make sure that stimulation information is provided
+        if (missing(jsd_col)) {
+            stop("`jsd_col` must be provided.")
+        } else if (missing(reference_level)) {
+            stop("`reference_level` must be provided.")
+        }
 
-    # check that the jsd_col is not one of the group_cols
-    jsd_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(jsd_col),
-        data = tof_tibble
-      ) |>
-      names()
+        # check that the jsd_col is not one of the group_cols
+        jsd_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(jsd_col),
+                data = tof_tibble
+            ) |>
+            names()
 
-    group_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(group_cols),
-        data = tof_tibble
-      ) |>
-      names()
+        group_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(group_cols),
+                data = tof_tibble
+            ) |>
+            names()
 
-    if (jsd_colname %in% group_colnames) {
-      stop("`jsd_col` should not be one of the `group_cols`")
-    }
+        if (jsd_colname %in% group_colnames) {
+            stop("`jsd_col` should not be one of the `group_cols`")
+        }
 
-    # extract the stimulation "levels" present in the original tof_tibble
-    stim_levels <-
-      tof_tibble |>
-      dplyr::pull({{jsd_col}}) |>
-      unique()
+        # extract the stimulation "levels" present in the original tof_tibble
+        stim_levels <-
+            tof_tibble |>
+            dplyr::pull({{ jsd_col }}) |>
+            unique()
 
-    non_basal_stim_levels <-
-      setdiff(stim_levels, reference_level)
+        non_basal_stim_levels <-
+            setdiff(stim_levels, reference_level)
 
-    # nest data
-    nested_data <-
-      tof_tibble |>
-      dplyr::select({{group_cols}}, {{cluster_col}}, {{jsd_col}}, {{marker_cols}}) |>
-      tidyr::pivot_longer(cols = {{marker_cols}}, names_to = "marker", values_to = "expression") |>
-      tidyr::nest(data = expression) |>
-      tidyr::pivot_wider(names_from = {{jsd_col}}, values_from = data) |>
-      # filter out any rows that don't have a basal stimulation condition,
-      # as this means that emd to basal is undefined
-      dplyr::filter(
-        purrr::map_lgl(.x = .data[[reference_level]], .f = ~!is.null(.x))
-      ) |>
-      # convert each column corresponding to a stimulation condition into a vector
-      dplyr::mutate(
-        dplyr::across(
-          tidyselect::all_of(stim_levels),
-          ~ purrr::map(
-            .x = .x,
-            .f = ~ pull_unless_null(.x, expression)
-          )
-        )
-      )
-
-    jsd_tibble <-
-      nested_data |>
-      dplyr::transmute(
-        dplyr::across({{group_cols}}),
-        {{cluster_col}},
-        .data$marker,
-        dplyr::across(
-          tidyselect::all_of(non_basal_stim_levels),
-          .fns = ~ purrr::map2_dbl(
-            .x = .x,
-            .y = .data[[reference_level]],
-            .f = ~ tof_find_jsd(.y, .x, num_bins = num_bins)
-          )
-        )
-      ) |>
-      tidyr::pivot_longer(
-        cols = tidyselect::all_of(non_basal_stim_levels),
-        names_to = "stimulation",
-        values_to = "jsd"
-      )
-
-    if (format == "wide") {
-      jsd_tibble <-
-        jsd_tibble |>
-        mutate(
-          col_name =
-            stringr::str_c(
-              .data$stimulation,
-              "_",
-              .data$marker,
-              "@",
-              {{cluster_col}},
-              "_jsd"
+        # nest data
+        nested_data <-
+            tof_tibble |>
+            dplyr::select({{ group_cols }}, {{ cluster_col }}, {{ jsd_col }}, {{ marker_cols }}) |>
+            tidyr::pivot_longer(cols = {{ marker_cols }}, names_to = "marker", values_to = "expression") |>
+            tidyr::nest(data = expression) |>
+            tidyr::pivot_wider(names_from = {{ jsd_col }}, values_from = data) |>
+            # filter out any rows that don't have a basal stimulation condition,
+            # as this means that emd to basal is undefined
+            dplyr::filter(
+                purrr::map_lgl(.x = .data[[reference_level]], .f = ~ !is.null(.x))
+            ) |>
+            # convert each column corresponding to a stimulation condition into a vector
+            dplyr::mutate(
+                dplyr::across(
+                    tidyselect::all_of(stim_levels),
+                    ~ purrr::map(
+                        .x = .x,
+                        .f = ~ pull_unless_null(.x, expression)
+                    )
+                )
             )
-        ) |>
-        dplyr::select({{group_cols}}, "jsd", "col_name") |>
-        tidyr::pivot_wider(
-          names_from = "col_name",
-          values_from = "jsd"
-        )
-    }
 
-    return(jsd_tibble)
-  }
+        jsd_tibble <-
+            nested_data |>
+            dplyr::transmute(
+                dplyr::across({{ group_cols }}),
+                {{ cluster_col }},
+                .data$marker,
+                dplyr::across(
+                    tidyselect::all_of(non_basal_stim_levels),
+                    .fns = ~ purrr::map2_dbl(
+                        .x = .x,
+                        .y = .data[[reference_level]],
+                        .f = ~ tof_find_jsd(.y, .x, num_bins = num_bins)
+                    )
+                )
+            ) |>
+            tidyr::pivot_longer(
+                cols = tidyselect::all_of(non_basal_stim_levels),
+                names_to = "stimulation",
+                values_to = "jsd"
+            )
+
+        if (format == "wide") {
+            jsd_tibble <-
+                jsd_tibble |>
+                mutate(
+                    col_name =
+                        stringr::str_c(
+                            .data$stimulation,
+                            "_",
+                            .data$marker,
+                            "@",
+                            {{ cluster_col }},
+                            "_jsd"
+                        )
+                ) |>
+                dplyr::select({{ group_cols }}, "jsd", "col_name") |>
+                tidyr::pivot_wider(
+                    names_from = "col_name",
+                    values_from = "jsd"
+                )
+        }
+
+        return(jsd_tibble)
+    }
 
 
 
@@ -1038,216 +1030,205 @@ tof_extract_jsd <-
 #' )
 #'
 tof_extract_features <-
-  function(
-    tof_tibble,
-    cluster_col,
-    group_cols = NULL,
-    stimulation_col = NULL,
-    lineage_cols,
-    signaling_cols,
-    central_tendency_function = stats::median,
-    signaling_method = c("threshold", "emd", "jsd", "central tendency"),
-    basal_level = NULL,
-    ... # Optional additional arguments to be passed to tof_extract_threshold, tof_extract_emd, or tof_extract_jsd
-  ) {
-
-    # check that lineage and signaling cols are provided
-    if (missing(lineage_cols) | missing(signaling_cols)) {
-      stop("Both lineage_cols and signaling_cols must be provided.\n")
-    }
-
-    # checking signaling method argument
-    signaling_method <- rlang::arg_match(signaling_method)
-
-    # extract stimulation column's name
-    # will be an empty character vector if stimulation_col = NULL
-    stimulation_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(stimulation_col),
-        data = tof_tibble
-      ) |>
-      names()
-
-    # extract grouping columns' names'
-    # will be an empty character vector if stimulation_col = NULL
-    group_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(group_cols),
-        data = tof_tibble
-      ) |>
-      names()
-
-    # check stimulation_col argument
-    if (signaling_method %in% c("emd", "jsd") & length(stimulation_colname) == 0) {
-      stop("stimulation_col must be specified for the chosen signaling_method.\n")
-    }
-
-    # check basal_level argument
-    if (signaling_method %in% c("emd", "jsd") & is.null(basal_level)) {
-      stop("basal_level must be specified for the chosen signaling_method.
-           It should be a character vector (a quoted string) indicating which
-           value in stimulation_col represents the basal (unstimulated) state.\n")
-    }
-
-    # find cluster abundance features
-    abundance_features <-
-      tof_tibble |>
-      tof_extract_proportion(
-        cluster_col = {{cluster_col}},
-        group_cols = {{group_cols}},
-        format = "wide"
-      )
-
-    # find lineage features
-    lineage_features <-
-      tof_tibble |>
-      tof_extract_central_tendency(
-        cluster_col = {{cluster_col}},
-        group_cols = {{group_cols}},
-        marker_cols = {{lineage_cols}},
-        central_tendency_function = central_tendency_function,
-        format = "wide"
-      )
-
-    # if no stimulations,
-    if (length(stimulation_colname) == 0) {
-      if (signaling_method == "central tendency") {
-        # find signaling features as above
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_central_tendency(
-            cluster_col = {{cluster_col}},
-            group_cols = {{group_cols}},
-            marker_cols = {{signaling_cols}},
-            central_tendency_function = central_tendency_function,
-            format = "wide",
-            ...
-          )
-
-      } else if (signaling_method == "threshold") {
-        # find signaling features using the threshold method
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_threshold(
-            cluster_col = {{cluster_col}},
-            group_cols = c({{group_cols}}),
-            marker_cols = {{signaling_cols}},
-            stimulation_col = {{stimulation_col}},
-            format = "wide",
-            ...
-          )
-      } else {
-        stop("stimulation_col must be specified for the chosen method.\n")
-      }
-
-    # if there *are* stimulations
-    } else {
-      if (signaling_method == "central tendency") {
-        # find signaling features as above
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_central_tendency(
-            cluster_col = {{cluster_col}},
-            group_cols = c({{group_cols}}),
-            marker_cols = {{signaling_cols}},
-            central_tendency_function = central_tendency_function,
-            format = "wide",
-            ...
-          )
-        # change tof_extract_central_tendency function
-        # so that it can accommodate a stimulation column
-
-        # find threshold features
-      } else if (signaling_method == "threshold") {
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_threshold(
-            cluster_col = {{cluster_col}},
-            group_cols = c({{group_cols}}),
-            marker_cols = {{signaling_cols}},
-            stimulation_col = {{stimulation_col}},
-            format = "wide",
-            ...
-          )
-
-        # find emd features
-      } else if (signaling_method == "emd") {
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_emd(
-            cluster_col = {{cluster_col}},
-            group_cols = {{group_cols}},
-            marker_cols = {{signaling_cols}},
-            emd_col = {{stimulation_col}},
-            reference_level = basal_level,
-            format = "wide",
-            ...
-          )
-
-      } else if (signaling_method == "jsd") {
-        signaling_features <-
-          tof_tibble |>
-          tof_extract_jsd(
-            cluster_col = {{cluster_col}},
-            group_cols = {{group_cols}},
-            marker_cols = {{signaling_cols}},
-            jsd_col = {{stimulation_col}},
-            reference_level = basal_level,
-            format = "wide",
-            ...
-          )
-      }
-
-      if (signaling_method %in% c("emd", "jsd")) {
-        # find basal stimulation features
-        basal_stim_features <-
-          tof_tibble |>
-          dplyr::filter({{stimulation_col}} == basal_level) |>
-          tof_extract_central_tendency(
-            cluster_col = {{cluster_col}},
-            group_cols = {{group_cols}},
-            marker_cols = {{signaling_cols}},
-            central_tendency_function = central_tendency_function,
-            format = "wide"
-          ) |>
-          dplyr::rename_with(
-            .fn = function(x) stringr::str_c(basal_level, "_", x),
-            .cols = -{{group_cols}}
-          )
-
-        if (length(group_colnames) == 0) {
-          signaling_features <-
-            basal_stim_features |>
-            dplyr::bind_cols(signaling_features)
-
-        } else {
-          signaling_features <-
-            basal_stim_features |>
-            dplyr::left_join(signaling_features, by = group_colnames)
+    function(
+        tof_tibble,
+        cluster_col,
+        group_cols = NULL,
+        stimulation_col = NULL,
+        lineage_cols,
+        signaling_cols,
+        central_tendency_function = stats::median,
+        signaling_method = c("threshold", "emd", "jsd", "central tendency"),
+        basal_level = NULL,
+        ... # Optional additional arguments to be passed to tof_extract_threshold, tof_extract_emd, or tof_extract_jsd
+        ) {
+        # check that lineage and signaling cols are provided
+        if (missing(lineage_cols) | missing(signaling_cols)) {
+            stop("Both lineage_cols and signaling_cols must be provided.\n")
         }
-      }
+
+        # checking signaling method argument
+        signaling_method <- rlang::arg_match(signaling_method)
+
+        # extract stimulation column's name
+        # will be an empty character vector if stimulation_col = NULL
+        stimulation_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(stimulation_col),
+                data = tof_tibble
+            ) |>
+            names()
+
+        # extract grouping columns' names'
+        # will be an empty character vector if stimulation_col = NULL
+        group_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(group_cols),
+                data = tof_tibble
+            ) |>
+            names()
+
+        # check stimulation_col argument
+        if (signaling_method %in% c("emd", "jsd") & length(stimulation_colname) == 0) {
+            stop("stimulation_col must be specified for the chosen signaling_method.\n")
+        }
+
+        # check basal_level argument
+        if (signaling_method %in% c("emd", "jsd") & is.null(basal_level)) {
+            stop("basal_level must be specified for the chosen signaling_method.
+            It should be a character vector (a quoted string) indicating which
+            value in stimulation_col represents the basal (unstimulated) state.\n")
+        }
+
+        # find cluster abundance features
+        abundance_features <-
+            tof_tibble |>
+            tof_extract_proportion(
+                cluster_col = {{ cluster_col }},
+                group_cols = {{ group_cols }},
+                format = "wide"
+            )
+
+        # find lineage features
+        lineage_features <-
+            tof_tibble |>
+            tof_extract_central_tendency(
+                cluster_col = {{ cluster_col }},
+                group_cols = {{ group_cols }},
+                marker_cols = {{ lineage_cols }},
+                central_tendency_function = central_tendency_function,
+                format = "wide"
+            )
+
+        # if no stimulations,
+        if (length(stimulation_colname) == 0) {
+            if (signaling_method == "central tendency") {
+                # find signaling features as above
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_central_tendency(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = {{ group_cols }},
+                        marker_cols = {{ signaling_cols }},
+                        central_tendency_function = central_tendency_function,
+                        format = "wide",
+                        ...
+                    )
+            } else if (signaling_method == "threshold") {
+                # find signaling features using the threshold method
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_threshold(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = c({{ group_cols }}),
+                        marker_cols = {{ signaling_cols }},
+                        stimulation_col = {{ stimulation_col }},
+                        format = "wide",
+                        ...
+                    )
+            } else {
+                stop("stimulation_col must be specified for the chosen method.\n")
+            }
+
+            # if there *are* stimulations
+        } else {
+            if (signaling_method == "central tendency") {
+                # find signaling features as above
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_central_tendency(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = c({{ group_cols }}),
+                        marker_cols = {{ signaling_cols }},
+                        central_tendency_function = central_tendency_function,
+                        format = "wide",
+                        ...
+                    )
+                # change tof_extract_central_tendency function
+                # so that it can accommodate a stimulation column
+
+                # find threshold features
+            } else if (signaling_method == "threshold") {
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_threshold(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = c({{ group_cols }}),
+                        marker_cols = {{ signaling_cols }},
+                        stimulation_col = {{ stimulation_col }},
+                        format = "wide",
+                        ...
+                    )
+
+                # find emd features
+            } else if (signaling_method == "emd") {
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_emd(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = {{ group_cols }},
+                        marker_cols = {{ signaling_cols }},
+                        emd_col = {{ stimulation_col }},
+                        reference_level = basal_level,
+                        format = "wide",
+                        ...
+                    )
+            } else if (signaling_method == "jsd") {
+                signaling_features <-
+                    tof_tibble |>
+                    tof_extract_jsd(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = {{ group_cols }},
+                        marker_cols = {{ signaling_cols }},
+                        jsd_col = {{ stimulation_col }},
+                        reference_level = basal_level,
+                        format = "wide",
+                        ...
+                    )
+            }
+
+            if (signaling_method %in% c("emd", "jsd")) {
+                # find basal stimulation features
+                basal_stim_features <-
+                    tof_tibble |>
+                    dplyr::filter({{ stimulation_col }} == basal_level) |>
+                    tof_extract_central_tendency(
+                        cluster_col = {{ cluster_col }},
+                        group_cols = {{ group_cols }},
+                        marker_cols = {{ signaling_cols }},
+                        central_tendency_function = central_tendency_function,
+                        format = "wide"
+                    ) |>
+                    dplyr::rename_with(
+                        .fn = function(x) stringr::str_c(basal_level, "_", x),
+                        .cols = -{{ group_cols }}
+                    )
+
+                if (length(group_colnames) == 0) {
+                    signaling_features <-
+                        basal_stim_features |>
+                        dplyr::bind_cols(signaling_features)
+                } else {
+                    signaling_features <-
+                        basal_stim_features |>
+                        dplyr::left_join(signaling_features, by = group_colnames)
+                }
+            }
+        }
+
+        # if there are no grouping variables
+        if (length(group_colnames) == 0) {
+            final_features <-
+                abundance_features |>
+                dplyr::bind_cols(lineage_features) |>
+                dplyr::bind_cols(signaling_features)
+        } else {
+            # if there are grouping columns
+            final_features <-
+                abundance_features |>
+                dplyr::left_join(lineage_features, by = group_colnames) |>
+                dplyr::left_join(signaling_features, by = group_colnames)
+        }
+
+        return(final_features)
     }
-
-    # if there are no grouping variables
-    if (length(group_colnames) == 0) {
-      final_features <-
-        abundance_features |>
-        dplyr::bind_cols(lineage_features) |>
-        dplyr::bind_cols(signaling_features)
-
-    } else {
-      # if there are grouping columns
-      final_features <-
-        abundance_features |>
-        dplyr::left_join(lineage_features, by = group_colnames) |>
-        dplyr::left_join(signaling_features, by = group_colnames)
-    }
-
-    return(final_features)
-
-  }
-
-
-
-
-

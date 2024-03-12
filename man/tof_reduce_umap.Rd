@@ -90,7 +90,6 @@ umap_recipe <- tof_reduce_umap(tof_tibble = sim_data, return_recipe = TRUE)
 # apply recipe to new data
 recipes::bake(umap_recipe, new_data = new_data)
 
-
 }
 \seealso{
 Other dimensionality reduction functions: 

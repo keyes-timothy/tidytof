@@ -86,14 +86,13 @@ tof_metacluster_flowsom(
     clustering_algorithm = "som"
 )
 
-
 }
 \seealso{
 Other metaclustering functions: 
+\code{\link{tof_metacluster}()},
 \code{\link{tof_metacluster_consensus}()},
 \code{\link{tof_metacluster_hierarchical}()},
 \code{\link{tof_metacluster_kmeans}()},
-\code{\link{tof_metacluster_phenograph}()},
-\code{\link{tof_metacluster}()}
+\code{\link{tof_metacluster_phenograph}()}
 }
 \concept{metaclustering functions}

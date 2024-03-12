@@ -35,9 +35,8 @@ at which to draw outlier thresholds in the t-distribution with `num_timesteps` -
 degrees of freedom. Defaults to 0.01.}
 
 \item{visualize}{A boolean value indicating if a plot should be generated to
-visualize each timestep's relative flow rate (by group). This plot is printed
-to the console as a side-effect of this function; for non-interactive R
-sessions, this argument should always be FALSE (the default).}
+visualize each timestep's relative flow rate (by group) instead of returning
+the tibble directly. Defaults to FALSE.}
 
 \item{...}{Optional additional arguments to pass to \code{\link[ggplot2]{facet_wrap}}.
 Ignored if visualize = FALSE.}
@@ -54,7 +53,8 @@ value for `time_col`), and "flagged_window" (a boolean vector indicating if
 each cell was collecting during a timestep flagged for having a high or low
 flow rate). If augment = TRUE, these 3 columns will be column-bound to `tof_tibble`
 to return an augmented version of the input dataset. (Note that in this case, time_col will
-not be duplicated).
+not be duplicated). If visualize = TRUE, then a ggplot object is returned instead
+of a tibble.
 }
 \description{
 This function performs a simplified version of
@@ -68,34 +68,33 @@ extreme values of the t-distribution across timesteps) are flagged.
 \examples{
 set.seed(1000L)
 sim_data <-
-  data.frame(
-    cd4 = rnorm(n = 1000, mean = 5, sd = 0.5),
-    cd8 = rnorm(n = 1000, mean = 0, sd = 0.1),
-    cd33 = rnorm(n = 1000, mean = 10, sd = 0.1),
-    file_name = c(rep("a", times = 500), rep("b", times = 500)),
-    time =
-      c(
-        sample(1:100, size = 200, replace = TRUE),
-        sample(100:400, size = 300, replace = TRUE),
-        sample(1:150, size = 400, replace = TRUE),
-        sample(1:500, size = 100, replace = TRUE)
-      )
-  )
+    data.frame(
+        cd4 = rnorm(n = 1000, mean = 5, sd = 0.5),
+        cd8 = rnorm(n = 1000, mean = 0, sd = 0.1),
+        cd33 = rnorm(n = 1000, mean = 10, sd = 0.1),
+        file_name = c(rep("a", times = 500), rep("b", times = 500)),
+        time =
+            c(
+                sample(1:100, size = 200, replace = TRUE),
+                sample(100:400, size = 300, replace = TRUE),
+                sample(1:150, size = 400, replace = TRUE),
+                sample(1:500, size = 100, replace = TRUE)
+            )
+    )
 
 sim_data |>
-  tof_assess_flow_rate(
-    time_col = time,
-    num_timesteps = 20,
-    visualize = TRUE
-  )
+    tof_assess_flow_rate(
+        time_col = time,
+        num_timesteps = 20,
+        visualize = TRUE
+    )
 
 sim_data |>
-  tof_assess_flow_rate(
-    time_col = time,
-    group_cols = file_name,
-    num_timesteps = 20,
-    visualize = TRUE
-  )
-
+    tof_assess_flow_rate(
+        time_col = time,
+        group_cols = file_name,
+        num_timesteps = 20,
+        visualize = TRUE
+    )
 
 }

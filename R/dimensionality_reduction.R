@@ -74,41 +74,37 @@
 #' # apply recipe to new data
 #' recipes::bake(pca_recipe, new_data = new_data)
 #'
-#'
 tof_reduce_pca <-
-  function(
-    tof_tibble,
-    pca_cols = where(tof_is_numeric),
-    num_comp = 5,
-    threshold = NA,
-    center = TRUE,
-    scale = TRUE,
-    return_recipe = FALSE
-  ) {
+    function(
+        tof_tibble,
+        pca_cols = where(tof_is_numeric),
+        num_comp = 5,
+        threshold = NA,
+        center = TRUE,
+        scale = TRUE,
+        return_recipe = FALSE) {
+        pca_recipe <-
+            recipes::recipe(~., data = select(tof_tibble, {{ pca_cols }})) |>
+            # remove any variables that have 0 variance
+            recipes::step_zv(recipes::all_numeric()) |>
+            recipes::step_pca(
+                recipes::all_numeric(),
+                num_comp = num_comp,
+                threshold = threshold,
+                options = list(center = center, scale. = scale)
+            ) |>
+            recipes::prep()
 
-    pca_recipe <-
-      recipes::recipe(~ ., data = select(tof_tibble, {{pca_cols}})) |>
-      # remove any variables that have 0 variance
-      recipes::step_zv(recipes::all_numeric()) |>
-      recipes::step_pca(
-        recipes::all_numeric(),
-        num_comp = num_comp,
-        threshold = threshold,
-        options = list(center = center, scale. = scale)
-      ) |>
-      recipes::prep()
-
-    if (return_recipe) {
-      return(pca_recipe)
-
-    } else {
-      result <-
-        pca_recipe |>
-        recipes::juice() |>
-        dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
-      return(result)
+        if (return_recipe) {
+            return(pca_recipe)
+        } else {
+            result <-
+                pca_recipe |>
+                recipes::juice() |>
+                dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
+            return(result)
+        }
     }
-  }
 
 
 
@@ -175,47 +171,43 @@ tof_reduce_pca <-
 #' # calculate tsne with only 2 columns
 #' tof_reduce_tsne(tof_tibble = sim_data, tsne_cols = c(cd34, cd38))
 #'
-#'
 tof_reduce_tsne <-
-  function(
-    tof_tibble,
-    tsne_cols = where(tof_is_numeric),
-    num_comp = 2,
-    perplexity = 30,
-    theta = 0.5,
-    max_iterations = 1000,
-    verbose = FALSE,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        tsne_cols = where(tof_is_numeric),
+        num_comp = 2,
+        perplexity = 30,
+        theta = 0.5,
+        max_iterations = 1000,
+        verbose = FALSE,
+        ...) {
+        # check that Rtsne is installed
+        has_rtsne <- requireNamespace(package = "Rtsne")
+        if (!has_rtsne) {
+            stop(
+                "This function requires the {Rtsne} package. Install it with this code:\n
+                install.packages(\"Rtsne\")"
+            )
+        }
 
-    # check that Rtsne is installed
-    has_rtsne <- requireNamespace(package = "Rtsne")
-    if (!has_rtsne) {
-      stop(
-        "This function requires the {Rtsne} package. Install it with this code:\n
-           install.packages(\"Rtsne\")"
-      )
+        result <-
+            Rtsne::Rtsne(
+                X = as.matrix(dplyr::select(tof_tibble, {{ tsne_cols }})),
+                dims = num_comp,
+                perplexity = perplexity,
+                theta = theta,
+                check_duplicates = FALSE,
+                max_iter = max_iterations,
+                verbose = verbose,
+                ...
+            ) |>
+            purrr::pluck("Y") |>
+            dplyr::as_tibble(.name_repair = "minimal")
+
+        colnames(result) <- paste0(".tsne", seq_len(num_comp))
+
+        return(result)
     }
-
-    result <-
-      Rtsne::Rtsne(
-        X = as.matrix(dplyr::select(tof_tibble, {{tsne_cols}})),
-        dims = num_comp,
-        perplexity = perplexity,
-        theta = theta,
-        check_duplicates = FALSE,
-        max_iter = max_iterations,
-        verbose = verbose,
-        ...
-      ) |>
-      purrr::pluck("Y") |>
-      dplyr::as_tibble(.name_repair = "minimal")
-
-    colnames(result) <- paste0(".tsne", 1:num_comp)
-
-    return(result)
-
-  }
 
 
 
@@ -305,58 +297,53 @@ tof_reduce_tsne <-
 #' # apply recipe to new data
 #' recipes::bake(umap_recipe, new_data = new_data)
 #'
-#'
 tof_reduce_umap <-
-  function(
-    tof_tibble,
-    umap_cols = where(tof_is_numeric),
-    num_comp = 2,
-    neighbors = 5,
-    min_dist = 0.01,
-    learn_rate = 1,
-    epochs = NULL,
-    verbose = FALSE,
-    n_threads = 1,
-    return_recipe = FALSE,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        umap_cols = where(tof_is_numeric),
+        num_comp = 2,
+        neighbors = 5,
+        min_dist = 0.01,
+        learn_rate = 1,
+        epochs = NULL,
+        verbose = FALSE,
+        n_threads = 1,
+        return_recipe = FALSE,
+        ...) {
+        # check for ConsensusClusterPlus package
+        rlang::check_installed(pkg = "embed")
 
-    # check for ConsensusClusterPlus package
-    rlang::check_installed(pkg = "embed")
+        if (!rlang::is_installed(pkg = "embed")) {
+            stop("tof_reduce_umap requires the embed package to be installed from CRAN.")
+        }
 
-    if (!rlang::is_installed(pkg = "embed")) {
-      stop("tof_reduce_umap requires the embed package to be installed from CRAN.")
+        suppressWarnings(
+            umap_recipe <-
+                recipes::recipe(~., data = dplyr::select(tof_tibble, {{ umap_cols }})) |>
+                # remove any variables that have 0 variance
+                recipes::step_zv(recipes::all_numeric()) |>
+                embed::step_umap(
+                    recipes::all_numeric(),
+                    num_comp = num_comp,
+                    neighbors = neighbors,
+                    min_dist = min_dist,
+                    learn_rate = learn_rate,
+                    epochs = epochs,
+                    options = list(verbose = verbose, n_threads = n_threads, ...)
+                ) |>
+                recipes::prep()
+        )
+
+        if (return_recipe) {
+            return(umap_recipe)
+        } else {
+            result <-
+                umap_recipe |>
+                recipes::juice() |>
+                dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
+            return(result)
+        }
     }
-
-    suppressWarnings(
-      umap_recipe <-
-        recipes::recipe(~ ., data = dplyr::select(tof_tibble, {{umap_cols}})) |>
-        # remove any variables that have 0 variance
-        recipes::step_zv(recipes::all_numeric()) |>
-        embed::step_umap(
-          recipes::all_numeric(),
-          num_comp = num_comp,
-          neighbors = neighbors,
-          min_dist = min_dist,
-          learn_rate = learn_rate,
-          epochs = epochs,
-          options = list(verbose = verbose, n_threads = n_threads, ...)
-        ) |>
-        recipes::prep()
-    )
-
-    if (return_recipe) {
-      return(umap_recipe)
-
-    } else {
-      result <-
-        umap_recipe |>
-        recipes::juice() |>
-        dplyr::rename_with(.fn = ~ tolower(paste0(".", .x)))
-      return(result)
-    }
-
-  }
 
 
 
@@ -411,38 +398,29 @@ tof_reduce_umap <-
 #' # calculate umap
 #' tof_reduce_dimensions(tof_tibble = sim_data, method = "umap")
 #'
-#'
 tof_reduce_dimensions <-
-  function(
-    tof_tibble,
-    ...,
-    augment = TRUE,
-    method = c("pca", "tsne", "umap")
-  ) {
+    function(
+        tof_tibble,
+        ...,
+        augment = TRUE,
+        method = c("pca", "tsne", "umap")) {
+        # check validity of method
+        method <- rlang::arg_match(arg = method)
 
-  # check validity of method
-  method <- rlang::arg_match(arg = method)
+        if (method == "pca") {
+            result <- tof_reduce_pca(tof_tibble, ...)
+        } else if (method == "tsne") {
+            result <- tof_reduce_tsne(tof_tibble, ...)
+        } else if (method == "umap") {
+            result <- tof_reduce_umap(tof_tibble, ...)
+        } else {
+            stop("Method no implemented")
+        }
 
-  if (method == "pca") {
-    result <- tof_reduce_pca(tof_tibble, ...)
-  } else if (method == "tsne") {
-    result <- tof_reduce_tsne(tof_tibble, ...)
-  } else if (method == "umap") {
-    result <- tof_reduce_umap(tof_tibble, ...)
-  } else {
-      stop("Method no implemented")
-  }
+        if (augment == TRUE) {
+            result <-
+                dplyr::bind_cols(tof_tibble, result)
+        }
 
-  if (augment == TRUE) {
-    result <-
-      dplyr::bind_cols(tof_tibble, result)
-  }
-
-  return(result)
-
-}
-
-
-
-
-
+        return(result)
+    }

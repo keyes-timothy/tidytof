@@ -38,15 +38,13 @@ or mass cytometry run.
 
 # simulate some data
 sim_data <-
-   data.frame(
-   cd4 = rnorm(n = 100, mean = 5, sd = 0.5),
-   cd8 = rnorm(n = 100, mean = 0, sd = 0.1),
-   cd33 = rnorm(n = 100, mean = 10, sd = 0.1),
-   time = sample(1:300, size = 100)
-)
+    data.frame(
+        cd4 = rnorm(n = 100, mean = 5, sd = 0.5),
+        cd8 = rnorm(n = 100, mean = 0, sd = 0.1),
+        cd33 = rnorm(n = 100, mean = 10, sd = 0.1),
+        time = sample(1:300, size = 100)
+    )
 
 tof_calculate_flow_rate(tof_tibble = sim_data, time_col = time, num_timesteps = 20L)
-
-
 
 }

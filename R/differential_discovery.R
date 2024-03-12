@@ -1,7 +1,7 @@
 # differential_discovery.R
 # This file contains functions relevant to performing differential discovery
 # analyses (differential abundance analysis and differential expression analysis)
-# on tof_tbl objects containing CyTOF data.
+# on tof_tbl objects containing high-dimensional cytometry data.
 
 # diffcyt ----------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 #' patient id (in a paired design), or patient age.
 #'
 #' Note that without multiple samples at each level of each of the
-#' random effect variables, it can be easy to overfit mixed models. For most CyTOF
+#' random effect variables, it can be easy to overfit mixed models. For most high-dimensional cytometry
 #' experiments, 2 or fewer (and often 0) random effect variables are appropriate.
 #'
 #' @param diffcyt_method A string indicating which diffcyt method should be used for the
@@ -122,242 +122,235 @@
 #' @importFrom rlang arg_match
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
-#'
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_abundance_diffcyt <-
-  function(
-    tof_tibble,
-    sample_col,
-    cluster_col,
-    fixed_effect_cols,
-    random_effect_cols,
-    diffcyt_method = c("glmm", "edgeR", "voom"),
-    include_observation_level_random_effects = FALSE,
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        sample_col,
+        cluster_col,
+        fixed_effect_cols,
+        random_effect_cols,
+        diffcyt_method = c("glmm", "edgeR", "voom"),
+        include_observation_level_random_effects = FALSE,
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05,
+        ...) {
+        # check to see if the diffcyt package is installed
+        has_diffcyt <- requireNamespace(package = "diffcyt")
+        if (!has_diffcyt) {
+            stop(
+                "This function requires the {diffcyt} package. Install it with this code:\n
+                if (!requireNamespace(\"BiocManager\", quietly = TRUE))
+                    install.packages(\"BiocManager\")
+                BiocManager::install(\"diffcyt\")"
+            )
+        }
 
-    # check to see if the diffcyt package is installed
-    has_diffcyt <- requireNamespace(package = "diffcyt")
-    if (!has_diffcyt) {
-      stop(
-        "This function requires the {diffcyt} package. Install it with this code:\n
-           if (!requireNamespace(\"BiocManager\", quietly = TRUE))
-           install.packages(\"BiocManager\")
-           BiocManager::install(\"diffcyt\")"
-      )
-    }
+        # check method argument
+        diffcyt_method <- rlang::arg_match(diffcyt_method)
 
-    # check method argument
-    diffcyt_method <- rlang::arg_match(diffcyt_method)
+        # edgeR can't model random effects, so we throw an error for the user
+        # if they are included
+        if (diffcyt_method == "edgeR" & !missing(random_effect_cols)) {
+            stop(
+                "edgeR can't model random effects. Trying using another method or
+                model everything as a fixed effect."
+            )
+        }
 
-    # edgeR can't model random effects, so we throw an error for the user
-    # if they are included
-    if (diffcyt_method == "edgeR" & !missing(random_effect_cols)) {
-      stop(
-        "edgeR can't model random effects. Trying using another method or
-           model everything as a fixed effect."
-      )
-    }
-
-    # Only the "glmm" method supports observation-level random effects, so
-    # provide a warning if include_observation_level_random_effects = TRUE
-    # for any other method.
-    if (include_observation_level_random_effects == TRUE & diffcyt_method != "glmm") {
-      warning(
-        "Warning: Only the \"glmm\" method can use observation-level random effects.
+        # Only the "glmm" method supports observation-level random effects, so
+        # provide a warning if include_observation_level_random_effects = TRUE
+        # for any other method.
+        if (include_observation_level_random_effects == TRUE & diffcyt_method != "glmm") {
+            message(
+                "Note: Only the \"glmm\" method can use observation-level random effects.
         Setting include_observation_level_random_effects to FALSE.\n"
-      )
-
-      include_observation_level_random_effects <- FALSE
-    }
-
-    # a hack-y approach for dealing with the diffcyt software - we can pick 2 random
-    # columns corresponding to CyTOF measurements to fill the SummarizedExperiment
-    # that diffcyt requires later, but because in DAA these measurements are not used,
-    # it doesn't matter that we ignore all the other protein measurements.
-    #
-    # This will make the implementation faster for DAA as well because fewer values will
-    # need to by copied into the SummarizedExperiment data structure.
-    marker_colnames <-
-      tidyselect::eval_select(expr = where(tof_is_numeric), data = tof_tibble) |>
-      names()
-    marker_colnames <- marker_colnames[1:2]
-
-    # remove all columns from `tof_tibble` that aren't relevant
-    tof_tibble <-
-      tof_tibble |>
-      dplyr::select(
-        {{sample_col}},
-        dplyr::any_of(marker_colnames),
-        {{cluster_col}},
-        {{fixed_effect_cols}},
-        {{random_effect_cols}}
-      )
-
-    diffcyt_args <-
-      prepare_diffcyt_args(
-        tof_tibble = tof_tibble,
-        sample_col = {{sample_col}},
-        cluster_col = {{cluster_col}},
-        marker_cols = dplyr::any_of(marker_colnames),
-        fixed_effect_cols = {{fixed_effect_cols}},
-        random_effect_cols = {{random_effect_cols}},
-        diffcyt_method = diffcyt_method,
-        include_observation_level_random_effects =
-          include_observation_level_random_effects
-      )
-
-    # find counts of each cluster in all samples
-    cell_counts <- diffcyt::calcCounts(diffcyt_args$data_diff)
-
-    # perform difference abundance testing
-    if (diffcyt_method == "glmm") {
-      # if glmms are being used,
-
-      result_tibble <-
-        diffcyt_args$contrast_matrix_tibble |>
-        dplyr::transmute(
-          tested_effect = .data$contrast_names,
-          daa_results =
-            map(
-              .x = .data$contrast_matrices,
-              .f = function(x) {
-                diffcyt::testDA_GLMM(
-                  d_counts = cell_counts,
-                  formula = diffcyt_args$my_formula,
-                  contrast = x,
-                  min_cells = min_cells,
-                  min_samples = min_samples,
-                  ...
-                ) |>
-                  diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
-                  dplyr::as_tibble() |>
-                  dplyr::arrange(.data$p_adj) |>
-                  dplyr::mutate(
-                    significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
-                  ) |>
-                  dplyr::rename("{{cluster_col}}" := "cluster_id")
-              }
             )
-        )
-    }
 
-    else if (diffcyt_method == "voom") {
-      # if limma/voom is being used,
+            include_observation_level_random_effects <- FALSE
+        }
 
-      # We unite all random effect columns and treat them as
-      # a single block ID. Note this occurs in the help file and that
-      # it is not recommended to use more than 1 random effect variable with
-      # the voom method.
+        # a hack-y approach for dealing with the diffcyt software - we can pick 2 random
+        # columns corresponding to high-dimensional cytometry measurements to fill the SummarizedExperiment
+        # that diffcyt requires later, but because in DAA these measurements are not used,
+        # it doesn't matter that we ignore all the other protein measurements.
+        #
+        # This will make the implementation faster for DAA as well because fewer values will
+        # need to by copied into the SummarizedExperiment data structure.
+        marker_colnames <-
+            tof_tibble |>
+            dplyr::select(dplyr::where(tof_is_numeric)) |>
+            colnames()
 
-      if (length(diffcyt_args$random_effect_colnames) != 0) {
-        # if there are random effects, combine them into a single block_id
-        block_id <-
-          diffcyt_args$experiment_info |>
-          tidyr::unite(
-            col = "block_id",
-            tidyselect::any_of(diffcyt_args$random_effect_colnames)
-          ) |>
-          dplyr::pull(.data$block_id) |>
-          as.factor()
+        marker_colnames <- marker_colnames[c(1, 2)]
 
-      } else {
-        # otherwise, don't include a block_id
-        block_id <- NULL
-      }
+        # remove all columns from `tof_tibble` that aren't relevant
+        tof_tibble <-
+            tof_tibble |>
+            dplyr::select(
+                {{ sample_col }},
+                dplyr::any_of(marker_colnames),
+                {{ cluster_col }},
+                {{ fixed_effect_cols }},
+                {{ random_effect_cols }}
+            )
 
-      result_tibble <-
-        suppressWarnings(suppressMessages(
-          diffcyt_args$contrast_matrix_tibble |>
-            dplyr::transmute(
-              tested_effect = .data$contrast_names,
-              daa_results =
-                purrr::map(
-                  .x = .data$contrast_matrices,
-                  .f = function(x) {
-                    diffcyt::testDA_voom(
-                      d_counts = cell_counts,
-                      design = diffcyt_args$my_design,
-                      contrast = x,
-                      block_id = block_id,
-                      min_cells = min_cells,
-                      min_samples = min_samples,
-                      ...
-                    ) |>
-                      diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
-                      dplyr::as_tibble() |>
-                      dplyr::arrange(.data$p_adj) |>
-                      dplyr::mutate(
-                        significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
-                      ) |>
-                      dplyr::select(
-                        "{{cluster_col}}" := "cluster_id",
-                        "p_val",
-                        "p_adj",
-                        "significant",
-                        tidyselect::everything()
-                      )
-                  }
+        diffcyt_args <-
+            prepare_diffcyt_args(
+                tof_tibble = tof_tibble,
+                sample_col = {{ sample_col }},
+                cluster_col = {{ cluster_col }},
+                marker_cols = dplyr::any_of(marker_colnames),
+                fixed_effect_cols = {{ fixed_effect_cols }},
+                random_effect_cols = {{ random_effect_cols }},
+                diffcyt_method = diffcyt_method,
+                include_observation_level_random_effects =
+                    include_observation_level_random_effects
+            )
+
+        # find counts of each cluster in all samples
+        cell_counts <- diffcyt::calcCounts(diffcyt_args$data_diff)
+
+        # perform difference abundance testing
+        if (diffcyt_method == "glmm") {
+            # if glmms are being used,
+
+            result_tibble <-
+                diffcyt_args$contrast_matrix_tibble |>
+                dplyr::transmute(
+                    tested_effect = .data$contrast_names,
+                    daa_results =
+                        map(
+                            .x = .data$contrast_matrices,
+                            .f = function(x) {
+                                diffcyt::testDA_GLMM(
+                                    d_counts = cell_counts,
+                                    formula = diffcyt_args$my_formula,
+                                    contrast = x,
+                                    min_cells = min_cells,
+                                    min_samples = min_samples,
+                                    ...
+                                ) |>
+                                    diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
+                                    dplyr::as_tibble() |>
+                                    dplyr::arrange(.data$p_adj) |>
+                                    dplyr::mutate(
+                                        significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
+                                    ) |>
+                                    dplyr::rename("{{cluster_col}}" := "cluster_id")
+                            }
+                        )
                 )
-            )
-        ))
+        } else if (diffcyt_method == "voom") {
+            # if limma/voom is being used,
+
+            # We unite all random effect columns and treat them as
+            # a single block ID. Note this occurs in the help file and that
+            # it is not recommended to use more than 1 random effect variable with
+            # the voom method.
+
+            if (length(diffcyt_args$random_effect_colnames) != 0) {
+                # if there are random effects, combine them into a single block_id
+                block_id <-
+                    diffcyt_args$experiment_info |>
+                    tidyr::unite(
+                        col = "block_id",
+                        dplyr::any_of(diffcyt_args$random_effect_colnames)
+                    ) |>
+                    dplyr::pull(.data$block_id) |>
+                    as.factor()
+            } else {
+                # otherwise, don't include a block_id
+                block_id <- NULL
+            }
+
+            result_tibble <-
+                suppressWarnings(suppressMessages(
+                    diffcyt_args$contrast_matrix_tibble |>
+                        dplyr::transmute(
+                            tested_effect = .data$contrast_names,
+                            daa_results =
+                                purrr::map(
+                                    .x = .data$contrast_matrices,
+                                    .f = function(x) {
+                                        diffcyt::testDA_voom(
+                                            d_counts = cell_counts,
+                                            design = diffcyt_args$my_design,
+                                            contrast = x,
+                                            block_id = block_id,
+                                            min_cells = min_cells,
+                                            min_samples = min_samples,
+                                            ...
+                                        ) |>
+                                            diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
+                                            dplyr::as_tibble() |>
+                                            dplyr::arrange(.data$p_adj) |>
+                                            dplyr::mutate(
+                                                significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
+                                            ) |>
+                                            dplyr::select(
+                                                "{{cluster_col}}" := "cluster_id",
+                                                "p_val",
+                                                "p_adj",
+                                                "significant",
+                                                dplyr::everything()
+                                            )
+                                    }
+                                )
+                        )
+                ))
+        } else {
+            result_tibble <-
+                diffcyt_args$contrast_matrix_tibble |>
+                dplyr::transmute(
+                    tested_effect = .data$contrast_names,
+                    daa_results =
+                        purrr::map(
+                            .x = .data$contrast_matrices,
+                            .f = function(x) {
+                                diffcyt::testDA_edgeR(
+                                    d_counts = cell_counts,
+                                    design = diffcyt_args$my_design,
+                                    contrast = x,
+                                    min_cells = min_cells,
+                                    min_samples = min_samples,
+                                    ...
+                                ) |>
+                                    diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
+                                    dplyr::as_tibble() |>
+                                    dplyr::arrange(.data$p_adj) |>
+                                    dplyr::mutate(
+                                        significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
+                                    ) |>
+                                    dplyr::select(
+                                        "{{cluster_col}}" := "cluster_id",
+                                        "p_val",
+                                        "p_adj",
+                                        "significant",
+                                        dplyr::everything()
+                                    )
+                            }
+                        )
+                )
+        }
+
+        # remove the omnibus test information (and unnest the results tibble)
+        # if there are only 2 levels to the fixed effects being tested (because
+        # this means the omnibus test and the individual effect will be identical)
+        if (nrow(result_tibble) == 2) {
+            result_tibble <-
+                result_tibble |>
+                dplyr::filter(.data$tested_effect != "omnibus") |>
+                tidyr::unnest(cols = "daa_results")
+        }
+
+        attr(result_tibble, "daa_method") <- paste0("diffcyt_", diffcyt_method)
+
+        return(result_tibble)
     }
-
-    else {
-
-      result_tibble <-
-        diffcyt_args$contrast_matrix_tibble |>
-        dplyr::transmute(
-          tested_effect = .data$contrast_names,
-          daa_results =
-            purrr::map(
-              .x = .data$contrast_matrices,
-              .f = function(x) {
-                diffcyt::testDA_edgeR(
-                  d_counts = cell_counts,
-                  design = diffcyt_args$my_design,
-                  contrast = x,
-                  min_cells = min_cells,
-                  min_samples = min_samples,
-                  ...
-                ) |>
-                  diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
-                  dplyr::as_tibble() |>
-                  dplyr::arrange(.data$p_adj) |>
-                  dplyr::mutate(
-                    significant = dplyr::if_else(.data$p_adj < alpha, "*", "")
-                  ) |>
-                  dplyr::select(
-                    "{{cluster_col}}" := "cluster_id",
-                    "p_val",
-                    "p_adj",
-                    "significant",
-                    tidyselect::everything()
-                  )
-              }
-            )
-        )
-    }
-
-    # remove the omnibus test information (and unnest the results tibble)
-    # if there are only 2 levels to the fixed effects being tested (because
-    # this means the omnibus test and the individual effect will be identical)
-    if (nrow(result_tibble) == 2) {
-      result_tibble <-
-        result_tibble |>
-        dplyr::filter(.data$tested_effect != "omnibus") |>
-        tidyr::unnest(cols = "daa_results")
-    }
-
-    attr(result_tibble, "daa_method") <- paste0("diffcyt_", diffcyt_method)
-
-    return(result_tibble)
-
-  }
 
 
 #' Differential Expression Analysis (DEA) with diffcyt
@@ -387,7 +380,7 @@ tof_analyze_abundance_diffcyt <-
 #' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
-#' (i.e. which CyTOF protein measurements) should be tested for differential expression between
+#' (i.e. which high-dimensional cytometry protein measurements) should be tested for differential expression between
 #' levels of the `fixed_effect_cols`. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselect helpers.
 #'
@@ -406,7 +399,7 @@ tof_analyze_abundance_diffcyt <-
 #' patient id (in a paired design), or patient age.
 #'
 #' Note that without many samples at each level of each of the
-#' random effect variables, it can be easy to overfit mixed models. For most CyTOF
+#' random effect variables, it can be easy to overfit mixed models. For most high-dimensional cytometry
 #' experiments, 2 or fewer (and often 0) random effect variables are appropriate.
 #'
 #' @param diffcyt_method A string indicating which diffcyt method should be used for the
@@ -475,210 +468,206 @@ tof_analyze_abundance_diffcyt <-
 #' @importFrom tidyr unite
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_expression_diffcyt <-
-  function(
-    tof_tibble,
-    sample_col,
-    cluster_col,
-    marker_cols = where(tof_is_numeric),
-    fixed_effect_cols,
-    random_effect_cols,
-    diffcyt_method = c("lmm", "limma"),
-    include_observation_level_random_effects = FALSE,
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        sample_col,
+        cluster_col,
+        marker_cols = where(tof_is_numeric),
+        fixed_effect_cols,
+        random_effect_cols,
+        diffcyt_method = c("lmm", "limma"),
+        include_observation_level_random_effects = FALSE,
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05,
+        ...) {
+        # check to see if the diffcyt package is installed
+        has_diffcyt <- requireNamespace(package = "diffcyt")
+        if (!has_diffcyt) {
+            stop(
+                "This function requires the {diffcyt} package. Install it with this code:\n
+                if (!requireNamespace(\"BiocManager\", quietly = TRUE)){
+                  install.packages(\"BiocManager\")
+                  BiocManager::install(\"diffcyt\")
+                }"
+            )
+        }
 
-    # check to see if the diffcyt package is installed
-    has_diffcyt <- requireNamespace(package = "diffcyt")
-    if (!has_diffcyt) {
-      stop(
-        "This function requires the {diffcyt} package. Install it with this code:\n
-           if (!requireNamespace(\"BiocManager\", quietly = TRUE))
-           install.packages(\"BiocManager\")
-           BiocManager::install(\"diffcyt\")"
-      )
-    }
+        # check diffcyt_method argument
+        diffcyt_method <- match.arg(diffcyt_method, choices = c("lmm", "limma"))
 
-    # check diffcyt_method argument
-    diffcyt_method <- match.arg(diffcyt_method, choices = c("lmm", "limma"))
-
-    # Only the "lmm" method supports observation-level random effects, so
-    # provide a warning if include_observation_level_random_effects = TRUE
-    # for any other method.
-    if (include_observation_level_random_effects == TRUE & diffcyt_method != "lmm") {
-      warning(
-        "Warning: Only the \"lmm\" method can use observation-level random effects.
+        # Only the "lmm" method supports observation-level random effects, so
+        # provide a warning if include_observation_level_random_effects = TRUE
+        # for any other method.
+        if (include_observation_level_random_effects == TRUE & diffcyt_method != "lmm") {
+            message(
+                "Note: Only the \"lmm\" method can use observation-level random effects.
         Setting include_observation_level_random_effects to FALSE.\n"
-      )
-    }
-
-    # remove all columns from `tof_tibble` that aren't relevant
-    tof_tibble <-
-      tof_tibble |>
-      dplyr::select(
-        {{sample_col}},
-        {{cluster_col}},
-        {{marker_cols}},
-        {{fixed_effect_cols}},
-        {{random_effect_cols}}
-      )
-
-    diffcyt_args <-
-      prepare_diffcyt_args(
-        tof_tibble = tof_tibble,
-        sample_col = {{sample_col}},
-        cluster_col = {{cluster_col}},
-        marker_cols = {{marker_cols}},
-        fixed_effect_cols = {{fixed_effect_cols}},
-        random_effect_cols = {{random_effect_cols}},
-        diffcyt_method = diffcyt_method,
-        include_observation_level_random_effects =
-          include_observation_level_random_effects
-      )
-
-    # find cluster counts and cluster medians
-    cell_counts <- diffcyt::calcCounts(diffcyt_args$data_diff)
-    cell_medians <- diffcyt::calcMedians(diffcyt_args$data_diff)
-
-    # Perform the differential expression analysis
-
-    my_contrast <-
-      diffcyt_args$contrast_matrix_tibble |>
-      dplyr::pull(.data$contrast_matrices) |>
-      purrr::pluck(1)
-
-    if (diffcyt_method == "lmm") {
-      # if lmm's are being used,
-      result_tibble <-
-        suppressWarnings(suppressMessages(
-          diffcyt_args$contrast_matrix_tibble |>
-            dplyr::transmute(
-              tested_effect = .data$contrast_names,
-              dea_results =
-                purrr::map(
-                  .x = .data$contrast_matrices,
-                  .f = function(x) {
-                    diffcyt::testDS_LMM(
-                      d_counts = cell_counts,
-                      d_medians = cell_medians,
-                      formula = diffcyt_args$my_formula,
-                      contrast = x,
-                      markers_to_test = rep(TRUE, nrow(diffcyt_args$marker_info)),
-                      min_cells = min_cells,
-                      min_samples = min_samples,
-                      ...
-                    ) |>
-                      diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
-                      dplyr::as_tibble() |>
-                      dplyr::mutate(
-                        significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-                        cluster_id = as.character(.data$cluster_id),
-                        marker_id = as.character(.data$marker_id)
-                      ) |>
-                      dplyr::rename(
-                        marker = .data$marker_id,
-                        "{{cluster_col}}" := "cluster_id"
-                      ) |>
-                      dplyr::select(
-                        {{cluster_col}},
-                        "marker",
-                        "p_val",
-                        "p_adj",
-                        "significant",
-                        tidyselect::everything()
-                      )
-                  }
-                )
             )
-        ))
-    }
+        }
 
-    else if (diffcyt_method == "limma") {
-      # if limma is being used,
-
-      if (length(diffcyt_args$random_effect_colnames) != 0) {
-        # if there are random effects, combine them into a single block_id
-        block_id <-
-          diffcyt_args$experiment_info |>
-          tidyr::unite(
-            col = "block_id",
-            tidyselect::any_of(diffcyt_args$random_effect_colnames)
-          ) |>
-          dplyr::pull(.data$block_id) |>
-          as.factor()
-
-      } else {
-        # otherwise, don't include a block_id
-        block_id <- NULL
-      }
-
-      result_tibble <-
-        suppressWarnings(suppressMessages(
-          diffcyt_args$contrast_matrix_tibble |>
-            dplyr::transmute(
-              tested_effect = .data$contrast_names,
-              dea_results =
-                purrr::map(
-                  .x = .data$contrast_matrices,
-                  .f = function(x) {
-                    diffcyt::testDS_limma(
-                      d_counts = cell_counts,
-                      d_medians = cell_medians,
-                      design = diffcyt_args$my_design,
-                      contrast = x,
-                      block_id = block_id,
-                      min_cells = min_cells,
-                      min_samples = min_samples,
-                      markers_to_test = rep(TRUE, nrow(diffcyt_args$marker_info)),
-                      ...
-                    ) |>
-                      diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
-                      dplyr::as_tibble() |>
-                      select(-.data$ID) |>
-                      dplyr::mutate(
-                        significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-                        cluster_id = as.character(.data$cluster_id),
-                        marker_id = as.character(.data$marker_id)
-                      ) |>
-                      dplyr::rename(
-                        marker = .data$marker_id,
-                        "{{cluster_col}}" := "cluster_id"
-                      ) |>
-                      dplyr::select(
-                        {{cluster_col}},
-                        "marker",
-                        "p_val",
-                        "p_adj",
-                        "significant",
-                        tidyselect::everything()
-                      )
-                  }
-                )
+        # remove all columns from `tof_tibble` that aren't relevant
+        tof_tibble <-
+            tof_tibble |>
+            dplyr::select(
+                {{ sample_col }},
+                {{ cluster_col }},
+                {{ marker_cols }},
+                {{ fixed_effect_cols }},
+                {{ random_effect_cols }}
             )
-        ))
+
+        diffcyt_args <-
+            prepare_diffcyt_args(
+                tof_tibble = tof_tibble,
+                sample_col = {{ sample_col }},
+                cluster_col = {{ cluster_col }},
+                marker_cols = {{ marker_cols }},
+                fixed_effect_cols = {{ fixed_effect_cols }},
+                random_effect_cols = {{ random_effect_cols }},
+                diffcyt_method = diffcyt_method,
+                include_observation_level_random_effects =
+                    include_observation_level_random_effects
+            )
+
+        # find cluster counts and cluster medians
+        cell_counts <- diffcyt::calcCounts(diffcyt_args$data_diff)
+        cell_medians <- diffcyt::calcMedians(diffcyt_args$data_diff)
+
+        # Perform the differential expression analysis
+
+        my_contrast <-
+            diffcyt_args$contrast_matrix_tibble |>
+            dplyr::pull(.data$contrast_matrices) |>
+            purrr::pluck(1)
+
+        if (diffcyt_method == "lmm") {
+            # if lmm's are being used,
+            result_tibble <-
+                suppressWarnings(suppressMessages(
+                    diffcyt_args$contrast_matrix_tibble |>
+                        dplyr::transmute(
+                            tested_effect = .data$contrast_names,
+                            dea_results =
+                                purrr::map(
+                                    .x = .data$contrast_matrices,
+                                    .f = function(x) {
+                                        diffcyt::testDS_LMM(
+                                            d_counts = cell_counts,
+                                            d_medians = cell_medians,
+                                            formula = diffcyt_args$my_formula,
+                                            contrast = x,
+                                            markers_to_test = rep(TRUE, nrow(diffcyt_args$marker_info)),
+                                            min_cells = min_cells,
+                                            min_samples = min_samples,
+                                            ...
+                                        ) |>
+                                            diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
+                                            dplyr::as_tibble() |>
+                                            dplyr::mutate(
+                                                significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                                                cluster_id = as.character(.data$cluster_id),
+                                                marker_id = as.character(.data$marker_id)
+                                            ) |>
+                                            dplyr::rename(
+                                                marker = .data$marker_id,
+                                                "{{cluster_col}}" := "cluster_id"
+                                            ) |>
+                                            dplyr::select(
+                                                {{ cluster_col }},
+                                                "marker",
+                                                "p_val",
+                                                "p_adj",
+                                                "significant",
+                                                dplyr::everything()
+                                            )
+                                    }
+                                )
+                        )
+                ))
+        } else if (diffcyt_method == "limma") {
+            # if limma is being used,
+
+            if (length(diffcyt_args$random_effect_colnames) != 0) {
+                # if there are random effects, combine them into a single block_id
+                block_id <-
+                    diffcyt_args$experiment_info |>
+                    tidyr::unite(
+                        col = "block_id",
+                        dplyr::any_of(diffcyt_args$random_effect_colnames)
+                    ) |>
+                    dplyr::pull(.data$block_id) |>
+                    as.factor()
+            } else {
+                # otherwise, don't include a block_id
+                block_id <- NULL
+            }
+
+            result_tibble <-
+                suppressWarnings(suppressMessages(
+                    diffcyt_args$contrast_matrix_tibble |>
+                        dplyr::transmute(
+                            tested_effect = .data$contrast_names,
+                            dea_results =
+                                purrr::map(
+                                    .x = .data$contrast_matrices,
+                                    .f = function(x) {
+                                        diffcyt::testDS_limma(
+                                            d_counts = cell_counts,
+                                            d_medians = cell_medians,
+                                            design = diffcyt_args$my_design,
+                                            contrast = x,
+                                            block_id = block_id,
+                                            min_cells = min_cells,
+                                            min_samples = min_samples,
+                                            markers_to_test = rep(TRUE, nrow(diffcyt_args$marker_info)),
+                                            ...
+                                        ) |>
+                                            diffcyt::topTable(all = TRUE, show_all_cols = TRUE) |>
+                                            dplyr::as_tibble() |>
+                                            select(-.data$ID) |>
+                                            dplyr::mutate(
+                                                significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                                                cluster_id = as.character(.data$cluster_id),
+                                                marker_id = as.character(.data$marker_id)
+                                            ) |>
+                                            dplyr::rename(
+                                                marker = .data$marker_id,
+                                                "{{cluster_col}}" := "cluster_id"
+                                            ) |>
+                                            dplyr::select(
+                                                {{ cluster_col }},
+                                                "marker",
+                                                "p_val",
+                                                "p_adj",
+                                                "significant",
+                                                dplyr::everything()
+                                            )
+                                    }
+                                )
+                        )
+                ))
+        }
+
+        # remove the omnibus test information (and unnest the results tibble)
+        # if there are only 2 levels to the fixed effects being tested (because
+        # this means the omnibus test and the individual effect will be identical)
+        if (nrow(result_tibble) == 2) {
+            result_tibble <-
+                result_tibble |>
+                dplyr::filter(.data$tested_effect != "omnibus") |>
+                tidyr::unnest(cols = "dea_results")
+        }
+
+        attr(result_tibble, "dea_method") <- paste0("diffcyt_", diffcyt_method)
+
+
+        return(result_tibble)
     }
-
-    # remove the omnibus test information (and unnest the results tibble)
-    # if there are only 2 levels to the fixed effects being tested (because
-    # this means the omnibus test and the individual effect will be identical)
-    if (nrow(result_tibble) == 2) {
-      result_tibble <-
-        result_tibble |>
-        dplyr::filter(.data$tested_effect != "omnibus") |>
-        tidyr::unnest(cols = "dea_results")
-    }
-
-    attr(result_tibble, "dea_method") <- paste0("diffcyt_", diffcyt_method)
-
-
-    return(result_tibble)
-
-  }
 
 
 
@@ -724,7 +713,7 @@ tof_analyze_expression_diffcyt <-
 #' patient id (in a paired design), or patient age.
 #'
 #' Note that without many samples at each level of each of the
-#' random effect variables, it can be easy to overfit mixed models. For most CyTOF
+#' random effect variables, it can be easy to overfit mixed models. For most high-dimensional cytometry
 #' experiments, 2 or fewer (and often 0) random effect variables are appropriate.
 #'
 #' @param min_cells An integer value used to filter clusters out of the differential
@@ -780,222 +769,195 @@ tof_analyze_expression_diffcyt <-
 #' @importFrom purrr map
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_abundance_glmm <-
-  function(
-    tof_tibble,
-    sample_col,
-    cluster_col,
-    fixed_effect_cols,
-    random_effect_cols,
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05
-  ) {
+    function(
+        tof_tibble,
+        sample_col,
+        cluster_col,
+        fixed_effect_cols,
+        random_effect_cols,
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05) {
+        # extract sample column as a character vector
+        # will return an empty character vector if the argument is missing
+        sample_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(sample_col),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract sample column as a character vector
-    # will return an empty character vector if the argument is missing
-    sample_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(sample_col),
-        data = tof_tibble
-      ) |>
-      names()
+        # extract fixed effect columns as a character vector
+        # will return an empty character vector if the argument is missing
+        fixed_effect_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(fixed_effect_cols),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract fixed effect columns as a character vector
-    # will return an empty character vector if the argument is missing
-    fixed_effect_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(fixed_effect_cols),
-        data = tof_tibble
-      ) |>
-      names()
+        if (length(fixed_effect_colnames) == 0) {
+            stop("Fixed effects must be specified. Did you forget to set the `fixed_effect_cols` argument?")
+        }
 
-    if (length(fixed_effect_colnames) == 0) {
-      stop("Fixed effects must be specified. Did you forget to set the `fixed_effect_cols` argument?")
+        # extract random effect columns as a character vector
+        # will return an empty character vector if the argument is missing
+        random_effect_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(random_effect_cols),
+                data = tof_tibble
+            ) |>
+            names()
+
+        # count cells in all samples
+        my_sep <- "_______"
+        cell_counts <-
+            tof_tibble |>
+            tidyr::unite(
+                col = "metadata",
+                c({{ sample_col }}, dplyr::any_of(c(fixed_effect_colnames, random_effect_colnames))),
+                sep = my_sep
+            ) |>
+            dplyr::mutate(
+                dplyr::across(
+                    c("metadata", {{ cluster_col }}),
+                    .f = as.factor
+                ),
+            ) |>
+            dplyr::count(.data$metadata, {{ cluster_col }}, name = "num_cells", .drop = FALSE) |>
+            tidyr::separate(
+                col = "metadata",
+                into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
+                sep = my_sep
+            ) |>
+            dplyr::mutate("{{cluster_col}}" := as.character({{ cluster_col }})) |>
+            dplyr::group_by({{ sample_col }}) |>
+            dplyr::mutate(
+                total_cells = sum(.data$num_cells),
+                prop = .data$num_cells / .data$total_cells
+            ) |>
+            dplyr::ungroup()
+
+        # find the clusters that don't have over the threshold of minimum cells
+        # in over the threshold of minimum samples
+        clusters_to_remove <-
+            cell_counts |>
+            dplyr::count(
+                {{ sample_col }},
+                {{ cluster_col }},
+                wt = .data$num_cells,
+                .drop = FALSE
+            ) |>
+            dplyr::mutate(has_over_min_cells = .data$n > min_cells) |>
+            dplyr::count({{ cluster_col }}, .data$has_over_min_cells) |>
+            dplyr::filter(.data$has_over_min_cells) |>
+            dplyr::filter(.data$n < min_samples) |>
+            dplyr::pull({{ cluster_col }})
+
+        cell_counts <-
+            cell_counts |>
+            dplyr::filter(!({{ cluster_col }} %in% clusters_to_remove))
+
+        # nest the count data so we can fit one model per cluster
+        fit_data <-
+            cell_counts |>
+            dplyr::group_by({{ cluster_col }}) |>
+            tidyr::nest() |>
+            dplyr::ungroup()
+
+        # specify if there are random effects
+        if (length(random_effect_colnames) == 0) {
+            has_random_effects <- FALSE
+        } else {
+            has_random_effects <- TRUE
+        }
+
+        # construct formula for each model
+        if (has_random_effects) {
+            formula_string <-
+                stringr::str_c(
+                    "prop ~ ",
+                    stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
+                    "+",
+                    stringr::str_c(paste0("(1 | ", random_effect_colnames, ")"), sep = "+")
+                )
+        } else {
+            formula_string <-
+                stringr::str_c(
+                    "prop ~ ",
+                    stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
+                    sep = ""
+                )
+        }
+
+        formula <- stats::as.formula(formula_string)
+
+        # fit one model per cluster
+        fit_data <-
+            suppressMessages(suppressWarnings(
+                fit_data |>
+                    dplyr::mutate(
+                        results =
+                            purrr::map(
+                                .x = data,
+                                .f = fit_da_model,
+                                formula = formula,
+                                has_random_effects = has_random_effects
+                            ),
+                        results = purrr::map(.x = .data$results, .f = tidy_lmer_test_glmm)
+                    )
+            ))
+
+        fit_data <-
+            fit_data |>
+            dplyr::select(-"data") |>
+            tidyr::unnest(cols = "results") |>
+            dplyr::filter(.data$term != "(Intercept)", !is.na(.data$p.value)) |>
+            dplyr::mutate(p_adj = stats::p.adjust(.data$p.value, method = "fdr")) |>
+            dplyr::arrange(.data$p_adj) |>
+            dplyr::mutate(
+                significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                mean_fc = exp(.data$estimate)
+            ) |>
+            dplyr::rename(
+                tested_effect = "term",
+                p_val = "p.value",
+                f_statistic = "statistic"
+            )
+
+        # if (has_random_effects) {
+        #   fit_data <-
+        #     fit_data |>
+        #     dplyr::select(-.data$group, -.data$effect)
+        # }
+
+        fit_data <-
+            fit_data |>
+            dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
+            dplyr::select(
+                {{ cluster_col }},
+                "p_val",
+                "p_adj",
+                "significant",
+                tidyselect::everything()
+            ) |>
+            tidyr::nest(daa_results = c(-"tested_effect"))
+
+        # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
+        # unnest it (which is more intuitive)
+        if (nrow(fit_data) == 1) {
+            fit_data <-
+                tidyr::unnest(fit_data, cols = "daa_results")
+        }
+
+        attr(fit_data, which = "daa_method") <- "glmm"
+
+        return(fit_data)
     }
-
-    # extract random effect columns as a character vector
-    # will return an empty character vector if the argument is missing
-    random_effect_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(random_effect_cols),
-        data = tof_tibble
-      ) |>
-      names()
-
-    # count cells in all samples
-    my_sep = "_______"
-    cell_counts <-
-      tof_tibble |>
-      tidyr::unite(
-        col = "metadata",
-        c({{sample_col}}, dplyr::any_of(c(fixed_effect_colnames, random_effect_colnames))),
-        sep = my_sep
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          c("metadata", {{cluster_col}}),
-          .f = as.factor
-          ),
-      ) |>
-      dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) |>
-      tidyr::separate(
-        col = "metadata",
-        into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
-        sep = my_sep
-      ) |>
-      dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) |>
-      dplyr::group_by({{sample_col}}) |>
-      dplyr::mutate(
-        total_cells = sum(.data$num_cells),
-        prop = .data$num_cells / .data$total_cells
-      ) |>
-      dplyr::ungroup()
-
-    # find the clusters that don't have over the threshold of minimum cells
-    # in over the threshold of minimum samples
-    clusters_to_remove <-
-      cell_counts |>
-      dplyr::count(
-        {{sample_col}},
-        {{cluster_col}},
-        wt = .data$num_cells,
-        .drop = FALSE
-      ) |>
-      dplyr::mutate(has_over_min_cells = .data$n > min_cells) |>
-      dplyr::count({{cluster_col}}, .data$has_over_min_cells) |>
-      dplyr::filter(.data$has_over_min_cells) |>
-      dplyr::filter(.data$n < min_samples) |>
-      dplyr::pull({{cluster_col}})
-
-    ## find the clusters that only occur in one of the fixed_effect_cols
-    # fixed_clusters_to_remove <-
-    #   cell_counts |>
-    #   dplyr::distinct({{cluster_col}}, {{fixed_effect_cols}}) |>
-    #   dplyr::count({{cluster_col}}, .drop = FALSE) |>
-    #   dplyr::filter(n == 1) |>
-    #   dplyr::pull({{cluster_col}})
-    #
-    # return(fixed_clusters_to_remove)
-
-    # clusters_to_remove <-
-    #   unique(c(clusters_to_remove, fixed_clusters_to_remove))
-
-    ## find the clusters that only occur in one of the random_effect_cols
-    # if (length(random_effect_colnames) != 0) {
-    #   random_clusters_to_remove <-
-    #     cell_counts |>
-    #     dplyr::distinct({{cluster_col}}, {{random_effect_cols}}) |>
-    #     dplyr::count({{cluster_col}}) |>
-    #     dplyr::filter(n == 1) |>
-    #     dplyr::pull({{cluster_col}})
-    #
-    #   clusters_to_remove <-
-    #     unique(c(clusters_to_remove, random_clusters_to_remove))
-    # }
-
-    cell_counts <-
-      cell_counts |>
-      dplyr::filter(!({{cluster_col}} %in% clusters_to_remove))
-
-    # nest the count data so we can fit one model per cluster
-    fit_data <-
-      cell_counts |>
-      dplyr::group_by({{cluster_col}}) |>
-      tidyr::nest() |>
-      dplyr::ungroup()
-
-    # specify if there are random effects
-    if (length(random_effect_colnames) == 0) {
-      has_random_effects <- FALSE
-    } else {
-      has_random_effects <- TRUE
-    }
-
-    # construct formula for each model
-    if (has_random_effects) {
-      formula_string <-
-        stringr::str_c(
-          "prop ~ ",
-          stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
-          "+",
-          stringr::str_c(paste0("(1 | ", random_effect_colnames, ")"), sep = "+")
-        )
-    } else {
-      formula_string <-
-        stringr::str_c(
-          "prop ~ ",
-          stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
-          sep = ""
-        )
-    }
-
-    formula <- stats::as.formula(formula_string)
-
-    # fit one model per cluster
-    fit_data <-
-      suppressMessages(suppressWarnings(
-        fit_data |>
-          dplyr::mutate(
-            results =
-              purrr::map(
-                .x = data,
-                .f = fit_da_model,
-                formula = formula,
-                has_random_effects = has_random_effects
-              ),
-             results = purrr::map(.x = .data$results, .f = tidy_lmer_test_glmm)
-          )
-      ))
-
-    fit_data <-
-      fit_data |>
-      dplyr::select(-"data") |>
-      tidyr::unnest(cols = "results") |>
-      dplyr::filter(.data$term != "(Intercept)", !is.na(.data$p.value)) |>
-      dplyr::mutate(p_adj = stats::p.adjust(.data$p.value, method = "fdr")) |>
-      dplyr::arrange(.data$p_adj) |>
-      dplyr::mutate(
-        significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-        mean_fc = exp(.data$estimate)
-      ) |>
-      dplyr::rename(
-        tested_effect = "term",
-        p_val = "p.value",
-        f_statistic = "statistic"
-      )
-
-    # if (has_random_effects) {
-    #   fit_data <-
-    #     fit_data |>
-    #     dplyr::select(-.data$group, -.data$effect)
-    # }
-
-    fit_data <-
-      fit_data |>
-      dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
-      dplyr::select(
-        {{cluster_col}},
-        "p_val",
-        "p_adj",
-        "significant",
-        tidyselect::everything()
-      ) |>
-      tidyr::nest(daa_results = c(-"tested_effect"))
-
-    # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
-    # unnest it (which is more intuitive)
-    if (nrow(fit_data) == 1) {
-      fit_data <-
-        tidyr::unnest(fit_data, cols = "daa_results")
-    }
-
-    attr(fit_data, which = "daa_method") <- "glmm"
-
-    return(fit_data)
-  }
 
 
 #' Differential Expression Analysis (DEA) with linear mixed-models (LMMs)
@@ -1029,7 +991,7 @@ tof_analyze_abundance_glmm <-
 #' any of the functions in the `tof_cluster_*` function family, or any other method.
 #'
 #' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
-#' (i.e. which CyTOF protein measurements) should be included in the differential
+#' (i.e. which high-dimensional cytometry protein measurements) should be included in the differential
 #' discovery analysis. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselection.
 #'
@@ -1115,258 +1077,257 @@ tof_analyze_abundance_glmm <-
 #' @family differential expression analysis functions
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_expression_lmm <-
-  function(
-    tof_tibble,
-    sample_col,
-    cluster_col,
-    marker_cols = where(tof_is_numeric),
-    fixed_effect_cols,
-    random_effect_cols,
-    central_tendency_function = median,
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05
-  ) {
+    function(
+        tof_tibble,
+        sample_col,
+        cluster_col,
+        marker_cols = where(tof_is_numeric),
+        fixed_effect_cols,
+        random_effect_cols,
+        central_tendency_function = median,
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05) {
+        # extract sample column as a character vector
+        # will return an empty character vector if the argument is missing
+        sample_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(sample_col),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract sample column as a character vector
-    # will return an empty character vector if the argument is missing
-    sample_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(sample_col),
-        data = tof_tibble
-      ) |>
-      names()
+        # extract cluster column as a character vector
+        # will return an empty character vector if the argument is missing
+        cluster_colname <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(cluster_col),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract cluster column as a character vector
-    # will return an empty character vector if the argument is missing
-    cluster_colname <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(cluster_col),
-        data = tof_tibble
-      ) |>
-      names()
+        # extract fixed effect columns as a character vector
+        # will return an empty character vector if the argument is missing
+        fixed_effect_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(fixed_effect_cols),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract fixed effect columns as a character vector
-    # will return an empty character vector if the argument is missing
-    fixed_effect_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(fixed_effect_cols),
-        data = tof_tibble
-      ) |>
-      names()
+        # extract random effect columns as a character vector
+        # will return an empty character vector if the argument is missing
+        random_effect_colnames <-
+            tidyselect::eval_select(
+                expr = rlang::enquo(random_effect_cols),
+                data = tof_tibble
+            ) |>
+            names()
 
-    # extract random effect columns as a character vector
-    # will return an empty character vector if the argument is missing
-    random_effect_colnames <-
-      tidyselect::eval_select(
-        expr = rlang::enquo(random_effect_cols),
-        data = tof_tibble
-      ) |>
-      names()
+        # count cells in all samples
+        my_sep <- "_______"
+        cell_counts <-
+            tof_tibble |>
+            tidyr::unite(
+                col = "metadata",
+                c({{ sample_col }}, dplyr::any_of(c(fixed_effect_colnames, random_effect_colnames))),
+                sep = my_sep
+            ) |>
+            dplyr::mutate(
+                dplyr::across(
+                    c("metadata", {{ cluster_col }}),
+                    .f = as.factor
+                ),
+            ) |>
+            dplyr::count(.data$metadata, {{ cluster_col }}, name = "num_cells", .drop = FALSE) |>
+            tidyr::separate(
+                col = "metadata",
+                into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
+                sep = my_sep
+            ) |>
+            dplyr::mutate("{{cluster_col}}" := as.character({{ cluster_col }})) |>
+            dplyr::group_by({{ sample_col }}) |>
+            dplyr::mutate(
+                total_cells = sum(.data$num_cells),
+                prop = .data$num_cells / .data$total_cells
+            ) |>
+            dplyr::ungroup()
 
-    # count cells in all samples
-    my_sep = "_______"
-    cell_counts <-
-      tof_tibble |>
-      tidyr::unite(
-        col = "metadata",
-        c({{sample_col}}, dplyr::any_of(c(fixed_effect_colnames, random_effect_colnames))),
-        sep = my_sep
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          c("metadata", {{cluster_col}}),
-          .f = as.factor
-        ),
-      ) |>
-      dplyr::count(.data$metadata, {{cluster_col}}, name = "num_cells", .drop = FALSE) |>
-      tidyr::separate(
-        col = "metadata",
-        into = c(sample_colname, fixed_effect_colnames, random_effect_colnames),
-        sep = my_sep
-      ) |>
-      dplyr::mutate("{{cluster_col}}" := as.character({{cluster_col}})) |>
-      dplyr::group_by({{sample_col}}) |>
-      dplyr::mutate(
-        total_cells = sum(.data$num_cells),
-        prop = .data$num_cells / .data$total_cells
-      ) |>
-      dplyr::ungroup()
+        # find the clusters that don't have over the threshold of minimum cells
+        # in over the threshold of minimum samples
+        clusters_to_remove <-
+            cell_counts |>
+            dplyr::mutate(has_over_min_cells = .data$num_cells > min_cells) |>
+            dplyr::count({{ cluster_col }}, .data$has_over_min_cells) |>
+            dplyr::filter(.data$has_over_min_cells) |>
+            dplyr::filter(.data$n < min_samples) |>
+            dplyr::pull({{ cluster_col }})
 
-    # find the clusters that don't have over the threshold of minimum cells
-    # in over the threshold of minimum samples
-    clusters_to_remove <-
-      cell_counts |>
-      dplyr::mutate(has_over_min_cells = .data$num_cells > min_cells) |>
-      dplyr::count({{cluster_col}}, .data$has_over_min_cells) |>
-      dplyr::filter(.data$has_over_min_cells) |>
-      dplyr::filter(.data$n < min_samples) |>
-      dplyr::pull({{cluster_col}})
+        ## find the clusters that only occur in one of the fixed_effect_cols
+        fixed_clusters_to_remove <-
+            cell_counts |>
+            dplyr::filter(.data$num_cells > 0) |>
+            dplyr::distinct({{ cluster_col }}, {{ fixed_effect_cols }}) |>
+            dplyr::count({{ cluster_col }}) |>
+            dplyr::filter(n == 1) |>
+            dplyr::pull({{ cluster_col }})
 
-    ## find the clusters that only occur in one of the fixed_effect_cols
-    fixed_clusters_to_remove <-
-      cell_counts |>
-      dplyr::filter(.data$num_cells > 0) |>
-      dplyr::distinct({{cluster_col}}, {{fixed_effect_cols}}) |>
-      dplyr::count({{cluster_col}}) |>
-      dplyr::filter(n == 1) |>
-      dplyr::pull({{cluster_col}})
+        clusters_to_remove <-
+            unique(c(clusters_to_remove, fixed_clusters_to_remove))
 
-    clusters_to_remove <-
-      unique(c(clusters_to_remove, fixed_clusters_to_remove))
+        ## find the clusters that only occur in one of the random_effect_cols
+        if (length(random_effect_colnames) != 0) {
+            random_clusters_to_remove <-
+                cell_counts |>
+                dplyr::distinct({{ cluster_col }}, {{ random_effect_cols }}) |>
+                dplyr::count({{ cluster_col }}) |>
+                dplyr::filter(n == 1) |>
+                dplyr::pull({{ cluster_col }})
 
-    ## find the clusters that only occur in one of the random_effect_cols
-    if (length(random_effect_colnames) != 0) {
-      random_clusters_to_remove <-
-        cell_counts |>
-        dplyr::distinct({{cluster_col}}, {{random_effect_cols}}) |>
-        dplyr::count({{cluster_col}}) |>
-        dplyr::filter(n == 1) |>
-        dplyr::pull({{cluster_col}})
+            clusters_to_remove <-
+                unique(c(clusters_to_remove, random_clusters_to_remove))
+        }
 
-      clusters_to_remove <-
-        unique(c(clusters_to_remove, random_clusters_to_remove))
+        # find the median for each cluster in each sample
+        expression_data <-
+            tof_tibble |>
+            dplyr::select(
+                {{ cluster_col }},
+                {{ sample_col }},
+                tidyselect::any_of(c(fixed_effect_colnames, random_effect_colnames)),
+                {{ marker_cols }}
+            ) |>
+            # remove clusters that don't fit the minimum criteria
+            dplyr::filter(!({{ cluster_col }} %in% clusters_to_remove)) |>
+            dplyr::group_by(
+                {{ sample_col }},
+                {{ cluster_col }},
+                dplyr::across(tidyselect::any_of(c(fixed_effect_colnames, random_effect_colnames)))
+            ) |>
+            dplyr::summarize(
+                dplyr::across(
+                    tidyselect::everything(),
+                    .fns = central_tendency_function
+                )
+            ) |>
+            dplyr::ungroup()
+
+        # nest the expression data so we can fit one model per cluster per channel
+        fit_data <-
+            expression_data |>
+            tidyr::pivot_longer(
+                cols = {{ marker_cols }},
+                names_to = "marker",
+                values_to = "expression"
+            ) |>
+            dplyr::group_by({{ cluster_col }}, .data$marker) |>
+            tidyr::nest() |>
+            dplyr::ungroup()
+
+        # specify if there are random effects
+        if (length(random_effect_colnames) == 0) {
+            has_random_effects <- FALSE
+        } else {
+            has_random_effects <- TRUE
+        }
+
+        # construct formula for each model
+        if (has_random_effects) {
+            formula_string <-
+                stringr::str_c(
+                    "expression ~ ",
+                    stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
+                    "+",
+                    stringr::str_c(paste0("(1 | ", random_effect_colnames, ")"), sep = "+")
+                )
+        } else {
+            formula_string <-
+                stringr::str_c(
+                    "expression ~ ",
+                    stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
+                    sep = ""
+                )
+        }
+
+        formula <- stats::as.formula(formula_string)
+
+        # fit one model per cluster
+        fit_data <-
+            suppressWarnings(suppressMessages(
+                fit_data |>
+                    dplyr::mutate(
+                        results =
+                            purrr::map(
+                                .x = data,
+                                .f = fit_de_model,
+                                formula = formula,
+                                has_random_effects = has_random_effects
+                            ),
+                        results = purrr::map(.x = .data$results, .f = tidy_lmer_test)
+                    ) |>
+                    dplyr::select(-"data") |>
+                    tidyr::unnest(cols = "results")
+            ))
+
+        intercepts <-
+            fit_data |>
+            dplyr::filter(.data$term == "(Intercept)", !is.na(.data$p.value)) |>
+            dplyr::rename(baseline_expression = "estimate") |>
+            dplyr::select({{ cluster_col }}, "marker", "baseline_expression")
+
+        fit_data <-
+            fit_data |>
+            dplyr::filter(.data$term != "(Intercept)", !is.na(.data$p.value)) |>
+            dplyr::mutate(p_adj = stats::p.adjust(.data$p.value, method = "fdr")) |>
+            dplyr::arrange(.data$p_adj) |>
+            dplyr::mutate(
+                significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                mean_diff = .data$estimate
+            ) |>
+            dplyr::rename(
+                tested_effect = "term",
+                p_val = "p.value",
+                f_statistic = "statistic"
+            ) |>
+            dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
+            dplyr::left_join(
+                intercepts,
+                by = c("marker", cluster_colname)
+            ) |>
+            dplyr::mutate(
+                mean_fc = (.data$baseline_expression + .data$mean_diff) / .data$baseline_expression
+            ) |>
+            dplyr::select(-"baseline_expression") |>
+            dplyr::select(
+                {{ cluster_col }},
+                "marker",
+                "p_val",
+                "p_adj",
+                "significant",
+                tidyselect::everything()
+            ) |>
+            dplyr::select(-"estimate")
+
+        fit_data <-
+            fit_data |>
+            dplyr::rename(std_error = "Std_ Error") |> # TO DO: Check
+            tidyr::nest(dea_results = c(-"tested_effect"))
+
+        # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
+        # unnest it (which is more intuitive)
+        if (nrow(fit_data) == 1) {
+            fit_data <-
+                tidyr::unnest(fit_data, cols = "dea_results")
+        }
+
+        attr(fit_data, which = "dea_method") <- "lmm"
+
+        return(fit_data)
     }
-
-    # find the median for each cluster in each sample
-    expression_data <-
-      tof_tibble |>
-      dplyr::select(
-        {{cluster_col}},
-        {{sample_col}},
-        tidyselect::any_of(c(fixed_effect_colnames, random_effect_colnames)),
-        {{marker_cols}}
-      ) |>
-      # remove clusters that don't fit the minimum criteria
-      dplyr::filter(!({{cluster_col}} %in% clusters_to_remove)) |>
-      dplyr::group_by(
-        {{sample_col}},
-        {{cluster_col}},
-        dplyr::across(tidyselect::any_of(c(fixed_effect_colnames, random_effect_colnames)))
-      ) |>
-      dplyr::summarize(
-        dplyr::across(
-          tidyselect::everything(),
-          .fns = central_tendency_function
-        )
-      ) |>
-      dplyr::ungroup()
-
-    # nest the expression data so we can fit one model per cluster per channel
-    fit_data <-
-      expression_data |>
-      tidyr::pivot_longer(
-        cols = {{marker_cols}},
-        names_to = "marker",
-        values_to = "expression"
-      ) |>
-      dplyr::group_by({{cluster_col}}, .data$marker) |>
-      tidyr::nest() |>
-      dplyr::ungroup()
-
-    # specify if there are random effects
-    if (length(random_effect_colnames) == 0) {
-      has_random_effects <- FALSE
-    } else {
-      has_random_effects <- TRUE
-    }
-
-    # construct formula for each model
-    if (has_random_effects) {
-      formula_string <-
-        stringr::str_c(
-          "expression ~ ",
-          stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
-          "+",
-          stringr::str_c(paste0("(1 | ", random_effect_colnames, ")"), sep = "+")
-        )
-    } else {
-      formula_string <-
-        stringr::str_c(
-          "expression ~ ",
-          stringr::str_c(fixed_effect_colnames, sep = "+", collapse = " + "),
-          sep = ""
-        )
-    }
-
-    formula <- stats::as.formula(formula_string)
-
-    # fit one model per cluster
-    fit_data <-
-      suppressWarnings(suppressMessages(
-        fit_data |>
-          dplyr::mutate(
-            results =
-              purrr::map(
-                .x = data,
-                .f = fit_de_model,
-                formula = formula,
-                has_random_effects = has_random_effects
-              ),
-            results = purrr::map(.x = .data$results, .f = tidy_lmer_test)
-          ) |>
-          dplyr::select(-"data") |>
-          tidyr::unnest(cols = "results")
-      ))
-
-    intercepts <-
-      fit_data |>
-      dplyr::filter(.data$term == "(Intercept)", !is.na(.data$p.value)) |>
-      dplyr::rename(baseline_expression = "estimate") |>
-      dplyr::select({{cluster_col}}, "marker", "baseline_expression")
-
-    fit_data <-
-      fit_data |>
-      dplyr::filter(.data$term != "(Intercept)", !is.na(.data$p.value)) |>
-      dplyr::mutate(p_adj = stats::p.adjust(.data$p.value, method = "fdr")) |>
-      dplyr::arrange(.data$p_adj) |>
-      dplyr::mutate(
-        significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-        mean_diff = .data$estimate
-      ) |>
-      dplyr::rename(
-        tested_effect = "term",
-        p_val = "p.value",
-        f_statistic = "statistic"
-      ) |>
-      dplyr::rename_with(stringr::str_replace_all, pattern = "(?<=.)\\.", replacement = "_") |>
-      dplyr::left_join(
-        intercepts,
-        by = c("marker", cluster_colname)
-      ) |>
-      dplyr::mutate(
-        mean_fc = (.data$baseline_expression + .data$mean_diff) / .data$baseline_expression
-      ) |>
-      dplyr::select(-"baseline_expression") |>
-      dplyr::select(
-        {{cluster_col}},
-        "marker",
-        "p_val",
-        "p_adj",
-        "significant",
-        tidyselect::everything()
-      ) |>
-      dplyr::select(-"estimate")
-
-    fit_data <-
-      fit_data |>
-      dplyr::rename(std_error = "Std_ Error") |> # TO DO: Check
-      tidyr::nest(dea_results = c(-"tested_effect"))
-
-    # if result tibble only has 1 row (only 2 levels of fixed_effect_cols), \
-    # unnest it (which is more intuitive)
-    if (nrow(fit_data) == 1) {
-      fit_data <-
-        tidyr::unnest(fit_data, cols = "dea_results")
-    }
-
-    attr(fit_data, which = "dea_method") <- "lmm"
-
-    return(fit_data)
-  }
 
 
 
@@ -1460,195 +1421,193 @@ tof_analyze_expression_lmm <-
 #' @importFrom stats p.adjust
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_abundance_ttest <-
-  function(
-    tof_tibble,
-    cluster_col,
-    effect_col,
-    group_cols,
-    test_type = c("unpaired", "paired"),
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05,
-    quiet = FALSE
-  ) {
+    function(
+        tof_tibble,
+        cluster_col,
+        effect_col,
+        group_cols,
+        test_type = c("unpaired", "paired"),
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05,
+        quiet = FALSE) {
+        # check the test_type argument
+        test_type <- rlang::arg_match(test_type, values = c("unpaired", "paired"))
 
-    # check the test_type argument
-    test_type <- rlang::arg_match(test_type, values = c("unpaired", "paired"))
+        # check for the number of unique levels in effect_col
+        if (missing(group_cols)) {
+            stop("The `group_cols` argument must be specified.")
+        }
 
-    # check for the number of unique levels in effect_col
-    if (missing(group_cols)) {
-      stop("The `group_cols` argument must be specified.")
-    }
+        # check for the number of unique levels in effect_col
+        if (missing(effect_col)) {
+            stop("The `effect_col` argument must be specified.")
+        }
 
-    # check for the number of unique levels in effect_col
-    if (missing(effect_col)) {
-      stop("The `effect_col` argument must be specified.")
-    }
+        effect_levels <-
+            tof_tibble |>
+            dplyr::pull({{ effect_col }}) |>
+            unique()
 
-    effect_levels <-
-      tof_tibble |>
-      dplyr::pull({{effect_col}}) |>
-      unique()
+        if (length(effect_levels) != 2L) {
+            stop("`effect_col` must have 2 distinct levels`.")
+        }
 
-    if (length(effect_levels) != 2L) {
-      stop("`effect_col` must have 2 distinct levels`.")
-    }
+        # count the cells in each cluster within each sample and effect_col level
+        count_df <-
+            tof_tibble |>
+            dplyr::mutate("{{cluster_col}}" := as.factor({{ cluster_col }})) |>
+            dplyr::count(across({{ group_cols }}), {{ effect_col }}, {{ cluster_col }}, .drop = FALSE) |>
+            dplyr::group_by(across({{ group_cols }}), {{ effect_col }}) |>
+            dplyr::mutate(prop = .data$n / sum(.data$n)) |>
+            dplyr::ungroup()
 
-    # count the cells in each cluster within each sample and effect_col level
-    count_df <-
-      tof_tibble |>
-      dplyr::mutate("{{cluster_col}}" := as.factor({{cluster_col}})) |>
-      dplyr::count(across({{group_cols}}), {{effect_col}}, {{cluster_col}}, .drop = FALSE) |>
-      dplyr::group_by(across({{group_cols}}), {{effect_col}}) |>
-      dplyr::mutate(prop = .data$n / sum(.data$n)) |>
-      dplyr::ungroup()
+        # find the clusters that should be removed due to not having enough cells in
+        # enough samples
+        clusters_to_keep <-
+            count_df |>
+            dplyr::filter(.data$n > min_cells) |>
+            dplyr::count({{ cluster_col }}) |>
+            dplyr::filter(.data$n > min_samples) |>
+            dplyr::pull({{ cluster_col }})
 
-    # find the clusters that should be removed due to not having enough cells in
-    # enough samples
-    clusters_to_keep <-
-      count_df |>
-      dplyr::filter(.data$n > min_cells) |>
-      dplyr::count({{cluster_col}}) |>
-      dplyr::filter(.data$n > min_samples) |>
-      dplyr::pull({{cluster_col}})
+        count_df <-
+            count_df |>
+            dplyr::filter({{ cluster_col }} %in% clusters_to_keep)
 
-    count_df <-
-      count_df |>
-      dplyr::filter({{cluster_col}} %in% clusters_to_keep)
+        # perform the t-tests
+        if (test_type == "paired") {
+            t_df <-
+                count_df |>
+                dplyr::select({{ group_cols }}, {{ effect_col }}, {{ cluster_col }}, "prop") |>
+                tidyr::pivot_wider(
+                    names_from = {{ effect_col }},
+                    values_from = "prop"
+                ) |>
+                tidyr::nest(data = -{{ cluster_col }}) |>
+                dplyr::mutate(
+                    t_test =
+                        purrr::map_if(
+                            .x = data,
+                            .p = ~ nrow(.x) > 1,
+                            .f = ~ stats::t.test(.x[[effect_levels[[1]]]], .x[[effect_levels[[2]]]], paired = TRUE),
+                            .else = ~ return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
+                        ),
+                    t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
+                    df = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$parameter),
+                    p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
+                    p_adj = stats::p.adjust(.data$p_val, "fdr"),
+                    significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                    mean_diff =
+                        purrr::map_dbl(
+                            .x = data,
+                            .f = ~ mean(.x[[effect_levels[[1]]]] - .x[[effect_levels[[2]]]])
+                        ),
+                    mean_fc =
+                    # note the correction factor to avoid divide-by-zero errors in calculating the fold-change
+                        purrr::map_dbl(
+                            .x = data,
+                            .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001))
+                        )
+                ) |>
+                dplyr::select(-"t_test", -"data")
+        } else {
+            # extract cluster_col names as a string
+            cluster_colname <-
+                count_df |>
+                dplyr::select({{ cluster_col }}) |>
+                colnames()
 
-    # perform the t-tests
-    if (test_type == "paired") {
-      t_df <-
-        count_df |>
-        dplyr::select({{group_cols}}, {{effect_col}}, {{cluster_col}}, "prop") |>
-        tidyr::pivot_wider(
-          names_from = {{effect_col}},
-          values_from = "prop"
-        ) |>
-        tidyr::nest(data = -{{cluster_col}}) |>
-        dplyr::mutate(
-          t_test =
-            purrr::map_if(
-              .x = data,
-              .p = ~ nrow(.x) > 1,
-              .f = ~ stats::t.test(.x[[effect_levels[[1]]]], .x[[effect_levels[[2]]]], paired = TRUE),
-              .else = ~return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
-            ),
-          t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
-          df = purrr::map_dbl(.x = .data$t_test, .f = ~.x$parameter),
-          p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
-          p_adj = stats::p.adjust(.data$p_val, "fdr"),
-          significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-          mean_diff =
-            purrr::map_dbl(
-              .x = data,
-              .f = ~ mean(.x[[effect_levels[[1]]]] - .x[[effect_levels[[2]]]])
-            ),
-          mean_fc =
-            # note the correction factor to avoid divide-by-zero errors in calculating the fold-change
-            purrr::map_dbl(
-              .x = data,
-              .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001))
+            effect_1_tibble <-
+                count_df |>
+                dplyr::filter({{ effect_col }} == effect_levels[[1]]) |>
+                tidyr::nest(data = -{{ cluster_col }}) |>
+                dplyr::transmute(
+                    {{ cluster_col }},
+                    effect_1_vector = purrr::map(.x = data, .f = ~ dplyr::pull(.x, .data$prop))
+                )
+
+            effect_2_tibble <-
+                count_df |>
+                dplyr::filter({{ effect_col }} == effect_levels[[2]]) |>
+                tidyr::nest(data = -{{ cluster_col }}) |>
+                dplyr::transmute(
+                    {{ cluster_col }},
+                    effect_2_vector = purrr::map(.x = data, .f = ~ dplyr::pull(.x, .data$prop))
+                )
+
+            t_df <-
+                dplyr::left_join(effect_1_tibble, effect_2_tibble, by = cluster_colname) |>
+                dplyr::mutate(
+                    enough_samples =
+                        purrr::map2_lgl(
+                            .x = .data$effect_1_vector,
+                            .y = .data$effect_2_vector,
+                            .f = ~ length(.x) > 1 & length(.y) > 1
+                        ),
+                    t_test =
+                        purrr::pmap(
+                            .l =
+                                list(.data$enough_samples, .data$effect_1_vector, .data$effect_2_vector),
+                            .f = tof_ttest
+                        ),
+                    t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
+                    df = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$parameter),
+                    p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
+                    p_adj = stats::p.adjust(.data$p_val, "fdr"),
+                    significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                    mean_diff =
+                        purrr::map2_dbl(
+                            .x = .data$effect_1_vector,
+                            .y = .data$effect_2_vector,
+                            .f = ~ mean(.x, na.rm = TRUE) - mean(.y, na.rm = TRUE),
+                        ),
+                    mean_fc =
+                        purrr::map2_dbl(
+                            .x = .data$effect_1_vector,
+                            .y = .data$effect_2_vector,
+                            .f = ~ mean(.x, na.rm = TRUE) / mean(.y, na.rm = TRUE),
+                        )
+                ) |>
+                dplyr::select(
+                    -"t_test",
+                    -"effect_1_vector",
+                    -"effect_2_vector",
+                    -"enough_samples"
+                ) |>
+                dplyr::arrange(.data$p_adj)
+        }
+
+        # convert cluster column back to a character vector for consistency with
+        # other tidytof functions and arrange columns into standard order
+        t_df <-
+            dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{ cluster_col }})) |>
+            dplyr::select(
+                {{ cluster_col }},
+                "p_val",
+                "p_adj",
+                "significant",
+                tidyselect::everything()
             )
-        ) |>
-        dplyr::select(-"t_test", -"data")
 
-    } else {
-      # extract cluster_col names as a string
-      cluster_colname <-
-        count_df |>
-        dplyr::select({{cluster_col}}) |>
-        colnames()
+        if (!quiet) {
+            if (any(is.na(t_df$t))) {
+                warning("Some conditions did not have at least 2 replicates. Some NA values returned as a result.\nBe sure to check the `group_cols` argument.")
+            }
+        }
 
-      effect_1_tibble <-
-        count_df |>
-        dplyr::filter({{effect_col}} == effect_levels[[1]]) |>
-        tidyr::nest(data = -{{cluster_col}}) |>
-        dplyr::transmute(
-          {{cluster_col}},
-          effect_1_vector = purrr::map(.x = data, .f = ~ dplyr::pull(.x, .data$prop))
-        )
+        # save the level in which the attributes were analyzed in case the user
+        # wants to interpret the mean difference or fold change values.
+        attr(t_df, "levels") <- effect_levels
 
-      effect_2_tibble <-
-        count_df |>
-        dplyr::filter({{effect_col}} == effect_levels[[2]]) |>
-        tidyr::nest(data = -{{cluster_col}}) |>
-        dplyr::transmute(
-          {{cluster_col}},
-          effect_2_vector = purrr::map(.x = data, .f = ~ dplyr::pull(.x, .data$prop))
-        )
+        attr(t_df, which = "daa_method") <- paste0("t_", test_type)
 
-      t_df <-
-        dplyr::left_join(effect_1_tibble, effect_2_tibble, by = cluster_colname) |>
-        dplyr::mutate(
-          enough_samples =
-            purrr::map2_lgl(
-              .x = .data$effect_1_vector,
-              .y = .data$effect_2_vector,
-              .f = ~ length(.x) > 1 & length(.y) > 1
-            ),
-          t_test =
-            purrr::pmap(
-              .l =
-                list(.data$enough_samples, .data$effect_1_vector, .data$effect_2_vector),
-              .f = tof_ttest
-            ),
-          t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
-          df = purrr::map_dbl(.x = .data$t_test, .f = ~.x$parameter),
-          p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
-          p_adj = stats::p.adjust(.data$p_val, "fdr"),
-          significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-          mean_diff =
-            purrr::map2_dbl(
-              .x = .data$effect_1_vector,
-              .y = .data$effect_2_vector,
-              .f = ~ mean(.x, na.rm = TRUE) - mean(.y, na.rm = TRUE),
-            ),
-          mean_fc =
-            purrr::map2_dbl(
-              .x = .data$effect_1_vector,
-              .y = .data$effect_2_vector,
-              .f = ~ mean(.x, na.rm = TRUE) / mean(.y, na.rm = TRUE),
-            )
-        ) |>
-        dplyr::select(
-          -"t_test",
-          -"effect_1_vector",
-          -"effect_2_vector",
-          -"enough_samples"
-        ) |>
-        dplyr::arrange(.data$p_adj)
+        return(t_df)
     }
-
-    # convert cluster column back to a character vector for consistency with
-    # other tidytof functions and arrange columns into standard order
-    t_df <-
-      dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{cluster_col}})) |>
-      dplyr::select(
-        {{cluster_col}},
-        "p_val",
-        "p_adj",
-        "significant",
-        tidyselect::everything()
-      )
-
-    if (!quiet) {
-      if (any(is.na(t_df$t))) {
-        warning("Some conditions did not have at least 2 replicates. Some NA values returned as a result.\nBe sure to check the `group_cols` argument.")
-      }
-    }
-
-    # save the level in which the attributes were analyzed in case the user
-    # wants to interpret the mean difference or fold change values.
-    attr(t_df, "levels") <- effect_levels
-
-    attr(t_df, which = "daa_method") <- paste0("t_", test_type)
-
-    return(t_df)
-}
 
 
 #' Differential Expression Analysis (DEA) with t-tests
@@ -1672,7 +1631,7 @@ tof_analyze_abundance_ttest <-
 #' only have 2 unique values.
 #'
 #' @param marker_cols Unquoted column names representing which columns in `tof_tibble`
-#' (i.e. which CyTOF protein measurements) should be tested for differential expression between
+#' (i.e. which high-dimensional cytometry protein measurements) should be tested for differential expression between
 #' levels of the `effect_col`. Defaults to all numeric (integer or double) columns.
 #' Supports tidyselect helpers.
 #'
@@ -1754,223 +1713,235 @@ tof_analyze_abundance_ttest <-
 #' @importFrom stats t.test
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_expression_ttest <-
-  function(
-    tof_tibble,
-    cluster_col,
-    marker_cols = where(tof_is_numeric),
-    effect_col,
-    group_cols,
-    test_type = c("unpaired", "paired"),
-    summary_function = mean,
-    min_cells = 3,
-    min_samples = 5,
-    alpha = 0.05,
-    quiet = FALSE
-  ) {
-    # check the test_type argument
-    test_type <- rlang::arg_match(test_type, values = c("unpaired", "paired"))
+    function(
+        tof_tibble,
+        cluster_col,
+        marker_cols = where(tof_is_numeric),
+        effect_col,
+        group_cols,
+        test_type = c("unpaired", "paired"),
+        summary_function = mean,
+        min_cells = 3,
+        min_samples = 5,
+        alpha = 0.05,
+        quiet = FALSE) {
+        # check the test_type argument
+        test_type <- rlang::arg_match(test_type, values = c("unpaired", "paired"))
 
-    # check for the number of unique levels in effect_col
-    if (missing(effect_col)) {
-      stop("The `effect_col` argument must be specified.")
+        # check for the number of unique levels in effect_col
+        if (missing(effect_col)) {
+            stop("The `effect_col` argument must be specified.")
+        }
+
+        # check for the number of unique levels in effect_col
+        if (missing(group_cols)) {
+            stop("The `group_cols` argument must be specified.")
+        }
+
+        effect_levels <-
+            tof_tibble |>
+            dplyr::pull({{ effect_col }}) |>
+            unique()
+
+        if (length(effect_levels) != 2L) {
+            stop("`effect_col` must have 2 distinct levels`.")
+        }
+
+        # extract marker columns for dea
+        marker_colnames <-
+            tof_tibble |>
+            dplyr::select({{ marker_cols }}) |>
+            colnames()
+
+        # summarize marker expression in each cluster within each sample and effect_col level
+        expression_df <-
+            tof_tibble |>
+            dplyr::mutate("{{cluster_col}}" := as.factor({{ cluster_col }})) |>
+            dplyr::group_by(across({{ group_cols }}), {{ effect_col }}, {{ cluster_col }}) |>
+            dplyr::summarize(
+                dplyr::across(
+                    dplyr::any_of(marker_colnames),
+                    summary_function
+                )
+            ) |>
+            dplyr::ungroup()
+
+        # find the clusters that should be removed due to not having enough cells in
+        # enough samples
+        count_df <-
+            tof_tibble |>
+            dplyr::mutate("{{cluster_col}}" := as.factor({{ cluster_col }})) |>
+            dplyr::count(across({{ group_cols }}), {{ effect_col }}, {{ cluster_col }}, .drop = FALSE) |>
+            dplyr::group_by(across({{ group_cols }}), {{ effect_col }}) |>
+            dplyr::ungroup()
+
+        clusters_to_keep <-
+            count_df |>
+            dplyr::filter(n > min_cells) |>
+            dplyr::count({{ cluster_col }}) |>
+            dplyr::filter(n > min_samples) |>
+            dplyr::pull({{ cluster_col }})
+
+        expression_df <-
+            expression_df |>
+            dplyr::filter({{ cluster_col }} %in% clusters_to_keep)
+
+        # throw an error if you didn't keep any clusters
+        if (nrow(expression_df) == 0) {
+            stop("No clusters were retained. Try changing `min_cells` and `min_samples`.")
+        }
+
+        # perform the t-tests
+        if (test_type == "paired") {
+            t_df <-
+                expression_df |>
+                tidyr::pivot_longer(
+                    cols = dplyr::any_of(marker_colnames),
+                    names_to = "marker",
+                    values_to = "summary"
+                ) |>
+                tidyr::nest(data = c(-"marker", -{{ cluster_col }})) |>
+                dplyr::mutate(
+                    data =
+                        purrr::map(
+                            data,
+                            ~ tidyr::pivot_wider(.x, names_from = {{ effect_col }}, values_from = summary)
+                        )
+                ) |>
+                dplyr::mutate(
+                    t_test =
+                        purrr::map_if(
+                            .x = data,
+                            .p = ~ nrow(.x) > 1,
+                            .f = ~
+                                stats::t.test(
+                                    x = .x[[effect_levels[[1]]]],
+                                    y = .x[[effect_levels[[2]]]],
+                                    paired = TRUE
+                                ),
+                            .else = ~ return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
+                        ),
+                    t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
+                    df = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$parameter),
+                    p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
+                    p_adj = stats::p.adjust(.data$p_val, "fdr"),
+                    significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                    mean_diff =
+                        purrr::map_dbl(
+                            .x = data,
+                            .f = ~ mean(.x[[effect_levels[[1]]]] - .x[[effect_levels[[2]]]], na.rm = TRUE)
+                        ),
+                    mean_fc =
+                        purrr::map_dbl(
+                            .x = data,
+                            .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001), na.rm = TRUE)
+                        )
+                ) |>
+                dplyr::select(-"t_test", -"data") |>
+                dplyr::select(
+                    {{ cluster_col }},
+                    "marker",
+                    "p_val",
+                    "p_adj",
+                    "significant",
+                    tidyselect::everything()
+                ) |>
+                dplyr::arrange(.data$p_adj)
+        } else {
+            t_df <-
+                expression_df |>
+                tidyr::pivot_longer(
+                    cols = dplyr::any_of(marker_colnames),
+                    names_to = "marker",
+                    values_to = "summary"
+                ) |>
+                tidyr::nest(data = c(-{{ effect_col }}, -{{ cluster_col }}, -"marker")) |>
+                tidyr::pivot_wider(names_from = {{ effect_col }}, values_from = data) |>
+                dplyr::mutate(
+                    enough_samples =
+                        purrr::map2_lgl(
+                            .x = .data[[effect_levels[[1]]]],
+                            .y = .data[[effect_levels[[2]]]],
+                            .f = ~ if (!is.null(.x) & !is.null(.y)) {
+                                return(nrow(.x) > 1 & nrow(.y) > 1)
+                            } else {
+                                return(FALSE)
+                            }
+                        ),
+                    t_test =
+                        purrr::pmap(
+                            .l = list(.data$enough_samples, .data[[effect_levels[[1]]]], .data[[effect_levels[[2]]]]),
+                            .f = function(x, y, z) tof_ttest(x, y$summary, z$summary)
+                        ),
+                    t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
+                    df = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$parameter),
+                    p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
+                    p_adj = stats::p.adjust(.data$p_val, "fdr"),
+                    significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
+                    mean_diff =
+                        purrr::map2_dbl(
+                            .x = .data[[effect_levels[[1]]]],
+                            .y = .data[[effect_levels[[2]]]],
+                            .f = ~ if (!is.null(.x) & !is.null(.y)) {
+                                return(mean(.x$summary) - mean(.y$summary))
+                            } else {
+                                return(NA_real_)
+                            }
+                        ),
+                    mean_fc =
+                    # note the correction factor to avoid divide-by-zero errors in calculating the fold-change
+                        purrr::map2_dbl(
+                            .x = .data[[effect_levels[[1]]]],
+                            .y = .data[[effect_levels[[2]]]],
+                            .f = ~ if (!is.null(.x) & !is.null(.y)) {
+                                return(mean(.x$summary) / (mean(.y$summary) + 0.001))
+                            } else {
+                                return(NA_real_)
+                            }
+                        )
+                ) |>
+                dplyr::select(
+                    -"t_test",
+                    -dplyr::any_of(effect_levels),
+                    -"enough_samples"
+                ) |>
+                dplyr::select(
+                    {{ cluster_col }},
+                    "marker",
+                    "p_val",
+                    "p_adj",
+                    "significant",
+                    tidyselect::everything()
+                ) |>
+                dplyr::arrange(.data$p_adj)
+        }
+
+        # convert cluster column back to a character vector for consistency with
+        # other tidytof functions
+        t_df <- dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{ cluster_col }}))
+
+        if (!quiet) {
+            if (any(is.na(t_df$t))) {
+                warning("Some conditions did not have at least 2 replicates. Some NA values returned as a result.\nBe sure to check the `group_cols` argument.")
+            }
+        }
+
+        # save the level in which the attributes were analyzed in case the user
+        # wants to interpret the mean difference or fold change values.
+        attr(t_df, "levels") <- effect_levels
+
+        attr(t_df, which = "dea_method") <- paste0("t_", test_type)
+
+        return(t_df)
     }
-
-    # check for the number of unique levels in effect_col
-    if (missing(group_cols)) {
-      stop("The `group_cols` argument must be specified.")
-    }
-
-    effect_levels <-
-      tof_tibble |>
-      dplyr::pull({{effect_col}}) |>
-      unique()
-
-    if (length(effect_levels) != 2L) {
-      stop("`effect_col` must have 2 distinct levels`.")
-    }
-
-    # extract marker columns for dea
-    marker_colnames <-
-      tof_tibble |>
-      dplyr::select({{marker_cols}}) |>
-      colnames()
-
-    # summarize marker expression in each cluster within each sample and effect_col level
-    expression_df <-
-      tof_tibble |>
-      dplyr::mutate("{{cluster_col}}" := as.factor({{cluster_col}})) |>
-      dplyr::group_by(across({{group_cols}}), {{effect_col}}, {{cluster_col}}) |>
-      dplyr::summarize(
-        dplyr::across(
-          dplyr::any_of(marker_colnames),
-          summary_function)
-      ) |>
-      dplyr::ungroup()
-
-    # find the clusters that should be removed due to not having enough cells in
-    # enough samples
-    count_df <-
-      tof_tibble |>
-      dplyr::mutate("{{cluster_col}}" := as.factor({{cluster_col}})) |>
-      dplyr::count(across({{group_cols}}), {{effect_col}}, {{cluster_col}}, .drop = FALSE) |>
-      dplyr::group_by(across({{group_cols}}), {{effect_col}}) |>
-      dplyr::ungroup()
-
-    clusters_to_keep <-
-      count_df |>
-      dplyr::filter(n > min_cells) |>
-      dplyr::count({{cluster_col}}) |>
-      dplyr::filter(n > min_samples) |>
-      dplyr::pull({{cluster_col}})
-
-    expression_df <-
-      expression_df |>
-      dplyr::filter({{cluster_col}} %in% clusters_to_keep)
-
-    # throw an error if you didn't keep any clusters
-    if (nrow(expression_df) == 0) {
-      stop("No clusters were retained. Try changing `min_cells` and `min_samples`.")
-    }
-
-    # perform the t-tests
-    if (test_type == "paired") {
-      t_df <-
-        expression_df |>
-        tidyr::pivot_longer(
-          cols = dplyr::any_of(marker_colnames),
-          names_to = "marker",
-          values_to = "summary"
-        ) |>
-        tidyr::nest(data = c(-"marker", -{{cluster_col}})) |>
-        dplyr::mutate(
-          data =
-            purrr::map(
-              data,
-              ~tidyr::pivot_wider(.x, names_from = {{effect_col}}, values_from = summary)
-            )
-        ) |>
-        dplyr::mutate(
-          t_test =
-            purrr::map_if(
-              .x = data,
-              .p = ~ nrow(.x) > 1,
-              .f = ~
-                stats::t.test(
-                  x = .x[[effect_levels[[1]]]],
-                  y = .x[[effect_levels[[2]]]],
-                  paired = TRUE
-                ),
-              .else = ~return(list(statistic = NA_real_, parameter = NA_real_, p.value = NA_real_))
-            ),
-          t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
-          df = purrr::map_dbl(.x = .data$t_test, .f = ~.x$parameter),
-          p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
-          p_adj = stats::p.adjust(.data$p_val, "fdr"),
-          significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-          mean_diff =
-            purrr::map_dbl(
-              .x = data,
-              .f = ~ mean(.x[[effect_levels[[1]]]] - .x[[effect_levels[[2]]]], na.rm = TRUE)
-            ),
-          mean_fc =
-            purrr::map_dbl(
-              .x = data,
-              .f = ~ mean(.x[[effect_levels[[1]]]] / (.x[[effect_levels[[2]]]] + 0.001), na.rm = TRUE)
-            )
-        ) |>
-        dplyr::select(-"t_test", -"data") |>
-        dplyr::select(
-          {{cluster_col}},
-          "marker",
-          "p_val",
-          "p_adj",
-          "significant",
-          tidyselect::everything()
-        ) |>
-        dplyr::arrange(.data$p_adj)
-
-    } else {
-      t_df <-
-        expression_df |>
-        tidyr::pivot_longer(
-          cols = dplyr::any_of(marker_colnames),
-          names_to = "marker",
-          values_to = "summary"
-        ) |>
-        tidyr::nest(data = c(-{{effect_col}}, -{{cluster_col}}, -"marker")) |>
-        tidyr::pivot_wider(names_from = {{effect_col}}, values_from = data) |>
-        dplyr::mutate(
-          enough_samples =
-            purrr::map2_lgl(
-              .x = .data[[effect_levels[[1]]]],
-              .y = .data[[effect_levels[[2]]]],
-              .f = ~ if (!is.null(.x) & !is.null(.y)) {return(nrow(.x) > 1 & nrow(.y) > 1)} else {return(FALSE)}
-            ),
-          t_test =
-            purrr::pmap(
-              .l = list(.data$enough_samples, .data[[effect_levels[[1]]]], .data[[effect_levels[[2]]]]),
-              .f = function(x, y, z) tof_ttest(x, y$summary, z$summary)
-            ),
-          t = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$statistic),
-          df = purrr::map_dbl(.x = .data$t_test, .f = ~.x$parameter),
-          p_val = purrr::map_dbl(.x = .data$t_test, .f = ~ .x$p.value),
-          p_adj = stats::p.adjust(.data$p_val, "fdr"),
-          significant = dplyr::if_else(.data$p_adj < alpha, "*", ""),
-          mean_diff =
-            purrr::map2_dbl(
-              .x = .data[[effect_levels[[1]]]],
-              .y = .data[[effect_levels[[2]]]],
-              .f = ~ if (!is.null(.x) & !is.null(.y)) {return(mean(.x$summary) - mean(.y$summary))} else {return(NA_real_)}
-            ),
-          mean_fc =
-            # note the correction factor to avoid divide-by-zero errors in calculating the fold-change
-            purrr::map2_dbl(
-              .x = .data[[effect_levels[[1]]]],
-              .y = .data[[effect_levels[[2]]]],
-              .f = ~ if (!is.null(.x) & !is.null(.y)) {return(mean(.x$summary) / (mean(.y$summary) + 0.001))} else {return(NA_real_)}
-            )
-        ) |>
-        dplyr::select(
-          -"t_test",
-          -dplyr::any_of(effect_levels),
-          -"enough_samples"
-        ) |>
-        dplyr::select(
-          {{cluster_col}},
-          "marker",
-          "p_val",
-          "p_adj",
-          "significant",
-          tidyselect::everything()
-        ) |>
-        dplyr::arrange(.data$p_adj)
-    }
-
-    # convert cluster column back to a character vector for consistency with
-    # other tidytof functions
-    t_df <- dplyr::mutate(t_df, "{{cluster_col}}" := as.character({{cluster_col}}))
-
-    if (!quiet) {
-      if (any(is.na(t_df$t))) {
-        warning("Some conditions did not have at least 2 replicates. Some NA values returned as a result.\nBe sure to check the `group_cols` argument.")
-      }
-    }
-
-    # save the level in which the attributes were analyzed in case the user
-    # wants to interpret the mean difference or fold change values.
-    attr(t_df, "levels") <- effect_levels
-
-    attr(t_df, which = "dea_method") <- paste0("t_", test_type)
-
-    return(t_df)
-  }
 
 # wrapper functions ------------------------------------------------------------
 
-#' Perform Differential Abundance Analysis (DAA) on CyTOF data
+#' Perform Differential Abundance Analysis (DAA) on high-dimensional cytometry data
 #'
 #' This function performs differential abundance analysis on the cell clusters
 #' contained within a `tof_tbl` using one of three methods
@@ -1997,38 +1968,38 @@ tof_analyze_expression_ttest <-
 #' @importFrom rlang arg_match
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_abundance <-
-  function(
-    tof_tibble,
-    method = c("diffcyt", "glmm", "ttest"),
-    ...
-  ) {
-    # check method argument
-    method <-
-      rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
+    function(
+        tof_tibble,
+        method = c("diffcyt", "glmm", "ttest"),
+        ...) {
+        # check method argument
+        method <-
+            rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
 
-    if (method == "diffcyt") {
-      result <-
-        tof_tibble |>
-        tof_analyze_abundance_diffcyt(...)
-    } else if (method == "glmm") {
-      result <-
-        tof_tibble |>
-        tof_analyze_abundance_glmm(...)
-    } else {
-      result <-
-        tof_tibble |>
-        tof_analyze_abundance_ttest(...)
+        if (method == "diffcyt") {
+            result <-
+                tof_tibble |>
+                tof_analyze_abundance_diffcyt(...)
+        } else if (method == "glmm") {
+            result <-
+                tof_tibble |>
+                tof_analyze_abundance_glmm(...)
+        } else {
+            result <-
+                tof_tibble |>
+                tof_analyze_abundance_ttest(...)
+        }
+        # return result
+        return(result)
     }
-    # return result
-    return(result)
-  }
 
 
 
-#' Perform Differential Expression Analysis (DEA) on CyTOF data
+#' Perform Differential Expression Analysis (DEA) on high-dimensional cytometry data
 #'
 #' This function performs differential expression analysis on the cell clusters
 #' contained within a `tof_tbl` using one of three methods
@@ -2055,34 +2026,34 @@ tof_analyze_abundance <-
 #' @importFrom rlang arg_match
 #'
 #' @examples
-#'# For differential discovery examples, please see the package vignettes
+#' # For differential discovery examples, please see the package vignettes
+#' NULL
 #'
 tof_analyze_expression <-
-  function(
-    tof_tibble,
-    method = c("diffcyt", "glmm", "ttest"),
-    ...
-  ) {
-    # check method argument
-    method <-
-      rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
+    function(
+        tof_tibble,
+        method = c("diffcyt", "glmm", "ttest"),
+        ...) {
+        # check method argument
+        method <-
+            rlang::arg_match(arg = method, values = c("diffcyt", "glmm", "ttest"))
 
-    if (method == "diffcyt") {
-      result <-
-        tof_tibble |>
-        tof_analyze_expression_diffcyt(...)
-    } else if (method == "lmm") {
-      result <-
-        tof_tibble |>
-        tof_analyze_expression_lmm(...)
-    } else {
-      result <-
-        tof_tibble |>
-        tof_analyze_expression_ttest(...)
+        if (method == "diffcyt") {
+            result <-
+                tof_tibble |>
+                tof_analyze_expression_diffcyt(...)
+        } else if (method == "lmm") {
+            result <-
+                tof_tibble |>
+                tof_analyze_expression_lmm(...)
+        } else {
+            result <-
+                tof_tibble |>
+                tof_analyze_expression_ttest(...)
+        }
+        # return result
+        return(result)
     }
-    # return result
-    return(result)
-  }
 
 # aliases for backwards compatibility ------------------------------------------
 
@@ -2095,6 +2066,3 @@ tof_dea_diffcyt <- tof_analyze_expression_diffcyt
 tof_dea_lmm <- tof_analyze_expression_lmm
 tof_dea_ttest <- tof_analyze_expression_ttest
 tof_dea <- tof_analyze_expression
-
-
-

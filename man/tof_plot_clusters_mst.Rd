@@ -103,9 +103,9 @@ layout_cd38 <-
         color_col = cd38
     )
 
- # use the same layout as the plot above to color the same
- # tree using a different marker
- layout_cd45 <-
+# use the same layout as the plot above to color the same
+# tree using a different marker
+layout_cd45 <-
     tof_plot_clusters_mst(
         tof_tibble = sim_data,
         cluster_col = cluster_id,

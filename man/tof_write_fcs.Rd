@@ -32,6 +32,10 @@ it contains into .fcs files within the directory located at `out_path`. The
 `group_cols` argument specifies how the rows of the `tof_tbl` (each cell)
 should be broken into separate .fcs files
 }
+\examples{
+NULL
+
+}
 \seealso{
 Other input/output functions: 
 \code{\link{tof_read_data}()},

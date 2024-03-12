@@ -30,7 +30,6 @@ current_panel <- tof_get_panel(tof_tibble)
 new_panel <- dplyr::filter(current_panel, antigens != "empty")
 tof_set_panel(tof_tibble = tof_tibble, panel = new_panel)
 
-
 }
 \seealso{
 Other tof_tbl utilities: 

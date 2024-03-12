@@ -65,9 +65,9 @@ sim_data <-
 # extract cluster proportions in each simulated patient
 feature_data <-
     tof_extract_proportion(
-       tof_tibble = sim_data,
-       cluster_col = cluster_id,
-       group_cols = sample_id
+        tof_tibble = sim_data,
+        cluster_col = cluster_id,
+        group_cols = sample_id
     )
 
 # plot the heatmap

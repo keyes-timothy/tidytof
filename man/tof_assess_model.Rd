@@ -70,7 +70,7 @@ feature_tibble <-
         pstat5 = runif(n = 100),
         cd34 = runif(n = 100),
         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100)
-   )
+    )
 
 new_tibble <-
     dplyr::tibble(
@@ -79,7 +79,7 @@ new_tibble <-
         pstat5 = runif(n = 20),
         cd34 = runif(n = 20),
         outcome = (3 * cd45) + (4 * pstat5) + rnorm(20)
-   )
+    )
 
 split_data <- tof_split_data(feature_tibble, split_method = "simple")
 
@@ -90,7 +90,7 @@ regression_model <-
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
         model_type = "linear"
-   )
+    )
 
 # assess the model on new data
 tof_assess_model(tof_model = regression_model, new_data = new_tibble)

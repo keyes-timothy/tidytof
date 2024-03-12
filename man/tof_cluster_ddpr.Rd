@@ -101,13 +101,12 @@ tof_cluster_ddpr(
     healthy_label_col = cluster_id
 )
 
-
 }
 \seealso{
 Other clustering functions: 
+\code{\link{tof_cluster}()},
 \code{\link{tof_cluster_flowsom}()},
 \code{\link{tof_cluster_kmeans}()},
-\code{\link{tof_cluster_phenograph}()},
-\code{\link{tof_cluster}()}
+\code{\link{tof_cluster_phenograph}()}
 }
 \concept{clustering functions}

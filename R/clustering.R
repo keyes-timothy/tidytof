@@ -38,7 +38,6 @@
 #' @param num_metaclusters An integer indicating the maximum number of metaclusters
 #' that should be returned after metaclustering. Defaults to 20.
 #'
-#'
 #' @param ... Optional additional parameters that can be passed to the \code{\link[FlowSOM]{BuildSOM}}
 #' function.
 #'
@@ -63,83 +62,80 @@
 #' tof_cluster_flowsom(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 #'
 tof_cluster_flowsom <-
-  function(
-    tof_tibble = NULL,
-    cluster_cols = where(tof_is_numeric),
-    som_xdim = 10,
-    som_ydim = 10,
-    som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
-    perform_metaclustering = TRUE,
-    num_metaclusters = 20,
-    ...
-  ) {
+    function(
+        tof_tibble = NULL,
+        cluster_cols = where(tof_is_numeric),
+        som_xdim = 10,
+        som_ydim = 10,
+        som_distance_function = c("euclidean", "manhattan", "chebyshev", "cosine"),
+        perform_metaclustering = TRUE,
+        num_metaclusters = 20,
+        ...) {
+        # check that flowSOM is installed
+        has_flowsom <- requireNamespace(package = "FlowSOM", quietly = TRUE)
+        if (!has_flowsom) {
+          stop(
+            "This function requires the {FlowSOM} package. Install it with this code:\n
+            if (!requireNamespace(\"BiocManager\", quietly = TRUE)) {\n
+                install.packages(\"BiocManager\")\n
+            }\n
+            BiocManager::install(\"FlowSOM\")\n"
+          )
+        }
 
-    # check that flowSOM is installed
-    has_flowsom <- requireNamespace(package = "FlowSOM")
-    if (!has_flowsom) {
-      stop(
-        "This function requires the {FlowSOM} package. Install it with this code:\n
-          if (!requireNamespace(\"BiocManager\", quietly = TRUE)) {\n
-             install.packages(\"BiocManager\")\n
-          }\n
-          BiocManager::install(\"FlowSOM\")\n"
-      )
+        som_distance_function <-
+            match.arg(
+                arg = som_distance_function,
+                choices = c("euclidean", "manhattan", "chebyshev", "cosine")
+            )
+
+        # extract string indicating which markers should be used for clustering
+        clustering_markers <-
+            tof_tibble |>
+            dplyr::select({{ cluster_cols }}) |>
+            colnames()
+
+        # convert character distance function name to a number that SOM understands
+        distf <-
+            switch(som_distance_function,
+                manhattan = 1,
+                euclidean = 2,
+                chebyshev = 3,
+                cosine = 4
+            )
+
+        som <-
+            suppressMessages(
+                FlowSOM::SOM(
+                    data = as.matrix(tof_tibble[, clustering_markers]),
+                    xdim = som_xdim,
+                    ydim = som_ydim,
+                    distf = distf,
+                    ...
+                )
+            )
+
+        # if no metaclustering, return FlowSOM cluster labels
+        if (!perform_metaclustering) {
+            flowsom_clusters <- as.character(som$mapping[, 1])
+            return(dplyr::tibble(.flowsom_cluster = flowsom_clusters))
+
+            # otherwise, perform metaclustering
+        } else {
+            metacluster_result <-
+                FlowSOM::metaClustering_consensus(
+                    data = som$codes,
+                    k = num_metaclusters
+                )
+
+            flowsom_metaclusters <-
+                metacluster_result[som$mapping[, 1]] |>
+                as.integer() |>
+                as.character()
+
+            return(dplyr::tibble(.flowsom_metacluster = flowsom_metaclusters))
+        }
     }
-
-    som_distance_function <-
-      match.arg(
-        arg = som_distance_function,
-        choices = c("euclidean", "manhattan", "chebyshev", "cosine")
-      )
-
-    # extract string indicating which markers should be used for clustering
-    clustering_markers <-
-      tof_tibble |>
-      dplyr::select({{cluster_cols}}) |>
-      colnames()
-
-    # convert character distance function name to a number that SOM understands
-    distf <-
-      switch(
-        som_distance_function,
-        manhattan = 1,
-        euclidean = 2,
-        chebyshev = 3,
-        cosine = 4
-      )
-
-    som <-
-      suppressMessages(
-        FlowSOM::SOM(
-          data = as.matrix(tof_tibble[, clustering_markers]),
-          xdim = som_xdim,
-          ydim = som_ydim,
-          distf = distf,
-          ...
-        )
-      )
-
-    # if no metaclustering, return FlowSOM cluster labels
-    if (!perform_metaclustering) {
-      flowsom_clusters <- as.character(som$mapping[, 1])
-      return(dplyr::tibble(.flowsom_cluster = flowsom_clusters))
-
-    # otherwise, perform metaclustering
-    } else {
-      metacluster_result <-
-        FlowSOM::metaClustering_consensus(
-          data = som$codes,
-          k = num_metaclusters
-        )
-
-      flowsom_metaclusters <-
-        metacluster_result[som$mapping[, 1]] |>
-        as.integer() |>
-        as.character()
-
-      return(dplyr::tibble(.flowsom_metacluster = flowsom_metaclusters))
-    }
-  }
 
 
 # tof_cluster_phenograph -------------------------------------------------------
@@ -192,25 +188,23 @@ tof_cluster_flowsom <-
 #' tof_cluster_phenograph(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 #'
 tof_cluster_phenograph <-
-  function(
-    tof_tibble,
-    cluster_cols = where(tof_is_numeric),
-    num_neighbors = 30,
-    distance_function = c("euclidean", "cosine"),
-    ...
-  ) {
-
-    result <-
-      phenograph_cluster(
+    function(
         tof_tibble,
-        cluster_cols = {{cluster_cols}},
-        num_neighbors = num_neighbors,
-        distance_function = distance_function,
-        ...
-      )
+        cluster_cols = where(tof_is_numeric),
+        num_neighbors = 30,
+        distance_function = c("euclidean", "cosine"),
+        ...) {
+        result <-
+            phenograph_cluster(
+                tof_tibble,
+                cluster_cols = {{ cluster_cols }},
+                num_neighbors = num_neighbors,
+                distance_function = distance_function,
+                ...
+            )
 
-    return(result)
-  }
+        return(result)
+    }
 
 
 # tof_cluster_kmeans -----------------------------------------------------------
@@ -258,25 +252,22 @@ tof_cluster_phenograph <-
 #' tof_cluster_kmeans(tof_tibble = sim_data)
 #' tof_cluster_kmeans(tof_tibble = sim_data, cluster_cols = c(cd45, cd19))
 #'
-#'
 tof_cluster_kmeans <-
-  function(
-    tof_tibble,
-    cluster_cols = where(tof_is_numeric),
-    num_clusters = 20,
-    ...
-  ) {
+    function(
+        tof_tibble,
+        cluster_cols = where(tof_is_numeric),
+        num_clusters = 20,
+        ...) {
+        kmeans_clusters <-
+            stats::kmeans(
+                x = select(tof_tibble, {{ cluster_cols }}),
+                centers = num_clusters,
+                ...
+            ) |>
+            purrr::pluck("cluster")
 
-    kmeans_clusters <-
-      stats::kmeans(
-        x = select(tof_tibble, {{cluster_cols}}),
-        centers = num_clusters,
-        ...
-      ) |>
-      purrr::pluck("cluster")
-
-    return(dplyr::tibble(.kmeans_cluster = as.character(kmeans_clusters)))
-  }
+        return(dplyr::tibble(.kmeans_cluster = as.character(kmeans_clusters)))
+    }
 
 
 
@@ -376,73 +367,68 @@ tof_cluster_kmeans <-
 #'     healthy_label_col = cluster_id
 #' )
 #'
-#'
 tof_cluster_ddpr <-
-  function(
-    tof_tibble,
-    healthy_tibble,
-    healthy_label_col,
-    cluster_cols = where(tof_is_numeric),
-    distance_function = c("mahalanobis", "cosine", "pearson"),
-    num_cores = 1L,
-    parallel_cols,
-    return_distances = FALSE,
-    verbose = FALSE
-  ) {
+    function(
+        tof_tibble,
+        healthy_tibble,
+        healthy_label_col,
+        cluster_cols = where(tof_is_numeric),
+        distance_function = c("mahalanobis", "cosine", "pearson"),
+        num_cores = 1L,
+        parallel_cols,
+        return_distances = FALSE,
+        verbose = FALSE) {
+        # check distance function
+        distance_function <-
+            match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
 
-    # check distance function
-    distance_function <-
-      match.arg(distance_function, c("mahalanobis", "cosine", "pearson"))
+        # check that healthy_tibble exists
+        if (missing(healthy_tibble)) {
+            stop("DDPR clustering requires the specification of a healthy_tibble.")
+        }
 
-    # check that healthy_tibble exists
-    if (missing(healthy_tibble)) {
-      stop("DDPR clustering requires the specification of a healthy_tibble.")
+        # build classifier
+        classifier_fit <-
+            tof_build_classifier(
+                healthy_tibble = dplyr::select(healthy_tibble, -{{ healthy_label_col }}),
+                healthy_cell_labels = dplyr::pull(healthy_tibble, {{ healthy_label_col }}),
+                classifier_markers = {{ cluster_cols }},
+                verbose = verbose
+            )
+
+        # apply classifier
+        if (missing(parallel_cols)) {
+            result <-
+                tof_apply_classifier(
+                    cancer_tibble = tof_tibble,
+                    classifier_fit = classifier_fit,
+                    distance_function = distance_function,
+                    num_cores = num_cores
+                )
+        } else {
+            result <-
+                tof_apply_classifier(
+                    cancer_tibble = tof_tibble,
+                    classifier_fit = classifier_fit,
+                    distance_function = distance_function,
+                    num_cores = num_cores,
+                    parallel_vars = {{ parallel_cols }}
+                )
+        }
+
+        # return result
+        result <-
+            result |>
+            dplyr::rename_with(.fn = function(x) paste0(".", x))
+
+        if (!return_distances) {
+            result <-
+                result |>
+                dplyr::select(tidyselect::all_of(paste0(".", distance_function, "_cluster")))
+        }
+
+        return(result)
     }
-
-    # build classifier
-    classifier_fit <-
-      tof_build_classifier(
-        healthy_tibble = dplyr::select(healthy_tibble, -{{healthy_label_col}}),
-        healthy_cell_labels = dplyr::pull(healthy_tibble, {{healthy_label_col}}),
-        classifier_markers = {{cluster_cols}},
-        verbose = verbose
-      )
-
-    # apply classifier
-    if(missing(parallel_cols)) {
-      result <-
-        tof_apply_classifier(
-          cancer_tibble = tof_tibble,
-          classifier_fit = classifier_fit,
-          distance_function = distance_function,
-          num_cores = num_cores
-        )
-
-    } else {
-      result <-
-        tof_apply_classifier(
-          cancer_tibble = tof_tibble,
-          classifier_fit = classifier_fit,
-          distance_function = distance_function,
-          num_cores = num_cores,
-          parallel_vars = {{parallel_cols}}
-        )
-
-    }
-
-    # return result
-    result <-
-      result |>
-      dplyr::rename_with(.fn = function(x) paste0(".", x))
-
-    if (!return_distances) {
-      result <-
-        result |>
-        dplyr::select(tidyselect::all_of(paste0(".", distance_function, "_cluster")))
-    }
-
-    return(result)
-  }
 
 
 
@@ -500,46 +486,44 @@ tof_cluster_ddpr <-
 #' tof_cluster(tof_tibble = sim_data, method = "phenograph")
 #'
 tof_cluster <-
-  function(
-    tof_tibble,
-    cluster_cols = where(tof_is_numeric),
-    group_cols = NULL,
-    ...,
-    augment = TRUE,
-    method
-  ) {
+    function(
+        tof_tibble,
+        cluster_cols = where(tof_is_numeric),
+        group_cols = NULL,
+        ...,
+        augment = TRUE,
+        method) {
+        # find grouping column names
+        group_colnames <-
+            tof_tibble |>
+            dplyr::select({{ group_cols }}) |>
+            colnames()
 
-    # find grouping column names
-    group_colnames <-
-      tof_tibble |>
-      dplyr::select({{group_cols}}) |>
-      colnames()
+        # if groups are present
+        if (length(group_colnames) > 0) {
+            result <-
+                tof_cluster_grouped(
+                    tof_tibble = tof_tibble,
+                    group_cols = {{ group_cols }},
+                    cluster_cols = {{ cluster_cols }},
+                    ...,
+                    augment = augment,
+                    method = method
+                )
 
-    # if groups are present
-    if (length(group_colnames) > 0) {
-      result <-
-        tof_cluster_grouped(
-          tof_tibble = tof_tibble,
-          group_cols = {{group_cols}},
-          cluster_cols = {{cluster_cols}},
-          ...,
-          augment = augment,
-          method = method
-        )
-
-      # if groups are not present
-    } else {
-      result <-
-        tof_cluster_tibble(
-          tof_tibble = tof_tibble,
-          cluster_cols = {{cluster_cols}},
-          ...,
-          augment = augment,
-          method = method
-        )
+            # if groups are not present
+        } else {
+            result <-
+                tof_cluster_tibble(
+                    tof_tibble = tof_tibble,
+                    cluster_cols = {{ cluster_cols }},
+                    ...,
+                    augment = augment,
+                    method = method
+                )
+        }
+        return(result)
     }
-    return(result)
-  }
 
 #' Cluster (ungrouped) high-dimensional cytometry data.
 #'
@@ -567,48 +551,42 @@ tof_cluster <-
 #' @importFrom dplyr bind_cols
 #'
 tof_cluster_tibble <-
-  function(
-    tof_tibble,
-    ...,
-    augment = TRUE,
-    method
-  ) {
-    if (method == "flowsom") {
-      clusters <-
-        tof_tibble |>
-        tof_cluster_flowsom(...)
+    function(
+        tof_tibble,
+        ...,
+        augment = TRUE,
+        method) {
+        if (method == "flowsom") {
+            clusters <-
+                tof_tibble |>
+                tof_cluster_flowsom(...)
+        } else if (method == "phenograph") {
+            clusters <-
+                tof_tibble |>
+                tof_cluster_phenograph(...)
+        } else if (method == "kmeans") {
+            clusters <-
+                tof_tibble |>
+                tof_cluster_kmeans(...)
+        } else if (method == "ddpr") {
+            clusters <-
+                tof_tibble |>
+                tof_cluster_ddpr(...)
+        } else if (method == "xshift") {
+            stop("X-shift is not yet implemented.")
+        } else {
+            stop("Not a valid clustering method.")
+        }
 
-    } else if (method == "phenograph") {
-      clusters <-
-        tof_tibble |>
-        tof_cluster_phenograph(...)
+        if (augment) {
+            result <-
+                dplyr::bind_cols(tof_tibble, clusters)
+        } else {
+            result <- clusters
+        }
 
-    } else if (method == "kmeans") {
-      clusters <-
-        tof_tibble |>
-        tof_cluster_kmeans(...)
-
-    } else if (method == "ddpr") {
-      clusters <-
-        tof_tibble |>
-        tof_cluster_ddpr(...)
-
-    } else if (method == "xshift") {
-      stop("X-shift is not yet implemented.")
-
-    } else {
-      stop("Not a valid clustering method.")
+        return(result)
     }
-
-    if (augment) {
-      result <-
-        dplyr::bind_cols(tof_tibble, clusters)
-    } else {
-      result <- clusters
-    }
-
-    return(result)
-  }
 
 
 #' Cluster (grouped) high-dimensional cytometry data.
@@ -652,68 +630,67 @@ tof_cluster_tibble <-
 #' @importFrom tidyr unnest
 #'
 tof_cluster_grouped <-
-  function(
-    tof_tibble,
-    group_cols,
-    ...,
-    augment = TRUE,
-    method
-  ) {
-    nested_tibble <-
-      tof_tibble |>
-      dplyr::group_by({{group_cols}}) |>
-      tidyr::nest() |>
-      dplyr::ungroup()
+    function(
+        tof_tibble,
+        group_cols,
+        ...,
+        augment = TRUE,
+        method) {
+        nested_tibble <-
+            tof_tibble |>
+            dplyr::group_by({{ group_cols }}) |>
+            tidyr::nest() |>
+            dplyr::ungroup()
 
-    # a list of data frames containing the independently
-    # clustered results (appended as columns to the rest of the input tibbles
-    # if requested by augment)
-    nested_clusters <-
-      purrr::map(
-        .x = nested_tibble$data,
-        .f = tof_cluster_tibble,
-        augment = FALSE,
-        method  = method,
-        ...
-      )
+        # a list of data frames containing the independently
+        # clustered results (appended as columns to the rest of the input tibbles
+        # if requested by augment)
+        nested_clusters <-
+            purrr::map(
+                .x = nested_tibble$data,
+                .f = tof_cluster_tibble,
+                augment = FALSE,
+                method = method,
+                ...
+            )
 
-    # append each group's cluster labels to the group information itself
-    # so that cluster labels are distinct among all groups
-    result <-
-      nested_tibble |>
-      tidyr::unite(col = ".prefix", {{group_cols}}, remove = FALSE) |>
-      dplyr::mutate(
-        clusters = nested_clusters,
-        clusters =
-          purrr::map2(
-            .x = .data$.prefix,
-            .y = .data$clusters,
-            .f = function(.x, .y) {
-              colname <- colnames(.y)
-              new_clusters <-
-                dplyr::tibble(cluster = paste(.y[[1]], .x, sep = "@"))
-              colnames(new_clusters) <- colname
-              return(new_clusters)
-            }
-          )
-      ) |>
-      dplyr::select(-".prefix")
+        # append each group's cluster labels to the group information itself
+        # so that cluster labels are distinct among all groups
+        result <-
+            nested_tibble |>
+            tidyr::unite(col = ".prefix", {{ group_cols }}, remove = FALSE) |>
+            dplyr::mutate(
+                clusters = nested_clusters,
+                clusters =
+                    purrr::map2(
+                        .x = .data$.prefix,
+                        .y = .data$clusters,
+                        .f = function(.x, .y) {
+                            colname <- colnames(.y)
+                            new_clusters <-
+                                dplyr::tibble(cluster = paste(.y[[1]], .x, sep = "@"))
+                            colnames(new_clusters) <- colname
+                            return(new_clusters)
+                        }
+                    )
+            ) |>
+            dplyr::select(-".prefix")
 
-    if (augment) {
-      result <-
-        result |>
-        #
-        tidyr::unnest(cols = c("data", "clusters"))
-    } else {
-      result <-
-        result |>
-        dplyr::select("clusters") |>
-        #
-        tidyr::unnest(cols = "clusters")
+        if (augment) {
+            result <-
+                result |>
+                #
+                tidyr::unnest(cols = c("data", "clusters"))
+        } else {
+            result <-
+                result |>
+                dplyr::select("clusters") |>
+                #
+                tidyr::unnest(cols = "clusters")
+        }
+
+        return(result)
     }
-
-    return(result)
-  }
 
 
 # tof_annotate_clusters --------------------------------------------------------
@@ -759,97 +736,65 @@ tof_cluster_grouped <-
 #' @examples
 #'
 #' sim_data <-
-#'   dplyr::tibble(
-#'     cd45 = rnorm(n = 1000),
-#'     cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
-#'     cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
-#'     cd19 = rnorm(n = 1000),
-#'     cluster_id = c(rep("a", 500), rep("b", 500))
-#'   )
+#'     dplyr::tibble(
+#'         cd45 = rnorm(n = 1000),
+#'         cd38 = c(rnorm(n = 500), rnorm(n = 500, mean = 2)),
+#'         cd34 = c(rnorm(n = 500), rnorm(n = 500, mean = 4)),
+#'         cd19 = rnorm(n = 1000),
+#'         cluster_id = c(rep("a", 500), rep("b", 500))
+#'     )
 #'
 #' # using named character vector
 #' sim_data |>
-#'   tof_annotate_clusters(
-#'     cluster_col = cluster_id,
-#'     annotations = c("macrophage" = "a", "dendritic cell" = "b")
-#'   )
+#'     tof_annotate_clusters(
+#'         cluster_col = cluster_id,
+#'         annotations = c("macrophage" = "a", "dendritic cell" = "b")
+#'     )
 #'
 #' # using two-column data.frame
 #' annotation_data_frame <-
-#'   data.frame(
-#'     cluster_id = c("a", "b"),
-#'     cluster_annotation = c("macrophage", "dendritic cell")
-#'   )
+#'     data.frame(
+#'         cluster_id = c("a", "b"),
+#'         cluster_annotation = c("macrophage", "dendritic cell")
+#'     )
 #'
 #' sim_data |>
-#'   tof_annotate_clusters(
-#'     cluster_col = cluster_id,
-#'     annotations = annotation_data_frame
-#'   )
-#'
-#'
-#'
-#'
+#'     tof_annotate_clusters(
+#'         cluster_col = cluster_id,
+#'         annotations = annotation_data_frame
+#'     )
 #'
 tof_annotate_clusters <- function(tof_tibble, cluster_col, annotations) {
+    cluster_colname <-
+        tof_tibble |>
+        dplyr::select({{ cluster_col }}) |>
+        colnames()
 
-  cluster_colname <-
-    tof_tibble |>
-    dplyr::select({{cluster_col}}) |>
-    colnames()
+    # if annotations are provided as a named vector
+    if (is.character(annotations)) {
+        annotations <-
+            tibble::enframe(
+                x = annotations,
+                name = paste0(cluster_colname, "_annotation"),
+                value = cluster_colname
+            )
 
-  # if annotations are provided as a named vector
-  if (is.character(annotations)) {
-    annotations <-
-      tibble::enframe(
-        x = annotations,
-        name = paste0(cluster_colname, "_annotation"),
-        value = cluster_colname
-      )
-
-    # if annotations are provided as a data.frame
-  } else if (is.data.frame(annotations)) {
-    if (!(cluster_colname %in% colnames(annotations))) {
-      stop("One of the columns of `annotations` must have the same name as cluster_col.")
-    } else if (ncol(annotations) != 2) {
-      stop("`annotations` must have exactly 2 columns.")
+        # if annotations are provided as a data.frame
+    } else if (is.data.frame(annotations)) {
+        if (!(cluster_colname %in% colnames(annotations))) {
+            stop("One of the columns of `annotations` must have the same name as cluster_col.")
+        } else if (ncol(annotations) != 2) {
+            stop("`annotations` must have exactly 2 columns.")
+        }
     }
-  }
 
     # compute and return result
     result <-
-      tof_tibble |>
-      dplyr::left_join(
-        annotations,
-        by = cluster_colname
-      )
+        tof_tibble |>
+        dplyr::left_join(
+            annotations,
+            by = cluster_colname
+        )
 
-  return(result)
-
-
+    return(result)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

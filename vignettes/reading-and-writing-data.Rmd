@@ -14,8 +14,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 
 options(tibble.print_min = 4L, tibble.print_max = 4L)
@@ -61,12 +61,12 @@ Using one of these directories (or any other directory containing CyTOF data on 
 Here, we can use `tof_read_data` to read in all of the FCS files in the "phenograph" example dataset bundled into `{tidytof}` and store it in the `phenograph` variable.
 
 ```{r}
-phenograph <- 
-  tidytof_example_data("phenograph") %>% 
-  tof_read_data()
+phenograph <-
+    tidytof_example_data("phenograph") %>%
+    tof_read_data()
 
-phenograph %>% 
-  class() 
+phenograph %>%
+    class()
 ```
 
 Regardless of the input data file type, `{tidytof}` reads data into an extended `tibble` class called a `tof_tbl` (pronounced "tof tibble"). 
@@ -74,8 +74,8 @@ Regardless of the input data file type, `{tidytof}` reads data into an extended 
 tof tibbles are an S3 class identical to `tbl_df`, but with one additional attribute ("panel"). `{tidytof}` stores this additional attribute in `tof_tbl`s because, in addition to analyzing CyTOF data from individual experiments, CyTOF users often want to compare panels between experiments to find common markers or to compare which metals are associated with particular markers across panels. To retrieve this panel information from a `tof_tbl`, use `tof_get_panel`: 
 
 ```{r}
-phenograph %>% 
-  tof_get_panel()
+phenograph %>%
+    tof_get_panel()
 ```
 
 A few additional notes about `tof_tbl`s:
@@ -91,25 +91,25 @@ As an extension of the `tbl_df` class, `tof_tbl`s get access to all `{dplyr}` an
 For example, the `phenograph` object above has two columns - `PhenoGraph` and `Condition` - that encode categorical variables as numeric codes. We might be interested in converting the types of these columns into strings to make sure that we don't accidentally perform any quantitative operations on them later. Thus, `{dplyr}`'s useful `mutate` method can be applied to `phenograph` to convert those two columns into character vectors.
 
 ```{r}
-phenograph <- 
-  phenograph %>% 
-  # mutate the input tof_tbl
-  mutate(
-    PhenoGraph = as.character(PhenoGraph), 
-    Condition = as.character(Condition)
-  )
+phenograph <-
+    phenograph %>%
+    # mutate the input tof_tbl
+    mutate(
+        PhenoGraph = as.character(PhenoGraph),
+        Condition = as.character(Condition)
+    )
 
-phenograph %>% 
-  # use dplyr's select method to show 
-  # that the columns have been changed
-  select(where(is.character)) 
+phenograph %>%
+    # use dplyr's select method to show
+    # that the columns have been changed
+    select(where(is.character))
 ```
 
 And note that the `tof_tbl` class is preserved even after these transformations.
 
 ```{r}
-phenograph %>% 
-  class()
+phenograph %>%
+    class()
 ```
 
 
@@ -118,19 +118,19 @@ Importantly, `tof_read_data` uses an opinionated heuristic to mine different key
 ```{r}
 # when csv files are read, the tof_tibble's "panel"
 # attribute will be empty by default
-tidytof_example_data("phenograph_csv") %>% 
-  tof_read_data() %>% 
-  tof_get_panel()
+tidytof_example_data("phenograph_csv") %>%
+    tof_read_data() %>%
+    tof_get_panel()
 
-# to add a panel manually, provide it as a tibble 
+# to add a panel manually, provide it as a tibble
 # to tof_read_data
-phenograph_panel <- 
-  phenograph %>% 
-  tof_get_panel()
+phenograph_panel <-
+    phenograph %>%
+    tof_get_panel()
 
-tidytof_example_data("phenograph_csv") %>% 
-  tof_read_data(panel_info = phenograph_panel) %>% 
-  tof_get_panel()
+tidytof_example_data("phenograph_csv") %>%
+    tof_read_data(panel_info = phenograph_panel) %>%
+    tof_get_panel()
 ```
 
 
@@ -145,16 +145,16 @@ print(phenograph_data)
 ```
 
 ```{r, eval = FALSE}
-# when copying and pasting this code, feel free to change this path 
+# when copying and pasting this code, feel free to change this path
 # to wherever you'd like to save your output files
 my_path <- file.path("~", "Desktop", "tidytof_vignette_files")
 
-phenograph_data %>% 
-  tof_write_data(
-    group_cols = phenograph_cluster, 
-    out_path = my_path,
-    format = "fcs"
-  )
+phenograph_data %>%
+    tof_write_data(
+        group_cols = phenograph_cluster,
+        out_path = my_path,
+        format = "fcs"
+    )
 ```
 
 `tof_write_data`'s trickiest argument is `group_cols`, the argument used to specify which columns in `tof_tibble` should be used to group cells (the rows of `tof_tibble`) into separate FCS or CSV files. Simply put, this argument allows `tof_write_data` to create a single FCS or CSV file for each unique combination of values in the `group_cols` columns specified by the user. In the example above, cells are grouped into 3 output FCS files - one for each of the 3 clusters encoded by the `phenograph_cluster` column in `phenograph_data`. These files should have the following names (derived from the values in the `phenograph_cluster` column):
@@ -166,24 +166,24 @@ phenograph_data %>%
 Note that these file names match the distinct values in our `group_cols` column (`phenograph_cluster`): 
 
 ```{r}
-phenograph_data %>% 
-  distinct(phenograph_cluster)
+phenograph_data %>%
+    distinct(phenograph_cluster)
 ```
 
 However, suppose we wanted to write multiple files for each cluster by breaking cells into two groups: those that express high levels of `pstat5` and those that express low levels of `pstat5`. We can use `dplyr::mutate` to create a new column in `phenograph_data` that breaks cells into high- and low-`pstat5` expression groups, then add this column to our `group_cols` specification:
 
 ```{r, eval = FALSE}
-phenograph_data %>% 
-  # create a variable representing if a cell is above or below 
-  # the median expression level of pstat5
-  mutate(
-    expression_group = if_else(pstat5 > median(pstat5), "high", "low")
-  ) %>% 
-  tof_write_data(
-    group_cols = c(phenograph_cluster, expression_group), 
-    out_path = my_path, 
-    format = "fcs"
-  )
+phenograph_data %>%
+    # create a variable representing if a cell is above or below
+    # the median expression level of pstat5
+    mutate(
+        expression_group = if_else(pstat5 > median(pstat5), "high", "low")
+    ) %>%
+    tof_write_data(
+        group_cols = c(phenograph_cluster, expression_group),
+        out_path = my_path,
+        format = "fcs"
+    )
 ```
 
 This will write 6 files with the following names (derived from the values in `phenograph_cluster` and `expression_group`).
@@ -198,13 +198,18 @@ This will write 6 files with the following names (derived from the values in `ph
 As above, note that these file names match the distinct values in our `group_cols` columns (`phenograph_cluster` and `expression_group`):
 
 ```{r}
-phenograph_data %>% 
-  mutate(
-    expression_group = if_else(pstat5 > median(pstat5), "high", "low")
-  ) %>% 
-  distinct(phenograph_cluster, expression_group)
+phenograph_data %>%
+    mutate(
+        expression_group = if_else(pstat5 > median(pstat5), "high", "low")
+    ) %>%
+    distinct(phenograph_cluster, expression_group)
 ```
 
 A useful feature of `tof_write_data` is that it will automatically concatenate cells into single FCS or CSV files based on the specified `group_cols` *regardless of how many unique files those cells came from*. This allows for easy concatenation of FCS or CSV files containing data from a single sample acquired over multiple CyTOF runs, for example.
 
+# Session info
+
+```{r}
+sessionInfo()
+```
 

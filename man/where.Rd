@@ -21,6 +21,10 @@ selects the variables for which a predicate function returns TRUE. See
 \details{
 This help file was replicated verbatim from \code{\link[tidyselect]{tidyselect-package}}.
 }
+\examples{
+NULL
+
+}
 \references{
 Lionel Henry and Hadley Wickham (2021). tidyselect:
 Select from a Set of Strings. R package version 1.1.1.

@@ -36,6 +36,9 @@ PMID: 29505032; PMCID: PMC5953207. Supplementary Table 1.
 \usage{
 data(ddpr_metadata)
 }
+\value{
+A data.frame
+}
 \description{
 A dataset containing patient-level clinical metadata for samples originally studied
 in the following paper: \cr \cr

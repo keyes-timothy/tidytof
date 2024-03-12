@@ -98,55 +98,53 @@
 #' )
 #'
 tof_upsample_distance <-
-  function(
-    tof_tibble,
-    reference_tibble,
-    reference_cluster_col,
-    upsample_cols = where(tof_is_numeric),
-    parallel_cols,
-    distance_function = c("mahalanobis", "cosine", "pearson"),
-    num_cores = 1L,
-    return_distances = FALSE
-  ) {
+    function(
+        tof_tibble,
+        reference_tibble,
+        reference_cluster_col,
+        upsample_cols = where(tof_is_numeric),
+        parallel_cols,
+        distance_function = c("mahalanobis", "cosine", "pearson"),
+        num_cores = 1L,
+        return_distances = FALSE) {
+        # if computed on 1 core
+        if (missing(parallel_cols)) {
+            result <-
+                tof_cluster_ddpr(
+                    tof_tibble = tof_tibble,
+                    healthy_tibble = reference_tibble,
+                    healthy_label_col = {{ reference_cluster_col }},
+                    cluster_cols = {{ upsample_cols }},
+                    distance_function = distance_function,
+                    num_cores = num_cores,
+                    return_distances = return_distances,
+                    verbose = FALSE
+                )
 
-    # if computed on 1 core
-    if(missing(parallel_cols)) {
-      result <-
-        tof_cluster_ddpr(
-          tof_tibble = tof_tibble,
-          healthy_tibble = reference_tibble,
-          healthy_label_col = {{reference_cluster_col}},
-          cluster_cols = {{upsample_cols}},
-          distance_function = distance_function,
-          num_cores = num_cores,
-          return_distances = return_distances,
-          verbose = FALSE
-        )
+            # if computed in parallel
+        } else {
+            result <-
+                tof_cluster_ddpr(
+                    tof_tibble = tof_tibble,
+                    healthy_tibble = reference_tibble,
+                    healthy_label_col = {{ reference_cluster_col }},
+                    cluster_cols = {{ upsample_cols }},
+                    parallel_cols = {{ parallel_cols }},
+                    distance_function = distance_function,
+                    num_cores = num_cores,
+                    return_distances = return_distances,
+                    verbose = FALSE
+                )
+        }
+        result_colnames <- colnames(result)
+        cluster_colname <- result_colnames[grepl("_cluster$", result_colnames)]
+        upsample_clusters <- result[[cluster_colname]]
 
-    # if computed in parallel
-    } else {
-      result <-
-        tof_cluster_ddpr(
-          tof_tibble = tof_tibble,
-          healthy_tibble = reference_tibble,
-          healthy_label_col = {{reference_cluster_col}},
-          cluster_cols = {{upsample_cols}},
-          parallel_cols = {{parallel_cols}},
-          distance_function = distance_function,
-          num_cores = num_cores,
-          return_distances = return_distances,
-          verbose = FALSE
-        )
+        new_result <- result[, !(result_colnames %in% cluster_colname)]
+        new_result$`.upsample_cluster` <- upsample_clusters
+        result <- new_result
+        return(result)
     }
-    result_colnames <- colnames(result)
-    cluster_colname <- result_colnames[grepl("_cluster$", result_colnames)]
-    upsample_clusters <- result[[cluster_colname]]
-
-    new_result <- result[, !(result_colnames %in% cluster_colname)]
-    new_result$`.upsample_cluster` <- upsample_clusters
-    result <- new_result
-    return(result)
-  }
 
 # tof_upsample_neighbor --------------------------------------------------------
 
@@ -230,60 +228,56 @@ tof_upsample_distance <-
 #' )
 #'
 tof_upsample_neighbor <-
-  function(
-    tof_tibble,
-    reference_tibble,
-    reference_cluster_col,
-    upsample_cols = where(tof_is_numeric),
-    num_neighbors = 1L,
-    distance_function = c("euclidean", "cosine", "l2", "ip")
-    ) {
+    function(
+        tof_tibble,
+        reference_tibble,
+        reference_cluster_col,
+        upsample_cols = where(tof_is_numeric),
+        num_neighbors = 1L,
+        distance_function = c("euclidean", "cosine", "l2", "ip")) {
+        distance_function <- rlang::arg_match(distance_function)
 
-    distance_function <- rlang::arg_match(distance_function)
+        query_matrix <-
+            tof_tibble |>
+            dplyr::select({{ upsample_cols }}) |>
+            as.matrix()
 
-    query_matrix <-
-      tof_tibble |>
-      dplyr::select({{upsample_cols}})  |>
-      as.matrix()
+        nn_result <-
+            reference_tibble |>
+            dplyr::select({{ upsample_cols }}) |>
+            tof_find_knn(
+                k = num_neighbors,
+                distance_function = distance_function,
+                .query = query_matrix
+            )
 
-    nn_result <-
-      reference_tibble |>
-      dplyr::select({{upsample_cols}}) |>
-      tof_find_knn(
-        k = num_neighbors,
-        distance_function = distance_function,
-        .query = query_matrix
-      )
+        nn_ids <- nn_result$neighbor_ids
 
-    nn_ids <- nn_result$neighbor_ids
+        clusters <- dplyr::pull(reference_tibble, {{ reference_cluster_col }})
 
-    clusters <- dplyr::pull(reference_tibble, {{reference_cluster_col}})
+        if (num_neighbors == 1L) {
+            upsampled_clusters <- clusters[nn_ids]
+        } else {
+            upsampled_clusters <-
+                purrr::map_chr(
+                    .x = seq_len(nrow(nn_ids)),
+                    .f = \(x) {
+                        clusters[nn_ids[x, ]] |>
+                            table() |>
+                            as.data.frame() |>
+                            dplyr::as_tibble() |>
+                            dplyr::slice_max(order_by = .data$Freq, n = 1L, with_ties = FALSE) |>
+                            dplyr::pull(.data$Var1) |>
+                            as.character()
+                    }
+                )
+        }
 
-    if (num_neighbors == 1L) {
+        result <-
+            dplyr::tibble(.upsample_cluster = upsampled_clusters)
 
-    upsampled_clusters <- clusters[nn_ids]
-
-    } else {
-      upsampled_clusters <-
-        purrr::map_chr(
-          .x = 1:nrow(nn_ids),
-          .f = \(x) {
-            clusters[nn_ids[x, ]] |>
-              table() |>
-              as.data.frame() |>
-              dplyr::as_tibble() |>
-              dplyr::slice_max(order_by = .data$Freq, n = 1L, with_ties = FALSE) |>
-              dplyr::pull(.data$Var1) |>
-              as.character()
-          }
-        )
+        return(result)
     }
-
-    result <-
-      dplyr::tibble(.upsample_cluster = upsampled_clusters)
-
-    return(result)
-  }
 
 # tof_upsample -----------------------------------------------------------------
 
@@ -366,45 +360,42 @@ tof_upsample_neighbor <-
 #'     method = "neighbor"
 #' )
 #'
-#'
 tof_upsample <-
-  function(
-    tof_tibble,
-    reference_tibble,
-    reference_cluster_col,
-    upsample_cols = where(tof_is_numeric),
-    ...,
-    augment = TRUE,
-    method = c("distance", "neighbor")
-  ) {
+    function(
+        tof_tibble,
+        reference_tibble,
+        reference_cluster_col,
+        upsample_cols = where(tof_is_numeric),
+        ...,
+        augment = TRUE,
+        method = c("distance", "neighbor")) {
+        method <- rlang::arg_match(arg = method, values = c("distance", "neighbor"))
 
-    method <- rlang::arg_match(arg = method, values = c("distance", "neighbor"))
+        if (method == "distance") {
+            result <-
+                tof_upsample_distance(
+                    tof_tibble = tof_tibble,
+                    reference_tibble = reference_tibble,
+                    reference_cluster_col = {{ reference_cluster_col }},
+                    upsample_cols = {{ upsample_cols }},
+                    ...
+                )
+        } else if (method == "neighbor") {
+            result <-
+                tof_upsample_neighbor(
+                    tof_tibble = tof_tibble,
+                    reference_tibble = reference_tibble,
+                    reference_cluster_col = {{ reference_cluster_col }},
+                    upsample_cols = {{ upsample_cols }},
+                    ...
+                )
+        } else {
+            stop("Not a valid method.")
+        }
 
-    if (method == "distance") {
-      result <-
-        tof_upsample_distance(
-          tof_tibble = tof_tibble,
-          reference_tibble = reference_tibble,
-          reference_cluster_col = {{reference_cluster_col}},
-          upsample_cols = {{upsample_cols}},
-          ...
-        )
-    } else if (method == "neighbor") {
-      result <-
-        tof_upsample_neighbor(
-          tof_tibble = tof_tibble,
-          reference_tibble = reference_tibble,
-          reference_cluster_col = {{reference_cluster_col}},
-          upsample_cols = {{upsample_cols}},
-          ...
-        )
-    } else {
-      stop("Not a valid method.")
+        if (augment) {
+            result <-
+                dplyr::bind_cols(tof_tibble, result)
+        }
+        return(result)
     }
-
-    if (augment) {
-      result <-
-        dplyr::bind_cols(tof_tibble, result)
-    }
-    return(result)
-  }

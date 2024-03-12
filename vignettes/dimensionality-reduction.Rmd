@@ -14,8 +14,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -37,33 +37,33 @@ Here is an example call to `tof_reduce_dimensions()` in which we use tSNE to vis
 data(phenograph_data)
 
 # perform the dimensionality reduction
-phenograph_tsne <- 
-  phenograph_data %>% 
-  tof_preprocess() %>% 
-  tof_reduce_dimensions(method = "tsne")
+phenograph_tsne <-
+    phenograph_data |>
+    tof_preprocess() |>
+    tof_reduce_dimensions(method = "tsne")
 
 # select only the tsne embedding columns
-phenograph_tsne %>% 
-  select(contains("tsne")) %>% 
-  head()
+phenograph_tsne |>
+    select(contains("tsne")) |>
+    head()
 ```
 
 By default, `tof_reduce_dimensions` will add reduced-dimension feature embeddings to the input `tof_tbl` and return the augmented `tof_tbl` (that is, a `tof_tbl` with new columns for each embedding dimension) as its result. To return only the features embeddings themselves, set `augment` to `FALSE` (as in `tof_cluster`).
 
 ```{r}
-phenograph_data %>% 
-  tof_preprocess() %>% 
-  tof_reduce_dimensions(method = "tsne", augment = FALSE)
+phenograph_data |>
+    tof_preprocess() |>
+    tof_reduce_dimensions(method = "tsne", augment = FALSE)
 ```
 
 Changing the `method` argument results in different low-dimensional embeddings: 
 
 ```{r}
-phenograph_data %>% 
-  tof_reduce_dimensions(method = "umap", augment = FALSE)
+phenograph_data |>
+    tof_reduce_dimensions(method = "umap", augment = FALSE)
 
-phenograph_data %>% 
-  tof_reduce_dimensions(method = "pca", augment = FALSE)
+phenograph_data |>
+    tof_reduce_dimensions(method = "pca", augment = FALSE)
 ```
 
 
@@ -73,14 +73,14 @@ phenograph_data %>%
 
 ```{r}
 # 2 principal components
-phenograph_data %>% 
-  tof_reduce_pca(num_comp = 2)
+phenograph_data |>
+    tof_reduce_pca(num_comp = 2)
 ```
 
 ```{r}
 # 3 principal components
-phenograph_data %>% 
-  tof_reduce_pca(num_comp = 3)
+phenograph_data |>
+    tof_reduce_pca(num_comp = 3)
 ```
 
 see `?tof_reduce_pca`, `?tof_reduce_umap`, and `?tof_reduce_tsne` for additional details.
@@ -91,19 +91,25 @@ Regardless of the method used, reduced-dimension feature embeddings can be visua
 
 ```{r}
 # plot the tsne embeddings using color to distinguish between clusters
-phenograph_tsne %>% 
-  tof_plot_cells_embedding(
-    embedding_cols = contains(".tsne"), 
-    color_col = phenograph_cluster
-  )
+phenograph_tsne |>
+    tof_plot_cells_embedding(
+        embedding_cols = contains(".tsne"),
+        color_col = phenograph_cluster
+    )
 
 # plot the tsne embeddings using color to represent CD11b expression
-phenograph_tsne %>% 
-  tof_plot_cells_embedding(
-    embedding_cols = contains(".tsne"), 
-    color_col = cd11b
-  ) + 
-  ggplot2::scale_fill_viridis_c()
+phenograph_tsne |>
+    tof_plot_cells_embedding(
+        embedding_cols = contains(".tsne"),
+        color_col = cd11b
+    ) +
+    ggplot2::scale_fill_viridis_c()
 ```
 
 Such visualizations can be helpful in qualitatively describing the phenotypic differences between the clusters in a dataset. For example, in the example above, we can see that one of the clusters has high CD11b expression, whereas the others have lower CD11b expression.
+
+# Session info
+
+```{r}
+sessionInfo()
+```

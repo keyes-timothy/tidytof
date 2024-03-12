@@ -55,7 +55,6 @@ tof_reduce_dimensions(tof_tibble = sim_data, method = "tsne")
 # calculate umap
 tof_reduce_dimensions(tof_tibble = sim_data, method = "umap")
 
-
 }
 \seealso{
 Other dimensionality reduction functions: 

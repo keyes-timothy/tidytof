@@ -47,7 +47,7 @@ of biological interest. Example random effect variables might include batch id,
 patient id (in a paired design), or patient age.
 
 Note that without multiple samples at each level of each of the
-random effect variables, it can be easy to overfit mixed models. For most CyTOF
+random effect variables, it can be easy to overfit mixed models. For most high-dimensional cytometry
 experiments, 2 or fewer (and often 0) random effect variables are appropriate.}
 
 \item{diffcyt_method}{A string indicating which diffcyt method should be used for the
@@ -128,13 +128,13 @@ effects, the "edgeR" method can only model fixed effects.
 }
 \examples{
 # For differential discovery examples, please see the package vignettes
-
+NULL
 
 }
 \seealso{
 Other differential abundance analysis functions: 
+\code{\link{tof_analyze_abundance}()},
 \code{\link{tof_analyze_abundance_glmm}()},
-\code{\link{tof_analyze_abundance_ttest}()},
-\code{\link{tof_analyze_abundance}()}
+\code{\link{tof_analyze_abundance_ttest}()}
 }
 \concept{differential abundance analysis functions}

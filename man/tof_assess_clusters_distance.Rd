@@ -56,49 +56,48 @@ sim_data_inner <-
     dplyr::tibble(
         cd45 = c(rnorm(n = 600), rnorm(n = 500, mean = -4)),
         cd38 =
-          c(
-            rnorm(n = 100, sd = 0.5),
-            rnorm(n = 500, mean = -3),
-            rnorm(n = 500, mean = 8)
-          ),
+            c(
+                rnorm(n = 100, sd = 0.5),
+                rnorm(n = 500, mean = -3),
+                rnorm(n = 500, mean = 8)
+            ),
         cd34 =
-          c(
-            rnorm(n = 100, sd = 0.2, mean = -10),
-            rnorm(n = 500, mean = 4),
-            rnorm(n = 500, mean = 60)
-          ),
+            c(
+                rnorm(n = 100, sd = 0.2, mean = -10),
+                rnorm(n = 500, mean = 4),
+                rnorm(n = 500, mean = 60)
+            ),
         cd19 = c(rnorm(n = 100, sd = 0.3, mean = 10), rnorm(n = 1000)),
         cluster_id = c(rep("a", 100), rep("b", 500), rep("c", 500)),
         dataset = "inner"
     )
 
 sim_data_outer <-
-  dplyr::tibble(
-    cd45 = c(rnorm(n = 10), rnorm(50, mean = 3), rnorm(n = 50, mean = -12)),
-    cd38 =
-      c(
-        rnorm(n = 10, sd = 0.5),
-        rnorm(n = 50, mean = -10),
-        rnorm(n = 50, mean = 10)
-      ),
-    cd34 =
-      c(
-        rnorm(n = 10, sd = 0.2, mean = -15),
-        rnorm(n = 50, mean = 15),
-        rnorm(n = 50, mean = 70)
-      ),
-    cd19 = c(rnorm(n = 10, sd = 0.3, mean = 19), rnorm(n = 100)),
-    cluster_id = c(rep("a", 10), rep("b", 50), rep("c", 50)),
-    dataset = "outer"
-  )
+    dplyr::tibble(
+        cd45 = c(rnorm(n = 10), rnorm(50, mean = 3), rnorm(n = 50, mean = -12)),
+        cd38 =
+            c(
+                rnorm(n = 10, sd = 0.5),
+                rnorm(n = 50, mean = -10),
+                rnorm(n = 50, mean = 10)
+            ),
+        cd34 =
+            c(
+                rnorm(n = 10, sd = 0.2, mean = -15),
+                rnorm(n = 50, mean = 15),
+                rnorm(n = 50, mean = 70)
+            ),
+        cd19 = c(rnorm(n = 10, sd = 0.3, mean = 19), rnorm(n = 100)),
+        cluster_id = c(rep("a", 10), rep("b", 50), rep("c", 50)),
+        dataset = "outer"
+    )
 
 sim_data <- rbind(sim_data_inner, sim_data_outer)
 
 # detect anomalous cells (in this case, the "outer" dataset contains small
 # clusters that get lumped into the larger clusters in the "inner" dataset)
 z_result <-
-  sim_data |>
-  tof_assess_clusters_distance(cluster_col = cluster_id, z_threshold = 2.5)
-
+    sim_data |>
+    tof_assess_clusters_distance(cluster_col = cluster_id, z_threshold = 2.5)
 
 }

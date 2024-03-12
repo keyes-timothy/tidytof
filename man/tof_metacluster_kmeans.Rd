@@ -64,10 +64,10 @@ tof_metacluster_kmeans(tof_tibble = sim_data, cluster_col = cluster_id)
 }
 \seealso{
 Other metaclustering functions: 
+\code{\link{tof_metacluster}()},
 \code{\link{tof_metacluster_consensus}()},
 \code{\link{tof_metacluster_flowsom}()},
 \code{\link{tof_metacluster_hierarchical}()},
-\code{\link{tof_metacluster_phenograph}()},
-\code{\link{tof_metacluster}()}
+\code{\link{tof_metacluster_phenograph}()}
 }
 \concept{metaclustering functions}

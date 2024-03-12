@@ -5,7 +5,7 @@
 \title{Fit a glmnet model and calculate performance metrics using a single rsplit object}
 \usage{
 tof_fit_split(
-  rsplit_data,
+  split_data,
   prepped_recipe,
   hyperparameter_grid,
   model_type,
@@ -13,7 +13,7 @@ tof_fit_split(
 )
 }
 \arguments{
-\item{rsplit_data}{An `rsplit` object from the \code{\link[rsample]{rsample}}
+\item{split_data}{An `rsplit` object from the \code{\link[rsample]{rsample}}
 package.
 Alternatively, an unsplit tbl_df can be provided, though this is not recommended.}
 
@@ -30,7 +30,7 @@ being fit represent the outcome variables (with all others assumed to be predict
 \value{
 A tibble with the same number of rows as the input hyperparameter grid.
 Each row represents a combination of mixture and penalty, and each column contains
-a performance metric for the fitted glmnet model on `rsplit_data`'s holdout set.
+a performance metric for the fitted glmnet model on `split_data`'s holdout set.
 The specific performance metrics depend on the type of model being fit:
 \describe{
 \item{"linear"}{mean-squared error (`mse`) and mean absolute error (`mae`)}

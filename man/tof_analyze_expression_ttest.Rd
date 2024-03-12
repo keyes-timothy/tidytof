@@ -27,7 +27,7 @@ Cluster labels can be produced via any method the user chooses - including manua
 any of the functions in the `tof_cluster_*` function family, or any other method.}
 
 \item{marker_cols}{Unquoted column names representing which columns in `tof_tibble`
-(i.e. which CyTOF protein measurements) should be tested for differential expression between
+(i.e. which high-dimensional cytometry protein measurements) should be tested for differential expression between
 levels of the `effect_col`. Defaults to all numeric (integer or double) columns.
 Supports tidyselect helpers.}
 
@@ -106,12 +106,13 @@ between sample types are detected after multiple-hypothesis correction.
 }
 \examples{
 # For differential discovery examples, please see the package vignettes
+NULL
 
 }
 \seealso{
 Other differential expression analysis functions: 
+\code{\link{tof_analyze_expression}()},
 \code{\link{tof_analyze_expression_diffcyt}()},
-\code{\link{tof_analyze_expression_lmm}()},
-\code{\link{tof_analyze_expression}()}
+\code{\link{tof_analyze_expression_lmm}()}
 }
 \concept{differential expression analysis functions}

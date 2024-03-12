@@ -48,7 +48,7 @@ of biological interest. Example random effect variables might include batch id,
 patient id (in a paired design), or patient age.
 
 Note that without many samples at each level of each of the
-random effect variables, it can be easy to overfit mixed models. For most CyTOF
+random effect variables, it can be easy to overfit mixed models. For most high-dimensional cytometry
 experiments, 2 or fewer (and often 0) random effect variables are appropriate.}
 
 \item{min_cells}{An integer value used to filter clusters out of the differential
@@ -101,12 +101,13 @@ information, and a (mixed) binomial regression model is fit using either
 }
 \examples{
 # For differential discovery examples, please see the package vignettes
+NULL
 
 }
 \seealso{
 Other differential abundance analysis functions: 
+\code{\link{tof_analyze_abundance}()},
 \code{\link{tof_analyze_abundance_diffcyt}()},
-\code{\link{tof_analyze_abundance_ttest}()},
-\code{\link{tof_analyze_abundance}()}
+\code{\link{tof_analyze_abundance_ttest}()}
 }
 \concept{differential abundance analysis functions}

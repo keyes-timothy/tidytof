@@ -5,7 +5,7 @@
 \title{Calculate and store the predicted outcomes for each validation set observation during model tuning}
 \usage{
 tof_find_cv_predictions(
-  rsplit_data,
+  split_data,
   prepped_recipe,
   lambda,
   alpha,
@@ -14,7 +14,7 @@ tof_find_cv_predictions(
 )
 }
 \arguments{
-\item{rsplit_data}{An `rsplit` object from the \code{\link[rsample]{rsample}}
+\item{split_data}{An `rsplit` object from the \code{\link[rsample]{rsample}}
 package.
 Alternatively, an unsplit tbl_df can be provided, though this is not recommended.}
 
@@ -38,7 +38,7 @@ being fit represent the outcome variables (with all others assumed to be predict
 }
 \value{
 A tibble containing the predicted and true values for the outcome
-for each of the validation observations in `rsplit_data`.
+for each of the validation observations in `split_data`.
 }
 \description{
 Calculate and store the predicted outcomes for each validation set observation during model tuning

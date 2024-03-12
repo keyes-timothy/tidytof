@@ -2,7 +2,7 @@
 % Please edit documentation in R/patient-level_modeling.R
 \name{tof_split_data}
 \alias{tof_split_data}
-\title{Split CyTOF data into a training and test set}
+\title{Split high-dimensional cytometry data into a training and test set}
 \usage{
 tof_split_data(
   feature_tibble,
@@ -59,7 +59,7 @@ for simple splitting, an "rsplit" object. For details, see
 \code{\link[rsample]{rsample}}.
 }
 \description{
-Split CyTOF data into a training and test set
+Split high-dimensional cytometry data into a training and test set
 }
 \examples{
 feature_tibble <-
@@ -79,7 +79,7 @@ feature_tibble <-
             ),
         event = c(rep(0, times = 50), rep(1, times = 50)),
         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
-   )
+    )
 
 # split the dataset into 10 CV folds
 tof_split_data(

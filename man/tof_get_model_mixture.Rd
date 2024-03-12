@@ -33,7 +33,7 @@ feature_tibble <-
             ),
         event = c(rep(0, times = 30), rep(1, times = 70)),
         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
-   )
+    )
 
 split_data <- tof_split_data(feature_tibble, split_method = "simple")
 

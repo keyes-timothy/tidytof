@@ -1,10 +1,10 @@
 # patient-level_modeling.R
 # This file contains functions relevant to performing patient- or sample-level
-# predictive modeling on aggregated single-cell CyTOF data.
+# predictive modeling on aggregated high-dimensional cytometry data.
 
 # Model Setup  -----------------------------------------------------------------
 
-#' Split CyTOF data into a training and test set
+#' Split high-dimensional cytometry data into a training and test set
 #'
 #' @param feature_tibble A tibble in which each row represents a sample- or patient-
 #' level observation, such as those produced by \code{tof_extract_features}.
@@ -52,9 +52,6 @@
 #'
 #' @importFrom dplyr pull
 #' @importFrom rlang arg_match
-#' @importFrom rsample initial_split
-#' @importFrom rsample vfold_cv
-#' @importFrom rsample bootstraps
 #'
 #' @examples
 #' feature_tibble <-
@@ -74,7 +71,7 @@
 #'             ),
 #'         event = c(rep(0, times = 50), rep(1, times = 50)),
 #'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
-#'    )
+#'     )
 #'
 #' # split the dataset into 10 CV folds
 #' tof_split_data(
@@ -97,75 +94,79 @@
 #' )
 #'
 tof_split_data <-
-  function(
-    feature_tibble,
-    split_method = c("k-fold", "bootstrap", "simple"),
-    split_col,
-    simple_prop = 3/4,
-    num_cv_folds = 10,
-    num_cv_repeats = 1L,
-    num_bootstraps = 10,
-    strata = NULL,
-    ...
-  ) {
+    function(
+        feature_tibble,
+        split_method = c("k-fold", "bootstrap", "simple"),
+        split_col,
+        simple_prop = 3 / 4,
+        num_cv_folds = 10,
+        num_cv_repeats = 1L,
+        num_bootstraps = 10,
+        strata = NULL,
+        ...) {
+        # Check that rsample is installed only if split_data is "rset" or "rsplit"
+        has_rsample <- requireNamespace("rsample", quietly = TRUE)
+        if (!has_rsample) {
+            stop(
+                "This function requires the {rsample} package for processing 'rset' or 'rsplit' objects. ",
+                "Install it with:\ninstall.packages(\"rsample\")\n"
+            )
+        }
 
-    # check split_col
-    if (!missing(split_col)) {
-      split_method <-
-        feature_tibble |>
-        dplyr::pull({{split_col}})
+        # check split_col
+        if (!missing(split_col)) {
+            split_method <-
+                feature_tibble |>
+                dplyr::pull({{ split_col }})
 
-      if (!is.logical(split_method)) {
-        stop("If `split_col` points to a column in `feature_tibble`, all values
-               in the column must be logical.")
-      }
+            if (!is.logical(split_method)) {
+                stop("If `split_col` points to a column in `feature_tibble`, all values
+                in the column must be logical.")
+            }
+        }
+
+        # check split method
+        if (is.character(split_method)) {
+            split_method <- rlang::arg_match(split_method)
+        } else if (is.logical(split_method)) {
+            rows_match <- nrow(feature_tibble) == length(split_method)
+            if (!rows_match) {
+                stop("If `split_method` is a logical vector, it must have one entry for each
+                row of `feature_tibble.`")
+            }
+        } else {
+            stop("`split_method` must be either a valid string or a logical vector.")
+        }
+
+        # perform split
+        if (is.logical(split_method)) {
+            training_ids <- which(split_method)
+            validation_ids <- which(!split_method)
+            split_result <-
+                list(data = feature_tibble, in_id = training_ids, out_id = NA, id = "Resample1")
+            class(split_result) <- "rsplit"
+        } else if (split_method == "simple") {
+            split_result <-
+                feature_tibble |>
+                rsample::initial_split(prop = simple_prop, strata = {{ strata }}, ...)
+        } else if (split_method == "k-fold") {
+            split_result <-
+                feature_tibble |>
+                rsample::vfold_cv(
+                    v = num_cv_folds,
+                    repeats = num_cv_repeats,
+                    strata = {{ strata }},
+                    ...
+                )
+        } else {
+            split_result <-
+                feature_tibble |>
+                rsample::bootstraps(times = num_bootstraps, strata = {{ strata }}, ...)
+        }
+
+        # return result
+        return(split_result)
     }
-
-    # check split method
-    if (is.character(split_method)) {
-      split_method <- rlang::arg_match(split_method)
-    } else if (is.logical(split_method)) {
-      rows_match <- nrow(feature_tibble) == length(split_method)
-      if (!rows_match) {
-        stop("If `split_method` is a logical vector, it must have one entry for each
-             row of `feature_tibble.`")
-      }
-    } else {
-      stop("`split_method` must be either a valid string or a logical vector.")
-    }
-
-    # perform split
-    if (is.logical(split_method)) {
-      training_ids <- which(split_method)
-      validation_ids <- which(!split_method)
-      split_result <-
-        list(data = feature_tibble, in_id = training_ids, out_id = NA, id = "Resample1")
-      class(split_result) <- "rsplit"
-
-    } else if (split_method == "simple") {
-      split_result <-
-        feature_tibble |>
-        rsample::initial_split(prop = simple_prop, strata = {{strata}}, ...)
-
-    } else if (split_method == "k-fold") {
-      split_result <-
-        feature_tibble |>
-        rsample::vfold_cv(
-          v = num_cv_folds,
-          repeats = num_cv_repeats,
-          strata = {{strata}},
-          ...
-        )
-
-    } else {
-      split_result <-
-        feature_tibble |>
-        rsample::bootstraps(times = num_bootstraps, strata = {{strata}}, ...)
-    }
-
-    # return result
-    return(split_result)
-  }
 
 
 #' Create an elastic net hyperparameter search grid of a specified size
@@ -215,35 +216,33 @@ tof_split_data <-
 #' tof_create_grid(penalty_values = c(0.01, 0.1, 0.5))
 #'
 tof_create_grid <-
-  function(
-    penalty_values,
-    mixture_values,
-    num_penalty_values = 5,
-    num_mixture_values = 5
-  ) {
+    function(
+        penalty_values,
+        mixture_values,
+        num_penalty_values = 5,
+        num_mixture_values = 5) {
+        if (missing(penalty_values)) {
+            penalty_values <- 10^(seq(-10, 0, length.out = num_penalty_values))
+        }
 
-    if (missing(penalty_values)) {
-      penalty_values <- 10^(seq(-10, 0, length.out = num_penalty_values))
+        if (missing(mixture_values)) {
+            mixture_values <- seq(0, 1, length.out = num_mixture_values)
+        }
+
+        hyperparam_grid <-
+            tidyr::expand_grid(penalty_values, mixture_values) |>
+            dplyr::rename(
+                penalty = penalty_values,
+                mixture = mixture_values
+            )
+
+        return(hyperparam_grid)
     }
-
-    if (missing(mixture_values)) {
-      mixture_values <- seq(0, 1, length.out = num_mixture_values)
-    }
-
-    hyperparam_grid <-
-      tidyr::expand_grid(penalty_values, mixture_values) |>
-      dplyr::rename(
-        penalty = penalty_values,
-        mixture = mixture_values
-      )
-
-    return(hyperparam_grid)
-  }
 
 
 # Building Models --------------------------------------------------------------
 
-#' Train an elastic net model to predict sample-level phenomena using CyTOF data.
+#' Train an elastic net model to predict sample-level phenomena using high-dimensional cytometry data.
 #'
 #' This function uses a training set/test set paradigm to tune and fit an
 #' elastic net model using a variety of user-specified details. Tuning can be
@@ -405,7 +404,7 @@ tof_create_grid <-
 #'             ),
 #'         event = c(rep(0, times = 30), rep(1, times = 70)),
 #'         time_to_event = rnorm(n = 100, mean = 10, sd = 2)
-#'    )
+#'     )
 #'
 #' split_data <- tof_split_data(feature_tibble, split_method = "simple")
 #'
@@ -434,236 +433,222 @@ tof_create_grid <-
 #'     model_type = "survival"
 #' )
 #'
-#'
 tof_train_model <-
-  function(
-    split_data,
-    unsplit_data,
-    predictor_cols,
-    response_col = NULL,
-    time_col = NULL,
-    event_col = NULL,
-    model_type = c("linear", "two-class", "multiclass", "survival"),
-    hyperparameter_grid = tof_create_grid(),
-    standardize_predictors = TRUE,
-    remove_zv_predictors = FALSE,
-    impute_missing_predictors = FALSE,
-    optimization_metric = "tidytof_default",
-    best_model_type = c("best", "best with sparsity"),
-    num_cores = 1
-  ) {
+    function(
+        split_data,
+        unsplit_data,
+        predictor_cols,
+        response_col = NULL,
+        time_col = NULL,
+        event_col = NULL,
+        model_type = c("linear", "two-class", "multiclass", "survival"),
+        hyperparameter_grid = tof_create_grid(),
+        standardize_predictors = TRUE,
+        remove_zv_predictors = FALSE,
+        impute_missing_predictors = FALSE,
+        optimization_metric = "tidytof_default",
+        best_model_type = c("best", "best with sparsity"),
+        num_cores = 1) {
+        # handle both split and unsplit data ---------------------------------------
+        if (missing(split_data)) {
+            if (missing(unsplit_data)) {
+                stop("either split_data or unsplit_data must be provided.")
+            } else {
+                split_data <- unsplit_data
+                is_split <- FALSE
+            }
+        } else {
+            is_split <- TRUE
+        }
 
-    # handle both split and unsplit data ---------------------------------------
-    if (missing(split_data)) {
-      if (missing(unsplit_data)) {
-        stop("either split_data or unsplit_data must be provided.")
-      } else {
-        split_data <- unsplit_data
-        is_split <- FALSE
-      }
-    } else {
-      is_split <- TRUE
-    }
-
-    # check arguments ----------------------------------------------------------
-    feature_tibble <-
-      tof_check_model_args(
-        split_data = split_data,
-        model_type = model_type,
-        best_model_type = best_model_type,
-        response_col = {{response_col}},
-        time_col = {{time_col}},
-        event_col = {{event_col}}
-      )
-
-    # create and prep recipe ---------------------------------------------------
-
-    # create recipe
-    if (model_type %in% c("linear", "two-class", "multiclass")) {
-      # if any type of model other than survival
-      unprepped_recipe <-
-        feature_tibble |>
-        tof_create_recipe(
-          predictor_cols = {{predictor_cols}},
-          outcome_cols = {{response_col}},
-          standardize_predictors = standardize_predictors,
-          remove_zv_predictors = remove_zv_predictors,
-          impute_missing_predictors = impute_missing_predictors
-        )
-    } else {
-      # if survival model
-      unprepped_recipe <-
-        feature_tibble |>
-        tof_create_recipe(
-          predictor_cols = {{predictor_cols}},
-          outcome_cols = c({{time_col}}, {{event_col}}),
-          standardize_predictors = standardize_predictors,
-          remove_zv_predictors = remove_zv_predictors,
-          impute_missing_predictors = impute_missing_predictors
-        )
-    }
-
-    # prep recipe(s) - will be a single recipe if split_data is a single rsplit,
-    # but will be a list of recipes if split_data is an rset object.
-    prepped_recipe <-
-      split_data |>
-      tof_prep_recipe(unprepped_recipe = unprepped_recipe)
-
-    # tune the model using the resampling, the recipes, and the
-    # hyperparameter grid ------------------------------------------------------
-    tuning_metrics <-
-      tof_tune_glmnet(
-        split_data = split_data,
-        prepped_recipe = prepped_recipe,
-        hyperparameter_grid = hyperparameter_grid,
-        model_type = model_type,
-        outcome_cols = c({{response_col}}, {{time_col}}, {{event_col}}),
-        optimization_metric = optimization_metric,
-        num_cores = num_cores
-      )
-
-    if (inherits(split_data, "rset")) {
-
-      performance_metrics <-
-        tuning_metrics |>
-        dplyr::select("performance_metrics") |>
-        tidyr::unnest(cols = "performance_metrics") |>
-        dplyr::group_by(.data$mixture, .data$penalty) |>
-        dplyr::summarize(
-          dplyr::across(
-            dplyr::everything(),
-            .fns = mean
-          )
-        ) |>
-        dplyr::ungroup()
-    } else {
-      performance_metrics <- tuning_metrics
-    }
-
-    # find the best hyperparameters using the tuning metrics -------------------
-
-    # find hyperparameters with best performance
-    best_model_parameters <-
-      performance_metrics |>
-      tof_find_best(model_type = model_type, optimization_metric = optimization_metric)
-
-    # combine data into a single preprocessing pipeline and glmnet model--------
-    all_data <- tof_all_data(split_data = split_data)
-
-    final_recipe <-
-      all_data |>
-      tof_prep_recipe(unprepped_recipe = unprepped_recipe)
-
-    # extract response column names
-    response_colname <- time_colname <- event_colname <- NULL
-
-    if (model_type %in% c("linear", "two-class", "multiclass")) {
-      response_colname <- rlang::as_name(rlang::ensym(response_col))
-    } else {
-      time_colname <- rlang::as_name(rlang::ensym(time_col))
-      event_colname <- rlang::as_name(rlang::ensym(event_col))
-    }
-
-    tof_model <-
-      all_data |>
-      tof_finalize_model(
-        best_model_parameters = best_model_parameters,
-        recipe = final_recipe,
-        model_type = model_type,
-        outcome_colnames = c(response_colname, time_colname, event_colname)
-      )
-
-    # add tuning metrics to final model
-    if (inherits(split_data, "rset")) {
-
-      fold_predictions <-
-        tuning_metrics |>
-        dplyr::mutate(
-          recipes = prepped_recipe,
-          .predictions =
-            purrr::map2(
-              .x = .data$splits,
-              .y = .data$recipes,
-              .f = ~ tof_find_cv_predictions(
-                rsplit_data = .x,
-                prepped_recipe = .y,
-                lambda = tof_model$penalty,
-                alpha = tof_model$mixture,
-                model_type = tof_model$model_type,
-                outcome_colnames = tof_model$outcome_colnames
-              )
+        # check arguments ----------------------------------------------------------
+        feature_tibble <-
+            tof_check_model_args(
+                split_data = split_data,
+                model_type = model_type,
+                best_model_type = best_model_type,
+                response_col = {{ response_col }},
+                time_col = {{ time_col }},
+                event_col = {{ event_col }}
             )
-        ) |>
-        dplyr::select(
-          "id",
-          ".predictions"
-        )
 
-      tof_model$tuning_metrics <-
-        tuning_metrics |>
-        dplyr::select("id", "performance_metrics") |>
-        tidyr::unnest(cols = "performance_metrics") |>
-        dplyr::filter(
-          .data$mixture == tof_model$mixture,
-          .data$penalty == tof_model$penalty
-        ) |>
-        dplyr::left_join(fold_predictions, by = "id")
+        # create and prep recipe ---------------------------------------------------
 
+        # create recipe
+        if (model_type %in% c("linear", "two-class", "multiclass")) {
+            # if any type of model other than survival
+            unprepped_recipe <-
+                feature_tibble |>
+                tof_create_recipe(
+                    predictor_cols = {{ predictor_cols }},
+                    outcome_cols = {{ response_col }},
+                    standardize_predictors = standardize_predictors,
+                    remove_zv_predictors = remove_zv_predictors,
+                    impute_missing_predictors = impute_missing_predictors
+                )
+        } else {
+            # if survival model
+            unprepped_recipe <-
+                feature_tibble |>
+                tof_create_recipe(
+                    predictor_cols = {{ predictor_cols }},
+                    outcome_cols = c({{ time_col }}, {{ event_col }}),
+                    standardize_predictors = standardize_predictors,
+                    remove_zv_predictors = remove_zv_predictors,
+                    impute_missing_predictors = impute_missing_predictors
+                )
+        }
 
-    } else {
-      tof_model$tuning_metrics <-
-        tuning_metrics |>
-        dplyr::filter(
-          .data$mixture == tof_model$mixture,
-          .data$penalty == tof_model$penalty
-        )
+        # prep recipe(s) - will be a single recipe if split_data is a single rsplit,
+        # but will be a list of recipes if split_data is an rset object.
+        prepped_recipe <-
+            split_data |>
+            tof_prep_recipe(unprepped_recipe = unprepped_recipe)
 
+        # tune the model using the resampling, the recipes, and the
+        # hyperparameter grid ------------------------------------------------------
+        tuning_metrics <-
+            tof_tune_glmnet(
+                split_data = split_data,
+                prepped_recipe = prepped_recipe,
+                hyperparameter_grid = hyperparameter_grid,
+                model_type = model_type,
+                outcome_cols = c({{ response_col }}, {{ time_col }}, {{ event_col }}),
+                optimization_metric = optimization_metric,
+                num_cores = num_cores
+            )
+
+        if (inherits(split_data, "rset")) {
+            performance_metrics <-
+                tuning_metrics |>
+                dplyr::select("performance_metrics") |>
+                tidyr::unnest(cols = "performance_metrics") |>
+                dplyr::group_by(.data$mixture, .data$penalty) |>
+                dplyr::summarize(
+                    dplyr::across(
+                        dplyr::everything(),
+                        .fns = mean
+                    )
+                ) |>
+                dplyr::ungroup()
+        } else {
+            performance_metrics <- tuning_metrics
+        }
+
+        # find the best hyperparameters using the tuning metrics -------------------
+
+        # find hyperparameters with best performance
+        best_model_parameters <-
+            performance_metrics |>
+            tof_find_best(model_type = model_type, optimization_metric = optimization_metric)
+
+        # combine data into a single preprocessing pipeline and glmnet model--------
+        all_data <- tof_all_data(split_data = split_data)
+
+        final_recipe <-
+            all_data |>
+            tof_prep_recipe(unprepped_recipe = unprepped_recipe)
+
+        # extract response column names
+        response_colname <- time_colname <- event_colname <- NULL
+
+        if (model_type %in% c("linear", "two-class", "multiclass")) {
+            response_colname <- rlang::as_name(rlang::ensym(response_col))
+        } else {
+            time_colname <- rlang::as_name(rlang::ensym(time_col))
+            event_colname <- rlang::as_name(rlang::ensym(event_col))
+        }
+
+        tof_model <-
+            all_data |>
+            tof_finalize_model(
+                best_model_parameters = best_model_parameters,
+                recipe = final_recipe,
+                model_type = model_type,
+                outcome_colnames = c(response_colname, time_colname, event_colname)
+            )
+
+        # add tuning metrics to final model
+        if (inherits(split_data, "rset")) {
+            fold_predictions <-
+                tuning_metrics |>
+                dplyr::mutate(
+                    recipes = prepped_recipe,
+                    .predictions =
+                        purrr::map2(
+                            .x = .data$splits,
+                            .y = .data$recipes,
+                            .f = ~ tof_find_cv_predictions(
+                                split_data = .x,
+                                prepped_recipe = .y,
+                                lambda = tof_model$penalty,
+                                alpha = tof_model$mixture,
+                                model_type = tof_model$model_type,
+                                outcome_colnames = tof_model$outcome_colnames
+                            )
+                        )
+                ) |>
+                dplyr::select(
+                    "id",
+                    ".predictions"
+                )
+
+            tof_model$tuning_metrics <-
+                tuning_metrics |>
+                dplyr::select("id", "performance_metrics") |>
+                tidyr::unnest(cols = "performance_metrics") |>
+                dplyr::filter(
+                    .data$mixture == tof_model$mixture,
+                    .data$penalty == tof_model$penalty
+                ) |>
+                dplyr::left_join(fold_predictions, by = "id")
+        } else {
+            tof_model$tuning_metrics <-
+                tuning_metrics |>
+                dplyr::filter(
+                    .data$mixture == tof_model$mixture,
+                    .data$penalty == tof_model$penalty
+                )
+        }
+
+        # for a survival model, use the log-rank test to find which relative_risk
+        # threshold best separates training observations into 2 groups (high and
+        # low risk)
+        if (model_type == "survival") {
+            predictions <-
+                tof_predict(
+                    tof_model = tof_model,
+                    new_data = all_data,
+                    prediction_type = "response"
+                )
+
+            survival_df <-
+                dplyr::tibble(
+                    relative_risk = predictions$.pred,
+                    time_to_event = all_data[tof_model$outcome_colnames][[1]],
+                    event = all_data[tof_model$outcome_colnames][[2]],
+                )
+
+            log_rank_thresholds <-
+                tof_find_log_rank_threshold(
+                    input_data = survival_df,
+                    relative_risk_col = .data$relative_risk,
+                    time_col = .data$time_to_event,
+                    event_col = .data$event
+                )
+
+            best_log_rank_threshold <-
+                log_rank_thresholds |>
+                dplyr::filter(.data$is_best) |>
+                dplyr::pull(.data$candidate_thresholds) |>
+                unique()
+
+            tof_model$log_rank_thresholds <- log_rank_thresholds
+            tof_model$best_log_rank_threshold <- best_log_rank_threshold
+        }
+
+        return(tof_model)
     }
-
-    # for a survival model, use the log-rank test to find which relative_risk
-    # threshold best separates training observations into 2 groups (high and
-    # low risk)
-    if (model_type == "survival") {
-      predictions <-
-        tof_predict(
-          tof_model = tof_model,
-          new_data = all_data,
-          prediction_type = "response"
-        )
-
-      survival_df <-
-        dplyr::tibble(
-          relative_risk = predictions$.pred,
-          time_to_event = all_data[tof_model$outcome_colnames][[1]],
-          event = all_data[tof_model$outcome_colnames][[2]],
-        )
-
-      log_rank_thresholds <-
-        tof_find_log_rank_threshold(
-          input_data = survival_df,
-          relative_risk_col = .data$relative_risk,
-          time_col = .data$time_to_event,
-          event_col = .data$event
-        )
-
-      best_log_rank_threshold <-
-        log_rank_thresholds |>
-        dplyr::filter(.data$is_best) |>
-        dplyr::pull(.data$candidate_thresholds) |>
-        unique()
-
-      tof_model$log_rank_thresholds <- log_rank_thresholds
-      tof_model$best_log_rank_threshold <- best_log_rank_threshold
-    }
-
-    # if (model_type %in% c("two-class", "multiclass")) {
-    #   outcome_levels <- levels(dplyr::pull(all_data, {{response_col}}))
-    #   tof_model$outcome_levels <- outcome_levels
-    # }
-
-    return(tof_model)
-
-  }
 
 
 # applying models to new data --------------------------------------------------
@@ -731,7 +716,7 @@ tof_train_model <-
 #'         pstat5 = runif(n = 100),
 #'         cd34 = runif(n = 100),
 #'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100)
-#'    )
+#'     )
 #'
 #' new_tibble <-
 #'     dplyr::tibble(
@@ -740,7 +725,7 @@ tof_train_model <-
 #'         pstat5 = runif(n = 20),
 #'         cd34 = runif(n = 20),
 #'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(20)
-#'    )
+#'     )
 #'
 #' split_data <- tof_split_data(feature_tibble, split_method = "simple")
 #'
@@ -751,143 +736,137 @@ tof_train_model <-
 #'         predictor_cols = c(cd45, pstat5, cd34),
 #'         response_col = outcome,
 #'         model_type = "linear"
-#'    )
+#'     )
 #'
 #' # apply the model to new data
 #' tof_predict(tof_model = regression_model, new_data = new_tibble)
 #'
 tof_predict <-
-  function(
-    tof_model,
-    new_data,
-    prediction_type = c("response", "class", "link", "survival curve")
-  ) {
+    function(
+        tof_model,
+        new_data,
+        prediction_type = c("response", "class", "link", "survival curve")) {
+        # set up -------------------------------------------------------------------
+        # check prediction_type
+        prediction_type <- rlang::arg_match(prediction_type)
 
-    # set up -------------------------------------------------------------------
-    # check prediction_type
-    prediction_type <- rlang::arg_match(prediction_type)
+        # extract the recipe and the glmnet model
+        model <- tof_model$model
+        recipe <- tof_model$recipe
+        lambda <- tof_get_model_penalty(tof_model)
+        alpha <- tof_get_model_mixture(tof_model)
 
-    # extract the recipe and the glmnet model
-    model <- tof_model$model
-    recipe <- tof_model$recipe
-    lambda <- tof_get_model_penalty(tof_model)
-    alpha <- tof_get_model_mixture(tof_model)
+        # extract the model type and outcome colnames
+        model_type <- tof_get_model_type(tof_model)
+        outcome_colnames <- tof_get_model_outcomes(tof_model)
 
-    # extract the model type and outcome colnames
-    model_type <- tof_get_model_type(tof_model)
-    outcome_colnames <- tof_get_model_outcomes(tof_model)
+        # if no new data is provided, simply return the training data predictions
+        if (missing(new_data)) {
+            new_data <- tof_get_model_training_data(tof_model)
+        }
 
-    # if no new data is provided, simply return the training data predictions
-    if (missing(new_data)) {
-      new_data <- tof_get_model_training_data(tof_model)
+        # preprocess the new_data
+        preprocessed_data <-
+            new_data |>
+            tof_setup_glmnet_xy(
+                recipe = recipe,
+                outcome_cols = dplyr::any_of(outcome_colnames),
+                model_type = model_type
+            )
+
+        # make predictions ---------------------------------------------------------
+
+        if (prediction_type == "survival curve") {
+            if (model_type != "survival") {
+                stop("Survival curves can only generated for survival models.")
+            } else {
+                preprocessed_training_data <-
+                    tof_model |>
+                    tof_get_model_training_data() |>
+                    tof_setup_glmnet_xy(
+                        recipe = recipe,
+                        outcome_cols = dplyr::any_of(outcome_colnames),
+                        model_type = model_type
+                    )
+
+                survfit_result <-
+                    survival::survfit(
+                        model,
+                        s = lambda,
+                        x = preprocessed_training_data$x,
+                        y = preprocessed_training_data$y,
+                        newx = preprocessed_data$x
+                    )
+
+                times <-
+                    dplyr::tibble(
+                        time = survfit_result$time,
+                        .timepoint_index = seq_along(survfit_result$time)
+                    )
+
+                survival_curves <-
+                    survfit_result$surv |>
+                    dplyr::as_tibble() |>
+                    dplyr::mutate(.timepoint_index = seq_len(nrow(survfit_result$surv))) |>
+                    tidyr::pivot_longer(
+                        cols = -".timepoint_index",
+                        names_to = "row_index",
+                        values_to = "probability"
+                    ) |>
+                    dplyr::left_join(times, by = ".timepoint_index") |>
+                    dplyr::select(-".timepoint_index") |>
+                    tidyr::nest(.survival_curve = -"row_index") |>
+                    dplyr::select(-"row_index")
+
+                return(survival_curves)
+            }
+        }
+
+        if (model_type != "multiclass") {
+            predictions <-
+                stats::predict(
+                    object = model,
+                    newx = preprocessed_data$x,
+                    s = lambda,
+                    type = prediction_type
+                ) |>
+                as.vector()
+
+            return(dplyr::tibble(.pred = predictions))
+        } else {
+            if (prediction_type == "class") {
+                class_predictions <-
+                    stats::predict(
+                        object = model,
+                        newx = preprocessed_data$x,
+                        s = lambda,
+                        type = prediction_type
+                    ) |>
+                    as.vector()
+
+                predictions <-
+                    dplyr::tibble(.pred = class_predictions)
+            } else {
+                predictions <-
+                    stats::predict(
+                        object = model,
+                        newx = preprocessed_data$x,
+                        s = lambda,
+                        type = prediction_type
+                    ) |>
+                    dplyr::as_tibble()
+
+                colnames(predictions) <-
+                    gsub(
+                        pattern = "\\.1$",
+                        replacement = "",
+                        x = paste0(".pred_", colnames(predictions))
+                    )
+            }
+
+            return(predictions)
+        }
     }
-
-    # preprocess the new_data
-    preprocessed_data <-
-      new_data |>
-      tof_setup_glmnet_xy(
-        recipe = recipe,
-        outcome_cols = dplyr::any_of(outcome_colnames),
-        model_type = model_type
-      )
-
-    # make predictions ---------------------------------------------------------
-
-    if (prediction_type == "survival curve") {
-      if (model_type != "survival") {
-        stop("Survival curves can only generated for survival models.")
-      } else {
-
-        preprocessed_training_data <-
-          tof_model |>
-          tof_get_model_training_data() |>
-          tof_setup_glmnet_xy(
-            recipe = recipe,
-            outcome_cols = dplyr::any_of(outcome_colnames),
-            model_type = model_type
-          )
-
-        survfit_result <-
-          survival::survfit(
-            model,
-            s = lambda,
-            x = preprocessed_training_data$x,
-            y = preprocessed_training_data$y,
-            newx = preprocessed_data$x
-          )
-
-        times <-
-          dplyr::tibble(
-            time = survfit_result$time,
-            .timepoint_index = 1:length(survfit_result$time)
-          )
-
-        survival_curves <-
-          survfit_result$surv |>
-          dplyr::as_tibble() |>
-          dplyr::mutate(.timepoint_index = 1:nrow(survfit_result$surv)) |>
-          tidyr::pivot_longer(
-            cols = -".timepoint_index",
-            names_to = "row_index",
-            values_to = "probability"
-          ) |>
-          dplyr::left_join(times, by = ".timepoint_index") |>
-          dplyr::select(-".timepoint_index") |>
-          tidyr::nest(.survival_curve = -"row_index") |>
-          dplyr::select(-"row_index")
-
-        return(survival_curves)
-      }
-    }
-
-    if (model_type != "multiclass") {
-      predictions <-
-        stats::predict(
-          object = model,
-          newx = preprocessed_data$x,
-          s = lambda,
-          type = prediction_type
-        ) |>
-        as.vector()
-
-      return(dplyr::tibble(.pred = predictions))
-    }
-    else {
-      if (prediction_type == "class") {
-        class_predictions <-
-          stats::predict(
-            object = model,
-            newx = preprocessed_data$x,
-            s = lambda,
-            type = prediction_type
-          ) |>
-          as.vector()
-
-        predictions <-
-          dplyr::tibble(.pred = class_predictions)
-
-      } else {
-
-        predictions <-
-          stats::predict(
-            object = model,
-            newx = preprocessed_data$x,
-            s = lambda,
-            type = prediction_type
-          ) |>
-          dplyr::as_tibble()
-
-        colnames(predictions) <-
-          gsub(
-            pattern = "\\.1$",
-            replacement = "",
-            x = paste0(".pred_", colnames(predictions))
-          )
-      }
-
-      return(predictions)
-    }
-  }
 
 # assessing model performance --------------------------------------------------
 
@@ -960,7 +939,7 @@ tof_predict <-
 #'         pstat5 = runif(n = 100),
 #'         cd34 = runif(n = 100),
 #'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100)
-#'    )
+#'     )
 #'
 #' new_tibble <-
 #'     dplyr::tibble(
@@ -969,7 +948,7 @@ tof_predict <-
 #'         pstat5 = runif(n = 20),
 #'         cd34 = runif(n = 20),
 #'         outcome = (3 * cd45) + (4 * pstat5) + rnorm(20)
-#'    )
+#'     )
 #'
 #' split_data <- tof_split_data(feature_tibble, split_method = "simple")
 #'
@@ -980,38 +959,35 @@ tof_predict <-
 #'         predictor_cols = c(cd45, pstat5, cd34),
 #'         response_col = outcome,
 #'         model_type = "linear"
-#'    )
+#'     )
 #'
 #' # assess the model on new data
 #' tof_assess_model(tof_model = regression_model, new_data = new_tibble)
 #'
 tof_assess_model <-
-  function(
-    tof_model,
-    new_data
-  ) {
+    function(
+        tof_model,
+        new_data) {
+        # if no new data is supplied, simply return the training data assessment
+        if (missing(new_data)) {
+            new_data <- tof_get_model_training_data(tof_model)
+        }
 
-    # if no new data is supplied, simply return the training data assessment
-    if (missing(new_data)) {
-      new_data <- tof_get_model_training_data(tof_model)
+        # if tuning data is requested, perform computations using the predictions
+        # stored in the tof_model object
+        if (is.character(new_data)) {
+            if (new_data == "tuning") {
+                result <- tof_assess_model_tuning(tof_model = tof_model)
+            }
+
+            # if tuning data is not requested, assess the model's performance on
+            # the new_data
+        } else {
+            result <-
+                tof_assess_model_new_data(tof_model = tof_model, new_data = new_data)
+        }
+
+        # return result
+        result <- purrr::discard(result, is.null)
+        return(result)
     }
-
-    # if tuning data is requested, perform computations using the predictions
-    # stored in the tof_model object
-    if (is.character(new_data)) {
-      if (new_data == "tuning") {
-        result <- tof_assess_model_tuning(tof_model = tof_model)
-      }
-
-      # if tuning data is not requested, assess the model's performance on
-      # the new_data
-    } else {
-
-      result <-
-        tof_assess_model_new_data(tof_model = tof_model, new_data = new_data)
-    }
-
-    # return result
-    result <- purrr::discard(result, is.null)
-    return(result)
-  }

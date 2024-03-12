@@ -14,8 +14,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 
 options(tibble.print_min = 4L, tibble.print_max = 4L)
@@ -39,30 +39,30 @@ As an example, we can preprocess `{tidytof}`'s built-in `phenograph_data` `tof_t
 data(phenograph_data)
 
 # before preprocessing
-phenograph_data %>% 
-  select(cd45, cd34, cd38) %>% 
-  head()
+phenograph_data %>%
+    select(cd45, cd34, cd38) %>%
+    head()
 ```
 
 
 ```{r}
-phenograph_data %>% 
-  # perform preprocessing
-  tof_preprocess() %>% 
-  # inspect new values
-  select(cd45, cd34, cd38) %>% 
-  head()
+phenograph_data %>%
+    # perform preprocessing
+    tof_preprocess() %>%
+    # inspect new values
+    select(cd45, cd34, cd38) %>%
+    head()
 ```
 
 To alter `tof_preprocess`'s default behavior, change the `channel_cols` argument to specify which columns of `tof_tibble` should be transformed. Alter the `transform_fun` argument to specify a vector-valued function that should be used to transform each of the `channel_cols`. For example, suppose we want to center and scale each of our numeric columns instead of arcsinh-transforming them: 
 
 ```{r}
-phenograph_data %>% 
-  # preprocess
-  tof_preprocess(transform_fun = scale) %>% 
-  # inspect new values
-  select(cd45, cd34, cd38) %>% 
-  head()
+phenograph_data %>%
+    # preprocess
+    tof_preprocess(transform_fun = scale) %>%
+    # inspect new values
+    select(cd45, cd34, cd38) %>%
+    head()
 ```
 
 To keep the gaussian noise added by Fluidigm software (or if you are working with a dataset that does not have this noise), set the `undo_noise` argument to `FALSE`.
@@ -72,15 +72,22 @@ To keep the gaussian noise added by Fluidigm software (or if you are working wit
 As a final note, note that the built-in function `tof_postprocess` works nearly identically `tof_preprocess`, but provides different default behavior (namely, applying the reverse arcsinh transformation with a cofactor of 5 to all numeric columns. See `?tof_postprocess` for details).
 
 ```{r}
-print(phenograph_data) %>% 
-  select(cd45, cd34, cd38) %>% 
-  head()
+print(phenograph_data) %>%
+    select(cd45, cd34, cd38) %>%
+    head()
 
-# after preprocessing and post-processing, the data are the same 
-# except that the re-added noise component is different for each value 
-phenograph_data %>% 
-  tof_preprocess() %>% 
-  tof_postprocess(redo_noise = TRUE) %>% 
-  select(cd45, cd34, cd38) %>% 
-  head()
+# after preprocessing and post-processing, the data are the same
+# except that the re-added noise component is different for each value
+phenograph_data %>%
+    tof_preprocess() %>%
+    tof_postprocess(redo_noise = TRUE) %>%
+    select(cd45, cd34, cd38) %>%
+    head()
+```
+
+
+# Session info
+
+```{r}
+sessionInfo()
 ```

@@ -38,7 +38,7 @@ feature_tibble <-
             as.factor(
                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
             )
-   )
+    )
 
 split_data <- tof_split_data(feature_tibble, split_method = "simple")
 
@@ -57,7 +57,7 @@ predictions <-
         log_model,
         new_data = feature_tibble,
         prediction_type = "response"
-     )
+    )
 prediction_tibble <-
     dplyr::tibble(
         truth = feature_tibble$class,
@@ -69,6 +69,6 @@ tof_make_roc_curve(
     input_data = prediction_tibble,
     truth_col = truth,
     prob_cols = prediction
- )
+)
 
 }

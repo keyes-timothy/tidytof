@@ -93,12 +93,13 @@ differences between sample types.
 }
 \examples{
 # For differential discovery examples, please see the package vignettes
+NULL
 
 }
 \seealso{
 Other differential abundance analysis functions: 
+\code{\link{tof_analyze_abundance}()},
 \code{\link{tof_analyze_abundance_diffcyt}()},
-\code{\link{tof_analyze_abundance_glmm}()},
-\code{\link{tof_analyze_abundance}()}
+\code{\link{tof_analyze_abundance_glmm}()}
 }
 \concept{differential abundance analysis functions}

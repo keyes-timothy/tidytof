@@ -4,7 +4,8 @@ author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 description: > 
-  Read this vignette to learn how to downsample a CyTOF dataset to a smaller 
+  Read this vignette to learn how to downsample a high-dimensional cytometry
+  dataset to a smaller 
   number of cells using {tidytof}.
 vignette: >
   %\VignetteIndexEntry{Downsampling}
@@ -14,10 +15,10 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>", 
-  fig.height = 4, 
-  fig.width = 4
+    collapse = TRUE,
+    comment = "#>",
+    fig.height = 4,
+    fig.width = 4
 )
 ```
 
@@ -29,7 +30,7 @@ library(ggplot2)
 count <- dplyr::count
 ```
 
-Often, CyTOF experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. 
+Often, high-dimensional cytometry experiments collect tens or hundreds or millions of cells in total, and it can be useful to downsample to a smaller, more computationally tractable number of cells - either for a final analysis or while developing code. 
 
 To do this, `{tidytof}` implements the `tof_downsample()` verb, which allows downsampling using 3 methods: downsampling to an integer number of cells, downsampling to a fixed proportion of the total number of input cells, or downsampling to a fixed cellular density in phenotypic space.
 
@@ -40,82 +41,82 @@ Using `{tidytof}`'s built-in dataset `phenograph_data`, we can see that the orig
 ```{r}
 data(phenograph_data)
 
-phenograph_data %>% 
-  dplyr::count(phenograph_cluster)
+phenograph_data |>
+    dplyr::count(phenograph_cluster)
 ```
 
 To randomly sample 200 cells per cluster, we can use `tof_downsample()` using the "constant" `method`:
 
 ```{r}
-phenograph_data %>% 
-  # downsample 
-  tof_downsample(
-    group_cols = phenograph_cluster, 
-    method = "constant",
-    num_cells = 200
-  ) %>% 
-  # count the number of downsampled cells in each cluster
-  count(phenograph_cluster)
+phenograph_data |>
+    # downsample
+    tof_downsample(
+        group_cols = phenograph_cluster,
+        method = "constant",
+        num_cells = 200
+    ) |>
+    # count the number of downsampled cells in each cluster
+    count(phenograph_cluster)
 ```
 
 Alternatively, if we wanted to sample 50% of the cells in each cluster, we could use the "prop" `method`:
 
 ```{r}
-phenograph_data %>% 
-  # downsample
-  tof_downsample(
-    group_cols = phenograph_cluster, 
-    method = "prop",
-    prop_cells = 0.5
-  ) %>% 
-  # count the number of downsampled cells in each cluster
-  count(phenograph_cluster)
+phenograph_data |>
+    # downsample
+    tof_downsample(
+        group_cols = phenograph_cluster,
+        method = "prop",
+        prop_cells = 0.5
+    ) |>
+    # count the number of downsampled cells in each cluster
+    count(phenograph_cluster)
 ```
 
 And finally, we might also be interested in taking a slightly different approach to downsampling that reduces the number of cells not to a fixed constant or proportion, but to a fixed *density* in phenotypic space. For example, the following scatterplot demonstrates that there are certain areas of phenotypic density in `phenograph_data` that contain more cells than others along the `cd34`/`cd38` axes:
 
 
 ```{r, warning = FALSE, message = FALSE}
-rescale_max <- 
-  function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) { 
-    x/from[2] * to[2]
-  }
+rescale_max <-
+    function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
+        x / from[2] * to[2]
+    }
 
-phenograph_data %>% 
-  # preprocess all numeric columns in the dataset
-  tof_preprocess(undo_noise = FALSE) %>% 
-  # plot
-  ggplot(aes(x = cd34, y = cd38)) + 
-  geom_hex() + 
-  coord_fixed(ratio = 0.4) + 
-  scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4)) +
-  scale_fill_viridis_c(
-    labels = function(x) round(rescale_max(x), 2)
-  ) + 
-  labs(
-    fill = "relative density"
-  )
+phenograph_data |>
+    # preprocess all numeric columns in the dataset
+    tof_preprocess(undo_noise = FALSE) |>
+    # plot
+    ggplot(aes(x = cd34, y = cd38)) +
+    geom_hex() +
+    coord_fixed(ratio = 0.4) +
+    scale_x_continuous(limits = c(NA, 1.5)) +
+    scale_y_continuous(limits = c(NA, 4)) +
+    scale_fill_viridis_c(
+        labels = function(x) round(rescale_max(x), 2)
+    ) +
+    labs(
+        fill = "relative density"
+    )
 ```
 
 To reduce the number of cells in our dataset until the local density around each cell in our dataset is relatively constant, we can use the "density" `method` of `tof_downsample`:
 
 ```{r, warning = FALSE, message = FALSE}
-phenograph_data %>% 
-  tof_preprocess(undo_noise = FALSE) %>% 
-  tof_downsample(method = "density", density_cols = c(cd34, cd38)) %>% 
-  # plot
-  ggplot(aes(x = cd34, y = cd38)) + 
-  geom_hex() + 
-  coord_fixed(ratio = 0.4) + 
-  scale_x_continuous(limits = c(NA, 1.5)) + 
-  scale_y_continuous(limits = c(NA, 4)) + 
-  scale_fill_viridis_c(
-    labels = function(x) round(rescale_max(x), 2)
-    ) + 
-  labs(
-    fill = "relative density"
-  )
+phenograph_data |>
+    tof_preprocess(undo_noise = FALSE) |>
+    tof_downsample(method = "density", density_cols = c(cd34, cd38)) |>
+    # plot
+    ggplot(aes(x = cd34, y = cd38)) +
+    geom_hex() +
+    coord_fixed(ratio = 0.4) +
+    scale_x_continuous(limits = c(NA, 1.5)) +
+    scale_y_continuous(limits = c(NA, 4)) +
+    scale_fill_viridis_c(
+        labels = function(x) round(rescale_max(x), 2)
+    ) +
+    labs(
+        fill = "relative density"
+    )
 ```
 
 Thus, we can see that the density after downsampling is more uniform (though not exactly uniform) across the range of `cd34`/`cd38` values in `phenograph_data`.
@@ -127,3 +128,10 @@ For more details, check out the documentation for the 3 underlying members of th
 -   `tof_downsample_constant`
 -   `tof_downsample_prop`
 -   `tof_downsample_density`
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```

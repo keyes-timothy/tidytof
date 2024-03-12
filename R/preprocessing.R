@@ -47,26 +47,24 @@
 #' tof_preprocess(tof_tibble, transform_fun = log10)
 #'
 tof_transform <-
-  function(
-    tof_tibble = NULL,
-    channel_cols = where(tof_is_numeric),
-    transform_fun
-  ) {
+    function(
+        tof_tibble = NULL,
+        channel_cols = where(tof_is_numeric),
+        transform_fun) {
+        # check if transformation function was specified
+        if (missing(transform_fun)) {
+            stop("transform_fun must be specified.")
+        } else if (!purrr::is_function(transform_fun)) {
+            stop("transform_fun must be a function.")
+        }
 
-    # check if transformation function was specified
-    if (missing(transform_fun)) {
-      stop("transform_fun must be specified.")
-    } else if (!purrr::is_function(transform_fun)) {
-        stop("transform_fun must be a function.")
+        #  apply transformation to all channel_cols
+        tof_tibble <-
+            tof_tibble |>
+            dplyr::mutate(dplyr::across({{ channel_cols }}, transform_fun))
+
+        return(tof_tibble)
     }
-
-    #  apply transformation to all channel_cols
-    tof_tibble <-
-      tof_tibble |>
-      dplyr::mutate(dplyr::across({{channel_cols}}, transform_fun))
-
-    return(tof_tibble)
-  }
 
 
 # tof_preprocess ---------------------------------------------------------------
@@ -120,26 +118,25 @@ tof_transform <-
 #' tof_preprocess(tof_tibble, transform_fun = log10)
 #'
 tof_preprocess <-
-  function(
-    tof_tibble = NULL,
-    channel_cols = where(tof_is_numeric),
-    undo_noise = FALSE,
-    transform_fun = function(x) asinh(x/5)
-  ) {
-    # first remove noise if specified
-    if (undo_noise) {
-      tof_tibble <-
-        tof_tibble |>
-        dplyr::mutate(dplyr::across({{channel_cols}}, ~ floor(.x) + 1))
+    function(
+        tof_tibble = NULL,
+        channel_cols = where(tof_is_numeric),
+        undo_noise = FALSE,
+        transform_fun = function(x) asinh(x / 5)) {
+        # first remove noise if specified
+        if (undo_noise) {
+            tof_tibble <-
+                tof_tibble |>
+                dplyr::mutate(dplyr::across({{ channel_cols }}, ~ floor(.x) + 1))
+        }
+
+        # then apply transformation to all channel_cols
+        tof_tibble <-
+            tof_tibble |>
+            dplyr::mutate(across({{ channel_cols }}, transform_fun))
+
+        return(tof_tibble)
     }
-
-    # then apply transformation to all channel_cols
-    tof_tibble <-
-      tof_tibble |>
-      dplyr::mutate(across({{channel_cols}}, transform_fun))
-
-    return(tof_tibble)
-  }
 
 
 
@@ -187,29 +184,22 @@ tof_preprocess <-
 #' tof_postprocess(tof_tibble)
 #'
 tof_postprocess <-
-  function(
-    tof_tibble = NULL,
-    channel_cols = where(tof_is_numeric),
-    redo_noise = FALSE,
-    transform_fun = function(x) rev_asinh(x, shift_factor = 0, scale_factor = 0.2)
-  ) {
+    function(
+        tof_tibble = NULL,
+        channel_cols = where(tof_is_numeric),
+        redo_noise = FALSE,
+        transform_fun = function(x) rev_asinh(x, shift_factor = 0, scale_factor = 0.2)) {
+        # first apply transformation function to all channel_cols
+        tof_tibble <-
+            tof_tibble |>
+            dplyr::mutate(across({{ channel_cols }}, transform_fun))
 
-    # first apply transformation function to all channel_cols
-    tof_tibble <-
-      tof_tibble |>
-      dplyr::mutate(across({{channel_cols}}, transform_fun))
+        # then remove noise if specified
+        if (redo_noise) {
+            tof_tibble <-
+                tof_tibble |>
+                dplyr::mutate(across({{ channel_cols }}, ~ .x - stats::runif(n = length(.x))))
+        }
 
-    # then remove noise if specified
-    if (redo_noise) {
-      tof_tibble <-
-        tof_tibble |>
-        dplyr::mutate(across({{channel_cols}}, ~ .x - stats::runif(n = length(.x))))
+        return(tof_tibble)
     }
-
-    return(tof_tibble)
-  }
-
-
-
-
-

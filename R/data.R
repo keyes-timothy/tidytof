@@ -1,4 +1,3 @@
-
 #' CyTOF data from two samples: 5,000 B-cell lineage cells from a healthy
 #' patient and 5,000 B-cell lineage cells from a B-cell precursor Acute
 #' Lymphoblastic Leukemia (BCP-ALL) patient.
@@ -12,7 +11,6 @@
 #' PMID: 29505032; PMCID: PMC5953207.
 #'
 #' @usage data(ddpr_data)
-#'
 #'
 #' @format A data frame with 10000 rows and 24 variables:
 #' \describe{
@@ -39,6 +37,9 @@
 #'   \item{pcreb}{A CyTOF measurement in raw ion counts}
 #' }
 #' @source \url{https://github.com/kara-davis-lab/DDPR}
+#'
+#' @return A data.frame
+#'
 "ddpr_data"
 
 
@@ -80,6 +81,9 @@
 #' lymphoblastic leukemia at diagnosis reveals predictors of relapse.
 #' Nat Med. 2018 May;24(4):474-483. doi: 10.1038/nm.4505. Epub 2018 Mar 5.
 #' PMID: 29505032; PMCID: PMC5953207. Supplementary Table 1.
+#'
+#' @return A data.frame
+#'
 "ddpr_metadata"
 
 #' CyTOF data from 6,000 healthy immune cells from a single patient.
@@ -126,6 +130,9 @@
 #'   \item{perk1-2}{A CyTOF measurement in raw ion counts}
 #' }
 #' @source \url{https://cytobank.org/nolanlab/reports/Levine2015.html}
+#'
+#' @return A data.frame
+#'
 "phenograph_data"
 
 #' A character vector of metal name patterns supported by tidytof.
@@ -144,4 +151,7 @@
 #' \url{https://cytobank.org/nolanlab/reports/Spitzer2015.html}
 #' \url{https://cytobank.org/nolanlab/reports/Spitzer2017.html}
 #' \url{https://community.cytobank.org/cytobank/projects/609}
+#'
+#' @return A named character vector.
+#'
 "metal_masterlist"

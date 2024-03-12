@@ -14,6 +14,7 @@
 #'
 #' @importFrom foreach `%dopar%`
 #' @importFrom foreach `%do%`
+#'
 NULL
 
 # dplyr reexports --------------------------------------------------------------
@@ -43,7 +44,7 @@ rlang::`.data`
 #'
 #' This help file was replicated verbatim from \code{\link[tidyselect]{tidyselect-package}}.
 #'
-#' @param fn 	A function that returns TRUE or FALSE (technically, a predicate function).
+#' @param fn A function that returns TRUE or FALSE (technically, a predicate function).
 #' Can also be a purrr-like formula.
 #'
 #' @importFrom tidyselect vars_select_helpers
@@ -55,6 +56,9 @@ rlang::`.data`
 #' @references  Lionel Henry and Hadley Wickham (2021). tidyselect:
 #' Select from a Set of Strings. R package version 1.1.1.
 #' https://CRAN.R-project.org/package=tidyselect
+#'
+#' @examples
+#' NULL
 #'
 where <- tidyselect::vars_select_helpers$where
 
@@ -96,5 +100,3 @@ tidyselect::any_of
 #' @importFrom tidyselect all_of
 #' @export
 tidyselect::all_of
-
-

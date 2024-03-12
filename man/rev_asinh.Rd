@@ -28,12 +28,11 @@ shift of `shift_factor`.
 }
 \examples{
 shift_factor <- 0
-scale_factor <- 1/5
+scale_factor <- 1 / 5
 
 input_value <- 20
 asinh_value <- asinh(shift_factor + input_value * scale_factor)
 
 restored_value <- rev_asinh(asinh_value, shift_factor, scale_factor)
-
 
 }

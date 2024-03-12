@@ -2,7 +2,7 @@
 % Please edit documentation in R/differential_discovery.R
 \name{tof_analyze_abundance}
 \alias{tof_analyze_abundance}
-\title{Perform Differential Abundance Analysis (DAA) on CyTOF data}
+\title{Perform Differential Abundance Analysis (DAA) on high-dimensional cytometry data}
 \usage{
 tof_analyze_abundance(tof_tibble, method = c("diffcyt", "glmm", "ttest"), ...)
 }
@@ -29,6 +29,7 @@ function family: \code{\link{tof_analyze_abundance_diffcyt}},
 }
 \examples{
 # For differential discovery examples, please see the package vignettes
+NULL
 
 }
 \seealso{

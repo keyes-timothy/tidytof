@@ -73,46 +73,46 @@ its entropy will be large.
 
 # simulate data
 sim_data <-
-  dplyr::tibble(
-    cd45 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd38 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd34 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cd19 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
-    cluster_id = c(rep("a", 1000), rep("b", 1000), rep("c", 1000))
-  )
+    dplyr::tibble(
+        cd45 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd38 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd34 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cd19 = c(rnorm(n = 1000, sd = 1.5), rnorm(n = 1000, mean = 2), rnorm(n = 1000, mean = -2)),
+        cluster_id = c(rep("a", 1000), rep("b", 1000), rep("c", 1000))
+    )
 
 # imagine a "reference" dataset in which "cluster a" isn't present
 sim_data_reference <-
-  sim_data |>
-  dplyr::filter(cluster_id \%in\% c("b", "c"))
+    sim_data |>
+    dplyr::filter(cluster_id \%in\% c("b", "c"))
 
 # if we cluster into the reference dataset, we will force all cells in
 # cluster a into a population where they don't fit very well
 sim_data <-
-  sim_data |>
-  tof_cluster(
-    healthy_tibble = sim_data_reference,
-    healthy_label_col = cluster_id,
-    method = "ddpr"
-  )
+    sim_data |>
+    tof_cluster(
+        healthy_tibble = sim_data_reference,
+        healthy_label_col = cluster_id,
+        method = "ddpr"
+    )
 
 # we can evaluate the clustering quality by calculating by the entropy of the
 # mahalanobis distance vector for each cell to all cluster centroids
 entropy_result <-
-  sim_data |>
-  tof_assess_clusters_entropy(
-    cluster_col = .mahalanobis_cluster,
-    marker_cols = starts_with("cd"),
-    entropy_quantile = 0.8,
-    augment = TRUE
-  )
+    sim_data |>
+    tof_assess_clusters_entropy(
+        cluster_col = .mahalanobis_cluster,
+        marker_cols = starts_with("cd"),
+        entropy_quantile = 0.8,
+        augment = TRUE
+    )
 
 # most cells in "cluster a" are flagged, and few cells in the other clusters are
 flagged_cluster_proportions <-
-  entropy_result |>
-  dplyr::group_by(cluster_id) |>
-  dplyr::summarize(
-    prop_flagged = mean(flagged_cell)
-  )
+    entropy_result |>
+    dplyr::group_by(cluster_id) |>
+    dplyr::summarize(
+        prop_flagged = mean(flagged_cell)
+    )
 
 }

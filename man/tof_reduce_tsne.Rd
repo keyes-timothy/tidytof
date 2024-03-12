@@ -66,7 +66,6 @@ tof_reduce_tsne(tof_tibble = sim_data)
 # calculate tsne with only 2 columns
 tof_reduce_tsne(tof_tibble = sim_data, tsne_cols = c(cd34, cd38))
 
-
 }
 \seealso{
 Other dimensionality reduction functions: 

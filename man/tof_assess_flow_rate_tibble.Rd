@@ -55,24 +55,24 @@ extreme values of the t-distribution across timesteps) are flagged.
 
 set.seed(1000L)
 sim_data <-
-  data.frame(
-    cd4 = rnorm(n = 1000, mean = 5, sd = 0.5),
-    cd8 = rnorm(n = 1000, mean = 0, sd = 0.1),
-    cd33 = rnorm(n = 1000, mean = 10, sd = 0.1),
-    time =
-      c(
-        sample(1:100, size = 200, replace = TRUE),
-        sample(100:400, size = 300, replace = TRUE),
-        sample(1:150, size = 400, replace = TRUE),
-        sample(1:500, size = 100, replace = TRUE)
-      )
-  )
+    data.frame(
+        cd4 = rnorm(n = 1000, mean = 5, sd = 0.5),
+        cd8 = rnorm(n = 1000, mean = 0, sd = 0.1),
+        cd33 = rnorm(n = 1000, mean = 10, sd = 0.1),
+        time =
+            c(
+                sample(1:100, size = 200, replace = TRUE),
+                sample(100:400, size = 300, replace = TRUE),
+                sample(1:150, size = 400, replace = TRUE),
+                sample(1:500, size = 100, replace = TRUE)
+            )
+    )
 
 sim_data |>
-  tof_assess_flow_rate(
-    time_col = time,
-    num_timesteps = 20,
-    visualize = TRUE
-  )
+    tof_assess_flow_rate(
+        time_col = time,
+        num_timesteps = 20,
+        visualize = TRUE
+    )
 
 }

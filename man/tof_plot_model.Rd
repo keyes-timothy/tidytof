@@ -39,7 +39,7 @@ feature_tibble <-
             as.factor(
                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
             )
-   )
+    )
 
 new_tibble <-
     dplyr::tibble(
@@ -52,7 +52,7 @@ new_tibble <-
             as.factor(
                 dplyr::if_else(outcome > median(outcome), "class1", "class2")
             )
-   )
+    )
 
 split_data <- tof_split_data(feature_tibble, split_method = "simple")
 
@@ -63,7 +63,7 @@ regression_model <-
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
         model_type = "linear"
-   )
+    )
 
 # make the plot
 plot_1 <- tof_plot_model(tof_model = regression_model, new_data = new_tibble)

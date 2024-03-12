@@ -50,12 +50,11 @@ tof_downsample_constant(
     num_cells = 20L
 )
 
-
 }
 \seealso{
 Other downsampling functions: 
+\code{\link{tof_downsample}()},
 \code{\link{tof_downsample_density}()},
-\code{\link{tof_downsample_prop}()},
-\code{\link{tof_downsample}()}
+\code{\link{tof_downsample_prop}()}
 }
 \concept{downsampling functions}

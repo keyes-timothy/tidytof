@@ -40,3 +40,7 @@ Compute the log-rank test p-value for the difference between the two survival
 curves obtained by splitting a dataset into a "low" and "high" risk group
 using a given relative-risk threshold.
 }
+\examples{
+NULL
+
+}
