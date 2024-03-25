@@ -14,7 +14,7 @@ and each method's corresponding input parameters."><!-- mathjax --><script src="
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,13 @@ and each method's corresponding input parameters."><!-- mathjax --><script src="
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -64,7 +70,7 @@ and each method's corresponding input parameters."><!-- mathjax --><script src="
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Metacluster clustered CyTOF data.</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/R/metaclustering.R" class="external-link"><code>R/metaclustering.R</code></a></small>
       <div class="d-none name"><code>tof_metacluster.Rd</code></div>
     </div>
 
@@ -169,18 +175,18 @@ plus an additional column encoding the metacluster ids.</p>
 <span class="r-in"><span>    method <span class="op">=</span> <span class="st">"flowsom"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45    cd38   cd34    cd19 cluster_id .flowsom_metacluster</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">0.361</span>   0.845   0.633  0.958  z          2                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.28   -<span style="color: #BB0000;">1.10</span>   -<span style="color: #BB0000;">1.31</span>   0.020<span style="text-decoration: underline;">4</span> x          6                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">1.03</span>   -<span style="color: #BB0000;">1.76</span>    0.228  0.889  q          3                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">1.74</span>   -<span style="color: #BB0000;">2.08</span>    0.297  1.46   x          6                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.054<span style="text-decoration: underline;">6</span>  0.221   1.84  -<span style="color: #BB0000;">0.279</span>  u          6                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  0.253   1.19   -<span style="color: #BB0000;">0.368</span>  0.519  a          1                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.046</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.011<span style="text-decoration: underline;">1</span>  0.250  1.27   p          4                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  0.399   1.59    1.28   1.38   y          3                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  0.716   0.204   1.40   0.238  l          7                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">1.41</span>    1.86    1.86  -<span style="color: #BB0000;">0.856</span>  a          1                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45    cd38     cd34   cd19 cluster_id .flowsom_metacluster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">0.949</span>   0.944  -<span style="color: #BB0000;">0.058</span><span style="color: #BB0000; text-decoration: underline;">7</span>   0.560 w          5                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  0.075<span style="text-decoration: underline;">8</span>  0.082<span style="text-decoration: underline;">0</span>  1.45    -<span style="color: #BB0000;">0.460</span> z          3                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">0.304</span>   0.294  -<span style="color: #BB0000;">0.853</span>   -<span style="color: #BB0000;">1.61</span>  h          5                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.057<span style="text-decoration: underline;">3</span>  0.273   0.040<span style="text-decoration: underline;">3</span>  -<span style="color: #BB0000;">0.325</span> h          5                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.491  -<span style="color: #BB0000;">0.012</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.494    0.124 k          1                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.981</span>   0.076<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">91</span> -<span style="color: #BB0000;">1.44</span>  e          3                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">1.51</span>   -<span style="color: #BB0000;">0.896</span>  -<span style="color: #BB0000;">0.781</span>    0.501 e          3                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  1.03    0.388  -<span style="color: #BB0000;">0.807</span>    1.09  q          5                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  1.79    0.085<span style="text-decoration: underline;">0</span> -<span style="color: #BB0000;">1.82</span>    -<span style="color: #BB0000;">0.889</span> f          1                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.605</span>  -<span style="color: #BB0000;">0.907</span>   0.116   -<span style="color: #BB0000;">1.31</span>  u          6                   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 990 more rows</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">tof_metacluster</span><span class="op">(</span></span></span>
@@ -189,18 +195,18 @@ plus an additional column encoding the metacluster ids.</p>
 <span class="r-in"><span>    method <span class="op">=</span> <span class="st">"phenograph"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,000 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45    cd38   cd34    cd19 cluster_id .phenograph_metacluster</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">0.361</span>   0.845   0.633  0.958  z          1                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  1.28   -<span style="color: #BB0000;">1.10</span>   -<span style="color: #BB0000;">1.31</span>   0.020<span style="text-decoration: underline;">4</span> x          4                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">1.03</span>   -<span style="color: #BB0000;">1.76</span>    0.228  0.889  q          3                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">1.74</span>   -<span style="color: #BB0000;">2.08</span>    0.297  1.46   x          4                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.054<span style="text-decoration: underline;">6</span>  0.221   1.84  -<span style="color: #BB0000;">0.279</span>  u          4                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  0.253   1.19   -<span style="color: #BB0000;">0.368</span>  0.519  a          5                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.046</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.011<span style="text-decoration: underline;">1</span>  0.250  1.27   p          2                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  0.399   1.59    1.28   1.38   y          3                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  0.716   0.204   1.40   0.238  l          1                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">1.41</span>    1.86    1.86  -<span style="color: #BB0000;">0.856</span>  a          5                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       cd45    cd38     cd34   cd19 cluster_id .phenograph_metacluster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">0.949</span>   0.944  -<span style="color: #BB0000;">0.058</span><span style="color: #BB0000; text-decoration: underline;">7</span>   0.560 w          1                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  0.075<span style="text-decoration: underline;">8</span>  0.082<span style="text-decoration: underline;">0</span>  1.45    -<span style="color: #BB0000;">0.460</span> z          1                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">0.304</span>   0.294  -<span style="color: #BB0000;">0.853</span>   -<span style="color: #BB0000;">1.61</span>  h          5                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  0.057<span style="text-decoration: underline;">3</span>  0.273   0.040<span style="text-decoration: underline;">3</span>  -<span style="color: #BB0000;">0.325</span> h          5                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  0.491  -<span style="color: #BB0000;">0.012</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.494    0.124 k          2                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.981</span>   0.076<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">91</span> -<span style="color: #BB0000;">1.44</span>  e          1                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">1.51</span>   -<span style="color: #BB0000;">0.896</span>  -<span style="color: #BB0000;">0.781</span>    0.501 e          1                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  1.03    0.388  -<span style="color: #BB0000;">0.807</span>    1.09  q          1                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  1.79    0.085<span style="text-decoration: underline;">0</span> -<span style="color: #BB0000;">1.82</span>    -<span style="color: #BB0000;">0.889</span> f          3                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.605</span>  -<span style="color: #BB0000;">0.907</span>   0.116   -<span style="color: #BB0000;">1.31</span>  u          2                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 990 more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

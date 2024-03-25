@@ -20,7 +20,7 @@ subgroups using `group_cols`.'><!-- mathjax --><script src="https://cdnjs.cloudf
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,13 @@ subgroups using `group_cols`.'><!-- mathjax --><script src="https://cdnjs.cloudf
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -70,7 +76,7 @@ subgroups using `group_cols`.'><!-- mathjax --><script src="https://cdnjs.cloudf
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Extract aggregated features from CyTOF data using the Jensen-Shannon Distance (JSD)</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/R/feature_extraction.R" class="external-link"><code>R/feature_extraction.R</code></a></small>
       <div class="d-none name"><code>tof_extract_jsd.Rd</code></div>
     </div>
 
@@ -202,17 +208,17 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 <span class="r-in"><span>    reference_level <span class="op">=</span> <span class="st">"basal"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 105</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   patient `stim_cd45@b_jsd` `stim_cd38@b_jsd` `stim_cd34@b_jsd`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   patient `stim_cd45@l_jsd` `stim_cd38@l_jsd` `stim_cd34@l_jsd`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> mario                  <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> kirby                  <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 101 more variables: `stim_cd19@b_jsd` &lt;dbl&gt;, `stim_cd45@v_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd38@v_jsd` &lt;dbl&gt;, `stim_cd34@v_jsd` &lt;dbl&gt;, `stim_cd19@v_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd45@j_jsd` &lt;dbl&gt;, `stim_cd38@j_jsd` &lt;dbl&gt;, `stim_cd34@j_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd19@j_jsd` &lt;dbl&gt;, `stim_cd45@f_jsd` &lt;dbl&gt;, `stim_cd38@f_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd34@f_jsd` &lt;dbl&gt;, `stim_cd19@f_jsd` &lt;dbl&gt;, `stim_cd45@u_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd38@u_jsd` &lt;dbl&gt;, `stim_cd34@u_jsd` &lt;dbl&gt;, `stim_cd19@u_jsd` &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd45@o_jsd` &lt;dbl&gt;, `stim_cd38@o_jsd` &lt;dbl&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby              <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario               0.916             0.916             0.916</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 101 more variables: `stim_cd19@l_jsd` &lt;dbl&gt;, `stim_cd45@z_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd38@z_jsd` &lt;dbl&gt;, `stim_cd34@z_jsd` &lt;dbl&gt;, `stim_cd19@z_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd45@o_jsd` &lt;dbl&gt;, `stim_cd38@o_jsd` &lt;dbl&gt;, `stim_cd34@o_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd19@o_jsd` &lt;dbl&gt;, `stim_cd45@y_jsd` &lt;dbl&gt;, `stim_cd38@y_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd34@y_jsd` &lt;dbl&gt;, `stim_cd19@y_jsd` &lt;dbl&gt;, `stim_cd45@i_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd38@i_jsd` &lt;dbl&gt;, `stim_cd34@i_jsd` &lt;dbl&gt;, `stim_cd19@i_jsd` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `stim_cd45@q_jsd` &lt;dbl&gt;, `stim_cd38@q_jsd` &lt;dbl&gt;, …</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># extract jsd of each cluster (using the "basal" stim</span></span></span>
 <span class="r-in"><span><span class="co"># condition as a reference) in long format</span></span></span>
@@ -224,18 +230,18 @@ column for the CyTOF channel names, and one column (`value`) containing the feat
 <span class="r-in"><span>    format <span class="op">=</span> <span class="st">"long"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 104 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    cluster_id marker stimulation    jsd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> b          cd45   stim        <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> b          cd38   stim        <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> b          cd34   stim        <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> b          cd19   stim        <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> v          cd45   stim         0.732</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> v          cd38   stim         0.860</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> v          cd34   stim         0.940</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> v          cd19   stim         0.879</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> j          cd45   stim         0.737</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> j          cd38   stim         0.619</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    cluster_id marker stimulation   jsd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> l          cd45   stim        0.779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> l          cd38   stim        0.748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> l          cd34   stim        0.863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> l          cd19   stim        0.663</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> z          cd45   stim        0.846</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> z          cd38   stim        0.846</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> z          cd34   stim        0.728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> z          cd19   stim        0.692</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> o          cd45   stim        0.920</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> o          cd38   stim        0.705</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 94 more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

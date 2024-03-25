@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -91,7 +98,7 @@ Keyes</h4>
             
             <h4 data-toc-skip class="date">2024-03-25</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/vignettes/dimensionality-reduction.Rmd" class="external-link"><code>vignettes/dimensionality-reduction.Rmd</code></a></small>
       <div class="d-none name"><code>dimensionality-reduction.Rmd</code></div>
     </div>
 
@@ -132,14 +139,14 @@ which we use tSNE to visualize data in <a href="https://keyes-timothy.github.io/
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"tsne"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
-<span><span class="co">#&gt;   .tsne1  .tsne2</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   8.18 -<span style="color: #BB0000;">16.4</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   9.22  -<span style="color: #BB0000;">3.40</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  30.5    6.17 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  18.7   -<span style="color: #BB0000;">7.71</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  14.3  -<span style="color: #BB0000;">15.7</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  21.6   -<span style="color: #BB0000;">0.150</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   .tsne1 .tsne2</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   8.29  -<span style="color: #BB0000;">12.7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   3.25  -<span style="color: #BB0000;">13.3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  -<span style="color: #BB0000;">7.65</span>  -<span style="color: #BB0000;">34.4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  -<span style="color: #BB0000;">5.42</span>  -<span style="color: #BB0000;">15.5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>   5.81  -<span style="color: #BB0000;">15.1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  -<span style="color: #BB0000;">4.45</span>  -<span style="color: #BB0000;">22.0</span></span></span></code></pre></div>
 <p>By default, <code>tof_reduce_dimensions</code> will add
 reduced-dimension feature embeddings to the input <code>tof_tbl</code>
 and return the augmented <code>tof_tbl</code> (that is, a
@@ -152,18 +159,18 @@ its result. To return only the features embeddings themselves, set
 <span>    <span class="fu"><a href="../reference/tof_preprocess.html">tof_preprocess</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/tof_reduce_dimensions.html">tof_reduce_dimensions</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"tsne"</span>, augment <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
-<span><span class="co">#&gt;    .tsne1  .tsne2</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  13.2  11.9   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  14.5   8.60  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  34.3   0.170 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  17.2  -<span style="color: #BB0000;">0.031</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  17.7   8.14  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  22.6  -<span style="color: #BB0000;">5.05</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  10.0  -<span style="color: #BB0000;">2.12</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  28.9  -<span style="color: #BB0000;">3.91</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  19.0  -<span style="color: #BB0000;">8.41</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   6.22  7.77  </span></span>
+<span><span class="co">#&gt;    .tsne1 .tsne2</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  -<span style="color: #BB0000;">4.24</span> -<span style="color: #BB0000;">15.6</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   1.09 -<span style="color: #BB0000;">16.3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  11.1  -<span style="color: #BB0000;">35.3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  11.4  -<span style="color: #BB0000;">18.1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  -<span style="color: #BB0000;">3.30</span> -<span style="color: #BB0000;">18.8</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   9.70 -<span style="color: #BB0000;">23.3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   2.69 -<span style="color: #BB0000;">17.5</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   9.05 -<span style="color: #BB0000;">28.6</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   9.14 -<span style="color: #BB0000;">20.0</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  -<span style="color: #BB0000;">1.65</span>  -<span style="color: #BB0000;">9.70</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span></code></pre></div>
 <p>Changing the <code>method</code> argument results in different
 low-dimensional embeddings:</p>
@@ -173,16 +180,16 @@ low-dimensional embeddings:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3,000 × 2</span></span></span>
 <span><span class="co">#&gt;    .umap1 .umap2</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  9.18   4.00 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  8.27   3.11 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  3.09   0.388</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  2.84  -<span style="color: #BB0000;">1.42</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  9.32   3.72 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  0.180 -<span style="color: #BB0000;">2.33</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  9.49   3.27 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  2.00  -<span style="color: #BB0000;">0.329</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  4.88  -<span style="color: #BB0000;">0.644</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  7.68   5.12 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> -<span style="color: #BB0000;">8.59</span>  -<span style="color: #BB0000;">5.45</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">7.92</span>  -<span style="color: #BB0000;">4.35</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">2.82</span>  -<span style="color: #BB0000;">0.442</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">3.05</span>   1.41 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">8.81</span>  -<span style="color: #BB0000;">5.37</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.586</span>  2.34 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">9.04</span>  -<span style="color: #BB0000;">5.14</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">2.27</span>   0.287</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">6.36</span>  -<span style="color: #BB0000;">0.283</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">7.26</span>  -<span style="color: #BB0000;">6.05</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2,990 more rows</span></span></span>
 <span></span>
 <span><span class="va">phenograph_data</span> <span class="op">|&gt;</span></span>
@@ -310,7 +317,7 @@ expression, whereas the others have lower CD11b expression.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] ggplot2_3.5.0  dplyr_1.1.4    tidytof_0.99.2</span></span>
+<span><span class="co">#&gt; [1] ggplot2_3.5.0  dplyr_1.1.4    tidytof_0.99.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] gridExtra_2.3       rlang_1.1.3         magrittr_2.0.3     </span></span>

@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -91,7 +98,7 @@ Keyes</h4>
             
             <h4 data-toc-skip class="date">2024-03-25</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/vignettes/preprocessing.Rmd" class="external-link"><code>vignettes/preprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>preprocessing.Rmd</code></div>
     </div>
 
@@ -218,12 +225,12 @@ details).</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
-<span><span class="co">#&gt;    cd45    cd34   cd38</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  2.42    0.896</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  230. -<span style="color: #BB0000;">1.19</span>   11.1  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  5.14    0.954</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.012</span><span style="color: #BB0000; text-decoration: underline;">8</span> 13.0  </span></span>
+<span><span class="co">#&gt;    cd45   cd34  cd38</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  3.23   1.08</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  230. -<span style="color: #BB0000;">0.992</span> 10.5 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  292.  4.25   1.07</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.573</span> 13.1 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -252,7 +259,7 @@ details).</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] dplyr_1.1.4    tidytof_0.99.2</span></span>
+<span><span class="co">#&gt; [1] dplyr_1.1.4    tidytof_0.99.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] tidyselect_1.2.1    viridisLite_0.4.2   timeDate_4032.109  </span></span>

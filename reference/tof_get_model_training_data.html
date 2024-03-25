@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -60,7 +66,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Get a `tof_model`'s training data</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/R/modeling_helpers.R" class="external-link"><code>R/modeling_helpers.R</code></a></small>
       <div class="d-none name"><code>tof_get_model_training_data.Rd</code></div>
     </div>
 
@@ -122,16 +128,16 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 × 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    sample   cd45 pstat5   cd34 outcome class  multiclass event time_to_event</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 32     0.921  0.052<span style="text-decoration: underline;">2</span> 0.888    2.68  class2 class2         1         12.1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 90     0.624  0.963  0.650    3.90  class1 class3         1         15.0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 54     0.614  0.844  0.415    4.00  class1 class2         1         10.4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 7      0.701  0.128  0.361    2.66  class2 class1         0          8.71</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 87     0.278  0.918  0.646    3.83  class1 class3         1          6.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 12     0.019<span style="text-decoration: underline;">1</span> 0.654  0.455    2.75  class2 class1         0          9.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 14     0.887  0.080<span style="text-decoration: underline;">6</span> 0.896    2.81  class2 class1         0          9.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 84     0.853  0.662  0.902    6.67  class1 class3         1         12.2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 83     0.247  0.418  0.052<span style="text-decoration: underline;">6</span>   4.63  class1 class3         1          9.22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 8      0.171  0.077<span style="text-decoration: underline;">6</span> 0.565    0.229 class2 class1         0         10.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 95     0.815   0.644 0.537     3.60 class1 class3         1          9.73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 29     0.129   0.753 0.737     3.92 class1 class1         0         11.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 89     0.911   0.490 0.018<span style="text-decoration: underline;">1</span>    5.67 class1 class3         1          8.04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 46     0.816   0.276 0.219     3.69 class1 class2         1         15.1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 49     0.804   0.529 0.015<span style="text-decoration: underline;">2</span>    4.91 class1 class2         1          6.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 35     0.170   0.405 0.431     3.08 class2 class2         1         12.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 13     0.250   0.494 0.758     3.88 class1 class1         0         10.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 36     0.044<span style="text-decoration: underline;">5</span>  0.751 0.794     2.09 class2 class2         1          8.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 30     0.687   0.749 0.620     3.16 class2 class1         0         12.7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 2      0.940   0.251 0.426     4.04 class1 class1         0         12.1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 90 more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

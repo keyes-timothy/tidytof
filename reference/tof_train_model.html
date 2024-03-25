@@ -16,7 +16,7 @@ or bootstrapping, and multiple preprocessing options are available."><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,13 @@ or bootstrapping, and multiple preprocessing options are available."><!-- mathja
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -66,7 +72,7 @@ or bootstrapping, and multiple preprocessing options are available."><!-- mathja
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Train an elastic net model to predict sample-level phenomena using high-dimensional cytometry data.</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/R/patient-level_modeling.R" class="external-link"><code>R/patient-level_modeling.R</code></a></small>
       <div class="d-none name"><code>tof_train_model.Rd</code></div>
     </div>
 
@@ -299,14 +305,14 @@ log-rank test when separating the training data into low- and high-risk groups.<
 <span class="r-in"><span>    response_col <span class="op">=</span> <span class="va">outcome</span>,</span></span>
 <span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"linear"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A linear `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 3.162e-03 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A linear `tof_model` with a mixture parameter (alpha) of 0 and a penalty parameter (lambda) of 3.162e-03 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   feature     coefficient</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> (Intercept)       3.56 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> pstat5            1.16 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd45              0.836</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> cd34             -<span style="color: #BB0000;">0.122</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> (Intercept)      3.42  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> pstat5           1.16  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd45             0.714 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> cd34             0.083<span style="text-decoration: underline;">8</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># train a logistic regression classifier</span></span></span>
 <span class="r-in"><span><span class="fu">tof_train_model</span><span class="op">(</span></span></span>
@@ -319,10 +325,10 @@ log-rank test when separating the training data into low- and high-risk groups.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   feature     coefficient</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> pstat5        -<span style="color: #BB0000;">0.234</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> cd45          -<span style="color: #BB0000;">0.184</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd34           0.031<span style="text-decoration: underline;">4</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> (Intercept)    0.000<span style="text-decoration: underline;">142</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> pstat5        -<span style="color: #BB0000;">0.295</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> cd45          -<span style="color: #BB0000;">0.110</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd34          -<span style="color: #BB0000;">0.037</span><span style="color: #BB0000; text-decoration: underline;">3</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> (Intercept)   -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">444</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># train a cox regression survival model</span></span></span>
 <span class="r-in"><span><span class="fu">tof_train_model</span><span class="op">(</span></span></span>
@@ -332,9 +338,13 @@ log-rank test when separating the training data into low- and high-risk groups.<
 <span class="r-in"><span>    event_col <span class="op">=</span> <span class="va">event</span>,</span></span>
 <span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"survival"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A survival `tof_model` with a mixture parameter (alpha) of 1 and a penalty parameter (lambda) of 1e+00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 variables: feature &lt;chr&gt;, coefficient &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A survival `tof_model` with a mixture parameter (alpha) of 0 and a penalty parameter (lambda) of 1e+00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   feature coefficient</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> cd45         0.073<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> pstat5       0.055<span style="text-decoration: underline;">3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cd34        -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">8</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

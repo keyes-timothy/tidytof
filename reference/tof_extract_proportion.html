@@ -14,7 +14,7 @@ into subgroups using `group_cols`."><!-- mathjax --><script src="https://cdnjs.c
     
     <a class="navbar-brand me-2" href="../index.html">tidytof</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,13 @@ into subgroups using `group_cols`."><!-- mathjax --><script src="https://cdnjs.c
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/keyes-timothy/tidytof/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -64,7 +70,7 @@ into subgroups using `group_cols`."><!-- mathjax --><script src="https://cdnjs.c
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Extract the proportion of cells in each cluster in a `tof_tibble`.</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/keyes-timothy/tidytof/blob/HEAD/R/feature_extraction.R" class="external-link"><code>R/feature_extraction.R</code></a></small>
       <div class="d-none name"><code>tof_extract_proportion.Rd</code></div>
     </div>
 
@@ -160,8 +166,8 @@ cluster proportions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 27</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   patient `prop@a` `prop@b` `prop@c` `prop@d` `prop@e` `prop@f` `prop@g`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby     0.044<span style="text-decoration: underline;">7</span>   0.046<span style="text-decoration: underline;">7</span>   0.031<span style="text-decoration: underline;">1</span>   0.042<span style="text-decoration: underline;">8</span>   0.037<span style="text-decoration: underline;">0</span>   0.048<span style="text-decoration: underline;">6</span>   0.044<span style="text-decoration: underline;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario     0.053<span style="text-decoration: underline;">5</span>   0.041<span style="text-decoration: underline;">2</span>   0.043<span style="text-decoration: underline;">2</span>   0.037<span style="text-decoration: underline;">0</span>   0.035<span style="text-decoration: underline;">0</span>   0.032<span style="text-decoration: underline;">9</span>   0.043<span style="text-decoration: underline;">2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> kirby     0.030<span style="text-decoration: underline;">5</span>   0.038<span style="text-decoration: underline;">2</span>   0.042<span style="text-decoration: underline;">0</span>   0.028<span style="text-decoration: underline;">6</span>   0.036<span style="text-decoration: underline;">3</span>   0.028<span style="text-decoration: underline;">6</span>   0.043<span style="text-decoration: underline;">9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> mario     0.029<span style="text-decoration: underline;">4</span>   0.037<span style="text-decoration: underline;">8</span>   0.042<span style="text-decoration: underline;">0</span>   0.029<span style="text-decoration: underline;">4</span>   0.063<span style="text-decoration: underline;">0</span>   0.029<span style="text-decoration: underline;">4</span>   0.044<span style="text-decoration: underline;">1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 19 more variables: `prop@h` &lt;dbl&gt;, `prop@i` &lt;dbl&gt;, `prop@j` &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `prop@k` &lt;dbl&gt;, `prop@l` &lt;dbl&gt;, `prop@m` &lt;dbl&gt;, `prop@n` &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `prop@o` &lt;dbl&gt;, `prop@p` &lt;dbl&gt;, `prop@q` &lt;dbl&gt;, `prop@r` &lt;dbl&gt;,</span></span>
@@ -178,16 +184,16 @@ cluster proportions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 52 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    patient cluster_id   prop</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          0.044<span style="text-decoration: underline;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   b          0.046<span style="text-decoration: underline;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   c          0.031<span style="text-decoration: underline;">1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   d          0.042<span style="text-decoration: underline;">8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   e          0.037<span style="text-decoration: underline;">0</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   f          0.048<span style="text-decoration: underline;">6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   g          0.044<span style="text-decoration: underline;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   h          0.048<span style="text-decoration: underline;">6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   i          0.021<span style="text-decoration: underline;">4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   j          0.031<span style="text-decoration: underline;">1</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> kirby   a          0.030<span style="text-decoration: underline;">5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> kirby   b          0.038<span style="text-decoration: underline;">2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> kirby   c          0.042<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> kirby   d          0.028<span style="text-decoration: underline;">6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> kirby   e          0.036<span style="text-decoration: underline;">3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> kirby   f          0.028<span style="text-decoration: underline;">6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> kirby   g          0.043<span style="text-decoration: underline;">9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> kirby   h          0.036<span style="text-decoration: underline;">3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> kirby   i          0.042<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> kirby   j          0.036<span style="text-decoration: underline;">3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 42 more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
