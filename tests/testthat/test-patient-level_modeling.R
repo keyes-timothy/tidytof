@@ -12,7 +12,7 @@ feature_tibble <-
         cd34 = runif(n = 100),
         outcome = (3 * cd45) + (4 * pstat5) + rnorm(100),
         class =
-            if_else(outcome > median(outcome), "class1", "class2") %>%
+            if_else(outcome > median(outcome), "class1", "class2") |>
                 as.factor(),
         multiclass = as.factor(c(rep("class1", 30), rep("class2", 30), rep("class3", 40))),
         event = c(rep(0, times = 50), rep(1, times = 50)),
@@ -23,24 +23,24 @@ feature_tibble <-
 # tof_split_data ---------------------------------------------------------------
 
 cv_split <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_split_data(
         split_method = "k-fold",
         strata = multiclass
     )
 
 cv_split_2 <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_split_data(split_method = "k-fold", num_cv_repeats = 2L)
 
 boot_split <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_split_data(
         split_method = "bootstrap"
     )
 
 simple_split <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_split_data(
         split_method = "simple"
     )
@@ -54,12 +54,12 @@ split_stratum <-
     )
 
 simple_split_2 <-
-    feature_tibble %>%
-    mutate(split_stratum = split_stratum) %>%
+    feature_tibble |>
+    mutate(split_stratum = split_stratum) |>
     tof_split_data(split_col = split_stratum)
 
 simple_split_3 <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_split_data(split_method = split_stratum)
 
 test_that("S3 classes for resampled objects are correct", {
@@ -126,7 +126,7 @@ test_that("Regular grid columns are correct", {
 
 # linear regression
 cv_linear_regression <-
-    cv_split %>%
+    cv_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
@@ -135,7 +135,7 @@ cv_linear_regression <-
     )
 
 bootstrap_linear_regression <-
-    boot_split %>%
+    boot_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
@@ -144,7 +144,7 @@ bootstrap_linear_regression <-
     )
 
 simple_linear_regression <-
-    simple_split %>%
+    simple_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
@@ -153,7 +153,7 @@ simple_linear_regression <-
     )
 
 unsplit_linear_regression <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = outcome,
@@ -268,7 +268,7 @@ test_that("linear tof_model's tuning_metrics has the right shape", {
 
 # logistic regression
 cv_logistic_regression <-
-    cv_split %>%
+    cv_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = class,
@@ -276,7 +276,7 @@ cv_logistic_regression <-
         hyperparameter_grid = reg_grid_3
     )
 bootstrap_logistic_regression <-
-    boot_split %>%
+    boot_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = class,
@@ -284,7 +284,7 @@ bootstrap_logistic_regression <-
         hyperparameter_grid = reg_grid_3
     )
 simple_logistic_regression <-
-    simple_split %>%
+    simple_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = class,
@@ -292,7 +292,7 @@ simple_logistic_regression <-
         hyperparameter_grid = reg_grid_3
     )
 unsplit_logistic_regression <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = class,
@@ -410,7 +410,7 @@ test_that("logistic tof_model's tuning_metrics has the right shape", {
 
 # multinomial regression
 cv_multinomial_regression <-
-    cv_split %>%
+    cv_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = multiclass,
@@ -419,7 +419,7 @@ cv_multinomial_regression <-
     )
 
 bootstrap_multinomial_regression <-
-    boot_split %>%
+    boot_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = multiclass,
@@ -427,7 +427,7 @@ bootstrap_multinomial_regression <-
         hyperparameter_grid = reg_grid_3
     )
 simple_multinomial_regression <-
-    simple_split %>%
+    simple_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = multiclass,
@@ -435,7 +435,7 @@ simple_multinomial_regression <-
         hyperparameter_grid = reg_grid_3
     )
 unsplit_multinomial_regression <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         response_col = multiclass,
@@ -554,7 +554,7 @@ test_that("multinomial tof_model's tuning_metrics has the right shape", {
 
 # survival regression
 cv_survival_regression <-
-    cv_split %>%
+    cv_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         time_col = time_to_event,
@@ -564,7 +564,7 @@ cv_survival_regression <-
     )
 
 bootstrap_survival_regression <-
-    boot_split %>%
+    boot_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         time_col = time_to_event,
@@ -574,7 +574,7 @@ bootstrap_survival_regression <-
     )
 
 simple_survival_regression <-
-    simple_split %>%
+    simple_split |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         time_col = time_to_event,
@@ -584,7 +584,7 @@ simple_survival_regression <-
     )
 
 unsplit_survival_regression <-
-    feature_tibble %>%
+    feature_tibble |>
     tof_train_model(
         predictor_cols = c(cd45, pstat5, cd34),
         time_col = time_to_event,
@@ -708,21 +708,21 @@ test_that("survival tof_model's tuning_metrics has the right shape", {
 
 # linear regression
 linear_predictions_0 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_predict(
         new_data = dplyr::arrange(bootstrap_linear_regression$training_data, sample)
     )
 
 linear_predictions_1 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_predict(new_data = dplyr::arrange(feature_tibble, sample))
 
 linear_predictions_2 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_predict(new_data = feature_tibble[1:10, ])
 
 linear_predictions_3 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_predict(new_data = feature_tibble[1:10, ], prediction_type = "link")
 
 test_that("linear regression predictions have the correct shape", {
@@ -753,21 +753,21 @@ test_that("linear regression types are correct", {
 
 # logistic regression
 logistic_predictions_0 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_predict(
         new_data = dplyr::arrange(bootstrap_logistic_regression$training_data, sample)
     )
 
 logistic_predictions_1 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_predict(new_data = dplyr::arrange(feature_tibble, sample))
 
 logistic_predictions_2 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_predict(new_data = feature_tibble[1:10, ])
 
 logistic_predictions_3 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_predict(new_data = feature_tibble[1:10, ], prediction_type = "class")
 
 test_that("logistic regression predictions have the correct shape", {
@@ -797,23 +797,23 @@ test_that("logistic regression types are correct", {
 
 # multinomial regression
 multinomial_predictions_0 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_predict(dplyr::arrange(bootstrap_multinomial_regression$training_data, sample))
 
 multinomial_predictions_1 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_predict(arrange(feature_tibble, sample))
 
 multinomial_predictions_2 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_predict(new_data = feature_tibble[1:10, ])
 
 multinomial_predictions_3 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_predict(new_data = feature_tibble[1:10, ], prediction_type = "class")
 
 multinomial_predictions_4 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_predict()
 
 test_that("multinomial regression predictions have the correct shape", {
@@ -855,30 +855,30 @@ test_that("multinomial regression types are correct", {
 
 # survival regression
 survival_predictions_0 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict(dplyr::arrange(bootstrap_survival_regression$training_data, sample))
 
 survival_predictions_1 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict(arrange(feature_tibble, sample))
 
 survival_predictions_2 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict(new_data = feature_tibble[1:10, ])
 
 survival_predictions_3 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict(new_data = feature_tibble[1:10, ], prediction_type = "link")
 
 survival_predictions_4 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict(
         new_data = feature_tibble[1:10, ],
         prediction_type = "survival curve"
     )
 
 survival_predictions_5 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_predict()
 
 test_that("survival regression predictions have the correct shape", {
@@ -916,24 +916,24 @@ test_that("survival regression types are correct", {
 
 # linear regression
 linear_a_0 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_assess_model()
 
 linear_a_1 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_assess_model(new_data = feature_tibble)
 
 linear_a_2 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_assess_model(new_data = feature_tibble[1:10, ])
 
 # add a random variable that wasn't in the original dataset
 linear_a_3 <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_assess_model(new_data = mutate(feature_tibble, new_var = "a"))
 
 linear_a_tuning <-
-    bootstrap_linear_regression %>%
+    bootstrap_linear_regression |>
     tof_assess_model(new_data = "tuning")
 
 linear_assessments <-
@@ -942,7 +942,7 @@ linear_assessments <-
 test_that("linear assessment results give a single model_metrics table", {
     # list component is model_metrics and nothing else
     has_model_metrics <-
-        purrr::map(linear_assessments, ~ setdiff(names(.x), "model_metrics")) %>%
+        purrr::map(linear_assessments, ~ setdiff(names(.x), "model_metrics")) |>
         purrr::map_lgl(.f = ~ identical(.x, character()))
     expect_true(all(has_model_metrics))
 
@@ -953,16 +953,16 @@ test_that("linear assessment results give a single model_metrics table", {
 
     # contents of the model_metrics table are correct
     metric_cols_correct <-
-        linear_assessments %>%
-        map(~ purrr::pluck(.x, "model_metrics")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("metric", "value"))) %>%
+        linear_assessments |>
+        map(~ purrr::pluck(.x, "model_metrics")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("metric", "value"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(metric_cols_correct))
 
     metric_row_num <-
-        linear_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "model_metrics")) %>%
+        linear_assessments |>
+        purrr::map(~ purrr::pluck(.x, "model_metrics")) |>
         purrr::map_int(nrow)
 
     expect_true(all(metric_row_num == 2L))
@@ -970,16 +970,16 @@ test_that("linear assessment results give a single model_metrics table", {
 
 # logistic regression
 logistic_a_1 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_assess_model(new_data = feature_tibble)
 
 # add a random variable that wasn't in the original dataset
 logistic_a_2 <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_assess_model(new_data = mutate(feature_tibble, new_var = "a"))
 
 logistic_a_tuning <-
-    bootstrap_logistic_regression %>%
+    bootstrap_logistic_regression |>
     tof_assess_model(new_data = "tuning")
 
 logistic_assessments <-
@@ -991,7 +991,7 @@ test_that("logistic assessment results give a model_metrics table, an roc_curve,
         purrr::map(
             logistic_assessments,
             ~ setdiff(names(.x), c("model_metrics", "roc_curve", "confusion_matrix"))
-        ) %>%
+        ) |>
         purrr::map_lgl(.f = ~ identical(.x, character()))
     expect_true(all(has_right_components))
 
@@ -1005,35 +1005,35 @@ test_that("logistic assessment results give a model_metrics table, an roc_curve,
 
     # contents of the model_metrics table are correct
     metric_cols_correct <-
-        logistic_assessments %>%
-        map(~ purrr::pluck(.x, "model_metrics")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("metric", "value"))) %>%
+        logistic_assessments |>
+        map(~ purrr::pluck(.x, "model_metrics")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("metric", "value"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(metric_cols_correct))
 
     metric_row_num <-
-        logistic_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "model_metrics")) %>%
+        logistic_assessments |>
+        purrr::map(~ purrr::pluck(.x, "model_metrics")) |>
         purrr::map_int(nrow)
 
     expect_true(all(metric_row_num == 6L))
 
     # contents of the roc_curve table are correct
     roc_cols_correct <-
-        logistic_assessments %>%
-        map(~ purrr::pluck(.x, "roc_curve")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c(".threshold", "specificity", "sensitivity", "tpr", "fpr"))) %>%
+        logistic_assessments |>
+        map(~ purrr::pluck(.x, "roc_curve")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c(".threshold", "specificity", "sensitivity", "tpr", "fpr"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(roc_cols_correct))
 
     # contents of the confusion_matrix table are correct
     confusion_cols_correct <-
-        logistic_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "confusion_matrix")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("true_outcome", "predicted_outcome", "num_observations"))) %>%
+        logistic_assessments |>
+        purrr::map(~ purrr::pluck(.x, "confusion_matrix")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("true_outcome", "predicted_outcome", "num_observations"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(confusion_cols_correct))
 })
@@ -1041,24 +1041,24 @@ test_that("logistic assessment results give a model_metrics table, an roc_curve,
 test_that("Warning if only 1 class is present in new_data", {
     # expect a warning
     expect_warning(
-        bootstrap_logistic_regression %>%
+        bootstrap_logistic_regression |>
             tof_assess_model(new_data = filter(feature_tibble, class == "class1"))
     )
 })
 
 # multinomial regression
 multinomial_a_1 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_assess_model(new_data = feature_tibble)
 
 
 # add a random variable that wasn't in the original dataset
 multinomial_a_2 <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_assess_model(new_data = mutate(feature_tibble, new_var = "a"))
 
 multinomial_a_tuning <-
-    bootstrap_multinomial_regression %>%
+    bootstrap_multinomial_regression |>
     tof_assess_model(new_data = "tuning")
 
 multinomial_assessments <-
@@ -1071,7 +1071,7 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
         purrr::map(
             multinomial_assessments,
             ~ setdiff(names(.x), c("model_metrics", "roc_curve", "confusion_matrix"))
-        ) %>%
+        ) |>
         purrr::map_lgl(.f = ~ identical(.x, character()))
     expect_true(all(has_right_components))
 
@@ -1085,35 +1085,35 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
 
     # contents of the model_metrics table are correct
     metric_cols_correct <-
-        multinomial_assessments %>%
-        map(~ purrr::pluck(.x, "model_metrics")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("metric", "value"))) %>%
+        multinomial_assessments |>
+        map(~ purrr::pluck(.x, "model_metrics")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("metric", "value"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(metric_cols_correct))
 
     metric_row_num <-
-        multinomial_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "model_metrics")) %>%
+        multinomial_assessments |>
+        purrr::map(~ purrr::pluck(.x, "model_metrics")) |>
         purrr::map_int(nrow)
 
     expect_true(all(metric_row_num == 6L))
 
     # contents of the roc_curve table are correct
     roc_cols_correct <-
-        multinomial_assessments %>%
-        map(~ purrr::pluck(.x, "roc_curve")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c(".level", ".threshold", "specificity", "sensitivity", "tpr", "fpr"))) %>%
+        multinomial_assessments |>
+        map(~ purrr::pluck(.x, "roc_curve")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c(".level", ".threshold", "specificity", "sensitivity", "tpr", "fpr"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(roc_cols_correct))
 
     # contents of the confusion_matrix table are correct
     confusion_cols_correct <-
-        multinomial_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "confusion_matrix")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("true_outcome", "predicted_outcome", "num_observations"))) %>%
+        multinomial_assessments |>
+        purrr::map(~ purrr::pluck(.x, "confusion_matrix")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("true_outcome", "predicted_outcome", "num_observations"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(confusion_cols_correct))
 })
@@ -1121,7 +1121,7 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
 # test_that("Warning if only 1 class is present in new_data", {
 #   expect_warning(
 #     expect_warning(
-#       bootstrap_multinomial_regression %>%
+#       bootstrap_multinomial_regression |>
 #         tof_assess_model(new_data = feature_tibble[1:10,])
 #     )
 #   )
@@ -1129,20 +1129,20 @@ test_that("multinomial assessment results give a model_metrics table, an roc_cur
 
 # survival regression
 survival_a_1 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_assess_model(new_data = feature_tibble)
 
 survival_a_2 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_assess_model(new_data = feature_tibble[1:60, ])
 
 # add a random variable that wasn't in the original dataset
 survival_a_3 <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_assess_model(new_data = mutate(feature_tibble, new_var = "a"))
 
 survival_a_tuning <-
-    bootstrap_survival_regression %>%
+    bootstrap_survival_regression |>
     tof_assess_model(new_data = "tuning")
 
 survival_assessments <-
@@ -1154,7 +1154,7 @@ test_that("survival assessment results give a model_metrics table and survival c
         purrr::map(
             survival_assessments,
             ~ setdiff(names(.x), c("model_metrics", "survival_curves"))
-        ) %>%
+        ) |>
         purrr::map_lgl(.f = ~ identical(.x, character()))
     expect_true(all(has_right_components))
 
@@ -1168,59 +1168,59 @@ test_that("survival assessment results give a model_metrics table and survival c
 
     # contents of the model_metrics table are correct
     metric_cols_correct <-
-        survival_assessments %>%
-        map(~ purrr::pluck(.x, "model_metrics")) %>%
-        purrr::map(colnames) %>%
-        purrr::map(~ setdiff(.x, c("metric", "value"))) %>%
+        survival_assessments |>
+        map(~ purrr::pluck(.x, "model_metrics")) |>
+        purrr::map(colnames) |>
+        purrr::map(~ setdiff(.x, c("metric", "value"))) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(metric_cols_correct))
 
     metric_row_num <-
-        survival_assessments %>%
-        purrr::map(~ purrr::pluck(.x, "model_metrics")) %>%
+        survival_assessments |>
+        purrr::map(~ purrr::pluck(.x, "model_metrics")) |>
         purrr::map_int(nrow)
 
     expect_true(all(metric_row_num == 3L))
 
     # contents of the survival_curves table are correct
     survival_cols_correct <-
-        survival_assessments[-length(survival_assessments)] %>%
-        map(~ purrr::pluck(.x, "survival_curves")) %>%
-        purrr::map(colnames) %>%
+        survival_assessments[-length(survival_assessments)] |>
+        map(~ purrr::pluck(.x, "survival_curves")) |>
+        purrr::map(colnames) |>
         purrr::map(
             ~ setdiff(
                 .x,
                 c("row_index", "survival_curve", "risk_group", "relative_risk", "time_to_event", "event")
             )
-        ) %>%
+        ) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(survival_cols_correct))
 
     tuning_survival_cols_correct <-
-        survival_assessments[length(survival_assessments)] %>%
-        map(~ purrr::pluck(.x, "survival_curves")) %>%
-        purrr::map(colnames) %>%
+        survival_assessments[length(survival_assessments)] |>
+        map(~ purrr::pluck(.x, "survival_curves")) |>
+        purrr::map(colnames) |>
         purrr::map(
             ~ setdiff(
                 .x,
                 c("survival_curve", "risk_group", "relative_risk", "time_to_event", "event")
             )
-        ) %>%
+        ) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(tuning_survival_cols_correct))
 
     # contents of the survival_curves for each sample are correct
     survival_curves_correct <-
-        survival_assessments %>%
-        map(~ purrr::pluck(.x, "survival_curves")) %>%
-        purrr::map(~ tidyr::unnest(.x, cols = "survival_curve")) %>%
-        purrr::map(colnames) %>%
+        survival_assessments |>
+        map(~ purrr::pluck(.x, "survival_curves")) |>
+        purrr::map(~ tidyr::unnest(.x, cols = "survival_curve")) |>
+        purrr::map(colnames) |>
         purrr::map(
             ~ setdiff(
                 .x,
                 c("row_index", "probability", "time", "risk_group", "relative_risk", "time_to_event", "event")
             )
-        ) %>%
+        ) |>
         purrr::map_lgl(~ identical(.x, character()))
     expect_true(all(survival_curves_correct))
 })

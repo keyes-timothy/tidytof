@@ -9,40 +9,40 @@ library(testthat)
 
 # setup
 fcs_path_1 <-
-    tidytof_example_data("phenograph") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("phenograph") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_2 <-
-    tidytof_example_data("ddpr") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("ddpr") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_3 <-
-    tidytof_example_data("aml") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("aml") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_4 <-
-    tidytof_example_data("surgery") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("surgery") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_5 <-
-    tidytof_example_data("surgery") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("surgery") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_6 <-
-    tidytof_example_data("surgery") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("surgery") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 fcs_path_list <- unlist(mget(x = paste0("fcs_path_", 1:6)))
 
 csv_path <-
-    tidytof_example_data("phenograph_csv") %>%
-    dir(full.names = TRUE) %>%
+    tidytof_example_data("phenograph_csv") |>
+    dir(full.names = TRUE) |>
     pluck(1)
 
 # tof_read_fcs -----------------------------------------------------------------
@@ -129,11 +129,11 @@ test_that("tof_read_fcs() tof_tbl's have correctly-named columns", {
 
 # setup
 csv_tibble <-
-    csv_path %>%
+    csv_path |>
     tidytof:::tof_read_csv()
 
 csv_tibble_2 <-
-    csv_path %>%
+    csv_path |>
     tidytof:::tof_read_csv(
         panel_info =
             tibble(
@@ -150,11 +150,11 @@ test_that("tof_read_csv() reads a .csv file into a tof_tbl", {
 
 test_that("tof_read_csv() tof_tbl's have a (correct) panel attribute", {
     csv_panel <-
-        csv_tibble %>%
+        csv_tibble |>
         tof_get_panel()
 
     csv_panel_2 <-
-        csv_tibble_2 %>%
+        csv_tibble_2 |>
         tof_get_panel()
 
     # all panels are a tibble
@@ -175,19 +175,19 @@ test_that("tof_read_csv() tof_tbl's have a (correct) panel attribute", {
 # setup
 
 fcs_fcs <-
-    fcs_path_1 %>%
+    fcs_path_1 |>
     tidytof:::tof_read_fcs()
 
 file_fcs <-
-    fcs_path_1 %>%
+    fcs_path_1 |>
     tidytof:::tof_read_file()
 
 csv_csv <-
-    csv_path %>%
+    csv_path |>
     tidytof:::tof_read_csv()
 
 file_csv <-
-    csv_path %>%
+    csv_path |>
     tidytof:::tof_read_file()
 
 test_that("tof_read_fcs and tof_read_file produce identical results for .fcs files", {
@@ -248,10 +248,10 @@ test_that("tof_read_data can read in multiple .csv files", {
 
 test_that("tof_read_data can read in multiple .csv and .fcs files simultaneously", {
     my_panel <-
-        tidytof_example_data("phenograph") %>%
-        dir(full.names = TRUE) %>%
-        pluck(1) %>%
-        tidytof:::tof_read_fcs() %>%
+        tidytof_example_data("phenograph") |>
+        dir(full.names = TRUE) |>
+        pluck(1) |>
+        tidytof:::tof_read_fcs() |>
         tof_get_panel()
 
     tof_tibble <- tof_read_data(tidytof_example_data("mix2"), panel = my_panel)

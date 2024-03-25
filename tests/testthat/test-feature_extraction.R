@@ -13,11 +13,11 @@ dat <-
     ddpr_data |>
     group_by(sample_name) |>
     slice_sample(n = 20) |>
-    ungroup() %>%
+    ungroup() |>
     mutate(
         condition = str_remove(sample_name, "_Basal"),
-        replicate = rep(x = c("1", "2"), times = (nrow(.) / 2)),
-        cluster = rep(x = c("a", "a", "b", "b"), times = (nrow(.) / 4))
+        replicate = rep(x = c("1", "2"), times = (n() / 2)),
+        cluster = rep(x = c("a", "a", "b", "b"), times = (n() / 4))
     )
 
 # testing
@@ -73,8 +73,8 @@ test_that("All proportions are 0.5", {
                 .f = ~
                     .x |>
                         select(where(is.numeric)) |>
-                        as.matrix() %>%
-                        `==`(0.5) |>
+                        as.matrix() |>
+                        (\(.x) .x == 0.5)() |>
                         all()
             )
         )
