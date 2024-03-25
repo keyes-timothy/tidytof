@@ -1,3 +1,13 @@
+# tidytof 0.99.3
+
+NEW FEATURES
+
+* Update docs. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
 # tidytof 0.99.2
 
 NEW FEATURES
