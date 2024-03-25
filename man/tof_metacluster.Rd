@@ -51,7 +51,7 @@ ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the metacluster ids.
 }
 \description{
-This function is a wrapper around {tidytof}'s tof_metacluster_* function family.
+This function is a wrapper around tidytof's tof_metacluster_* function family.
 It performs metaclustering on CyTOF data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters.
 }

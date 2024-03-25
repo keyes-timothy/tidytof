@@ -45,7 +45,7 @@ ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the local density estimates.
 }
 \description{
-This function is a wrapper around {tidytof}'s tof_*_density() function family.
+This function is a wrapper around tidytof's tof_*_density() function family.
 It performs local density estimation on high-dimensional cytometry data using a user-specified
 method (of 3 choices) and each method's corresponding input parameters.
 }

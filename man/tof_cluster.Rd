@@ -41,7 +41,7 @@ ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.
 }
 \description{
-This function is a wrapper around {tidytof}'s tof_cluster_* function family.
+This function is a wrapper around tidytof's tof_cluster_* function family.
 It performs clustering on high-dimensional cytometry data using a user-specified method (of 5 choices)
 and each method's corresponding input parameters.
 }

@@ -651,7 +651,7 @@ pull_unless_null <- function(tib, uq_colname) {
 
 #' Estimate the local densities for all cells in a high-dimensional cytometry dataset.
 #'
-#' This function is a wrapper around {tidytof}'s tof_*_density() function family.
+#' This function is a wrapper around tidytof's tof_*_density() function family.
 #' It performs local density estimation on high-dimensional cytometry data using a user-specified
 #' method (of 3 choices) and each method's corresponding input parameters.
 #'

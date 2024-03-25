@@ -1,0 +1,46 @@
+pkgVer <- function(pkg) {
+    if (!exists("meta") || is.null(meta)) meta <- packageDescription(pkg)
+    ver <- meta$Version
+    paste0('https://github.com/keyes-timothy/tidytof/', pkg, ' - R package version ', ver)
+}
+
+c(
+
+    bibentry(bibtype="manual",
+        title = "tidytof: a user-friendly framework for scalable and reproducible high-dimensional cytometry data analysis",
+        author = c(person(given = "Timothy",
+             family = "Keyes",
+             role = c("cre"),
+             email = "tkeyes@stanford.edu",
+             comment = c(ORCID = "0000-0003-0423-9679")),
+      person(given = "Kara",
+             family = "Davis",
+             role = c("rth", "own"),
+             email = "kldavis@stanford.edu"),
+      person(given = "Garry",
+             family = "Nolan",
+             role = c("rth", "own"),
+             email = "gnolan@stanford.edu")),
+        year = format(Sys.Date(), "%Y"),
+        url = "http://www.bioconductor.org/packages/tidytof",
+        note = pkgVer('tidytof'),
+        doi = '10.18129/B9.bioc.tidytof'
+    ),
+    bibentry(bibtype = "article",
+         title = "tidytof: a user-friendly framework for scalable and reproducible high-dimensional cytometry data analysis",
+         author = personList(
+             as.person("Keyes, Timothy J."),
+             as.person("Koladiya, Abhishek"),
+             as.person("Lo, Yu-Chen"),
+             as.person("Nolan, Garry P."),
+             as.person("Davis, Kara L.")
+         ),
+         year = "2023",
+         journal = "Bioinformatics Advances",
+         volume = "3",
+         number = "1",
+         doi = "10.1093/bioadv/vbad071",
+         url = "https://academic.oup.com/bioinformaticsadvances/article/3/1/vbad071/7192984"
+)
+
+)

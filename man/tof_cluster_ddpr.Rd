@@ -66,7 +66,7 @@ subpopulations' cluster centroids. The final column represents the cluster id of
 the healthy subpopulation with the minimum distance to the cell represented
 by that row.
 
-If `return_distances = FALSE`, a tibble with one column named `.{distance_function}_cluster`.
+If `return_distances = FALSE`, a tibble with one column named `.\{distance_function\}_cluster`.
 This column will contain an integer vector of length `nrow(tof_tibble)` indicating the id of
 the developmental cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 }

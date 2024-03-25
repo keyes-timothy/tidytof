@@ -330,7 +330,7 @@ tof_cluster_kmeans <-
 #' the healthy subpopulation with the minimum distance to the cell represented
 #' by that row.
 #'
-#' If `return_distances = FALSE`, a tibble with one column named `.{distance_function}_cluster`.
+#' If `return_distances = FALSE`, a tibble with one column named `.\{distance_function\}_cluster`.
 #' This column will contain an integer vector of length `nrow(tof_tibble)` indicating the id of
 #' the developmental cluster to which each cell (i.e. each row) in `tof_tibble` was assigned.
 #'
@@ -436,7 +436,7 @@ tof_cluster_ddpr <-
 
 #' Cluster high-dimensional cytometry data.
 #'
-#' This function is a wrapper around {tidytof}'s tof_cluster_* function family.
+#' This function is a wrapper around tidytof's tof_cluster_* function family.
 #' It performs clustering on high-dimensional cytometry data using a user-specified method (of 5 choices)
 #' and each method's corresponding input parameters.
 #'
@@ -527,7 +527,7 @@ tof_cluster <-
 
 #' Cluster (ungrouped) high-dimensional cytometry data.
 #'
-#' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
+#' This function is a wrapper around tidytof's tof_cluster_* function family and
 #' provides a low-level API for clustering ungrouped data frames. It is a subroutine
 #' of tof_cluster and shouldn't be called directly by users.
 #'
@@ -591,7 +591,7 @@ tof_cluster_tibble <-
 
 #' Cluster (grouped) high-dimensional cytometry data.
 #'
-#' This function is a wrapper around {tidytof}'s tof_cluster_* function family and
+#' This function is a wrapper around tidytof's tof_cluster_* function family and
 #' provides a low-level API for clustering grouped data frames. It is a subroutine
 #' of tof_cluster and shouldn't be called directly by users.
 #'

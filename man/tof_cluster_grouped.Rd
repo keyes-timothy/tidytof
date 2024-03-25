@@ -30,7 +30,7 @@ ncol(tof_tibble) + 1 columns: each of the (unaltered) columns in `tof_tibble`
 plus an additional column encoding the cluster ids.
 }
 \description{
-This function is a wrapper around {tidytof}'s tof_cluster_* function family and
+This function is a wrapper around tidytof's tof_cluster_* function family and
 provides a low-level API for clustering grouped data frames. It is a subroutine
 of tof_cluster and shouldn't be called directly by users.
 }

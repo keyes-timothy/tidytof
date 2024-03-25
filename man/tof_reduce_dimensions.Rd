@@ -32,7 +32,7 @@ a single cell. Each of the `num_comp` columns represents each cell's embedding
 in the calculated embedding space.
 }
 \description{
-This function is a wrapper around {tidytof}'s tof_reduce_* function family.
+This function is a wrapper around tidytof's tof_reduce_* function family.
 It performs dimensionality reduction on single-cell data using a user-specified method
 (of 3 choices) and each method's corresponding input parameters
 }

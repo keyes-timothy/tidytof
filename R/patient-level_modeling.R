@@ -173,7 +173,7 @@ tof_split_data <-
 #'
 #' This function creates a regular hyperparameter search grid (in the form of a
 #' \code{\link[dplyr]{tibble}}) specifying the search space for the two
-#' hyperparameters of a generalized linear model using the {glmnet} package:
+#' hyperparameters of a generalized linear model using the glmnet package:
 #' the regularization penalty term
 #' and the lasso/ridge regression mixture term.
 #'

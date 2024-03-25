@@ -172,7 +172,7 @@ tof_calculate_flow_rate <-
 #' a tibble including only the computed flags should be returned (FALSE, the default).
 #'
 #' @return A tibble with the same number of rows as `tof_tibble`. If augment = FALSE
-#' (the default), it will have 3 columns: "{time_col}" (the same column as `time_col`),
+#' (the default), it will have 3 columns: "\{time_col\}" (the same column as `time_col`),
 #' "timestep" (the numeric timestep to which each cell was assigned based on its
 #' value for `time_col`), and "flagged_window" (a boolean vector indicating if
 #' each cell was collecting during a timestep flagged for having a high or low
@@ -306,7 +306,7 @@ tof_assess_flow_rate_tibble <-
 #' a tibble including only the computed flags should be returned (FALSE, the default).
 #'
 #' @return A tibble with the same number of rows as `tof_tibble`. If augment = FALSE
-#' (the default), it will have 3 columns: "{time_col}" (the same column as `time_col`),
+#' (the default), it will have 3 columns: "\{time_col\}" (the same column as `time_col`),
 #' "timestep" (the numeric timestep to which each cell was assigned based on its
 #' value for `time_col`), and "flagged_window" (a boolean vector indicating if
 #' each cell was collecting during a timestep flagged for having a high or low
@@ -652,7 +652,7 @@ tof_sum_rescale <- function(vec) {
 #' Two of the columns will be "entropy" (the entropy value for each cell) and "flagged_cell"
 #' (a boolean value indicating if each cell had an entropy value above entropy_threshold).
 #' The other NUM_CLUSTERS columns will contain the mahalanobis distances from each cell
-#' to each of the clusters in cluster_col (named ".mahalanobis_{cluster_name}").
+#' to each of the clusters in cluster_col (named ".mahalanobis_\{cluster_name\}").
 #' If augment = TRUE, the same 2 + NUM_CLUSTERS columns will be column-bound to
 #' tof_tibble, and the resulting tibble will be returned.
 #'

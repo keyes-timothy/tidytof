@@ -18,6 +18,13 @@
 \alias{all_of}
 \title{Objects exported from other packages}
 \keyword{internal}
+\value{
+See documentation in each object's original package.
+}
+\examples{
+# See examples in each object's original package
+NULL
+}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.

@@ -13,3 +13,5 @@
 ^pkgdown$
 ^man/figures/README-*
 ^dev$
+^\.git/
+\.Rproj\.user/

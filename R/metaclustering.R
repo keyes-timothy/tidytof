@@ -690,7 +690,7 @@ tof_metacluster_flowsom <-
 
 #' Metacluster clustered CyTOF data.
 #'
-#' This function is a wrapper around {tidytof}'s tof_metacluster_* function family.
+#' This function is a wrapper around tidytof's tof_metacluster_* function family.
 #' It performs metaclustering on CyTOF data using a user-specified method (of 5 choices)
 #' and each method's corresponding input parameters.
 #'
