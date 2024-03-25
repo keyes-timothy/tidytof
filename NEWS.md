@@ -1,3 +1,20 @@
+# tidytof 0.99.1
+
+NEW FEATURES
+
+* Removed unnecessary files that caused build to fail. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
+BUG FIXES
+
+* None
+
+
+
+
 # tidytof 0.99.0
 
 NEW FEATURES
