@@ -1,7 +1,7 @@
 Type: Package
 Package: tidytof
 Title: Analyze High-dimensional Cytometry Data Using Tidy Data Principles
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: 
     c(person(given = "Timothy",
              family = "Keyes",
@@ -80,7 +80,8 @@ Suggests:
     Seurat,
     SeuratObject,
     embed,
-    rsample
+    rsample,
+    BiocGenerics
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: false

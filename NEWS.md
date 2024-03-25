@@ -1,3 +1,13 @@
+# tidytof 0.99.5
+
+NEW FEATURES
+
+* Update dependencies. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
 # tidytof 0.99.4
 
 NEW FEATURES
@@ -62,3 +72,4 @@ SIGNIFICANT USER-VISIBLE CHANGES
 BUG FIXES
 
 * None
+

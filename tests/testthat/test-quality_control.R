@@ -1,9 +1,7 @@
 # libraries
 library(ggplot2)
 library(dplyr)
-library(forcats)
 library(testthat)
-
 
 # tof_assess_channels() --------------------------------------------------------
 
@@ -273,13 +271,6 @@ sim_data <-
         cluster_id = c(rep("a", 1000), rep("b", 1000), rep("c", 1000))
     )
 
-# sim_data |>
-#   tof_reduce_dimensions(method = "pca") |>
-#   tof_plot_cells_embedding(
-#     embedding_cols = c(.pc1, .pc2),
-#     color_col = cluster_id
-#   )
-
 
 sim_data_healthy <-
     sim_data |>
@@ -311,10 +302,6 @@ entropy_result_augmented <-
         augment = TRUE
     )
 
-# entropy_assessment |>
-#   ggplot(aes(x = entropy, fill = cluster_id)) +
-#   geom_density(alpha = 0.4) +
-#   theme_bw()
 
 test_that("Entropy result has the right rows and columns", {
     # rows
