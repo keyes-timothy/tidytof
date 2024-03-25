@@ -89,7 +89,7 @@
                         <h4 data-toc-skip class="author">Timothy
 Keyes</h4>
             
-            <h4 data-toc-skip class="date">2024-03-12</h4>
+            <h4 data-toc-skip class="date">2024-03-25</h4>
       
       
       <div class="d-none name"><code>preprocessing.Rmd</code></div>
@@ -218,12 +218,12 @@ details).</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cd45</span>, <span class="va">cd34</span>, <span class="va">cd38</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
-<span><span class="co">#&gt;    cd45   cd34   cd38</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  131.  3.21   0.925</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  229. -<span style="color: #BB0000;">0.907</span> 10.8  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  293.  5.05   1.42 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431.  0.235 12.6  </span></span>
+<span><span class="co">#&gt;    cd45    cd34   cd38</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  130.  2.75    0.971</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>  229. -<span style="color: #BB0000;">0.886</span>  10.9  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  292.  5.11    0.938</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  431. -<span style="color: #BB0000;">0.010</span><span style="color: #BB0000; text-decoration: underline;">0</span> 12.9  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -255,23 +255,23 @@ details).</p>
 <span><span class="co">#&gt; [1] dplyr_1.1.4    tidytof_0.99.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] tidyselect_1.2.0    viridisLite_0.4.2   timeDate_4032.109  </span></span>
+<span><span class="co">#&gt;   [1] tidyselect_1.2.1    viridisLite_0.4.2   timeDate_4032.109  </span></span>
 <span><span class="co">#&gt;   [4] farver_2.1.1        viridis_0.6.5       ggraph_2.2.1       </span></span>
 <span><span class="co">#&gt;   [7] fastmap_1.1.1       tweenr_2.0.3        rpart_4.1.23       </span></span>
-<span><span class="co">#&gt;  [10] digest_0.6.34       timechange_0.3.0    lifecycle_1.0.4    </span></span>
-<span><span class="co">#&gt;  [13] yardstick_1.3.0     survival_3.5-8      magrittr_2.0.3     </span></span>
-<span><span class="co">#&gt;  [16] compiler_4.3.3      rlang_1.1.3         sass_0.4.8         </span></span>
-<span><span class="co">#&gt;  [19] tools_4.3.3         igraph_2.0.2        utf8_1.2.4         </span></span>
+<span><span class="co">#&gt;  [10] digest_0.6.35       timechange_0.3.0    lifecycle_1.0.4    </span></span>
+<span><span class="co">#&gt;  [13] yardstick_1.3.1     survival_3.5-8      magrittr_2.0.3     </span></span>
+<span><span class="co">#&gt;  [16] compiler_4.3.3      rlang_1.1.3         sass_0.4.9         </span></span>
+<span><span class="co">#&gt;  [19] tools_4.3.3         igraph_2.0.3        utf8_1.2.4         </span></span>
 <span><span class="co">#&gt;  [22] yaml_2.3.8          data.table_1.15.2   knitr_1.45         </span></span>
 <span><span class="co">#&gt;  [25] graphlayouts_1.1.1  withr_3.0.0         purrr_1.0.2        </span></span>
-<span><span class="co">#&gt;  [28] RProtoBufLib_2.14.0 BiocGenerics_0.48.1 desc_1.4.3         </span></span>
+<span><span class="co">#&gt;  [28] RProtoBufLib_2.14.1 BiocGenerics_0.48.1 desc_1.4.3         </span></span>
 <span><span class="co">#&gt;  [31] nnet_7.3-19         grid_4.3.3          polyclip_1.10-6    </span></span>
 <span><span class="co">#&gt;  [34] stats4_4.3.3        fansi_1.0.6         RcppHNSW_0.6.0     </span></span>
 <span><span class="co">#&gt;  [37] future_1.33.1       colorspace_2.1-0    ggplot2_3.5.0      </span></span>
 <span><span class="co">#&gt;  [40] globals_0.16.3      scales_1.3.0        iterators_1.0.14   </span></span>
 <span><span class="co">#&gt;  [43] MASS_7.3-60.0.1     cli_3.6.2           rmarkdown_2.26     </span></span>
-<span><span class="co">#&gt;  [46] ragg_1.2.7          generics_0.1.3      future.apply_1.11.1</span></span>
-<span><span class="co">#&gt;  [49] tzdb_0.4.0          cachem_1.0.8        flowCore_2.14.1    </span></span>
+<span><span class="co">#&gt;  [46] ragg_1.3.0          generics_0.1.3      future.apply_1.11.1</span></span>
+<span><span class="co">#&gt;  [49] tzdb_0.4.0          cachem_1.0.8        flowCore_2.14.2    </span></span>
 <span><span class="co">#&gt;  [52] ggforce_0.4.2       stringr_1.5.1       splines_4.3.3      </span></span>
 <span><span class="co">#&gt;  [55] parallel_4.3.3      matrixStats_1.2.0   vctrs_0.6.5        </span></span>
 <span><span class="co">#&gt;  [58] hardhat_1.3.1       glmnet_4.1-8        Matrix_1.6-5       </span></span>
@@ -286,7 +286,7 @@ details).</p>
 <span><span class="co">#&gt;  [85] ipred_0.9-14        lava_1.8.0          R6_2.5.1           </span></span>
 <span><span class="co">#&gt;  [88] textshaping_0.3.7   doParallel_1.0.17   tidygraph_1.3.1    </span></span>
 <span><span class="co">#&gt;  [91] evaluate_0.23       Biobase_2.62.0      lattice_0.22-5     </span></span>
-<span><span class="co">#&gt;  [94] readr_2.1.5         memoise_2.0.1       bslib_0.6.1        </span></span>
+<span><span class="co">#&gt;  [94] readr_2.1.5         memoise_2.0.1       bslib_0.6.2        </span></span>
 <span><span class="co">#&gt;  [97] class_7.3-22        Rcpp_1.0.12         prodlim_2023.08.28 </span></span>
 <span><span class="co">#&gt; [100] gridExtra_2.3       xfun_0.42           fs_1.6.3           </span></span>
 <span><span class="co">#&gt; [103] pkgconfig_2.0.3</span></span></code></pre></div>

@@ -163,7 +163,7 @@ where NUM_CLUSTERS is the number of unique clusters in cluster_col.
 Two of the columns will be "entropy" (the entropy value for each cell) and "flagged_cell"
 (a boolean value indicating if each cell had an entropy value above entropy_threshold).
 The other NUM_CLUSTERS columns will contain the mahalanobis distances from each cell
-to each of the clusters in cluster_col (named ".mahalanobis_cluster_name").
+to each of the clusters in cluster_col (named ".mahalanobis_{cluster_name}").
 If augment = TRUE, the same 2 + NUM_CLUSTERS columns will be column-bound to
 tof_tibble, and the resulting tibble will be returned.</p>
     </div>
