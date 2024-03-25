@@ -1,4 +1,18 @@
-# tidytof 0.99.1
+# tidytof 0.99.2
+
+NEW FEATURES
+
+* Update docs. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
+BUG FIXES
+
+* None
+
+# tidytof 0.99.2
 
 NEW FEATURES
 
