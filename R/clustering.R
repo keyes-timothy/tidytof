@@ -319,7 +319,7 @@ tof_cluster_kmeans <-
 #' printed during developmental classification. Default is FALSE.
 #'
 #' @return  If `return_distances = FALSE`, a tibble with one column named
-#' `.{distance_function}_cluster`, a character vector of length `nrow(tof_tibble)`
+#' `.\{distance_function\}_cluster`, a character vector of length `nrow(tof_tibble)`
 #' indicating the id of the developmental cluster to which each cell
 #' (i.e. each row) in `tof_tibble` was assigned.
 #'
@@ -723,7 +723,7 @@ tof_cluster_grouped <-
 #' (as a character vector). If `annotations` was provided as a data.frame, the
 #' new column will have the same name as the column containing the cluster annotations
 #' in `annotations`. If `annotations` was provided as a named character vector,
-#' the new column will be named `{cluster_col}_annotation`.
+#' the new column will be named `\{cluster_col\}_annotation`.
 #'
 #' @export
 #'

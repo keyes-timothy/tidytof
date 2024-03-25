@@ -30,7 +30,7 @@ additional column containing the manual cluster annotations for each cell
 (as a character vector). If `annotations` was provided as a data.frame, the
 new column will have the same name as the column containing the cluster annotations
 in `annotations`. If `annotations` was provided as a named character vector,
-the new column will be named `{cluster_col}_annotation`.
+the new column will be named `\{cluster_col\}_annotation`.
 }
 \description{
 This function adds an additional column to a `tibble` or `tof_tbl` to allow

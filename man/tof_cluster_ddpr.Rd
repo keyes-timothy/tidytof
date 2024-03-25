@@ -55,7 +55,7 @@ printed during developmental classification. Default is FALSE.}
 }
 \value{
 If `return_distances = FALSE`, a tibble with one column named
-`.{distance_function}_cluster`, a character vector of length `nrow(tof_tibble)`
+`.\{distance_function\}_cluster`, a character vector of length `nrow(tof_tibble)`
 indicating the id of the developmental cluster to which each cell
 (i.e. each row) in `tof_tibble` was assigned.
 
