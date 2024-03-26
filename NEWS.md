@@ -1,3 +1,14 @@
+# tidytof 0.99.6
+
+NEW FEATURES
+
+* Update tests. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
+
 # tidytof 0.99.5
 
 NEW FEATURES
