@@ -1,3 +1,14 @@
+# tidytof 0.99.7
+
+NEW FEATURES
+
+* Expand introductory vignette to include more details about how to explore the tidytof package as a beginner.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
+
 # tidytof 0.99.6
 
 NEW FEATURES
