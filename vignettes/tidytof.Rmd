@@ -1,5 +1,5 @@
 ---
-title: "Getting started with tidytof"
+title: "GETTING STARTED with tidytof"
 author: "Timothy Keyes"
 date: "`r Sys.Date()`"
 output: 
@@ -29,7 +29,7 @@ library(tidytof)
 
 Analyzing single-cell data can be surprisingly complicated. This is partially because single-cell data analysis is an incredibly active area of research, with new methods being published on a weekly - or even daily! - basis. Accordingly, when new tools are published, they often require researchers to learn unique, method-specific application programming interfaces (APIs) with distinct requirements for input data formatting, function syntax, and output data structure. On the other hand, analyzing single-cell data can be challenging because it often involves simultaneously asking questions at multiple levels of biological scope - the single-cell level, the cell subpopulation (i.e. cluster) level, and the whole-sample or whole-patient level - each of which has distinct data processing needs.
 
-To address both of these challenges for high-dimensional cytometry, `{tidytof}` implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing high-dimensional cytometry data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to high-dimensional cytometry datasets.
+To address both of these challenges for high-dimensional cytometry, `{tidytof}` ("tidy" as in ["tidy data"](https://r4ds.had.co.nz/tidy-data.html); "tof" as in ["CyTOF"](https://onlinelibrary.wiley.com/doi/10.1002/cyto.a.23621), a flagship high-dimensional cytometry technology) implements a concise, integrated "grammar" of single-cell data analysis capable of answering a variety of biological questions. Available as an open-source R package, `{tidytof}` provides an easy-to-use pipeline for analyzing high-dimensional cytometry data by automating many common data-processing tasks under a common ["tidy data"](https://r4ds.had.co.nz/tidy-data.html) interface. This vignette introduces you to the tidytof's high-level API and shows quick examples of how they can be applied to high-dimensional cytometry datasets.
 
 ## Prerequisites
 
@@ -167,6 +167,23 @@ First, it means that `{tidytof}` was designed with a few quality-of-life feature
 Second, it means that `{tidytof}` functions *should* be relatively intuitive to use due to their shared logic - in other words, if you understand how to use one `{tidytof}` function, you should understand how to use most of the others. An example of shared logic across `{tidytof}` functions is the argument `group_cols`, which shows up in multiple verbs (`tof_downsample`, `tof_cluster`, `tof_daa`, `tof_dea`, `tof_extract_features`, and `tof_write_data`). In each case, `group_cols` works the same way: it accepts an unquoted vector of column names (specified manually or using [tidyselection](https://r4ds.had.co.nz/transform.html#select)) that should be used to group cells before an operation is performed. This idea generalizes throughout `{tidytof}`: if you see an argument in one place, it will behave identically (or at least very similarly) wherever else you encounter it.
 
 Finally, it means that `{tidytof}` is optimized first for ease-of-use, then for performance. Because humans and computers interact with data differently, there is always a trade-off between choosing a data representation that is intuitive to a human user vs. choosing a data representation optimized for computational speed and memory efficiency. When these design choices conflict with one another, our team tends to err on the side of choosing a representation that is easy-to-understand for users even at the expense of small performance costs. Ultimately, this means that `{tidytof}` may not be the optimal tool for every high-dimensional cytometry analysis, though hopefully its general framework will provide most users with some useful functionality.
+
+
+# Where to go next
+
+`{tidytof}` includes multiple vignettes that cover different components of the prototypical high-dimensional cytometry data analysis pipeline. To learn the basics, we recommend visiting the vignettes in the following order to start with smalle (cell-level) operations and work your way up to larger (cluster- and sample-level) operations: 
+
+* Reading and writing data
+* Preprocessing
+* Quality control
+* Downsampling
+* Dimensionality reduction
+* Clustering and metaclustering
+* Differential discovery analysis
+* Feature extraction 
+* Modeling
+
+You can also read the academic papers describing [`{tidytof}`](https://academic.oup.com/bioinformaticsadvances/article/3/1/vbad071/7192984) and/or the larger [`tidyomics` initiative](https://www.biorxiv.org/content/10.1101/2023.09.10.557072v2) of which `{tidytof}` is a part. You can also visit the `{tidytof}` [website](https://keyes-timothy.github.io/tidytof/). 
 
 
 # Session info
