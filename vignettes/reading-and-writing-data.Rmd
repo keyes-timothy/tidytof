@@ -18,7 +18,11 @@ knitr::opts_chunk$set(
     comment = "#>"
 )
 
-options(tibble.print_min = 4L, tibble.print_max = 4L)
+options(
+  tibble.print_min = 4L, 
+  tibble.print_max = 4L, 
+  rmarkdown.html_vignette.check_title = FALSE
+)
 ```
 
 ```{r setup, message = FALSE}
