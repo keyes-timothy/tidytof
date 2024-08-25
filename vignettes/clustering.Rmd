@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to identify clusters of cells with shared
   phenotypic characteristics using {tidytof}.
 vignette: >
-  %\VignetteIndexEntry{Clustering and metaclustering}
+  %\VignetteIndexEntry{07. Clustering and metaclustering}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

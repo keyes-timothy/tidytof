@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to perform basic quality control analyses on 
   high-dimensional cytometry data with {tidytof}. 
 vignette: >
-  %\VignetteIndexEntry{Quality control}
+  %\VignetteIndexEntry{03. Quality control}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

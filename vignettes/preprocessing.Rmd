@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to clean and preprocess CyTOF data using 
   {tidytof}.
 vignette: >
-  %\VignetteIndexEntry{Preprocessing}
+  %\VignetteIndexEntry{04. Preprocessing}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,3 +1,13 @@
+# tidytof 0.99.8
+
+NEW FEATURES
+
+* Vignette bug fixes. 
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* None
+
 # tidytof 0.99.7
 
 NEW FEATURES

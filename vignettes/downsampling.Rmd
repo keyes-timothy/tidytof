@@ -8,7 +8,7 @@ description: >
   dataset to a smaller 
   number of cells using {tidytof}.
 vignette: >
-  %\VignetteIndexEntry{Downsampling}
+  %\VignetteIndexEntry{05. Downsampling}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

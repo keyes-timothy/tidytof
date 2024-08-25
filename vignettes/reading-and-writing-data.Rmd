@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to read data from FCS and CSV files
   on disk and how to write data to FCS and CSV files on disk. 
 vignette: >
-  %\VignetteIndexEntry{Reading and writing data}
+  %\VignetteIndexEntry{02. Reading and writing data}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

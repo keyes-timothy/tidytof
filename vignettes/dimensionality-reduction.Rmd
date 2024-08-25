@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how visualize single-cell phenotypes in 
   low-dimensional space using dimensionality reduction algorithms (PCA, UMAP, tSNE)
 vignette: >
-  %\VignetteIndexEntry{Dimensionality reduction}
+  %\VignetteIndexEntry{06. Dimensionality reduction}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

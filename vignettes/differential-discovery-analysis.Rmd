@@ -8,7 +8,7 @@ description: >
   expression across experimental/clinical variables using various statistical
   tools.
 vignette: >
-  %\VignetteIndexEntry{Differential discovery analysis}
+  %\VignetteIndexEntry{08. Differential discovery analysis}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---

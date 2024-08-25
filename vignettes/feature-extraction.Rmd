@@ -7,7 +7,7 @@ description: >
   Read this vignette to learn how to compute summary statistics like cluster 
   abundance and cluster marker expression using {tidytof} 
 vignette: >
-  %\VignetteIndexEntry{Feature extraction}
+  %\VignetteIndexEntry{09. Feature extraction}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
